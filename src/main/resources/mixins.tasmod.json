@@ -1,0 +1,24 @@
+{
+    "required": true,
+    "minVersion": "0.7.10",
+    "package": "de.scribble.lp.tasmod.mixin",
+    "refmap": "mixins.tasmod.refmap.json",
+    "compatibilityLevel": "JAVA_8",
+    "mixins": [
+        "MixinMinecraftServer"
+    ],
+    "client": [
+        "MixinMinecraft",
+        "MixinEntityRenderer",
+		"MixinGameSettings",
+		"MixinGuiContainer",
+		"MixinGuiScreen",
+		"MixinGuiClickableScrolledSelectionListProxy",
+		"MixinGuiSlot",
+		"MixinGuiContainerCreative",
+		"MixinGuiChat",
+		"MixinGuiScreenAdvancements",
+		"MixinGuiScreen",
+		"MixinKeyBinding"
+	]
+}
