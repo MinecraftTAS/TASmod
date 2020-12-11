@@ -1,7 +1,7 @@
-﻿# TASmod
-Let's you record and play back tickperfect inputs.
+﻿# TASmod  
+Let's you record and play back tickperfect inputs.  
   ## Credits  
-  tr7zw: Author of the original mod
+  tr7zw: Author of the original mod  
   ScribbleLP: Author
     
   Contibutions by: Famous1622  
@@ -13,5 +13,5 @@ Let's you record and play back tickperfect inputs.
   `/play <filename>` Starts to  play back a file  
   
 ## Development
-To load mixins in eclipse use`--mixin mixins.tasmod.json --tweakClass org.spongepowered.asm.launch.MixinTweaker` in program arguments  
+To load mixins in eclipse use `--mixin mixins.tasmod.json --tweakClass org.spongepowered.asm.launch.MixinTweaker` in program arguments  
 
