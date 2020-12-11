@@ -35,7 +35,7 @@ public class InfoGui extends Gui{
                 
                 new Gui().drawString(mc.fontRenderer, "S: "+TickSync.getServertickcounter(), 22, 60, 0xFFFFFF); //Current Pointer location
                 new Gui().drawString(mc.fontRenderer, "C: "+TickSync.getClienttickcounter(), 22, 70, 0xFFFFFF); //Current Pointer location
-                new Gui().drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width/2, 270, 0xFF8400); //Current Pointer location
+                new Gui().drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width/2, height-50, 0xFF8400); //Current Pointer location
 //            }
 //            if (Strokesenabled) {
 //                drawKeyStrokes(height, width);
