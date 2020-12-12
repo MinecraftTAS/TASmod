@@ -1,13 +1,7 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
-import javax.annotation.Nullable;
-
-import org.lwjgl.input.Keyboard;
-
 import de.scribble.lp.tasmod.CommonProxy;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Timer;
 
 public class TickrateChangerServer {
 	public static float TICKS_PER_SECOND=20F;

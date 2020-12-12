@@ -4,7 +4,6 @@ import org.lwjgl.input.Keyboard;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Timer;
 
 public class TickrateChangerClient {
 	public static float TICKS_PER_SECOND=20f;
