@@ -4,9 +4,6 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.IntHashMap;
-
 /**
  * Class to store which keys on the keyboard have been pressed, similar to how Keybindings work.<br>
  * Also stores the keynames and it's keycodes.
