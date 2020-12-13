@@ -1,8 +1,8 @@
 ﻿# TASmod  
 Let's you record and play back tickperfect inputs.  
   ## Credits  
-  tr7zw: Author of the original mod  
-  ScribbleLP: Author
+  Author of the original mod: tr7zw  
+  Author: ScribbleLP  
     
   Contibutions by: Famous1622  
     
