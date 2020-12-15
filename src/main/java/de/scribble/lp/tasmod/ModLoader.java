@@ -3,7 +3,6 @@ package de.scribble.lp.tasmod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.scribble.lp.tasmod.custom.CustomEntityRenderer;
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
@@ -37,8 +36,6 @@ public class ModLoader {
 	private MinecraftServer serverInstance;
 	
 	public static final Logger logger= LogManager.getFormatterLogger("TASMod");
-	
-	public CustomEntityRenderer centityRenderer=new CustomEntityRenderer();
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent ev) {
