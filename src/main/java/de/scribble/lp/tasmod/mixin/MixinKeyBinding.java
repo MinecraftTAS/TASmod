@@ -10,7 +10,7 @@ import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 
 @Mixin(KeyBinding.class)
 public class MixinKeyBinding {
-	@Redirect(method = "updateKeyBindState", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z"),remap=false)
+	@Redirect(method = "updateKeyBindState", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z"))
 	public boolean redirectIsKeyDown(int i) {
 		return VirtualMouseAndKeyboard.isKeyDown(i);
 	}
