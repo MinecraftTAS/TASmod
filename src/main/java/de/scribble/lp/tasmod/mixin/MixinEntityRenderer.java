@@ -196,27 +196,30 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
                 {
                     CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering screen");
                     CrashReportCategory crashreportcategory = crashreport.makeCategory("Screen render details");
-                    crashreportcategory.addDetail("Screen name", new ICrashReportDetail<String>()
-                    {
-                        public String call() throws Exception
-                        {
-                            return Minecraft.getMinecraft().currentScreen.getClass().getCanonicalName();
-                        }
-                    });
-                    crashreportcategory.addDetail("Mouse location", new ICrashReportDetail<String>()
-                    {
-                        public String call() throws Exception
-                        {
-                            return String.format("Scaled: (%d, %d). Absolute: (%d, %d)", k1, l1, Mouse.getX(), Mouse.getY());
-                        }
-                    });
-                    crashreportcategory.addDetail("Screen size", new ICrashReportDetail<String>()
-                    {
-                        public String call() throws Exception
-                        {
-                            return String.format("Scaled: (%d, %d). Absolute: (%d, %d). Scale factor of %d", scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight, scaledresolution.getScaleFactor());
-                        }
-                    });
+//                    crashreportcategory.addDetail("Screen name", new ICrashReportDetail<String>()
+//                    {
+//                        public String call() throws Exception
+//                        {
+//                            return Minecraft.getMinecraft().currentScreen.getClass().getCanonicalName();
+//                        }
+//                    });
+                    Minecraft.LOGGER.fatal(Minecraft.getMinecraft().currentScreen.getClass().getCanonicalName());
+//                    crashreportcategory.addDetail("Mouse location", new ICrashReportDetail<String>()
+//                    {
+//                        public String call() throws Exception
+//                        {
+//                            return String.format("Scaled: (%d, %d). Absolute: (%d, %d)", k1, l1, Mouse.getX(), Mouse.getY());
+//                        }
+//                    });
+                    Minecraft.LOGGER.fatal(Minecraft.getMinecraft().currentScreen.getClass().getCanonicalName());
+//                    crashreportcategory.addDetail("Screen size", new ICrashReportDetail<String>()
+//                    {
+//                        public String call() throws Exception
+//                        {
+//                            return String.format("Scaled: (%d, %d). Absolute: (%d, %d). Scale factor of %d", scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight, scaledresolution.getScaleFactor());
+//                        }
+//                    });
+                    Minecraft.LOGGER.fatal(Minecraft.getMinecraft().currentScreen.getClass().getCanonicalName());
                     throw new ReportedException(crashreport);
                 }
             }

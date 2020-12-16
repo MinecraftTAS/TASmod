@@ -30,9 +30,9 @@ public abstract class MixinGuiScreen{
 	private int eventButton;
 	@Shadow
 	private long lastMouseEvent;
-	@Shadow
+	@Shadow(remap = false)
 	private boolean keyHandled;
-	@Shadow
+	@Shadow(remap = false)
 	private boolean mouseHandled;
 	@Inject(method = "handleInput", at = @At(value = "HEAD"),cancellable = true)
 	public void redirectHandleInput(CallbackInfo ci) throws IOException {
