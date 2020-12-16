@@ -8,6 +8,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
+import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
@@ -59,6 +61,10 @@ public class InputRecorder {
 //			Minecraft.getMinecraft().randommanager.setEntityRandomnessAll(0);
 //			RandomLogger.startRandomLogging();
 //			new SavestateHandlerClient().saveState();
+			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();
+			if(tutorial.istutorial&&tutorial.getState()==3) {
+				tutorial.advanceState();
+			}
 		}else {
 			logger.error("There is already a recording running!");
 		}
@@ -195,6 +201,10 @@ public class InputRecorder {
 			recording=false;
 			Thread t = new Thread(new FileWriterThread(output, fileLocation, logger), "FileWriterThreadTicks");
 			t.start();
+			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();
+			if(tutorial.istutorial&&tutorial.getState()==4) {
+				tutorial.advanceState();
+			}
 //			Thread t2 = new Thread(new FileWriterThread(outputSubtick, fileLocationSubTick, logger), "FileWriterThreadSubtick");
 //			t2.start();
 //			RandomLogger.stopRandomLogging();
