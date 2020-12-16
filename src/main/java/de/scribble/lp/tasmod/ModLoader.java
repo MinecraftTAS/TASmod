@@ -7,6 +7,7 @@ import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.ticksync.CommandTickSync;
+import de.scribble.lp.tasmod.tutorial.CommandPlaybacktutorial;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -60,6 +61,7 @@ public class ModLoader {
 		ev.registerServerCommand(new CommandTickSync());
 		ev.registerServerCommand(new CommandRecord());
 		ev.registerServerCommand(new CommandPlay());
+		ev.registerServerCommand(new CommandPlaybacktutorial());
 	}
 	public static ModLoader getInstance() {
 		return instance;
