@@ -475,13 +475,14 @@ public abstract class MixinMinecraft {
             {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Updating screen events");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Affected screen");
-                crashreportcategory.addDetail("Screen name", new ICrashReportDetail<String>()
-                {
-                    public String call() throws Exception
-                    {
-                        return Minecraft.getMinecraft().currentScreen.getClass().getCanonicalName();
-                    }
-                });
+//                crashreportcategory.addDetail("Screen name", new ICrashReportDetail<String>()
+//                {
+//                    public String call() throws Exception
+//                    {
+//                        return Minecraft.getMinecraft().currentScreen.getClass().getCanonicalName();
+//                    }
+//                });
+                Minecraft.LOGGER.fatal(this.currentScreen.getClass().getCanonicalName());
                 throw new ReportedException(crashreport);
             }
 
@@ -495,13 +496,14 @@ public abstract class MixinMinecraft {
                 {
                     CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Ticking screen");
                     CrashReportCategory crashreportcategory1 = crashreport1.makeCategory("Affected screen");
-                    crashreportcategory1.addDetail("Screen name", new ICrashReportDetail<String>()
-                    {
-                        public String call() throws Exception
-                        {
-                            return Minecraft.getMinecraft().currentScreen.getClass().getCanonicalName();
-                        }
-                    });
+//                    crashreportcategory1.addDetail("Screen name", new ICrashReportDetail<String>()
+//                    {
+//                        public String call() throws Exception
+//                        {
+//                            return Minecraft.getMinecraft().currentScreen.getClass().getCanonicalName();
+//                        }
+//                    });
+                    Minecraft.LOGGER.fatal(this.currentScreen.getClass().getCanonicalName());
                     throw new ReportedException(crashreport1);
                 }
             }
