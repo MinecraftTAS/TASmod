@@ -9,7 +9,7 @@ import net.minecraft.client.gui.advancements.GuiScreenAdvancements;
 
 @Mixin(GuiScreenAdvancements.class)
 public class MixinGuiScreenAdvancements {
-	@Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;isButtonDown(I)Z"))
+	@Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;isButtonDown(I)Z", remap = false))
 	public boolean redirectIsButtonDown() {
 		return VirtualMouseAndKeyboard.isKeyDown(-100);
 	}

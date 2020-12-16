@@ -13,13 +13,11 @@ public class CommandTickSync extends CommandBase{
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "ticksync";
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		// TODO Auto-generated method stub
 		return "/ticksync [reset]";
 	}
 

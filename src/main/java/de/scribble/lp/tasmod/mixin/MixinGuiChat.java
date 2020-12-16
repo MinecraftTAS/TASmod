@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiChat;
 
 @Mixin(GuiChat.class)
 public class MixinGuiChat {
-	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE",target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I"))
+	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE",target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I", remap = false))
 	public int redirectHandleMouseInput4() {
 		return VirtualMouseAndKeyboard.getEventDWheel();
 	}
