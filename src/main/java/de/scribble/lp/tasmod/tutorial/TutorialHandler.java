@@ -12,6 +12,12 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+/**
+ * Renders an interactive tutorial to the game overlay.
+ * 
+ * @author ScribbleLP
+ *
+ */
 public class TutorialHandler {
 
 	public static boolean istutorial;
@@ -25,16 +31,23 @@ public class TutorialHandler {
 	
 	public TutorialHandler() {
 	}
+	
 	public TutorialHandler(int state) {
 		this.state=state;
 	}
+	
 	public void setState(int state) {
 		cooldown=cooldowntime;
 		this.state = state;
 	}
+	
 	public int getState() {
 		return state;
 	}
+	/**
+	 * Get the current text depending on the state
+	 * @return String[]
+	 */
 	public String[] getTutorialText() {
 		String[] textout;
         switch (state) {
@@ -80,6 +93,9 @@ public class TutorialHandler {
 		}
         return textout;
 	}
+	/**
+	 * Checks for an action that advances or closes the tutorial
+	 */
 	private void checkForKeys() {
 		switch (state) {
 		case 0:
@@ -90,7 +106,7 @@ public class TutorialHandler {
 		case 8:
 		case 11:
 		
-			if(Keyboard.isKeyDown(Keyboard.KEY_RETURN)&&cooldown==0) {
+			if(Keyboard.isKeyDown(Keyboard.KEY_RETURN)&&cooldown==0) {	//Checking for presses on the physical keyboard, since tickrate 0 is a thing
 				advanceState();
 			}
 			break;
@@ -113,11 +129,19 @@ public class TutorialHandler {
 			break;
 		}
 	}
+	/**
+	 * Advances the tutorial state and adds cooldown
+	 */
 	public void advanceState() {
 		cooldown=cooldowntime;
 		state++;
 	}
 	Minecraft mc= Minecraft.getMinecraft();
+	
+	/**
+	 * Main rendering event. This is needed so it can function in tickrate 0
+	 * @param event
+	 */
     @SubscribeEvent
     public void drawStuff(RenderGameOverlayEvent.Post event) {
 		if (istutorial) {
@@ -129,17 +153,20 @@ public class TutorialHandler {
 			int width = scaled.getScaledWidth();
 			int height = scaled.getScaledHeight();
 			String[] text = getTutorialText();
-			for (int i = 0; i < text.length; i++) {
+			
+			
+			for (int i = 0; i < text.length; i++) { //For every new element in the string array, a new line is created.
 				String tex = text[i];
 				new Gui().drawString(mc.fontRenderer, tex, width - mc.fontRenderer.getStringWidth(tex) - 10,
-						10 + 10 * i, 0xFFFFFF);
+						10 + 10 * i, 0xFFFFFF); //Drawing the text on the screen
 			}
 
 			if (cooldown != 0) {
-				cooldown--;
+				cooldown--;		//Decreasing the cooldown of the button cooldown until it reaches 0
 			}
     	}
     }
+    //Every String in one place... maybe later with translations
 	private final String[] text1={"1. Hi, welcome to this InTeRaCtIvE tutorial on how to use this mod.",
 			"",
 			"If you have already enough of this text,",
