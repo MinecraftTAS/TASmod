@@ -10,6 +10,7 @@ import org.lwjgl.input.Keyboard;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.util.PointerNormalizer;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
@@ -105,7 +106,7 @@ public class InputRecorder {
 					ending="";
 				}
 				VirtualKeyboardEvent event=keyboardEventList.get(i);
-				if(event.getKeyCode()==67) {
+				if(event.getKeyCode()==67) {		//Removing F9 from the recorded inputs
 					continue;
 				}
 				keyboardString=keyboardString.concat(VirtualMouseAndKeyboard.getNameFromKeyCode(event.getKeyCode())+ending);	//Add everything into a string
@@ -135,8 +136,10 @@ public class InputRecorder {
 				}else {
 					scrollString=scrollString.concat(event.getScrollwheel()+ending);
 				}
-				mouseXString=mouseXString.concat(event.getMouseX()+ending);
-				mouseYString=mouseYString.concat(event.getMouseY()+ending);
+				double normalizedX=PointerNormalizer.getNormalizedX(event.getMouseX());
+				double normalizedY=PointerNormalizer.getNormalizedY(event.getMouseY());
+				mouseXString=mouseXString.concat(normalizedX+ending);
+				mouseYString=mouseYString.concat(normalizedY+ending);
 				slotString=slotString.concat(event.getSlotidx()+ending);
 			}
 			

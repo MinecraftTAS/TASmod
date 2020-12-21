@@ -1,8 +1,12 @@
 package de.scribble.lp.tasmod;
 
+import org.lwjgl.input.Keyboard;
+
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -12,6 +16,8 @@ public class ClientProxy extends CommonProxy{
 	public static Configuration config;
 	
 	static TutorialHandler playbackTutorial;
+	
+	static final KeyBinding CalibrateKey=new KeyBinding("Calibrates the window position of mc", Keyboard.KEY_V, "TASmod");
 	
 	public void preInit(FMLPreInitializationEvent ev) {
 		config = new Configuration(ev.getSuggestedConfigurationFile());
@@ -23,6 +29,7 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		
+		ClientRegistry.registerKeyBinding(CalibrateKey);
 		super.init(ev);
 	}
 	public void postInit(FMLPostInitializationEvent ev) {
@@ -30,5 +37,8 @@ public class ClientProxy extends CommonProxy{
 	}
 	public static TutorialHandler getPlaybackTutorial() {
 		return playbackTutorial;
+	}
+	public static KeyBinding getCalibratekey() {
+		return CalibrateKey;
 	}
 }
