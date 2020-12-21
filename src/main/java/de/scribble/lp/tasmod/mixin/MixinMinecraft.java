@@ -13,15 +13,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.ModLoader;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.gui.GuiMultiplayerTimeOut;
+import de.scribble.lp.tasmod.gui.GuiMultiplayerWarn;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
-import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;
@@ -52,6 +51,7 @@ import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.crash.ICrashReportDetail;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.profiler.Profiler;
@@ -211,13 +211,12 @@ public abstract class MixinMinecraft {
         long l = System.nanoTime();
         this.mcProfiler.startSection("tick");
         //TASmod
-//        if(TickrateChangerClient.cooldownKeyPause>0) {
-//        	TickrateChangerClient.cooldownKeyPause--;
-//        }
-//        if(TickrateChangerClient.cooldownKeyAdvance>0) {
-//        	TickrateChangerClient.cooldownKeyAdvance--;
-//        }
-        VirtualKeybindings.increaseCooldowntimer();
+        if(TickrateChangerClient.cooldownKeyPause>0) {
+        	TickrateChangerClient.cooldownKeyPause--;
+        }
+        if(TickrateChangerClient.cooldownKeyAdvance>0) {
+        	TickrateChangerClient.cooldownKeyAdvance--;
+        }
         TickrateChangerClient.INSTANCE.bypass();
         for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
         {
@@ -229,9 +228,7 @@ public abstract class MixinMinecraft {
 					}
 					this.runTick();
 				}else if(TickSync.getClienttickcounter()>TickSync.getServertickcounter()) {	//If it's too fast
-					if(!ClientProxy.isDevEnvironment) { //For the Dev environment to stop a disconnect when debugging on the server side
-						softLockTimer++;
-					}
+					//softLockTimer++;
 					if(softLockTimer==100) {
 						this.world.sendQuittingDisconnectingPacket();
 						this.loadWorld((WorldClient)null);
@@ -760,7 +757,6 @@ public abstract class MixinMinecraft {
 			if (net.minecraftforge.client.ForgeHooksClient.postMouseEvent()) continue; //Might have to disable this one
 			
 			int i = VirtualMouseAndKeyboard.getEventMouseButton() + 100;
-			VirtualMouseAndKeyboard.runThroughKeyboard(i-100, VirtualMouseAndKeyboard.getEventMouseButtonState());
 			KeyBinding.setKeyBindState(i - 100, VirtualMouseAndKeyboard.getEventMouseButtonState());
 
 			if (VirtualMouseAndKeyboard.getEventMouseButtonState()) {

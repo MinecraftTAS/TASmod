@@ -1,11 +1,12 @@
 package de.scribble.lp.tasmod;
 
-import org.lwjgl.input.Mouse;
+import java.awt.MouseInfo;
+import java.awt.Toolkit;
+
 import org.lwjgl.opengl.Display;
 
 import de.scribble.lp.tasmod.ticksync.TickSync;
-import de.scribble.lp.tasmod.virtual.VirtualKeys;
-import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
+import de.scribble.lp.tasmod.util.PointerNormalizer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -30,30 +31,19 @@ public class InfoGui extends Gui{
         int height = scaled.getScaledHeight();
         if (!(mc.gameSettings.showDebugInfo)) {
 //            if (Infoenabled) {
-                //new Gui().drawCenteredString(mc.fontRenderer, (mc.player.posX - 0.5) + " " + Math.round((mc.player.posY)) + " " + (mc.player.posZ - 0.5), 130, 10, 0xFFFFFF);    //Coordinates
-        		
-        		// moved coordinates out of Tick Based Stuff
-        	
-        		new Gui().drawString(mc.fontRenderer, "Pitch: " + mc.player.rotationPitch, 16, 60, 0xFFFFFF);                //Show the current Pitch
-                new Gui().drawString(mc.fontRenderer, "Yaw: " + mc.player.rotationYaw, 16, 70, 0xFFFFFF);        //Show the current Yaw (This comes from the modversion for 1.7.10 since 1.7 has just SOUTH as a yaw in F3)
+                new Gui().drawCenteredString(mc.fontRenderer, (mc.player.posX - 0.5) + " " + Math.round((mc.player.posY)) + " " + (mc.player.posZ - 0.5), 130, 10, 0xFFFFFF);    //Coordinates
+                new Gui().drawString(mc.fontRenderer, "Pitch: " + mc.player.rotationPitch, 16, 20, 0xFFFFFF);                //Show the current Pitch
+                new Gui().drawString(mc.fontRenderer, "Yaw: " + mc.player.rotationYaw, 22, 30, 0xFFFFFF);        //Show the current Yaw (This comes from the modversion for 1.7.10 since 1.7 has just SOUTH as a yaw in F3)
 
-                new Gui().drawString(mc.fontRenderer, "Mouse " + Mouse.getEventX() + " " + Mouse.getEventY(), 16, 80, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, MouseInfo.getPointerInfo().getLocation().x + " " + MouseInfo.getPointerInfo().getLocation().y, 22, 40, 0xFFFFFF); //Current Pointer location
+                double x=PointerNormalizer.getNormalizedX(MouseInfo.getPointerInfo().getLocation().x);
+                double y=PointerNormalizer.getNormalizedY(MouseInfo.getPointerInfo().getLocation().y);
+                new Gui().drawString(mc.fontRenderer, x + " " + y, 22, 50, 0xFFFFFF); //Current Pointer location
                 
-                new Gui().drawString(mc.fontRenderer, "Server Ticks: "+TickSync.getServertickcounter(), 16, 100, 0xFFFFFF); //Current Pointer location
-                new Gui().drawString(mc.fontRenderer, "Client Ticks: "+TickSync.getClienttickcounter(), 16, 110, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, mc.displayWidth+" "+Display.getX(), 22, 60, 0xFFFFFF); //Current Pointer location
                 
-                if(Display.isActive()) {
-                	String out1="";
-	                for(String mouse : VirtualMouseAndKeyboard.getCurrentMousePresses()) {
-	                	out1=out1.concat(mouse+" ");
-	                }
-	                new Gui().drawString(mc.fontRenderer, out1, 5, height-20, 0xFFFFFF); //Current Pointer location
-	                String out2="";
-	                for(String key : VirtualMouseAndKeyboard.getCurrentKeyboardPresses()) {
-	                	out2=out2.concat(key+" ");
-	                }
-	                new Gui().drawString(mc.fontRenderer, out2, 5, height-10, 0xFFFFFF); //Current Pointer location
-                }
+                new Gui().drawString(mc.fontRenderer, "S: "+TickSync.getServertickcounter(), 22, 70, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, "C: "+TickSync.getClienttickcounter(), 22, 80, 0xFFFFFF); //Current Pointer location
                 new Gui().drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width/2, height-50, 0xFF8400); //Current Pointer location
                 
 //            }
