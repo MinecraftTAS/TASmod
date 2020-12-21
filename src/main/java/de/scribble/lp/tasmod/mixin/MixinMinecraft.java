@@ -15,6 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.ModLoader;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
+import de.scribble.lp.tasmod.gui.GuiMultiplayerTimeOut;
+import de.scribble.lp.tasmod.gui.GuiMultiplayerWarn;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -178,6 +180,8 @@ public abstract class MixinMinecraft {
 	protected abstract int getLimitFramerate();
     @Shadow
 	protected abstract boolean isFramerateLimitBelowMax();
+    
+    public int softLockTimer;
 	/**
 	 * Rewrites 
 	 * 
@@ -224,6 +228,12 @@ public abstract class MixinMinecraft {
 					}
 					this.runTick();
 				}else if(TickSync.getClienttickcounter()>TickSync.getServertickcounter()) {	//If it's too fast
+					softLockTimer++;
+					if(softLockTimer==100) {
+						this.world.sendQuittingDisconnectingPacket();
+						this.loadWorld((WorldClient)null);
+						this.displayGuiScreen(new GuiMultiplayerTimeOut());
+					}
 					continue;
 				}else if(TickSync.getClienttickcounter()<TickSync.getServertickcounter()) {
 					for(int h=0;h<TickSync.getServertickcounter()-TickSync.getClienttickcounter();h++) {	//If it's too slow
@@ -235,12 +245,6 @@ public abstract class MixinMinecraft {
 					}
 				}
 			}else if(Minecraft.getMinecraft().world==null) {
-				if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
-					((SubtickDuck)this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
-				}
-				this.runTick();
-			}else { //If Ticksync is disabled
-				TickSync.incrementClienttickcounter();
 				if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
 					((SubtickDuck)this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 				}
@@ -352,6 +356,8 @@ public abstract class MixinMinecraft {
         this.mcProfiler.endSection();
         ci.cancel();
     }
+    @Shadow
+    protected abstract void loadWorld(WorldClient worldClient);
 //	@Inject(method="runGameLoop",at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;startSection(S)V", shift = At.Shift.AFTER, remap = false, ordinal = 2))
 //	public void injectTick(CallbackInfo ci) {
 //		if(TickrateChangerClient.cooldownKeyPause>0) {
@@ -412,6 +418,7 @@ public abstract class MixinMinecraft {
 	
 	@Inject(method="runTick", at=@At(value="HEAD"), cancellable = true)
 	public void injectRunTick(CallbackInfo ci) throws IOException {
+		softLockTimer=0;
 		if (this.rightClickDelayTimer > 0)
         {
             --this.rightClickDelayTimer;

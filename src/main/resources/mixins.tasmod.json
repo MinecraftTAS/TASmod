@@ -19,6 +19,7 @@
 		"MixinGuiChat",
 		"MixinGuiScreenAdvancements",
 		"MixinGuiScreen",
-		"MixinKeyBinding"
+		"MixinKeyBinding",
+		"MixinGuiMainMenu"
 	]
 }
