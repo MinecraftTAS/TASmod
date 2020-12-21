@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.util.PointerNormalizer;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
@@ -395,7 +396,8 @@ public class InputPlayback {
 			String[] keys = xpart[0].split(",");
 			for (int i = 0; i < keys.length; i++) {
 				//System.out.println(linecounter+" "+keys[i]); //TODO
-				out.add(getNumber("MouseX", keys[i], linecounter, i));
+				double pointer=getDouble("MouseX", keys[i], linecounter, i);
+				out.add(PointerNormalizer.getCoordsX(pointer));
 			}
 		}
 		return out;
@@ -411,7 +413,8 @@ public class InputPlayback {
 			String[] keys = ypart[1].split(",");
 			for (int i = 0; i < keys.length; i++) {
 				//System.out.println(linecounter+" "+keys[i]); //TODO
-				out.add(getNumber("MouseY", keys[i], linecounter, i));
+				double pointer=getDouble("MouseY", keys[i], linecounter, i);
+				out.add(PointerNormalizer.getCoordsY(pointer));
 			}
 		}
 		return out;
@@ -460,7 +463,17 @@ public class InputPlayback {
 		try {
 			counter=Float.parseFloat(floatnumber);
 		}catch (NumberFormatException e) {
-			logger.error("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number ("+floatnumber+")");
+			logger.error("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number type float ("+floatnumber+")");
+			throw new IOException();
+		}
+		return counter;
+	}
+	private static double getDouble(String name, String doublenumber, int linecounter, int position) throws IOException {
+		double counter=0D;
+		try {
+			counter=Double.parseDouble(doublenumber);
+		}catch (NumberFormatException e) {
+			logger.error("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number of type double ("+doublenumber+")");
 			throw new IOException();
 		}
 		return counter;
