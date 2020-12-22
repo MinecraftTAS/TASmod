@@ -57,7 +57,7 @@ public class InputRecorder {
 			fileLocation=files;
 			recording=true;
 			output=new StringBuilder();
-			output.append("#StartLocation:" + getStartLocation() +"\n");
+			addHeader(output);
 			tickCounter=0;
 //			Minecraft.getMinecraft().randommanager.setEntityRandomnessAll(0);
 //			RandomLogger.startRandomLogging();
@@ -69,6 +69,9 @@ public class InputRecorder {
 		}else {
 			logger.error("There is already a recording running!");
 		}
+	}
+	private static void addHeader(StringBuilder output2) {
+		output.append("#StartLocation:" + getStartLocation() +"\n");
 	}
 	private static String getStartLocation() {
 		String pos=mc.player.getPositionVector().toString();
