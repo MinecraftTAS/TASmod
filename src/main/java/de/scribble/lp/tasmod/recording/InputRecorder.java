@@ -16,6 +16,7 @@ import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 
 /**
  * Takes keys from the VirtualMouseAndKeyboard and adds them to a file
@@ -71,7 +72,22 @@ public class InputRecorder {
 		}
 	}
 	private static void addHeader(StringBuilder output2) {
-		output.append("#StartLocation:" + getStartLocation() +"\n");
+		Minecraft mc=Minecraft.getMinecraft();
+//		output.append("#StartLocation:" + getStartLocation() +"\n");
+		output.append	("################################################# TASFile ###################################################\n"
+						+"#							This file was generated using the Minecraft TASMod								#\n"
+						+"#																											#\n"
+						+"#	If you make a mistake in this file, the mod will notify you via the console, so it's best to keep the	#\n"
+						+"#										console open at all times											#\n"
+						+"#																											#\n"
+						+"#------------------------------------------------ Header ---------------------------------------------------#\n"
+						+"#Author:"+ mc.player.getName()+"\n"
+						+"#																											#\n"
+						+"#StartLocation:" + getStartLocation() +",\n"
+						+"#																											#\n"
+						+"#Resolution:"+ mc.displayWidth+"x"+mc.displayHeight+"\n"
+						+"#																											#\n"
+						+"#############################################################################################################\n");
 	}
 	private static String getStartLocation() {
 		String pos=mc.player.getPositionVector().toString();
