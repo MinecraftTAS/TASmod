@@ -45,7 +45,7 @@ public abstract class MixinGuiScreen{
         		if((GuiScreen)(Object)this instanceof GuiContainer) {
         			GuiContainer container = (GuiContainer)(GuiScreen)(Object)this;
         			int X=calcX(Mouse.getEventX());
-        			int Y=calcY(Mouse.getY());
+        			int Y=calcY(Mouse.getEventY());
         			if(container.getSlotAtPosition(X,Y) != null) {
         				slotindex=container.getSlotAtPosition(X, Y).slotNumber;
         			}
