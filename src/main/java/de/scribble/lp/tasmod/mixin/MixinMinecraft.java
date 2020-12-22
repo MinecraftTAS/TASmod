@@ -228,7 +228,7 @@ public abstract class MixinMinecraft {
 					}
 					this.runTick();
 				}else if(TickSync.getClienttickcounter()>TickSync.getServertickcounter()) {	//If it's too fast
-					//softLockTimer++;
+					softLockTimer++;
 					if(softLockTimer==100) {
 						this.world.sendQuittingDisconnectingPacket();
 						this.loadWorld((WorldClient)null);
