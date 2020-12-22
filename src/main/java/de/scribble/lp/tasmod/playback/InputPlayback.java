@@ -41,6 +41,13 @@ public class InputPlayback {
 			Filename=filename;
 			fileLocation=file;
 			inputList=new ArrayList<TickFrame>();
+//			try {
+//				readHeader();
+//			}catch (IOException e){
+//				logger.error("Cannot read the tasfile "+filename);
+//				e.printStackTrace();
+//				return;
+//			}
 			try {
 				readInputs();
 			} catch (IOException e) {
@@ -60,6 +67,17 @@ public class InputPlayback {
 		}else {
 			logger.error("There is a playback already running!");
 		}
+	}
+	private static void readHeader()throws IOException {
+		//Create a bunch of variables
+		BufferedReader buff = new BufferedReader(new FileReader(fileLocation));
+		String wholeLine="";
+		int linecounter=0;
+		//Read the lines until the line is null
+		while((wholeLine=buff.readLine()) != null) {
+			
+		}
+		tpPlayer(wholeLine, linecounter);
 	}
 	public static void stopPlayback() {
 		if(isPlayingback()) {
@@ -125,12 +143,8 @@ public class InputPlayback {
 			while((wholeLine=buff.readLine()) != null) {
 				//Increment the linecounter
 				linecounter++;
-				//Sets the tp location for the start of the TAS TODO Maybe remove this in the future
-				if(wholeLine.startsWith("#StartLocation:")) {
-					tpPlayer(wholeLine, linecounter);
-					continue;
 				//Skip comments
-				}else if(wholeLine.startsWith("#")) {
+				if(wholeLine.startsWith("#")) {
 					continue;
 				//Read subticks
 				}else if(wholeLine.startsWith("S")) {
