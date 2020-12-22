@@ -27,13 +27,19 @@ public class PointerNormalizer {
 	public static int getCoordsX(double normalizedX) {
 		Minecraft mc=Minecraft.getMinecraft();
 		ScaledResolution scaled=new ScaledResolution(mc);
-		int out=(int) Math.round(normalizedX*(double) mc.displayWidth*(4D/(double)scaled.getScaleFactor()));
+		double guiScaled=normalizedX*(double) mc.displayWidth*(4D/(double)scaled.getScaleFactor());
+		int out=(int) Math.round(scaleAroundPoint(guiScaled, (double)scaled.getScaledWidth_double()/2D, 1));
 		return out;
 	}
 	public static int getCoordsY(double normalizedY) {
 		Minecraft mc=Minecraft.getMinecraft();
 		ScaledResolution scaled=new ScaledResolution(mc);
-		int out=(int) Math.round(normalizedY*(double) mc.displayHeight*(4D/(double)scaled.getScaleFactor()));
+		double guiScaled=normalizedY*(double) mc.displayHeight*(4D/(double)scaled.getScaleFactor());
+		int out=(int) Math.round(scaleAroundPoint(guiScaled, (double)scaled.getScaledHeight_double()/2D, 1));
+		return out;
+	}
+	private static double scaleAroundPoint(double pointToScaleX, double pointCoordX, double scaleFactor) {
+		double out = (pointToScaleX-pointCoordX)*scaleFactor+pointCoordX;
 		return out;
 	}
 }

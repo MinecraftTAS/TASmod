@@ -41,13 +41,13 @@ public class InputPlayback {
 			Filename=filename;
 			fileLocation=file;
 			inputList=new ArrayList<TickFrame>();
-//			try {
-//				readHeader();
-//			}catch (IOException e){
-//				logger.error("Cannot read the tasfile "+filename);
-//				e.printStackTrace();
-//				return;
-//			}
+			try {
+				readHeader();
+			}catch (IOException e){
+				logger.error("Cannot read the tasfile "+filename);
+				e.printStackTrace();
+				return;
+			}
 			try {
 				readInputs();
 			} catch (IOException e) {
@@ -75,9 +75,36 @@ public class InputPlayback {
 		int linecounter=0;
 		//Read the lines until the line is null
 		while((wholeLine=buff.readLine()) != null) {
-			
+			linecounter++;
+			if(wholeLine.startsWith("###########################################################################################################")) {
+				break;
+			}
+			if(wholeLine.startsWith("#StartLocation:")) {
+				tpPlayer(wholeLine, linecounter);
+			}else if(wholeLine.startsWith("#Resolution:")) {
+				getGameResolution(wholeLine, linecounter);
+			}
 		}
-		tpPlayer(wholeLine, linecounter);
+		buff.close();
+	}
+	private static void tpPlayer(String wholeLine, int linecounter) throws IOException {
+		wholeLine=wholeLine.replace("#StartLocation:", "");
+		String[] section = wholeLine.split(",");
+		if(section.length<5) {
+			logger.error("Error while reading header in "+Filename+" in line "+linecounter+". Incorrect tp position");
+			throw new IOException();
+		}
+		Minecraft.getMinecraft().player.sendChatMessage("/tp "+section[0]+" "+section[1]+" "+section[2]+" "+section[3]+" "+section[4]); //I don't care anymore TODO
+		
+	}
+	private static void getGameResolution(String wholeLine, int linecounter) throws IOException {
+		wholeLine=wholeLine.replace("#Resolution:", "");
+		String[] section = wholeLine.split("x");
+		if(section.length<2) {
+			logger.error("Error while reading header in "+Filename+" in line "+linecounter+". Incorrect resolution");
+			throw new IOException();
+		}
+		
 	}
 	public static void stopPlayback() {
 		if(isPlayingback()) {
@@ -205,16 +232,6 @@ public class InputPlayback {
 		}
 	}
 	
-	private static void tpPlayer(String wholeLine, int linecounter) throws IOException {
-		wholeLine=wholeLine.replace("#StartLocation:", "");
-		String[] section = wholeLine.split(",");
-		if(section.length<5) {
-			logger.error("Error while reading tickcounter in "+Filename+" in line "+linecounter+". Incorrect tp position");
-			throw new IOException();
-		}
-		Minecraft.getMinecraft().player.sendChatMessage("/tp "+section[0]+" "+section[1]+" "+section[2]+" "+section[3]+" "+section[4]); //I don't care anymore TODO
-		
-	}
 	/*The following methods take different sections of the line and interpret them. Returns all inputs as a list*/
 	private static int getTickCounter(String[] sections, int linecounter, int sectionnumber) throws IOException {
 		//System.out.println(sections[0]); //TODO
