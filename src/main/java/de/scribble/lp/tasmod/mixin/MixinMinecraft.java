@@ -53,6 +53,7 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ICrashReportDetail;
 import net.minecraft.entity.Entity;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.profiler.Snooper;
@@ -228,7 +229,9 @@ public abstract class MixinMinecraft {
 					}
 					this.runTick();
 				}else if(TickSync.getClienttickcounter()>TickSync.getServertickcounter()) {	//If it's too fast
-					softLockTimer++;
+					if(!(Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment")) { //For the Dev environment to stop a disconnect when debugging on the server side
+						softLockTimer++;
+					}
 					if(softLockTimer==100) {
 						this.world.sendQuittingDisconnectingPacket();
 						this.loadWorld((WorldClient)null);
