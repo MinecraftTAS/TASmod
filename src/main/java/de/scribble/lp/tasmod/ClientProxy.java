@@ -17,8 +17,6 @@ public class ClientProxy extends CommonProxy{
 	
 	static TutorialHandler playbackTutorial;
 	
-	static final KeyBinding CalibrateKey=new KeyBinding("Calibrates the window position of mc", Keyboard.KEY_V, "TASmod");
-	
 	public void preInit(FMLPreInitializationEvent ev) {
 		config = new Configuration(ev.getSuggestedConfigurationFile());
 		Config.reloadClientConfig(config);
@@ -29,7 +27,6 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		
-		ClientRegistry.registerKeyBinding(CalibrateKey);
 		super.init(ev);
 	}
 	public void postInit(FMLPostInitializationEvent ev) {
@@ -37,8 +34,5 @@ public class ClientProxy extends CommonProxy{
 	}
 	public static TutorialHandler getPlaybackTutorial() {
 		return playbackTutorial;
-	}
-	public static KeyBinding getCalibratekey() {
-		return CalibrateKey;
 	}
 }
