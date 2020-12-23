@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
@@ -73,7 +74,6 @@ public class InputRecorder {
 	}
 	private static void addHeader(StringBuilder output2) {
 		Minecraft mc=Minecraft.getMinecraft();
-//		output.append("#StartLocation:" + getStartLocation() +"\n");
 		output.append	("################################################# TASFile ###################################################\n"
 						+"#							This file was generated using the Minecraft TASMod								#\n"
 						+"#																											#\n"
@@ -108,7 +108,9 @@ public class InputRecorder {
 		if(recording) {
 			/*Key for stopping the recording*/
 			if(Keyboard.isKeyDown(Keyboard.KEY_N)) {
-				logger.info("Stopping the recording");
+				stopRecording();
+			}
+			if(!Display.isActive()) {
 				stopRecording();
 			}
 			tickCounter++; //Tickcounter used as a time reference, not actually used for playback
@@ -221,6 +223,7 @@ public class InputRecorder {
 	public static void stopRecording() {
 		if(recording) {
 			recording=false;
+			logger.info("Stopping the recording");
 			Thread t = new Thread(new FileWriterThread(output, fileLocation, logger), "FileWriterThreadTicks");
 			t.start();
 			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();

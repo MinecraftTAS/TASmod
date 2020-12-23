@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.Display;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
@@ -59,6 +60,7 @@ public class InputPlayback {
 			playbackIndex=-1;
 			subtickPlaybackindex=-1;
 			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();
+			Minecraft.getMinecraft().gameSettings.chatLinks=false;
 			if(tutorial.istutorial&&tutorial.getState()==6) {
 				tutorial.advanceState();
 			}
@@ -81,8 +83,6 @@ public class InputPlayback {
 			}
 			if(wholeLine.startsWith("#StartLocation:")) {
 				tpPlayer(wholeLine, linecounter);
-			}else if(wholeLine.startsWith("#Resolution:")) {
-				getGameResolution(wholeLine, linecounter);
 			}
 		}
 		buff.close();
@@ -97,15 +97,16 @@ public class InputPlayback {
 		Minecraft.getMinecraft().player.sendChatMessage("/tp "+section[0]+" "+section[1]+" "+section[2]+" "+section[3]+" "+section[4]); //I don't care anymore TODO
 		
 	}
+	/* This was part in my journey of making the cursor scale with the window (See pointernormalizer. Maybe I'll find a use for this again
+	
 	private static void getGameResolution(String wholeLine, int linecounter) throws IOException {
 		wholeLine=wholeLine.replace("#Resolution:", "");
 		String[] section = wholeLine.split("x");
-		if(section.length<2) {
+		if(section.length<3) {
 			logger.error("Error while reading header in "+Filename+" in line "+linecounter+". Incorrect resolution");
 			throw new IOException();
 		}
-		
-	}
+	}*/
 	public static void stopPlayback() {
 		if(isPlayingback()) {
 			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();
@@ -127,6 +128,9 @@ public class InputPlayback {
 		if(isPlayingback()) {
 			if(playbackIndex==inputList.size()-1) {
 				logger.info("Ticks finished playback");
+				stopPlayback();
+			}
+			if(!Display.isActive()) {
 				stopPlayback();
 			}
 			playbackIndex++;

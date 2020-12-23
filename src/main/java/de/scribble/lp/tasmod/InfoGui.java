@@ -37,11 +37,6 @@ public class InfoGui extends Gui{
                 new Gui().drawString(mc.fontRenderer, "Yaw: " + mc.player.rotationYaw, 22, 30, 0xFFFFFF);        //Show the current Yaw (This comes from the modversion for 1.7.10 since 1.7 has just SOUTH as a yaw in F3)
 
                 new Gui().drawString(mc.fontRenderer, Mouse.getEventX() + " " + Mouse.getEventY(), 22, 40, 0xFFFFFF); //Current Pointer location
-                double x=PointerNormalizer.getNormalizedX(Mouse.getEventX());
-                double y=PointerNormalizer.getNormalizedY(Mouse.getEventY());
-                new Gui().drawString(mc.fontRenderer, x + " " + y, 22, 50, 0xFFFFFF); //Current Pointer location
-                
-                new Gui().drawString(mc.fontRenderer, scaled.getScaleFactor()+" ", 22, 60, 0xFFFFFF); //Current Pointer location
                 
                 new Gui().drawString(mc.fontRenderer, "S: "+TickSync.getServertickcounter(), 22, 70, 0xFFFFFF); //Current Pointer location
                 new Gui().drawString(mc.fontRenderer, "C: "+TickSync.getClienttickcounter(), 22, 80, 0xFFFFFF); //Current Pointer location
