@@ -28,10 +28,18 @@ public class TickrateChangerClient {
 	}
 
 	public static void pauseUnpauseGame() {
-		CommonProxy.NETWORK.sendToServer(new TickratePacket(false, 20, true));
+		if(Minecraft.getMinecraft().world!=null) {
+			CommonProxy.NETWORK.sendToServer(new TickratePacket(false, 20, true));
+		}else {
+			pauseUnpauseClient();
+		}
     }
     public static void advanceTick() {
-    	CommonProxy.NETWORK.sendToServer(new TickratePacket(true, 20, false));
+    	if(Minecraft.getMinecraft().world!=null) {
+    		CommonProxy.NETWORK.sendToServer(new TickratePacket(true, 20, false));
+    	}else {
+    		advanceClientTick();
+    	}
     }
     /**
      * Bypasses the tick system
@@ -50,5 +58,17 @@ public class TickrateChangerClient {
 		changeClientTickrate(TICKRATE_SAVED);
 		ADVANCE_TICK=true;
 	}
-
+	
+	/**
+	 * Pauses and unpauses the client, used in main menus
+	 */
+	public static void pauseUnpauseClient() {
+		if(TICKS_PER_SECOND>0) {
+    		TICKRATE_SAVED=TICKS_PER_SECOND;
+			changeClientTickrate(0F);
+    	}
+    	else if (TICKS_PER_SECOND==0) {
+    		changeClientTickrate(TICKRATE_SAVED);
+    	}
+	}
 }

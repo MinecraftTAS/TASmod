@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.ModLoader;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.gui.GuiMultiplayerTimeOut;
-import de.scribble.lp.tasmod.gui.GuiMultiplayerWarn;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -51,9 +51,7 @@ import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.crash.ICrashReportDetail;
 import net.minecraft.entity.Entity;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.profiler.Snooper;
@@ -229,7 +227,7 @@ public abstract class MixinMinecraft {
 					}
 					this.runTick();
 				}else if(TickSync.getClienttickcounter()>TickSync.getServertickcounter()) {	//If it's too fast
-					if(!(Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment")) { //For the Dev environment to stop a disconnect when debugging on the server side
+					if(!ClientProxy.isDevEnvironment) { //For the Dev environment to stop a disconnect when debugging on the server side
 						softLockTimer++;
 					}
 					if(softLockTimer==100) {
