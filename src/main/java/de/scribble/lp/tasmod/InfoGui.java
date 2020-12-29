@@ -1,13 +1,8 @@
 package de.scribble.lp.tasmod;
 
-import java.awt.MouseInfo;
-import java.awt.Toolkit;
-
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 
 import de.scribble.lp.tasmod.ticksync.TickSync;
-import de.scribble.lp.tasmod.util.PointerNormalizer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
