@@ -1,9 +1,5 @@
 package de.scribble.lp.tasmod.util;
 
-import java.awt.MouseInfo;
-
-import org.lwjgl.opengl.Display;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 /**

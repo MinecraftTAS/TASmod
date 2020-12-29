@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import de.scribble.lp.tasmod.gui.GuiMultiplayerWarn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiScreen;
 
 @Mixin(GuiMainMenu.class)
 public class MixinGuiMainMenu {

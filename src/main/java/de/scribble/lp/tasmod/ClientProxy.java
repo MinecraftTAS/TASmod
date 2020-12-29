@@ -1,12 +1,9 @@
 package de.scribble.lp.tasmod;
 
-import org.lwjgl.input.Keyboard;
-
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
-import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -17,9 +14,13 @@ public class ClientProxy extends CommonProxy{
 	
 	static TutorialHandler playbackTutorial;
 	
+	public static boolean isDevEnvironment;
+	
 	public void preInit(FMLPreInitializationEvent ev) {
+		isDevEnvironment=(Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 		config = new Configuration(ev.getSuggestedConfigurationFile());
 		Config.reloadClientConfig(config);
+		
 		super.preInit(ev);
 	}
 	public void init(FMLInitializationEvent ev) {

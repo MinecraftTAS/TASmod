@@ -3,13 +3,11 @@ package de.scribble.lp.tasmod.tutorial;
 import org.lwjgl.input.Keyboard;
 
 import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
