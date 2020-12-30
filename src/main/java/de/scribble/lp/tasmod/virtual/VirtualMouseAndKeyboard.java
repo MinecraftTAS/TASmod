@@ -424,6 +424,7 @@ public class VirtualMouseAndKeyboard {
 	public static void incrementTimeSinceLastTick() {
 		timeSinceLastTick++;
 	}
+	/*Unused*/
 	public static int getTimeSinceLastTick() {
 		return timeSinceLastTick;
 	}

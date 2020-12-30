@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
  * @author ScribbleLP
  *
  */
-@Mod(modid = "tasmod", name = "Tool-Assisted-Speedrun-Mod", version =ModLoader.VERSION)
+@Mod(modid = "tasmod", name = "Tool-Assisted Speedrun Mod", version =ModLoader.VERSION)
 public class ModLoader {
 	@Instance
 	public static ModLoader instance = new ModLoader();
