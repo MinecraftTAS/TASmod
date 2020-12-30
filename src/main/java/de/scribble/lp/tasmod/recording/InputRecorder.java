@@ -36,6 +36,7 @@ public class InputRecorder {
 	private static long tickCounter;
 	private static boolean iskeydown;
 	private static final String tasdirectory=mc.mcDataDir.getAbsolutePath()+ File.separator +"saves" + File.separator + "tasfiles";
+	private static boolean pauseRecording=false;
 
 	/**
 	 * Start the recording and generate a filename consisting of recording+System.currentTimeMillis
@@ -63,6 +64,7 @@ public class InputRecorder {
 //			Minecraft.getMinecraft().randommanager.setEntityRandomnessAll(0);
 //			RandomLogger.startRandomLogging();
 //			new SavestateHandlerClient().saveState();
+			pauseRecording=false;
 			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();
 			if(tutorial.istutorial&&tutorial.getState()==3) {
 				tutorial.advanceState();
@@ -111,6 +113,9 @@ public class InputRecorder {
 			}
 			if(!Display.isActive()) {
 				stopRecording();
+			}
+			if(pauseRecording) {
+				return;
 			}
 			tickCounter++; //Tickcounter used as a time reference, not actually used for playback
 			
@@ -162,6 +167,11 @@ public class InputRecorder {
 				mouseYString=mouseYString.concat(normalizedY+ending);
 				slotString=slotString.concat(event.getSlotidx()+ending);
 			}
+			/*=====Subticks=====*/		//Subticks describe camera movement, like rotationPitch, rotationYaw. This is normally dependant on the framerate hence the name subticks. Before, this was seperated from the ticks
+			
+			VirtualSubticks subtick= VirtualMouseAndKeyboard.getSubtick();
+			String pitch=Float.toString(subtick.getPitch());
+			String yaw=Float.toString(subtick.getYaw());
 			
 			/*=====Special rules=====*/
 			mouseString=mouseString.replace("MOUSEMOVED", " ");			//The standard event for moving the mouse is set to blank here. Since the mouse is moved VERY often, this clutters the whole file
@@ -190,29 +200,13 @@ public class InputRecorder {
 			
 			+(mouseXString.isEmpty()?"":"MouseX/Y:")+mouseXString+";"+mouseYString+"|"		//MouseCoords
 					
-			+(slotString.isEmpty()?"":"SlotID:")+slotString+"\n");		//SlotID
+			+(pitch.isEmpty()?"":"Pitch:")+pitch+"|"		//Pitch
+			
+			+(yaw.isEmpty()?"":"Yaw:")+yaw+"|"		//Yaw
+			
+			+(slotString.isEmpty()?"":"SlotID:")+slotString+"\n");			//SlotID (Unused)
 		}
 	}
-	/**
-	 * Records the mouse movement aka. the mouse deltas
-	 */
-	public static void recordSubTick() {
-		if(recording) {
-			VirtualSubticks subtick= VirtualMouseAndKeyboard.getSubtick();
-			output.append("S"+VirtualMouseAndKeyboard.getTimeSinceLastTick()+"|"+subtick.getPitch()+"|"+subtick.getYaw()+"\n");
-		}
-	}
-	/**
-	 * Normally the yaw of the player is not contained within -180 +180 bounds and thus causes the camera to snap to the other side when switching from -180 to +180<br>
-	 * This tries to prevent this
-	 * @param Yaw
-	 * @return
-	 */
-	private static Float recalcYaw(float Yaw) {
-        while (Yaw >= 180) Yaw -= 360;
-        while (Yaw < -180) Yaw += 360;
-        return Yaw;
-    }
 	public File getSaveLocation() {
 		return fileLocation;
 	}
@@ -272,5 +266,8 @@ public class InputRecorder {
 	
 	public static boolean isRecording() {
 		return recording;
+	}
+	public static boolean isPaused() {
+		return pauseRecording;
 	}
 }
