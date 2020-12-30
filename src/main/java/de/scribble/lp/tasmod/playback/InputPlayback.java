@@ -32,6 +32,7 @@ public class InputPlayback {
 	private static File fileLocation;
 	private static String Filename;
 	public static int playbackIndex=-1;
+	private static boolean pausePlayback;
 	private static List<TickFrame> inputList=new ArrayList<TickFrame>();
 	
 	private static List<VirtualSubticks> subtickList= new ArrayList<VirtualSubticks>();
@@ -133,6 +134,10 @@ public class InputPlayback {
 			if(!Display.isActive()) {
 				stopPlayback();
 			}
+			
+			if(pausePlayback) {
+				return;
+			}
 			playbackIndex++;
 		}
 	}
@@ -141,6 +146,9 @@ public class InputPlayback {
 			if(subtickPlaybackindex==subtickList.size()-1) {
 				logger.info("Subticks finished playback");
 				stopPlayback();
+			}
+			if(pausePlayback) {
+				return;
 			}
 			subtickPlaybackindex++;
 		}
@@ -177,14 +185,6 @@ public class InputPlayback {
 				//Skip comments
 				if(wholeLine.startsWith("#")) {
 					continue;
-				//Read subticks
-				}else if(wholeLine.startsWith("S")) {
-					String[] sections=wholeLine.split("\\|");
-					sections[0]=sections[0].replace("S", "");
-					int tick=getTickCounter(sections, linecounter, 0);
-					float pitch=getSubtickPitch(sections, linecounter);
-					float yaw=getSubtickYaw(sections, linecounter);
-					subtickList.add(new VirtualSubticks(tick, pitch, yaw));
 				//Read ticks
 				}else {
 					//Split the whole line into sections seperated by a "|"
@@ -198,7 +198,10 @@ public class InputPlayback {
 					List<Integer> scrollWheelDeltas=getScrollWheelDeltas(sections, linecounter, 7);
 					List<Integer> mouseX=getMouseX(sections, linecounter, 8);
 					List<Integer> mouseY=getMouseY(sections, linecounter, 8);
-					List<Integer> slotID= getSlotID(sections, linecounter, 9);
+					float pitch=getPitch(sections, linecounter,9);
+					float yaw=getYaw(sections, linecounter,10);
+					List<Integer> slotID= getSlotID(sections, linecounter, 11);
+					
 					
 					List<VirtualKeyboardEvent> keyboardEvents = new ArrayList<VirtualKeyboardEvent>();
 					//Making sure keyboard presses states and chars are the same size, since there is really no reason why they shouldn't
@@ -230,6 +233,7 @@ public class InputPlayback {
 					}
 					//Adding every keyboard an mouse event from the current tick into yet another list that contains every input from every tick 
 					inputList.add(new TickFrame(tick, keyboardEvents, mouseEvents));
+					subtickList.add(new VirtualSubticks(tick, pitch, yaw));
 				}
 			}
 			buff.close();
@@ -238,7 +242,6 @@ public class InputPlayback {
 	
 	/*The following methods take different sections of the line and interpret them. Returns all inputs as a list*/
 	private static int getTickCounter(String[] sections, int linecounter, int sectionnumber) throws IOException {
-		//System.out.println(sections[0]); //TODO
 		if(sections[sectionnumber].isEmpty()) {
 			logger.error("Error while reading tickcounter in "+Filename+ " in line "+linecounter+"and the input in position "+1+" from the left. The input is empty!");
 			throw new IOException();
@@ -257,7 +260,6 @@ public class InputPlayback {
 			}
 			String[] keys= sections[sectionnumber].split(",");
 			for (int i = 0; i < keys.length; i++) {
-				//System.out.println(linecounter+" "+keys[i]); //TODO
 				if(isNumber(keys[i])) {
 					out.add(Integer.parseInt(keys[i]));
 				}else {
@@ -284,7 +286,6 @@ public class InputPlayback {
 				if (keys[i].contentEquals(" ")) {
 					keys[i] = "false";
 				}
-				//System.out.println(linecounter+": "+keys[i]); //TODO
 				if (keys[i].contentEquals("true")||keys[i].contentEquals("false")) {
 					out.add(Boolean.parseBoolean(keys[i]));
 				} else {
@@ -307,7 +308,6 @@ public class InputPlayback {
 				sections[sectionnumber]= sections[sectionnumber].replace("\\n","\n"); //TODO Seperate CR and LF for linux users
 				char[] chars = sections[sectionnumber].toCharArray();
 				for (int j = 0; j < chars.length; j++) {
-					//System.out.println(linecounter + ": " + chars[j]); // TODO
 					out.add(chars[j]);
 				}
 
@@ -330,7 +330,6 @@ public class InputPlayback {
 					if (keys[i].contentEquals(" ")) {
 						keys[i] = "MOUSEMOVED";
 					}
-					//System.out.println(linecounter+": "+keys[i]); //TODO
 					if (VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]) != -1) {
 							out.add(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]));
 					} else {
@@ -356,7 +355,6 @@ public class InputPlayback {
 				if (keys[i].contentEquals(" ")) {
 					keys[i] = "false";
 				}
-				//System.out.println(linecounter+": "+keys[i]); //TODO
 				if (keys[i].contentEquals("true")||keys[i].contentEquals("false")) {
 					out.add(Boolean.parseBoolean(keys[i]));
 				} else {
@@ -382,7 +380,6 @@ public class InputPlayback {
 				if (keys[i].contentEquals(" ")) {
 					keys[i] = "0";
 				}
-				//System.out.println(linecounter+": "+keys[i]); //TODO
 				out.add(getNumber("ScrollWheel", keys[i], linecounter, i));
 			}
 		}
@@ -398,7 +395,6 @@ public class InputPlayback {
 //			}
 //			String[] keys = xpart[0].split(",");
 //			for (int i = 0; i < keys.length; i++) {
-//				//System.out.println(linecounter+" "+keys[i]); //TODO
 //				out.add(Float.parseFloat(keys[i]));
 //			}
 //		}
@@ -414,7 +410,6 @@ public class InputPlayback {
 //			}
 //			String[] keys = ypart[1].split(",");
 //			for (int i = 0; i < keys.length; i++) {
-//				//System.out.println(linecounter+" "+keys[i]); //TODO
 //				out.add(Float.parseFloat(keys[i]));
 //			}
 //		}
@@ -430,7 +425,6 @@ public class InputPlayback {
 			}
 			String[] keys = xpart[0].split(",");
 			for (int i = 0; i < keys.length; i++) {
-				//System.out.println(linecounter+" "+keys[i]); //TODO
 				double pointer=getDouble("MouseX", keys[i], linecounter, i);
 				out.add(PointerNormalizer.getCoordsX(pointer));
 			}
@@ -447,7 +441,6 @@ public class InputPlayback {
 			}
 			String[] keys = ypart[1].split(",");
 			for (int i = 0; i < keys.length; i++) {
-				//System.out.println(linecounter+" "+keys[i]); //TODO
 				double pointer=getDouble("MouseY", keys[i], linecounter, i);
 				out.add(PointerNormalizer.getCoordsY(pointer));
 			}
@@ -466,7 +459,6 @@ public class InputPlayback {
 				if (keys[i].contentEquals(" ")) {
 					keys[i] = "-1";
 				}
-				//System.out.println(linecounter+": "+keys[i]); //TODO
 				out.add(getNumber("SlotID", keys[i], linecounter, i));
 			}
 		}
@@ -517,21 +509,27 @@ public class InputPlayback {
 		return playingback;
 	}
 	
-	private static float getSubtickPitch(String[] sections, int linecounter) throws IOException {
+	private static float getPitch(String[] sections, int linecounter, int sectionnumber) throws IOException {
 		float x=0;
-		if(sections[1].isEmpty()) {
-			logger.error("Error while reading tickcounter in "+Filename+ " in line "+linecounter+". The input is empty!");
+		if(sections[sectionnumber].startsWith("Pitch:")) {
+			sections[sectionnumber]=sections[sectionnumber].replace("Pitch:", "");
+		}
+		if(sections[sectionnumber].isEmpty()) {
+			logger.error("Error while reading pitch in "+Filename+ " in line "+linecounter+". The input is empty!");
 		}else {
-			x=getFloat("subtickPitch", sections[1], linecounter, 1);
+			x=getFloat("Pitch", sections[sectionnumber], linecounter, 1);
 		}
 		return x;
 	}
-	private static float getSubtickYaw(String[] sections, int linecounter) throws IOException {
+	private static float getYaw(String[] sections, int linecounter, int sectionnumber) throws IOException {
 		float y=0;
-		if(sections.length<3) {
-			logger.error("Error while reading tickcounter in "+Filename+ " in line "+linecounter+". The input is empty!");
+		if(sections[sectionnumber].startsWith("Yaw:")) {
+			sections[sectionnumber]=sections[sectionnumber].replace("Yaw:", "");
+		}
+		if(sections[sectionnumber].isEmpty()) {
+			logger.error("Error while reading yaw in "+Filename+ " in line "+linecounter+". The input is empty!");
 		}else {
-			y=getFloat("subtickYaw", sections[2], linecounter, 1);
+			y=getFloat("Yaw", sections[sectionnumber], linecounter, 1);
 		}
 		return y;
 	}
@@ -541,5 +539,4 @@ public class InputPlayback {
 	public static VirtualSubticks getCurrentSubtick() {
 		return subtickList.get(subtickPlaybackindex);
 	}
-	
 }

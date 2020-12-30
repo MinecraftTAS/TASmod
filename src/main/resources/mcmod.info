@@ -1,17 +1,20 @@
 [
 {
   "modid": "tasmod",
-  "name": "Tool Assisted Speedrun Mod",
+  "name": "Tool-Assisted Speedrun Mod",
   "description": "Saves tickperfect inputs to a file and is able to play it back",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
   "authorList": ["tr7zw, famous1622, ScribbleLP"],
-  "credits": "Thanks to tr7zw for the initial idea, famous for setting up and helping,
+  "credits": "
+  Thanks to tr7zw for the initial idea,
+  famous for setting up and helping,
   Tickrate Code inspired by Guichaguri
   Tickrate 0 Code inspired by Cubitect
-  RNG Math by Admiral_Stapler",
+  RNG Math by Admiral_Stapler
+  Special thanks to Darkmoon",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
