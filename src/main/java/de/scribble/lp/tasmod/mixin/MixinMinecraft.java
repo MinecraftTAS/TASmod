@@ -21,6 +21,7 @@ import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
+import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;
@@ -216,7 +217,7 @@ public abstract class MixinMinecraft {
 //        if(TickrateChangerClient.cooldownKeyAdvance>0) {
 //        	TickrateChangerClient.cooldownKeyAdvance--;
 //        }
-        ClientProxy.getVkeys().decreaseCooldowns();
+        VirtualKeybindings.increaseCooldowntimer();
         TickrateChangerClient.INSTANCE.bypass();
         for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
         {

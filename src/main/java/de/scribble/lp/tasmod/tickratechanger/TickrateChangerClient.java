@@ -45,9 +45,9 @@ public class TickrateChangerClient {
      * Bypasses the tick system
      */
     public void bypass() {
-		if (ClientProxy.getVkeys().isKeyDown(ClientProxy.tickratezeroKey)) {
+		if (VirtualKeybindings.isKeyDown(ClientProxy.tickratezeroKey)) {
 			pauseUnpauseGame();
-		} else if (ClientProxy.getVkeys().isKeyDown(ClientProxy.tickAdvance)) {
+		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickAdvance)) {
 			advanceTick();
 		}
     }

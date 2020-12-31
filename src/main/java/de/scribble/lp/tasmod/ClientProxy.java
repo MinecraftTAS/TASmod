@@ -25,9 +25,7 @@ public class ClientProxy extends CommonProxy{
 	
 	private static SavestateHandlerClient saveHandler;
 	
-	private static VirtualKeybindings vkeys;
-	
-	public static KeyBinding tickratezeroKey= new KeyBinding("Toggle Tick Advance", Keyboard.KEY_F8, "TASmod");
+	public static KeyBinding tickratezeroKey= new KeyBinding("Tickrate 0 Key", Keyboard.KEY_F8, "TASmod");
 	
 	public static KeyBinding tickAdvance= new KeyBinding("Advance Tick", Keyboard.KEY_F9, "TASmod");
 	
@@ -50,7 +48,6 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
 		
 		saveHandler=new SavestateHandlerClient();
-		vkeys=new VirtualKeybindings();
 		
 		ClientRegistry.registerKeyBinding(tickratezeroKey);
 		ClientRegistry.registerKeyBinding(tickAdvance);
@@ -66,8 +63,5 @@ public class ClientProxy extends CommonProxy{
 	}
 	public static SavestateHandlerClient getSaveHandler() {
 		return saveHandler;
-	}
-	public static VirtualKeybindings getVkeys() {
-		return vkeys;
 	}
 }
