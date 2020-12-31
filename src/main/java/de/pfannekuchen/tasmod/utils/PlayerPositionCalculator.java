@@ -19,18 +19,13 @@ import net.minecraft.util.math.Vec3d;
 
 public class PlayerPositionCalculator {
 
-	public static double xNew = 0f;
-	public static double yNew = 0f;
-	public static double zNew = 0f;
-	
 	public static void calculateNextPosition(Minecraft mc, EntityPlayer source) {
 		bb = source.getEntityBoundingBox();
 		float f6 = 0.91F;
 
-		float strafe = mc.gameSettings.keyBindForward.isKeyDown() ? .98f : mc.gameSettings.keyBindBack.isKeyDown() ? -.98f : 0f;
+		float strafe = source.moveStrafing;
 		float up = source.moveVertical;
-		float forward = mc.gameSettings.keyBindLeft.isKeyDown() ? .98f : mc.gameSettings.keyBindRight.isKeyDown() ? -.98f : 0f;
-		
+		float forward = source.moveForward;
 		double motionX = source.motionX;
 		double motionY = source.motionY;
 		double motionZ = source.motionZ;
@@ -339,17 +334,13 @@ public class PlayerPositionCalculator {
         else
         {
             float f2 = source.rotationPitch;
-            float f1 = source.rotationYaw;
+            float f1 = source.rotationYawHead;
             vec3d1 = source.getVectorForRotation(f2, f1);
         }
         
         Vec3d vec3d2 = vec3d.addVector(vec3d1.x * mc.playerController.getBlockReachDistance(), vec3d1.y * mc.playerController.getBlockReachDistance(), vec3d1.z * mc.playerController.getBlockReachDistance());
         
         RayTraceResult result = source.world.rayTraceBlocks(vec3d, vec3d2, false, false, true);
-        
-        xNew = posX;
-        yNew = posY;
-        zNew = posZ;
         
         Minecraft.getMinecraft().renderGlobal.drawSelectionBox(source, result, 0, Minecraft.getMinecraft().getRenderPartialTicks());
 		GlStateManager.enableAlpha();
