@@ -1,12 +1,16 @@
 package de.scribble.lp.tasmod.virtual;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
 import org.lwjgl.input.Keyboard;
 
+import com.google.common.collect.Maps;
+
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.IntHashMap;
 
 /**
  * Transforms certain Minecraft keybindings to keybindings checked by LWJGL's isKeyDown method. <br>
@@ -16,69 +20,28 @@ import net.minecraft.client.settings.KeyBinding;
  */
 public class VirtualKeybindings {
 	private static final int standardCooldown=10;
-	List<KeyCooldown> keyList=new ArrayList<KeyCooldown>();
+	private static HashMap<KeyBinding, Long> cooldownHashMap=Maps.<KeyBinding, Long>newHashMap();
+	private static long cooldowntimer=0;
 	
-	private void add(KeyBinding keybinding) {
-		keyList.add(new KeyCooldown(keybinding, standardCooldown));
+	public static void increaseCooldowntimer() {
+		cooldowntimer++;
 	}
 	
-	public void decreaseCooldowns() {
-		Stack<Integer> index=new Stack<Integer>();
-		for(KeyCooldown key: keyList) {
-			if(key.getCoooldown()==0) {
-				index.add(keyList.indexOf(key));
-			}else {
-				key.cooldown--;
-			}
-		}
-		for (int i = 0; i < index.size(); i++) {
-			keyList.remove((int)index.pop());
-		}
-	}
-	
-	public boolean isKeyDown(KeyBinding key) {
-		boolean down=Keyboard.isKeyDown(key.getKeyCode());
+	public static boolean isKeyDown(KeyBinding keybind) {
+		boolean down=Keyboard.isKeyDown(keybind.getKeyCode());
 		if(down) {
-			for(KeyCooldown keys: keyList) {
-				if(keys.getKeyName().contentEquals(key.getKeyDescription())) {
-					return false;
+			if(cooldownHashMap.containsKey(keybind)) {
+				if(standardCooldown<=cooldowntimer-(long)cooldownHashMap.get(keybind)) {
+					cooldownHashMap.put(keybind, cooldowntimer);
+					return true;
 				}
+				return false;
+			}else {
+				cooldownHashMap.put(keybind, cooldowntimer);
+				return true;
 			}
-			keyList.add(new KeyCooldown(key, standardCooldown));
 		}
-		return down;
+		return false;
 	}
 	
-	class KeyCooldown{
-		private KeyBinding key;
-		private int standardCooldown;
-		public int cooldown=0;
-		
-		public KeyCooldown(KeyBinding key, int standardCooldown) {
-			this.key=key;
-			this.standardCooldown=standardCooldown;
-			this.cooldown=standardCooldown;
-		}
-		
-		public int getCoooldown() {
-			return cooldown;
-		}
-		
-		public void setPressed() {
-			cooldown=standardCooldown;
-		}
-		
-		public int getKeycode() {
-			return key.getKeyCode();
-		}
-		
-		public void decreaseCooldown() {
-			if(cooldown>0) {
-				cooldown--;
-			}
-		}
-		public String getKeyName() {
-			return key.getKeyDescription();
-		}
-	}
 }
