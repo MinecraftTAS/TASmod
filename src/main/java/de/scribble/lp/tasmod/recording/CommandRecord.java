@@ -1,6 +1,7 @@
 package de.scribble.lp.tasmod.recording;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
 public class CommandRecord extends CommandBase{
-    private Minecraft mc = Minecraft.getMinecraft();
     private boolean check = false;
 
     public List<String> getFilenames() {
@@ -64,12 +64,20 @@ public class CommandRecord extends CommandBase{
             	TickSyncServer.resetTickCounter();
             	CommonProxy.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(),true,TickSyncServer.isEnabled()));
                 sender.sendMessage(new TextComponentString("No filename set! Generating one..."));
-                InputRecorder.startRecording();
+                try {
+					InputRecorder.startRecording();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
             }
             if (args.length == 1) {
             	TickSyncServer.resetTickCounter();
             	CommonProxy.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(),true,TickSyncServer.isEnabled()));
-            	InputRecorder.startRecording(args[0]);
+            	try {
+					InputRecorder.startRecording(args[0]);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
             }
             if (args.length > 1) {
                 sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments"));
