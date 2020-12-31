@@ -2,7 +2,9 @@ package de.scribble.lp.tasmod.tickratechanger;
 
 import org.lwjgl.input.Keyboard;
 
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 
 public class TickrateChangerClient {
@@ -12,8 +14,6 @@ public class TickrateChangerClient {
 	public static TickrateChangerClient INSTANCE= new TickrateChangerClient();
 	public static float TICKRATE_SAVED=20F;
 	public static boolean ADVANCE_TICK=false;
-	public static int cooldownKeyPause;
-	public static int cooldownKeyAdvance;
 	
 
 	public static void changeClientTickrate(float tickrate) {
@@ -45,11 +45,9 @@ public class TickrateChangerClient {
      * Bypasses the tick system
      */
     public void bypass() {
-		if (Keyboard.isKeyDown(Keyboard.KEY_F8)&&cooldownKeyPause==0) {
-			cooldownKeyPause=10;
+		if (ClientProxy.getVkeys().isKeyDown(ClientProxy.tickratezeroKey)) {
 			pauseUnpauseGame();
-		} else if (Keyboard.isKeyDown(Keyboard.KEY_F9)&&cooldownKeyAdvance==0) {
-			cooldownKeyAdvance=10;
+		} else if (ClientProxy.getVkeys().isKeyDown(ClientProxy.tickAdvance)) {
 			advanceTick();
 		}
     }
