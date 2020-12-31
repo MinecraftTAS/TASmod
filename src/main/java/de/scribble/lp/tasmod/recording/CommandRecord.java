@@ -69,7 +69,6 @@ public class CommandRecord extends CommandBase{
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
-                sender.sendMessage(new TextComponentString("Recording started"));
             }
             if (args.length == 1) {
             	TickSyncServer.resetTickCounter();
