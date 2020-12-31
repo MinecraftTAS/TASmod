@@ -134,7 +134,9 @@ public class InputPlayback {
 			if(!Display.isActive()) {
 				stopPlayback();
 			}
-			
+			if(ClientProxy.getVkeys().isKeyDown(ClientProxy.stopkey)) {
+				stopPlayback();
+			}
 			if(pausePlayback) {
 				return;
 			}

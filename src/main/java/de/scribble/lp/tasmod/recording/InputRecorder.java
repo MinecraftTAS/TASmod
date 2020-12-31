@@ -114,6 +114,9 @@ public class InputRecorder {
 			if(!Display.isActive()) {
 				stopRecording();
 			}
+			if(ClientProxy.getVkeys().isKeyDown(ClientProxy.stopkey)) {
+				stopRecording();
+			}
 			if(pauseRecording) {
 				return;
 			}

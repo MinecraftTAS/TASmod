@@ -1,5 +1,7 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
+import org.lwjgl.input.Keyboard;
+
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -43,9 +45,9 @@ public class TickrateChangerClient {
      * Bypasses the tick system
      */
     public void bypass() {
-		if (VirtualKeybindings.isKeyDown(ClientProxy.tickratezeroKey)) {
+		if (ClientProxy.getVkeys().isKeyDown(ClientProxy.tickratezeroKey)) {
 			pauseUnpauseGame();
-		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickAdvance)) {
+		} else if (ClientProxy.getVkeys().isKeyDown(ClientProxy.tickAdvance)) {
 			advanceTick();
 		}
     }
