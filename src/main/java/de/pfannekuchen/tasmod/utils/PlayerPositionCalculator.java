@@ -27,9 +27,10 @@ public class PlayerPositionCalculator {
 		bb = source.getEntityBoundingBox();
 		float f6 = 0.91F;
 
-		float strafe = source.moveStrafing;
+		float strafe = mc.gameSettings.keyBindForward.isKeyDown() ? .98f : mc.gameSettings.keyBindBack.isKeyDown() ? -.98f : 0f;
 		float up = source.moveVertical;
-		float forward = source.moveForward;
+		float forward = mc.gameSettings.keyBindLeft.isKeyDown() ? .98f : mc.gameSettings.keyBindRight.isKeyDown() ? -.98f : 0f;
+		
 		double motionX = source.motionX;
 		double motionY = source.motionY;
 		double motionZ = source.motionZ;
