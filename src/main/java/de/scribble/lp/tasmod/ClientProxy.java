@@ -1,12 +1,9 @@
 package de.scribble.lp.tasmod;
 
-<<<<<<< Updated upstream
 import org.lwjgl.input.Keyboard;
 
 import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
-=======
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
->>>>>>> Stashed changes
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.settings.KeyBinding;
