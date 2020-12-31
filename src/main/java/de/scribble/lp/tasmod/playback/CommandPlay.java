@@ -97,9 +97,11 @@ public class CommandPlay extends CommandBase{
         } else if(InputPlayback.isPlayingback()){
             InputPlayback.stopPlayback();
             sender.sendMessage(new TextComponentString("Playback finished"));
-			String[] sentences = new String[] {"I have finished my TAS", "Thats time!", "Playback done, where's the money?", "Im done, what's next?"};
-			Minecraft.getMinecraft().player.sendChatMessage(sentences[new Random().nextInt(sentences.length)]); // Uwot here he is using Random!!!
-		}
+			
+            //String[] sentences = new String[] {"I have finished my TAS", "Thats time!", "Playback done, where's the money?", "Im done, what's next?"};
+			//Minecraft.getMinecraft().player.sendChatMessage(sentences[new Random().nextInt(sentences.length)]); // Uwot here he is using Random!!!
+            // Sad Pfannekuchen right here ^
+        }
     }
 
     @Override
