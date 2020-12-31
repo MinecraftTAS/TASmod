@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
+import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.tutorial.CommandPlaybacktutorial;
 import net.minecraft.server.MinecraftServer;
@@ -37,6 +38,7 @@ public class ModLoader {
 	
 	public static final Logger logger= LogManager.getFormatterLogger("TASMod");
 	
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent ev) {
 		proxy.preInit(ev);
@@ -63,5 +65,8 @@ public class ModLoader {
 	}
 	public static ModLoader getInstance() {
 		return instance;
+	}
+	public MinecraftServer getServerInstance() {
+		return serverInstance;
 	}
 }

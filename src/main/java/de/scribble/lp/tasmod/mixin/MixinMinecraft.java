@@ -210,12 +210,13 @@ public abstract class MixinMinecraft {
         long l = System.nanoTime();
         this.mcProfiler.startSection("tick");
         //TASmod
-        if(TickrateChangerClient.cooldownKeyPause>0) {
-        	TickrateChangerClient.cooldownKeyPause--;
-        }
-        if(TickrateChangerClient.cooldownKeyAdvance>0) {
-        	TickrateChangerClient.cooldownKeyAdvance--;
-        }
+//        if(TickrateChangerClient.cooldownKeyPause>0) {
+//        	TickrateChangerClient.cooldownKeyPause--;
+//        }
+//        if(TickrateChangerClient.cooldownKeyAdvance>0) {
+//        	TickrateChangerClient.cooldownKeyAdvance--;
+//        }
+        ClientProxy.getVkeys().decreaseCooldowns();
         TickrateChangerClient.INSTANCE.bypass();
         for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
         {
