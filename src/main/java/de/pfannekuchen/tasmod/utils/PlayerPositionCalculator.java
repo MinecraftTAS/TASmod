@@ -19,6 +19,10 @@ import net.minecraft.util.math.Vec3d;
 
 public class PlayerPositionCalculator {
 
+	public static double xNew = 0f;
+	public static double yNew = 0f;
+	public static double zNew = 0f;
+	
 	public static void calculateNextPosition(Minecraft mc, EntityPlayer source) {
 		bb = source.getEntityBoundingBox();
 		float f6 = 0.91F;
@@ -341,6 +345,10 @@ public class PlayerPositionCalculator {
         Vec3d vec3d2 = vec3d.addVector(vec3d1.x * mc.playerController.getBlockReachDistance(), vec3d1.y * mc.playerController.getBlockReachDistance(), vec3d1.z * mc.playerController.getBlockReachDistance());
         
         RayTraceResult result = source.world.rayTraceBlocks(vec3d, vec3d2, false, false, true);
+        
+        xNew = posX;
+        yNew = posY;
+        zNew = posZ;
         
         Minecraft.getMinecraft().renderGlobal.drawSelectionBox(source, result, 0, Minecraft.getMinecraft().getRenderPartialTicks());
 		GlStateManager.enableAlpha();
