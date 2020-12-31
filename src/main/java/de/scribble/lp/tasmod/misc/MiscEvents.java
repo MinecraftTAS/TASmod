@@ -1,15 +1,8 @@
 package de.scribble.lp.tasmod.misc;
 
-import java.io.File;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 
 public class MiscEvents {
 	public static boolean ignorerespawntimerClient=false;

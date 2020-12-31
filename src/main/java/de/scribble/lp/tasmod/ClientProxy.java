@@ -2,6 +2,7 @@ package de.scribble.lp.tasmod;
 
 import org.lwjgl.input.Keyboard;
 
+import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -13,7 +14,6 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import scala.swing.event.Key;
 
 public class ClientProxy extends CommonProxy{
 	
@@ -27,9 +27,11 @@ public class ClientProxy extends CommonProxy{
 	
 	private static VirtualKeybindings vkeys;
 	
-	public static KeyBinding tickratezeroKey= new KeyBinding("Tickrate 0 Key", Keyboard.KEY_F8, "TASmod");
+	public static KeyBinding tickratezeroKey= new KeyBinding("Toggle Tick Advance", Keyboard.KEY_F8, "TASmod");
 	
-	public static KeyBinding tickAdvance= new KeyBinding("Tickadvance Key", Keyboard.KEY_F9, "TASmod");
+	public static KeyBinding tickAdvance= new KeyBinding("Advance Tick", Keyboard.KEY_F9, "TASmod");
+	
+	public static KeyBinding showNextLocation= new KeyBinding("Show Next Location", Keyboard.KEY_O, "TASmod");
 	
 	public static KeyBinding stopkey= new KeyBinding("Recording/Playback Stop", Keyboard.KEY_F10, "TASmod");
 	
@@ -45,6 +47,7 @@ public class ClientProxy extends CommonProxy{
 		playbackTutorial=new TutorialHandler((short)1);
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
+		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
 		
 		saveHandler=new SavestateHandlerClient();
 		vkeys=new VirtualKeybindings();
@@ -52,6 +55,7 @@ public class ClientProxy extends CommonProxy{
 		ClientRegistry.registerKeyBinding(tickratezeroKey);
 		ClientRegistry.registerKeyBinding(tickAdvance);
 		ClientRegistry.registerKeyBinding(stopkey);
+		ClientRegistry.registerKeyBinding(showNextLocation);
 		super.init(ev);
 	}
 	public void postInit(FMLPostInitializationEvent ev) {
