@@ -13,6 +13,7 @@ import org.lwjgl.opengl.Display;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
+import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
@@ -115,15 +116,11 @@ public class InputRecorder {
 	 * output
 	 */
 	public static void recordTick() {
-		if (recording) {
-			/* Key for stopping the recording */
-			if (Keyboard.isKeyDown(Keyboard.KEY_N)) {
+		if(recording) {
+			if(!Display.isActive()) {
 				stopRecording();
 			}
-			if (!Display.isActive()) {
-				stopRecording();
-			}
-			if (ClientProxy.getVkeys().isKeyDown(ClientProxy.stopkey)) {
+			if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
 				stopRecording();
 			}
 			if (pauseRecording) {
