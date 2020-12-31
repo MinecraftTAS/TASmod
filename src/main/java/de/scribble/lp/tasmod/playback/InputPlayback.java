@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +20,7 @@ import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.TextComponentString;
 
 /**
  * Takes a file and produces VirtualEvents that can be presses in the VirtualMouseAndKeyboard

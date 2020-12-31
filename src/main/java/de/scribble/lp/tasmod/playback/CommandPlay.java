@@ -3,6 +3,7 @@ package de.scribble.lp.tasmod.playback;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.google.common.collect.ImmutableList;
 
@@ -79,6 +80,7 @@ public class CommandPlay extends CommandBase{
                 	TickSyncServer.resetTickCounter();
                 	CommonProxy.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(),true,TickSyncServer.isEnabled()));
                     InputPlayback.startPlayback(file,args[0]);
+                    sender.sendMessage(new TextComponentString("Playback started"));
                     return;
                 } else if (args.length == 2 && !args[1].equalsIgnoreCase("load")) {
                     sender.sendMessage(new TextComponentString(TextFormatting.RED + "Wrong usage! /play <filename> (load)"));
@@ -94,7 +96,10 @@ public class CommandPlay extends CommandBase{
             return;
         } else if(InputPlayback.isPlayingback()){
             InputPlayback.stopPlayback();
-        }
+            sender.sendMessage(new TextComponentString("Playback finished"));
+			String[] sentences = new String[] {"I have finished my TAS", "Thats time!", "Playback done, where's the money?", "Im done, what's next?"};
+			Minecraft.getMinecraft().player.sendChatMessage(sentences[new Random().nextInt(sentences.length)]); // Uwot here he is using Random!!!
+		}
     }
 
     @Override
