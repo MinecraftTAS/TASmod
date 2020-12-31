@@ -15,6 +15,7 @@ import org.lwjgl.opengl.Display;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
+import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
@@ -136,7 +137,7 @@ public class InputPlayback {
 			if(!Display.isActive()) {
 				stopPlayback();
 			}
-			if(ClientProxy.getVkeys().isKeyDown(ClientProxy.stopkey)) {
+			if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
 				stopPlayback();
 			}
 			if(pausePlayback) {
