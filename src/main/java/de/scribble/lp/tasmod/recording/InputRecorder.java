@@ -119,15 +119,15 @@ public class InputRecorder {
 	 */
 	public static void recordTick() {
 		if(recording) {
-//			if(!Display.isActive()) {
-//				stopRecording();
-//			}
+			if(!Display.isActive()) {
+				stopRecording();
+			}
 			if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
 				stopRecording();
 			}
-			if(Keyboard.isKeyDown(Keyboard.KEY_P)) {
-				pauseRecording=!pauseRecording;
-			}
+//			if(Keyboard.isKeyDown(Keyboard.KEY_P)) {
+//				pauseRecording=!pauseRecording;
+//			}
 			if (pauseRecording) {
 				return;
 			}
