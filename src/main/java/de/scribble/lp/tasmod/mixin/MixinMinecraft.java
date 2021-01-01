@@ -760,6 +760,7 @@ public abstract class MixinMinecraft {
 			if (net.minecraftforge.client.ForgeHooksClient.postMouseEvent()) continue; //Might have to disable this one
 			
 			int i = VirtualMouseAndKeyboard.getEventMouseButton() + 100;
+			VirtualMouseAndKeyboard.runThroughKeyboard(i-100, VirtualMouseAndKeyboard.getEventMouseButtonState());
 			KeyBinding.setKeyBindState(i - 100, VirtualMouseAndKeyboard.getEventMouseButtonState());
 
 			if (VirtualMouseAndKeyboard.getEventMouseButtonState()) {
