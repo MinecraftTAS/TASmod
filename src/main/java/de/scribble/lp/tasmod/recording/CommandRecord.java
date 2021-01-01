@@ -79,14 +79,12 @@ public class CommandRecord extends CommandBase{
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
-            	sender.sendMessage(new TextComponentString("Recording started"));
             }
             if (args.length > 1) {
                 sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments"));
             }
         } else if (InputRecorder.isRecording()) {
             InputRecorder.stopRecording();
-            sender.sendMessage(new TextComponentString("Recording stopped"));
         } else {
             sender.sendMessage(new TextComponentString(TextFormatting.RED + "A playback is running. /play to abort"));
         }

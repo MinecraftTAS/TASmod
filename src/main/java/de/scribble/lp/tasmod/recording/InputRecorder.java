@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
 import de.scribble.lp.tasmod.ClientProxy;
@@ -19,6 +18,7 @@ import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.TextComponentString;
 
 /**
  * Takes keys from the VirtualMouseAndKeyboard and adds them to a file
@@ -56,6 +56,7 @@ public class InputRecorder {
 	public static void startRecording(String filename) throws FileNotFoundException {
 		if (!recording) {
 			makeTASDir();
+			mc.player.sendMessage(new TextComponentString("Recording started"));
 			File files = interpretFilename(filename);
 			if (files == null) {
 				logger.error("The filename is not applicable");
@@ -256,10 +257,10 @@ public class InputRecorder {
 			if (TutorialHandler.istutorial && tutorial.getState() == 4) {
 				tutorial.advanceState();
 			}
+			mc.player.sendMessage(new TextComponentString("Recording stopped"));
 			fileThread.close();
 //			Thread t2 = new Thread(new FileWriterThread(outputSubtick, fileLocationSubTick, logger), "FileWriterThreadSubtick");
 //			t2.start();
-//			RandomLogger.stopRandomLogging();
 		} else {
 			logger.error("There is no recording that can be aborted!");
 		}

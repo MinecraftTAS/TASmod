@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +21,7 @@ import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * Takes a file and produces VirtualEvents that can be presses in the VirtualMouseAndKeyboard
@@ -30,6 +30,7 @@ import net.minecraft.util.text.TextComponentString;
  *
  */
 public class InputPlayback {
+	private static Minecraft mc= Minecraft.getMinecraft();
 	private static boolean playingback;
 	private static Logger logger= LogManager.getLogger("InputPlayback");
 	private static File fileLocation;
@@ -51,6 +52,7 @@ public class InputPlayback {
 			}catch (IOException e){
 				logger.error("Cannot read the tasfile "+filename);
 				e.printStackTrace();
+				mc.player.sendMessage(new TextComponentString(e.getMessage()));
 				return;
 			}
 			try {
@@ -58,8 +60,10 @@ public class InputPlayback {
 			} catch (IOException e) {
 				logger.error("Cannot read the tasfile "+filename);
 				e.printStackTrace();
+				mc.player.sendMessage(new TextComponentString(TextFormatting.RED+e.getMessage()));
 				return;
 			}
+			mc.player.sendMessage(new TextComponentString("Playback started"));
 			playingback=true;
 			playbackIndex=-1;
 			subtickPlaybackindex=-1;
@@ -121,6 +125,7 @@ public class InputPlayback {
 			inputList=new ArrayList<TickFrame>();
 			subtickList=new ArrayList<VirtualSubticks>();
 			VirtualMouseAndKeyboard.unpressEverything();
+			mc.player.sendMessage(new TextComponentString("Playback finished"));
 //			RandomLogger.stopRandomLogging();
 		}
 	}
@@ -219,8 +224,7 @@ public class InputPlayback {
 					}else {
 						//Errorhandling
 						buff.close();
-						logger.error("Error while reading 'Everything related to keyboard' in " + Filename + " in line " + linecounter+". Keyboard, KeyboardState and CharTyped always need to have the same number of inputs");
-						throw new IOException();
+						throw new IOException("Error while reading 'Everything related to keyboard' in " + Filename + " in line " + linecounter+". Keyboard, KeyboardState and CharTyped always need to have the same number of inputs");
 					}
 					
 					//Same as the keyboard but with the mouse
@@ -233,8 +237,7 @@ public class InputPlayback {
 						
 					}else {
 						buff.close();
-						logger.error("Error while reading 'Everything related to mouse' in " + Filename + " in line " + linecounter+". Mouse, MouseStates, ScrollWheel, DeltaX, DeltaY, MouseX, MouseY and slotID always need to have the same number of inputs");
-						throw new IOException();
+						throw new IOException("Error while reading 'Everything related to mouse' in " + Filename + " in line " + linecounter+". Mouse, MouseStates, ScrollWheel, DeltaX, DeltaY, MouseX, MouseY and slotID always need to have the same number of inputs");
 					}
 					//Adding every keyboard an mouse event from the current tick into yet another list that contains every input from every tick 
 					inputList.add(new TickFrame(tick, keyboardEvents, mouseEvents));
@@ -248,8 +251,7 @@ public class InputPlayback {
 	/*The following methods take different sections of the line and interpret them. Returns all inputs as a list*/
 	private static int getTickCounter(String[] sections, int linecounter, int sectionnumber) throws IOException {
 		if(sections[sectionnumber].isEmpty()) {
-			logger.error("Error while reading tickcounter in "+Filename+ " in line "+linecounter+"and the input in position "+1+" from the left. The input is empty!");
-			throw new IOException();
+			throw new IOException("Error while reading tickcounter in "+Filename+ " in line "+linecounter+"and the input in position "+1+" from the left. The input is empty!");
 		}else {
 			int counter=getNumber("tickcounter", sections[sectionnumber], linecounter, 0);
 			return counter;
@@ -271,8 +273,7 @@ public class InputPlayback {
 					if(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i])!=-1) {
 						out.add(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]));
 					} else{
-						logger.error("Error while reading 'Keyboard' in "+Filename+ " in line "+linecounter+" and the input in position "+(i+1)+" from the left. Couldn't find the key "+keys[i]+".");
-						throw new IOException();
+						throw new IOException("Error while reading 'Keyboard' in "+Filename+ " in line "+linecounter+" and the input in position "+(i+1)+" from the left. Couldn't find the key "+keys[i]+".");
 					}
 				}
 			}
@@ -294,10 +295,9 @@ public class InputPlayback {
 				if (keys[i].contentEquals("true")||keys[i].contentEquals("false")) {
 					out.add(Boolean.parseBoolean(keys[i]));
 				} else {
-					logger.error("Error while reading 'KeyboardState' in " + Filename + " in line " + linecounter
+					throw new IOException("Error while reading 'KeyboardState' in " + Filename + " in line " + linecounter
 							+ " and the key in position " + (i + 1) + " from the left. Input is not true or false: '"
 							+ keys[i] + "'");
-					throw new IOException();
 				}
 			}
 		}
@@ -315,8 +315,6 @@ public class InputPlayback {
 				for (int j = 0; j < chars.length; j++) {
 					out.add(chars[j]);
 				}
-
-			
 		}
 		return out;
 	}
@@ -338,10 +336,9 @@ public class InputPlayback {
 					if (VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]) != -1) {
 							out.add(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]));
 					} else {
-						logger.error("Error while reading 'Mouse' in " + Filename + " in line " + linecounter
+						throw new IOException("Error while reading 'Mouse' in " + Filename + " in line " + linecounter
 								+ " and the key in position " + (i + 1) + " from the left. Couldn't find the key "
 								+ keys[i]);
-						throw new IOException();
 					}
 				}
 			}
@@ -363,10 +360,9 @@ public class InputPlayback {
 				if (keys[i].contentEquals("true")||keys[i].contentEquals("false")) {
 					out.add(Boolean.parseBoolean(keys[i]));
 				} else {
-					logger.error("Error while reading 'MouseState' in " + Filename + " in line " + linecounter
+					throw new IOException("Error while reading 'MouseState' in " + Filename + " in line " + linecounter
 							+ " and the key in position " + (i + 1) + " from the left. Input is not true or false: '"
 							+ keys[i] + "'");
-					throw new IOException();
 				}
 			}
 		}
@@ -476,8 +472,7 @@ public class InputPlayback {
 		try {
 			counter=Integer.parseInt(number);
 		} catch (NumberFormatException e) {
-			logger.error("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number ("+number+")");
-			throw new IOException();
+			throw new IOException("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number ("+number+")");
 		}
 		return counter;
 	}
@@ -495,8 +490,7 @@ public class InputPlayback {
 		try {
 			counter=Float.parseFloat(floatnumber);
 		}catch (NumberFormatException e) {
-			logger.error("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number type float ("+floatnumber+")");
-			throw new IOException();
+			throw new IOException("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number type float ("+floatnumber+")");
 		}
 		return counter;
 	}
@@ -505,8 +499,7 @@ public class InputPlayback {
 		try {
 			counter=Double.parseDouble(doublenumber);
 		}catch (NumberFormatException e) {
-			logger.error("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number of type double ("+doublenumber+")");
-			throw new IOException();
+			throw new IOException("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number of type double ("+doublenumber+")");
 		}
 		return counter;
 	}
@@ -520,7 +513,7 @@ public class InputPlayback {
 			sections[sectionnumber]=sections[sectionnumber].replace("Pitch:", "");
 		}
 		if(sections[sectionnumber].isEmpty()) {
-			logger.error("Error while reading pitch in "+Filename+ " in line "+linecounter+". The input is empty!");
+			throw new IOException("Error while reading pitch in "+Filename+ " in line "+linecounter+". The input is empty!");
 		}else {
 			x=getFloat("Pitch", sections[sectionnumber], linecounter, 1);
 		}
@@ -532,7 +525,7 @@ public class InputPlayback {
 			sections[sectionnumber]=sections[sectionnumber].replace("Yaw:", "");
 		}
 		if(sections[sectionnumber].isEmpty()) {
-			logger.error("Error while reading yaw in "+Filename+ " in line "+linecounter+". The input is empty!");
+			throw new IOException("Error while reading yaw in "+Filename+ " in line "+linecounter+". The input is empty!");
 		}else {
 			y=getFloat("Yaw", sections[sectionnumber], linecounter, 1);
 		}
