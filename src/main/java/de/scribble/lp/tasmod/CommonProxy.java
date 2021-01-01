@@ -1,5 +1,8 @@
 package de.scribble.lp.tasmod;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
@@ -17,6 +20,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class CommonProxy {
 	public static SimpleNetworkWrapper NETWORK;
+	public static Logger logger= LogManager.getLogger("TASmod");
 	public void preInit(FMLPreInitializationEvent ev) {
 		NETWORK= NetworkRegistry.INSTANCE.newSimpleChannel("tasmod");
 		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, 0, Side.SERVER);

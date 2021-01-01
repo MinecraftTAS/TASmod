@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.playback.InputPlayback;
-import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import net.minecraft.client.Minecraft;
@@ -21,7 +20,6 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.crash.ICrashReportDetail;
 import net.minecraft.util.ReportedException;
 
 @Mixin(EntityRenderer.class)
@@ -278,7 +276,7 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
             }
             InputPlayback.nextPlaybackSubtick();
             VirtualMouseAndKeyboard.fillSubtick(VirtualMouseAndKeyboard.getTimeSinceLastTick(), mc.player.rotationPitch,  mc.player.rotationYaw);
-            InputRecorder.recordSubTick();
+//            InputRecorder.recordSubTick();
             VirtualMouseAndKeyboard.fillSubtickWithPlayback();
             mc.player.rotationPitch=VirtualMouseAndKeyboard.getSubtickPitch();
             mc.player.rotationYaw=VirtualMouseAndKeyboard.getSubtickYaw();

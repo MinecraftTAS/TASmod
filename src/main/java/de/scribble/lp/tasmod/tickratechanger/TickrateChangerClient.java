@@ -1,8 +1,8 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
-import org.lwjgl.input.Keyboard;
-
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 
 public class TickrateChangerClient {
@@ -12,8 +12,6 @@ public class TickrateChangerClient {
 	public static TickrateChangerClient INSTANCE= new TickrateChangerClient();
 	public static float TICKRATE_SAVED=20F;
 	public static boolean ADVANCE_TICK=false;
-	public static int cooldownKeyPause;
-	public static int cooldownKeyAdvance;
 	
 
 	public static void changeClientTickrate(float tickrate) {
@@ -28,20 +26,26 @@ public class TickrateChangerClient {
 	}
 
 	public static void pauseUnpauseGame() {
-		CommonProxy.NETWORK.sendToServer(new TickratePacket(false, 20, true));
+		if(Minecraft.getMinecraft().world!=null) {
+			CommonProxy.NETWORK.sendToServer(new TickratePacket(false, 20, true));
+		}else {
+			pauseUnpauseClient();
+		}
     }
     public static void advanceTick() {
-    	CommonProxy.NETWORK.sendToServer(new TickratePacket(true, 20, false));
+    	if(Minecraft.getMinecraft().world!=null) {
+    		CommonProxy.NETWORK.sendToServer(new TickratePacket(true, 20, false));
+    	}else {
+    		advanceClientTick();
+    	}
     }
     /**
      * Bypasses the tick system
      */
     public void bypass() {
-		if (Keyboard.isKeyDown(Keyboard.KEY_F8)&&cooldownKeyPause==0) {
-			cooldownKeyPause=10;
+		if (VirtualKeybindings.isKeyDown(ClientProxy.tickratezeroKey)) {
 			pauseUnpauseGame();
-		} else if (Keyboard.isKeyDown(Keyboard.KEY_F9)&&cooldownKeyAdvance==0) {
-			cooldownKeyAdvance=10;
+		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickAdvance)) {
 			advanceTick();
 		}
     }
@@ -50,5 +54,17 @@ public class TickrateChangerClient {
 		changeClientTickrate(TICKRATE_SAVED);
 		ADVANCE_TICK=true;
 	}
-
+	
+	/**
+	 * Pauses and unpauses the client, used in main menus
+	 */
+	public static void pauseUnpauseClient() {
+		if(TICKS_PER_SECOND>0) {
+    		TICKRATE_SAVED=TICKS_PER_SECOND;
+			changeClientTickrate(0F);
+    	}
+    	else if (TICKS_PER_SECOND==0) {
+    		changeClientTickrate(TICKRATE_SAVED);
+    	}
+	}
 }

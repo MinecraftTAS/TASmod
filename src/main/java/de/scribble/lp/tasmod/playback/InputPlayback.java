@@ -9,14 +9,19 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.Display;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.util.PointerNormalizer;
+import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * Takes a file and produces VirtualEvents that can be presses in the VirtualMouseAndKeyboard
@@ -25,11 +30,13 @@ import net.minecraft.client.Minecraft;
  *
  */
 public class InputPlayback {
+	private static Minecraft mc= Minecraft.getMinecraft();
 	private static boolean playingback;
 	private static Logger logger= LogManager.getLogger("InputPlayback");
 	private static File fileLocation;
 	private static String Filename;
 	public static int playbackIndex=-1;
+	private static boolean pausePlayback;
 	private static List<TickFrame> inputList=new ArrayList<TickFrame>();
 	
 	private static List<VirtualSubticks> subtickList= new ArrayList<VirtualSubticks>();
@@ -41,16 +48,27 @@ public class InputPlayback {
 			fileLocation=file;
 			inputList=new ArrayList<TickFrame>();
 			try {
+				readHeader();
+			}catch (IOException e){
+				logger.error("Cannot read the tasfile "+filename);
+				e.printStackTrace();
+				mc.player.sendMessage(new TextComponentString(e.getMessage()));
+				return;
+			}
+			try {
 				readInputs();
 			} catch (IOException e) {
 				logger.error("Cannot read the tasfile "+filename);
 				e.printStackTrace();
+				mc.player.sendMessage(new TextComponentString(TextFormatting.RED+e.getMessage()));
 				return;
 			}
+			mc.player.sendMessage(new TextComponentString("Playback started"));
 			playingback=true;
 			playbackIndex=-1;
 			subtickPlaybackindex=-1;
 			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();
+			Minecraft.getMinecraft().gameSettings.chatLinks=false;
 			if(tutorial.istutorial&&tutorial.getState()==6) {
 				tutorial.advanceState();
 			}
@@ -60,6 +78,43 @@ public class InputPlayback {
 			logger.error("There is a playback already running!");
 		}
 	}
+	private static void readHeader()throws IOException {
+		//Create a bunch of variables
+		BufferedReader buff = new BufferedReader(new FileReader(fileLocation));
+		String wholeLine="";
+		int linecounter=0;
+		//Read the lines until the line is null
+		while((wholeLine=buff.readLine()) != null) {
+			linecounter++;
+			if(wholeLine.startsWith("###########################################################################################################")) {
+				break;
+			}
+			if(wholeLine.startsWith("#StartLocation:")) {
+				tpPlayer(wholeLine, linecounter);
+			}
+		}
+		buff.close();
+	}
+	private static void tpPlayer(String wholeLine, int linecounter) throws IOException {
+		wholeLine=wholeLine.replace("#StartLocation:", "");
+		String[] section = wholeLine.split(",");
+		if(section.length<5) {
+			logger.error("Error while reading header in "+Filename+" in line "+linecounter+". Incorrect tp position");
+			throw new IOException();
+		}
+		Minecraft.getMinecraft().player.sendChatMessage("/tp "+section[0]+" "+section[1]+" "+section[2]+" "+section[3]+" "+section[4]); //I don't care anymore TODO
+		
+	}
+	/* This was part in my journey of making the cursor scale with the window (See pointernormalizer. Maybe I'll find a use for this again
+	
+	private static void getGameResolution(String wholeLine, int linecounter) throws IOException {
+		wholeLine=wholeLine.replace("#Resolution:", "");
+		String[] section = wholeLine.split("x");
+		if(section.length<3) {
+			logger.error("Error while reading header in "+Filename+" in line "+linecounter+". Incorrect resolution");
+			throw new IOException();
+		}
+	}*/
 	public static void stopPlayback() {
 		if(isPlayingback()) {
 			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();
@@ -70,6 +125,7 @@ public class InputPlayback {
 			inputList=new ArrayList<TickFrame>();
 			subtickList=new ArrayList<VirtualSubticks>();
 			VirtualMouseAndKeyboard.unpressEverything();
+			mc.player.sendMessage(new TextComponentString("Playback finished"));
 //			RandomLogger.stopRandomLogging();
 		}
 	}
@@ -83,6 +139,15 @@ public class InputPlayback {
 				logger.info("Ticks finished playback");
 				stopPlayback();
 			}
+			if(!Display.isActive()) {
+				stopPlayback();
+			}
+			if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
+				stopPlayback();
+			}
+			if(pausePlayback) {
+				return;
+			}
 			playbackIndex++;
 		}
 	}
@@ -91,6 +156,9 @@ public class InputPlayback {
 			if(subtickPlaybackindex==subtickList.size()-1) {
 				logger.info("Subticks finished playback");
 				stopPlayback();
+			}
+			if(pausePlayback) {
+				return;
 			}
 			subtickPlaybackindex++;
 		}
@@ -124,21 +192,9 @@ public class InputPlayback {
 			while((wholeLine=buff.readLine()) != null) {
 				//Increment the linecounter
 				linecounter++;
-				//Sets the tp location for the start of the TAS TODO Maybe remove this in the future
-				if(wholeLine.startsWith("#StartLocation:")) {
-					tpPlayer(wholeLine, linecounter);
-					continue;
 				//Skip comments
-				}else if(wholeLine.startsWith("#")) {
+				if(wholeLine.startsWith("#")) {
 					continue;
-				//Read subticks
-				}else if(wholeLine.startsWith("S")) {
-					String[] sections=wholeLine.split("\\|");
-					sections[0]=sections[0].replace("S", "");
-					int tick=getTickCounter(sections, linecounter, 0);
-					float pitch=getSubtickPitch(sections, linecounter);
-					float yaw=getSubtickYaw(sections, linecounter);
-					subtickList.add(new VirtualSubticks(tick, pitch, yaw));
 				//Read ticks
 				}else {
 					//Split the whole line into sections seperated by a "|"
@@ -152,7 +208,10 @@ public class InputPlayback {
 					List<Integer> scrollWheelDeltas=getScrollWheelDeltas(sections, linecounter, 7);
 					List<Integer> mouseX=getMouseX(sections, linecounter, 8);
 					List<Integer> mouseY=getMouseY(sections, linecounter, 8);
-					List<Integer> slotID= getSlotID(sections, linecounter, 9);
+					float pitch=getPitch(sections, linecounter,9);
+					float yaw=getYaw(sections, linecounter,10);
+					List<Integer> slotID= getSlotID(sections, linecounter, 11);
+					
 					
 					List<VirtualKeyboardEvent> keyboardEvents = new ArrayList<VirtualKeyboardEvent>();
 					//Making sure keyboard presses states and chars are the same size, since there is really no reason why they shouldn't
@@ -165,8 +224,7 @@ public class InputPlayback {
 					}else {
 						//Errorhandling
 						buff.close();
-						logger.error("Error while reading 'Everything related to keyboard' in " + Filename + " in line " + linecounter+". Keyboard, KeyboardState and CharTyped always need to have the same number of inputs");
-						throw new IOException();
+						throw new IOException("Error while reading 'Everything related to keyboard' in " + Filename + " in line " + linecounter+". Keyboard, KeyboardState and CharTyped always need to have the same number of inputs");
 					}
 					
 					//Same as the keyboard but with the mouse
@@ -179,33 +237,21 @@ public class InputPlayback {
 						
 					}else {
 						buff.close();
-						logger.error("Error while reading 'Everything related to mouse' in " + Filename + " in line " + linecounter+". Mouse, MouseStates, ScrollWheel, DeltaX, DeltaY, MouseX, MouseY and slotID always need to have the same number of inputs");
-						throw new IOException();
+						throw new IOException("Error while reading 'Everything related to mouse' in " + Filename + " in line " + linecounter+". Mouse, MouseStates, ScrollWheel, DeltaX, DeltaY, MouseX, MouseY and slotID always need to have the same number of inputs");
 					}
 					//Adding every keyboard an mouse event from the current tick into yet another list that contains every input from every tick 
 					inputList.add(new TickFrame(tick, keyboardEvents, mouseEvents));
+					subtickList.add(new VirtualSubticks(tick, pitch, yaw));
 				}
 			}
 			buff.close();
 		}
 	}
 	
-	private static void tpPlayer(String wholeLine, int linecounter) throws IOException {
-		wholeLine=wholeLine.replace("#StartLocation:", "");
-		String[] section = wholeLine.split(",");
-		if(section.length<5) {
-			logger.error("Error while reading tickcounter in "+Filename+" in line "+linecounter+". Incorrect tp position");
-			throw new IOException();
-		}
-		Minecraft.getMinecraft().player.sendChatMessage("/tp "+section[0]+" "+section[1]+" "+section[2]+" "+section[3]+" "+section[4]); //I don't care anymore TODO
-		
-	}
 	/*The following methods take different sections of the line and interpret them. Returns all inputs as a list*/
 	private static int getTickCounter(String[] sections, int linecounter, int sectionnumber) throws IOException {
-		//System.out.println(sections[0]); //TODO
 		if(sections[sectionnumber].isEmpty()) {
-			logger.error("Error while reading tickcounter in "+Filename+ " in line "+linecounter+"and the input in position "+1+" from the left. The input is empty!");
-			throw new IOException();
+			throw new IOException("Error while reading tickcounter in "+Filename+ " in line "+linecounter+"and the input in position "+1+" from the left. The input is empty!");
 		}else {
 			int counter=getNumber("tickcounter", sections[sectionnumber], linecounter, 0);
 			return counter;
@@ -221,15 +267,13 @@ public class InputPlayback {
 			}
 			String[] keys= sections[sectionnumber].split(",");
 			for (int i = 0; i < keys.length; i++) {
-				//System.out.println(linecounter+" "+keys[i]); //TODO
 				if(isNumber(keys[i])) {
 					out.add(Integer.parseInt(keys[i]));
 				}else {
 					if(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i])!=-1) {
 						out.add(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]));
 					} else{
-						logger.error("Error while reading 'Keyboard' in "+Filename+ " in line "+linecounter+" and the input in position "+(i+1)+" from the left. Couldn't find the key "+keys[i]+".");
-						throw new IOException();
+						throw new IOException("Error while reading 'Keyboard' in "+Filename+ " in line "+linecounter+" and the input in position "+(i+1)+" from the left. Couldn't find the key "+keys[i]+".");
 					}
 				}
 			}
@@ -248,14 +292,12 @@ public class InputPlayback {
 				if (keys[i].contentEquals(" ")) {
 					keys[i] = "false";
 				}
-				//System.out.println(linecounter+": "+keys[i]); //TODO
 				if (keys[i].contentEquals("true")||keys[i].contentEquals("false")) {
 					out.add(Boolean.parseBoolean(keys[i]));
 				} else {
-					logger.error("Error while reading 'KeyboardState' in " + Filename + " in line " + linecounter
+					throw new IOException("Error while reading 'KeyboardState' in " + Filename + " in line " + linecounter
 							+ " and the key in position " + (i + 1) + " from the left. Input is not true or false: '"
 							+ keys[i] + "'");
-					throw new IOException();
 				}
 			}
 		}
@@ -271,11 +313,8 @@ public class InputPlayback {
 				sections[sectionnumber]= sections[sectionnumber].replace("\\n","\n"); //TODO Seperate CR and LF for linux users
 				char[] chars = sections[sectionnumber].toCharArray();
 				for (int j = 0; j < chars.length; j++) {
-					//System.out.println(linecounter + ": " + chars[j]); // TODO
 					out.add(chars[j]);
 				}
-
-			
 		}
 		return out;
 	}
@@ -294,14 +333,12 @@ public class InputPlayback {
 					if (keys[i].contentEquals(" ")) {
 						keys[i] = "MOUSEMOVED";
 					}
-					//System.out.println(linecounter+": "+keys[i]); //TODO
 					if (VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]) != -1) {
 							out.add(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]));
 					} else {
-						logger.error("Error while reading 'Mouse' in " + Filename + " in line " + linecounter
+						throw new IOException("Error while reading 'Mouse' in " + Filename + " in line " + linecounter
 								+ " and the key in position " + (i + 1) + " from the left. Couldn't find the key "
 								+ keys[i]);
-						throw new IOException();
 					}
 				}
 			}
@@ -320,14 +357,12 @@ public class InputPlayback {
 				if (keys[i].contentEquals(" ")) {
 					keys[i] = "false";
 				}
-				//System.out.println(linecounter+": "+keys[i]); //TODO
 				if (keys[i].contentEquals("true")||keys[i].contentEquals("false")) {
 					out.add(Boolean.parseBoolean(keys[i]));
 				} else {
-					logger.error("Error while reading 'MouseState' in " + Filename + " in line " + linecounter
+					throw new IOException("Error while reading 'MouseState' in " + Filename + " in line " + linecounter
 							+ " and the key in position " + (i + 1) + " from the left. Input is not true or false: '"
 							+ keys[i] + "'");
-					throw new IOException();
 				}
 			}
 		}
@@ -346,7 +381,6 @@ public class InputPlayback {
 				if (keys[i].contentEquals(" ")) {
 					keys[i] = "0";
 				}
-				//System.out.println(linecounter+": "+keys[i]); //TODO
 				out.add(getNumber("ScrollWheel", keys[i], linecounter, i));
 			}
 		}
@@ -362,7 +396,6 @@ public class InputPlayback {
 //			}
 //			String[] keys = xpart[0].split(",");
 //			for (int i = 0; i < keys.length; i++) {
-//				//System.out.println(linecounter+" "+keys[i]); //TODO
 //				out.add(Float.parseFloat(keys[i]));
 //			}
 //		}
@@ -378,7 +411,6 @@ public class InputPlayback {
 //			}
 //			String[] keys = ypart[1].split(",");
 //			for (int i = 0; i < keys.length; i++) {
-//				//System.out.println(linecounter+" "+keys[i]); //TODO
 //				out.add(Float.parseFloat(keys[i]));
 //			}
 //		}
@@ -394,8 +426,8 @@ public class InputPlayback {
 			}
 			String[] keys = xpart[0].split(",");
 			for (int i = 0; i < keys.length; i++) {
-				//System.out.println(linecounter+" "+keys[i]); //TODO
-				out.add(getNumber("MouseX", keys[i], linecounter, i));
+				double pointer=getDouble("MouseX", keys[i], linecounter, i);
+				out.add(PointerNormalizer.getCoordsX(pointer));
 			}
 		}
 		return out;
@@ -410,8 +442,8 @@ public class InputPlayback {
 			}
 			String[] keys = ypart[1].split(",");
 			for (int i = 0; i < keys.length; i++) {
-				//System.out.println(linecounter+" "+keys[i]); //TODO
-				out.add(getNumber("MouseY", keys[i], linecounter, i));
+				double pointer=getDouble("MouseY", keys[i], linecounter, i);
+				out.add(PointerNormalizer.getCoordsY(pointer));
 			}
 		}
 		return out;
@@ -428,7 +460,6 @@ public class InputPlayback {
 				if (keys[i].contentEquals(" ")) {
 					keys[i] = "-1";
 				}
-				//System.out.println(linecounter+": "+keys[i]); //TODO
 				out.add(getNumber("SlotID", keys[i], linecounter, i));
 			}
 		}
@@ -441,8 +472,7 @@ public class InputPlayback {
 		try {
 			counter=Integer.parseInt(number);
 		} catch (NumberFormatException e) {
-			logger.error("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number ("+number+")");
-			throw new IOException();
+			throw new IOException("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number ("+number+")");
 		}
 		return counter;
 	}
@@ -460,8 +490,16 @@ public class InputPlayback {
 		try {
 			counter=Float.parseFloat(floatnumber);
 		}catch (NumberFormatException e) {
-			logger.error("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number ("+floatnumber+")");
-			throw new IOException();
+			throw new IOException("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number type float ("+floatnumber+")");
+		}
+		return counter;
+	}
+	private static double getDouble(String name, String doublenumber, int linecounter, int position) throws IOException {
+		double counter=0D;
+		try {
+			counter=Double.parseDouble(doublenumber);
+		}catch (NumberFormatException e) {
+			throw new IOException("Error while reading "+name+" in "+Filename+ " in line "+linecounter+" and the input in position "+(position+1)+" from the left. The input doesn't contain a number of type double ("+doublenumber+")");
 		}
 		return counter;
 	}
@@ -469,21 +507,27 @@ public class InputPlayback {
 		return playingback;
 	}
 	
-	private static float getSubtickPitch(String[] sections, int linecounter) throws IOException {
+	private static float getPitch(String[] sections, int linecounter, int sectionnumber) throws IOException {
 		float x=0;
-		if(sections[1].isEmpty()) {
-			logger.error("Error while reading tickcounter in "+Filename+ " in line "+linecounter+". The input is empty!");
+		if(sections[sectionnumber].startsWith("Pitch:")) {
+			sections[sectionnumber]=sections[sectionnumber].replace("Pitch:", "");
+		}
+		if(sections[sectionnumber].isEmpty()) {
+			throw new IOException("Error while reading pitch in "+Filename+ " in line "+linecounter+". The input is empty!");
 		}else {
-			x=getFloat("subtickPitch", sections[1], linecounter, 1);
+			x=getFloat("Pitch", sections[sectionnumber], linecounter, 1);
 		}
 		return x;
 	}
-	private static float getSubtickYaw(String[] sections, int linecounter) throws IOException {
+	private static float getYaw(String[] sections, int linecounter, int sectionnumber) throws IOException {
 		float y=0;
-		if(sections.length<3) {
-			logger.error("Error while reading tickcounter in "+Filename+ " in line "+linecounter+". The input is empty!");
+		if(sections[sectionnumber].startsWith("Yaw:")) {
+			sections[sectionnumber]=sections[sectionnumber].replace("Yaw:", "");
+		}
+		if(sections[sectionnumber].isEmpty()) {
+			throw new IOException("Error while reading yaw in "+Filename+ " in line "+linecounter+". The input is empty!");
 		}else {
-			y=getFloat("subtickYaw", sections[2], linecounter, 1);
+			y=getFloat("Yaw", sections[sectionnumber], linecounter, 1);
 		}
 		return y;
 	}
@@ -493,5 +537,4 @@ public class InputPlayback {
 	public static VirtualSubticks getCurrentSubtick() {
 		return subtickList.get(subtickPlaybackindex);
 	}
-	
 }

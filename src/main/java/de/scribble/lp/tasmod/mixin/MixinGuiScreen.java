@@ -45,7 +45,7 @@ public abstract class MixinGuiScreen{
         		if((GuiScreen)(Object)this instanceof GuiContainer) {
         			GuiContainer container = (GuiContainer)(GuiScreen)(Object)this;
         			int X=calcX(Mouse.getEventX());
-        			int Y=calcY(Mouse.getY());
+        			int Y=calcY(Mouse.getEventY());
         			if(container.getSlotAtPosition(X,Y) != null) {
         				slotindex=container.getSlotAtPosition(X, Y).slotNumber;
         			}
@@ -64,8 +64,8 @@ public abstract class MixinGuiScreen{
 		if (Keyboard.isCreated()) {
 			VirtualMouseAndKeyboard.prepareKeyboardEvents();
 			while (Keyboard.next()) {
-				VirtualMouseAndKeyboard.fillKeyboardEvents(Keyboard.getEventKey(), Keyboard.getEventKeyState(),
-						Keyboard.getEventCharacter());
+				VirtualMouseAndKeyboard.fillKeyboardEvents(Keyboard.getEventKey(), Keyboard.getEventKeyState(),	Keyboard.getEventCharacter());
+				
 			}
 			VirtualMouseAndKeyboard.fillKeyboardEventsWithPlayback();
 			while (VirtualMouseAndKeyboard.nextKeyboardEvent()) {
@@ -116,7 +116,7 @@ public abstract class MixinGuiScreen{
 		int j = this.height - uncalcY(VirtualMouseAndKeyboard.getEventY()) * this.height / this.mc.displayHeight - 1;
 
 		int k = VirtualMouseAndKeyboard.getEventMouseButton() + 100;
-
+		VirtualMouseAndKeyboard.runThroughKeyboard(k-100, VirtualMouseAndKeyboard.getEventMouseButtonState());
 		if(InputPlayback.isPlayingback()) {
 			Mouse.setCursorPosition(uncalcX(i), uncalcY(j));
 		}

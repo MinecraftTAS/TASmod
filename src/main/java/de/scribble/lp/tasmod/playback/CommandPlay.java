@@ -81,7 +81,7 @@ public class CommandPlay extends CommandBase{
                     InputPlayback.startPlayback(file,args[0]);
                     return;
                 } else if (args.length == 2 && !args[1].equalsIgnoreCase("load")) {
-                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "Wrong usage! /play <filename> (load)"));
+                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "Wrong usage! /play <filename>"));
                     return;
                 }
             } else {
@@ -94,6 +94,10 @@ public class CommandPlay extends CommandBase{
             return;
         } else if(InputPlayback.isPlayingback()){
             InputPlayback.stopPlayback();
+			
+            //String[] sentences = new String[] {"I have finished my TAS", "Thats time!", "Playback done, where's the money?", "Im done, what's next?"};
+			//Minecraft.getMinecraft().player.sendChatMessage(sentences[new Random().nextInt(sentences.length)]); // Uwot here he is using Random!!!
+            // Sad Pfannekuchen right here ^
         }
     }
 

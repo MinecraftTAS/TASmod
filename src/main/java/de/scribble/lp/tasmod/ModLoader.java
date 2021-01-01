@@ -3,6 +3,7 @@ package de.scribble.lp.tasmod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.scribble.lp.tasmod.misc.CommandFolder;
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
@@ -22,7 +23,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
  * @author ScribbleLP
  *
  */
-@Mod(modid = "tasmod", name = "Tool-Assisted-Speedrun-Mod", version =ModLoader.VERSION)
+@Mod(modid = "tasmod", name = "Tool-Assisted Speedrun Mod", version =ModLoader.VERSION)
 public class ModLoader {
 	@Instance
 	public static ModLoader instance = new ModLoader();
@@ -36,6 +37,7 @@ public class ModLoader {
 	private MinecraftServer serverInstance;
 	
 	public static final Logger logger= LogManager.getFormatterLogger("TASMod");
+	
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent ev) {
@@ -60,8 +62,12 @@ public class ModLoader {
 		ev.registerServerCommand(new CommandRecord());
 		ev.registerServerCommand(new CommandPlay());
 		ev.registerServerCommand(new CommandPlaybacktutorial());
+		ev.registerServerCommand(new CommandFolder());
 	}
 	public static ModLoader getInstance() {
 		return instance;
+	}
+	public MinecraftServer getServerInstance() {
+		return serverInstance;
 	}
 }
