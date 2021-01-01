@@ -1,10 +1,14 @@
 package de.scribble.lp.tasmod;
 
+import java.io.File;
+
 import org.lwjgl.input.Keyboard;
 
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
+import de.scribble.lp.tasmod.savestates.SavestateEvents;
 import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.MinecraftForge;
@@ -32,6 +36,10 @@ public class ClientProxy extends CommonProxy{
 	
 	public static KeyBinding stopkey= new KeyBinding("Recording/Playback Stop", Keyboard.KEY_F10, "TASmod");
 	
+	public static KeyBinding savestateSaveKey = new KeyBinding("Create Savestate", Keyboard.KEY_J, "TASmod");
+	
+	public static KeyBinding SavestateLoadKey = new KeyBinding("Load Latest Savestate", Keyboard.KEY_K, "TASmod");
+	
 	
 	public void preInit(FMLPreInitializationEvent ev) {
 		isDevEnvironment=(Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
@@ -45,6 +53,7 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
+		MinecraftForge.EVENT_BUS.register(new SavestateEvents());
 		
 		saveHandler=new SavestateHandlerClient();
 		
@@ -52,6 +61,8 @@ public class ClientProxy extends CommonProxy{
 		ClientRegistry.registerKeyBinding(tickAdvance);
 		ClientRegistry.registerKeyBinding(stopkey);
 		ClientRegistry.registerKeyBinding(showNextLocation);
+		
+		new File (Minecraft.getMinecraft().mcDataDir,"saves"+File.separator+"savestates").mkdir();
 		super.init(ev);
 	}
 	public void postInit(FMLPostInitializationEvent ev) {

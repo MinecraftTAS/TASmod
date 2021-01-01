@@ -18,7 +18,7 @@ public class GuiSavestateLoadingScreen extends GuiScreen{
 		int width = scaled.getScaledWidth();
 		int height = scaled.getScaledHeight();
 		
-		drawCenteredString(fontRenderer,I18n.format("gui.savestate.loadingscreen.msg"), width / 2, height / 4 + 50 + -16, 0xFFFFFF);	//Loading a savestate!
+		drawCenteredString(fontRenderer,I18n.format("Loading a savestate!"), width / 2, height / 4 + 50 + -16, 0xFFFFFF);	//Loading a savestate!
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}

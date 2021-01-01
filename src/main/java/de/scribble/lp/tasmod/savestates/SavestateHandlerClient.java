@@ -37,8 +37,8 @@ public class SavestateHandlerClient {
 	Minecraft mc=Minecraft.getMinecraft();
 	public static boolean isSaving=false;
 	public static boolean isLoading=false;
-	public static int savetimer;
-	public static int loadtimer;
+	public static int savetimer=5000;
+	public static int loadtimer=100;
 	
 	private File currentworldfolder;
 	private File targetsavefolder=null;
@@ -108,8 +108,7 @@ public class SavestateHandlerClient {
 			if(!isSaving&&!isLoading) {
 				isLoading=true;
 				currentworldfolder = new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + mc.getIntegratedServer().getFolderName());
-				foldername=mc.getIntegratedServer().getFolderName();
-				worldname=Minecraft.getMinecraft().getIntegratedServer().getFolderName();
+				worldname=foldername=mc.getIntegratedServer().getFolderName();
 				//getting latest savestate
 				int i=1;
 				while(i<=300) {
@@ -322,6 +321,7 @@ public class SavestateHandlerClient {
 						+ targetsavefolder.getPath() + " for some reason (Savestate save)");
 				e.printStackTrace();
 			} finally {
+				displayIngameMenu();
 				isSaving = false;
 			}
 		}
