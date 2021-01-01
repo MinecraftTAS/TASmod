@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
 import de.scribble.lp.tasmod.ClientProxy;
@@ -118,11 +119,14 @@ public class InputRecorder {
 	 */
 	public static void recordTick() {
 		if(recording) {
-			if(!Display.isActive()) {
-				stopRecording();
-			}
+//			if(!Display.isActive()) {
+//				stopRecording();
+//			}
 			if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
 				stopRecording();
+			}
+			if(Keyboard.isKeyDown(Keyboard.KEY_P)) {
+				pauseRecording=!pauseRecording;
 			}
 			if (pauseRecording) {
 				return;

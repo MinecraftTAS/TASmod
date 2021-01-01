@@ -3,6 +3,7 @@ package de.scribble.lp.tasmod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.scribble.lp.tasmod.misc.CommandFolder;
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
@@ -61,6 +62,7 @@ public class ModLoader {
 		ev.registerServerCommand(new CommandRecord());
 		ev.registerServerCommand(new CommandPlay());
 		ev.registerServerCommand(new CommandPlaybacktutorial());
+		ev.registerServerCommand(new CommandFolder());
 	}
 	public static ModLoader getInstance() {
 		return instance;
