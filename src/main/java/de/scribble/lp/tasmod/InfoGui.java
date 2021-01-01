@@ -1,8 +1,11 @@
 package de.scribble.lp.tasmod;
 
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
 import de.scribble.lp.tasmod.ticksync.TickSync;
+import de.scribble.lp.tasmod.virtual.VirtualKeys;
+import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -38,6 +41,19 @@ public class InfoGui extends Gui{
                 
                 new Gui().drawString(mc.fontRenderer, "Server Ticks: "+TickSync.getServertickcounter(), 16, 100, 0xFFFFFF); //Current Pointer location
                 new Gui().drawString(mc.fontRenderer, "Client Ticks: "+TickSync.getClienttickcounter(), 16, 110, 0xFFFFFF); //Current Pointer location
+                
+                if(Display.isActive()) {
+                	String out1="";
+	                for(String mouse : VirtualMouseAndKeyboard.getCurrentMousePresses()) {
+	                	out1=out1.concat(mouse+" ");
+	                }
+	                new Gui().drawString(mc.fontRenderer, out1, 5, height-20, 0xFFFFFF); //Current Pointer location
+	                String out2="";
+	                for(String key : VirtualMouseAndKeyboard.getCurrentKeyboardPresses()) {
+	                	out2=out2.concat(key+" ");
+	                }
+	                new Gui().drawString(mc.fontRenderer, out2, 5, height-10, 0xFFFFFF); //Current Pointer location
+                }
                 new Gui().drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width/2, height-50, 0xFF8400); //Current Pointer location
                 
 //            }
