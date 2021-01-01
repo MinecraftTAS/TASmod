@@ -1,16 +1,12 @@
 package de.scribble.lp.tasmod.virtual;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
 
 import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Maps;
 
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.IntHashMap;
 
 /**
  * Transforms certain Minecraft keybindings to keybindings checked by LWJGL's isKeyDown method. <br>
@@ -19,7 +15,7 @@ import net.minecraft.util.IntHashMap;
  *
  */
 public class VirtualKeybindings {
-	private static final int standardCooldown=10;
+	private static final long standardCooldown=20;
 	private static HashMap<KeyBinding, Long> cooldownHashMap=Maps.<KeyBinding, Long>newHashMap();
 	private static long cooldowntimer=0;
 	
