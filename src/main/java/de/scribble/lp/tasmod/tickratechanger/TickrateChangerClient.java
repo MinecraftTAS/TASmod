@@ -1,7 +1,5 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
-import org.lwjgl.input.Keyboard;
-
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;

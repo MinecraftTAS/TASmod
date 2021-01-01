@@ -339,7 +339,7 @@ public class PlayerPositionCalculator {
         else
         {
             float f2 = source.rotationPitch;
-            float f1 = source.rotationYawHead;
+            float f1 = source.rotationYaw;
             vec3d1 = source.getVectorForRotation(f2, f1);
         }
         

@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
-import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.tutorial.CommandPlaybacktutorial;
 import net.minecraft.server.MinecraftServer;
