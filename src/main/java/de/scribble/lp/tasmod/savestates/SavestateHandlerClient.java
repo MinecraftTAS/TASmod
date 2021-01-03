@@ -18,6 +18,7 @@ import com.google.common.io.Files;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.misc.MiscEvents;
+import de.scribble.lp.tasmod.recording.InputRecorder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -94,6 +95,17 @@ public class SavestateHandlerClient {
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
+				}
+				
+				if (InputRecorder.isRecording()) {
+					InputRecorder.setPause(true);
+					PropertySaver psaver = new PropertySaver();
+					psaver.start();
+					try {
+						psaver.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 				SavestateSaveEventsClient Saver = new SavestateSaveEventsClient();
 				Saver.start();
@@ -321,7 +333,8 @@ public class SavestateHandlerClient {
 						+ targetsavefolder.getPath() + " for some reason (Savestate save)");
 				e.printStackTrace();
 			} finally {
-				displayIngameMenu();
+				mc.displayGuiScreen(null);
+				InputRecorder.setPause(false);
 				isSaving = false;
 			}
 		}
@@ -343,10 +356,15 @@ public class SavestateHandlerClient {
 		public void event(TickEvent.RenderTickEvent ev) {
 			if(ev.phase==Phase.START) {
 				if (cooldown<=0) {
+					String filename="";
+					if(InputRecorder.isRecording()) {
+						InputRecorder.stopRecording();
+						filename=InputRecorder.getFilename();						
+					}
 					this.mc.world.sendQuittingDisconnectingPacket();
 					this.mc.loadWorld((WorldClient)null);
 		            
-		            SavestateLoadEventsClient Loader=new SavestateLoadEventsClient();
+		            SavestateLoadEventsClient Loader=new SavestateLoadEventsClient(!filename.isEmpty());
 		            Loader.setName("Savestate Loader");
 		            try {
 		            	Loader.start();
@@ -363,12 +381,23 @@ public class SavestateHandlerClient {
 		            isLoading = false;
 		            MinecraftForge.EVENT_BUS.unregister(this);
 		            FMLClientHandler.instance().getClient().launchIntegratedServer(foldername, worldname, null);
+		            if(!filename.isEmpty()) {
+			            try {
+							InputRecorder.appendRecording(filename);
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
+		            }
 				}
 				cooldown--;
 			}
 		}
 	}
 	private class SavestateLoadEventsClient extends Thread {
+		boolean isRecording;
+		public SavestateLoadEventsClient(boolean recording) {
+			isRecording=recording;
+		}
 		@Override
 		public void run() {
 			while (mc.isIntegratedServerRunning()) {
@@ -379,7 +408,19 @@ public class SavestateHandlerClient {
 					isLoading = false;
 				}
 			}
+			
 			deleteDirContents(currentworldfolder, new String[] { " " });
+			
+			if(isRecording) {
+				File tasfolder=new File(targetsavefolder+File.separator+"TASMod");
+			
+				try {
+					Files.copy(new File(tasfolder+File.separator+InputRecorder.getFilename()+".tas"), InputRecorder.getFileLocation());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			
 			try {
 				copyDirectory(targetsavefolder, currentworldfolder, new String[] { " " });
 			} catch (IOException e) {
@@ -390,6 +431,28 @@ public class SavestateHandlerClient {
 			} finally {
 				isLoading = false;
 			}
+		}
+	}
+	class PropertySaver extends Thread{
+		@Override
+		public void run() {
+			this.setName("PropertySaverThread");
+			File tasfolder=new File(currentworldfolder+File.separator+"TASMod");
+			if(!tasfolder.exists()) {
+				tasfolder.mkdir();
+			}
+			InputRecorder.saveFile();
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e1) {
+//				e1.printStackTrace();
+//			}
+			try {
+				Files.copy(InputRecorder.getFileLocation(), new File(tasfolder+File.separator+InputRecorder.getFilename()+".tas"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			super.run();
 		}
 	}
 }
