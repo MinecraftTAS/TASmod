@@ -1,7 +1,10 @@
 package de.scribble.lp.tasmod.recording;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +39,7 @@ public class InputRecorder {
 	private static long tickCounter;
 	private static final String tasdirectory = mc.mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles";
 	private static boolean pauseRecording = false;
+	private static String filenames;
 
 	private static FileThread fileThread;
 	
@@ -63,19 +67,14 @@ public class InputRecorder {
 				logger.error("The filename is not applicable");
 				return;
 			}
-			fileLocation = files;
-			recording = true;
+			tickCounter=0;
+			prepareRecording(filename, files);
 			
-			fileThread = new FileThread(fileLocation);
+			fileThread = new FileThread(fileLocation, false);
 			fileThread.start();
 			
-			// output=new StringBuilder();
 			addHeader();
-			tickCounter = 0;
-//			Minecraft.getMinecraft().randommanager.setEntityRandomnessAll(0);
-//			RandomLogger.startRandomLogging();
-//			new SavestateHandlerClient().saveState();
-			pauseRecording = false;
+			
 			TutorialHandler tutorial = ClientProxy.getPlaybackTutorial();
 			if (TutorialHandler.istutorial && tutorial.getState() == 3) {
 				tutorial.advanceState();
@@ -84,7 +83,57 @@ public class InputRecorder {
 			logger.error("There is already a recording running!");
 		}
 	}
-
+	public static void appendRecording(String filename) throws FileNotFoundException {
+		if(!recording) {
+			File files = interpretFilename(filename);
+			if (files == null) {
+				logger.error("The filename is not applicable");
+				return;
+			}
+			try {
+				tickCounter=getLatestTickCounter(files);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			prepareRecording(filename, files);
+			fileThread = new FileThread(fileLocation, true);
+			fileThread.start();
+		}
+	}
+	private static int getLatestTickCounter(File siles) throws IOException {
+		// Create a bunch of variables
+		@SuppressWarnings("resource")
+		BufferedReader buff = new BufferedReader(new FileReader(fileLocation));
+		String wholeLine = "";
+		int ticks=0;
+		int compare=0;
+		int linecounter=0;
+		// Read the lines until the line is null
+		while ((wholeLine = buff.readLine()) != null) {
+			linecounter++;
+			if (wholeLine.startsWith("#")) {
+				continue;
+			}
+			String[] sections=wholeLine.split("\\|");
+			try {
+				ticks=Integer.parseInt(sections[0]);
+			}catch(NumberFormatException e) {
+				throw new IOException("Error while reading the tickcounter in line "+linecounter+". Not a number");
+			}
+			if(compare+1!=ticks) {
+				throw new IOException("Error while reading tickcounter in line "+linecounter+". The numbers are not consecutive");
+			}
+			compare=ticks;
+		}
+		buff.close();
+		return ticks;
+	}
+	private static void prepareRecording(String filename, File files) {
+		filenames=filename;
+		fileLocation = files;
+		recording = true;
+		pauseRecording = false;
+	}
 	private static void addHeader() {
 		fileThread.addLine(
 				"################################################# TASFile ###################################################\n"
@@ -125,9 +174,6 @@ public class InputRecorder {
 			if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
 				stopRecording();
 			}
-//			if(Keyboard.isKeyDown(Keyboard.KEY_P)) {
-//				pauseRecording=!pauseRecording;
-//			}
 			if (pauseRecording) {
 				return;
 			}
@@ -301,5 +347,17 @@ public class InputRecorder {
 
 	public static boolean isPaused() {
 		return pauseRecording;
+	}
+	public static void setPause(boolean pause) {
+		pauseRecording=pause;
+	}
+	public static File getFileLocation() {
+		return fileLocation;
+	}
+	public static String getFilename() {
+		return filenames;
+	}
+	public static void saveFile() {
+		fileThread.flush();
 	}
 }
