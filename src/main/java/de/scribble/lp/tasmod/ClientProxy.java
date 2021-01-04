@@ -5,7 +5,6 @@ import java.io.File;
 import org.lwjgl.input.Keyboard;
 
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
-import de.scribble.lp.tasmod.recording.PauseDuringLoad;
 import de.scribble.lp.tasmod.savestates.SavestateEvents;
 import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
@@ -39,7 +38,7 @@ public class ClientProxy extends CommonProxy{
 	
 	public static KeyBinding savestateSaveKey = new KeyBinding("Create Savestate", Keyboard.KEY_J, "TASmod");
 	
-	public static KeyBinding SavestateLoadKey = new KeyBinding("Load Latest Savestate", Keyboard.KEY_K, "TASmod");
+	public static KeyBinding savestateLoadKey = new KeyBinding("Load Latest Savestate", Keyboard.KEY_K, "TASmod");
 	
 	
 	public void preInit(FMLPreInitializationEvent ev) {
@@ -55,7 +54,6 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
 		MinecraftForge.EVENT_BUS.register(new SavestateEvents());
-		MinecraftForge.EVENT_BUS.register(new PauseDuringLoad());
 		
 		saveHandler=new SavestateHandlerClient();
 		

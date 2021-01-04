@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.scribble.lp.tasmod.playback.InputPlayback;
+import net.minecraft.client.settings.KeyBinding;
 
 /**
  * Emulates a virtual keyboard that is set between the lwjgl.input.Keyboard & lwjgl.input.Mouse and the keybindings.<br>
@@ -262,6 +263,7 @@ public class VirtualMouseAndKeyboard {
 		VirtualKeys.keyCodes.forEach((key,virtual)->{
 			virtual.setPressed(false);
 		});
+		KeyBinding.unPressAllKeys();
 	}
 	/**
 	 * Reset things after a tick has passed

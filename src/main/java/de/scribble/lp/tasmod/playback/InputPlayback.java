@@ -143,6 +143,7 @@ public class InputPlayback {
 				stopPlayback();
 			}
 			if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
+				VirtualMouseAndKeyboard.unpressEverything();
 				stopPlayback();
 			}
 			if(pausePlayback) {
