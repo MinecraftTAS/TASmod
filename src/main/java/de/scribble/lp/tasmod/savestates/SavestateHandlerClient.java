@@ -28,6 +28,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 /**
@@ -153,7 +154,6 @@ public class SavestateHandlerClient {
 				FMLCommonHandler.instance().firePlayerLoggedOut(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers().get(0));
 
 				mc.displayGuiScreen(new GuiSavestateLoadingScreen());
-				
 				MinecraftForge.EVENT_BUS.register(new SavestateBrake(mc));
 			}else {
 				CommonProxy.logger.error("Loading savestate is blocked by another action. If this is permanent, restart the game.");
@@ -347,16 +347,16 @@ public class SavestateHandlerClient {
 	 *
 	 */
 	private class SavestateBrake{
-		int cooldown=loadtimer;
-		Minecraft mc;
+		private int cooldown=loadtimer;
+		private Minecraft mc;
+		private String filename="";
 		public SavestateBrake(Minecraft mc) {
 			this.mc=mc;
 		}
 		@SubscribeEvent
 		public void event(TickEvent.RenderTickEvent ev) {
 			if(ev.phase==Phase.START) {
-				if (cooldown<=0) {
-					String filename="";
+				if (cooldown==0) {
 					if(InputRecorder.isRecording()) {
 						InputRecorder.stopRecording();
 						filename=InputRecorder.getFilename();						
@@ -377,20 +377,24 @@ public class SavestateHandlerClient {
 					}
 		            
 		            MiscEvents.ignorerespawntimerClient=true; //Make it so the Player is vulnerable after a savestate
-		            
 		            isLoading = false;
-		            MinecraftForge.EVENT_BUS.unregister(this);
 		            FMLClientHandler.instance().getClient().launchIntegratedServer(foldername, worldname, null);
-		            if(!filename.isEmpty()) {
-			            try {
-							InputRecorder.appendRecording(filename);
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						}
-		            }
+		            
 				}
 				cooldown--;
 			}
+		}
+		
+		@SubscribeEvent
+		public void onLogin(PlayerLoggedInEvent ev) {
+			if(!filename.isEmpty()) {
+	            try {
+					InputRecorder.appendRecording(filename);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+            }
+			MinecraftForge.EVENT_BUS.unregister(this);
 		}
 	}
 	private class SavestateLoadEventsClient extends Thread {
