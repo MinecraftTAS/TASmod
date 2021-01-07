@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +44,8 @@ public class InputRecorder {
 	private static String filenames;
 
 	private static FileThread fileThread;
+	
+	private static boolean rewind;
 	
 	/**
 	 * Start the recording and generate a filename consisting of
@@ -83,8 +87,11 @@ public class InputRecorder {
 			logger.error("There is already a recording running!");
 		}
 	}
-	public static void appendRecording(String filename) throws FileNotFoundException {
+	public static void appendRecording(@Nullable String filename) throws FileNotFoundException {
 		if(!recording) {
+			if(filename==null) {
+				filename=filenames;
+			}
 			File files = interpretFilename(filename);
 			if (files == null) {
 				logger.error("The filename is not applicable");
@@ -128,6 +135,10 @@ public class InputRecorder {
 		buff.close();
 		return ticks;
 	}
+	public static void prepareForRewind() {
+		stopRecording(false);
+		rewind=true;
+	}
 	private static void prepareRecording(String filename, File files) {
 		filenames=filename;
 		fileLocation = files;
@@ -169,13 +180,17 @@ public class InputRecorder {
 	public static void recordTick() {
 		if(recording) {
 			if(!Display.isActive()) {
-				stopRecording();
+				stopRecording(true);
 			}
 			if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
-				stopRecording();
+				stopRecording(true);
 			}
 			if (pauseRecording) {
 				return;
+			}
+			if(rewind) {
+				VirtualMouseAndKeyboard.fillMouseEventsWithCurrentKeyPresses(0, 0);
+				rewind=false;
 			}
 			tickCounter++; // Tickcounter used as a time reference, not actually used for playback
 
@@ -197,7 +212,7 @@ public class InputRecorder {
 					ending = "";
 				}
 				VirtualKeyboardEvent event = keyboardEventList.get(i);
-				if (event.getKeyCode() == 67) { // Removing F9 from the recorded inputs
+				if (VirtualKeybindings.isKeyCodeBlockedDuringRecording(event.getKeyCode())) { // Removing TASmod keybindings from the recording
 					continue;
 				}
 				keyboardString = keyboardString
@@ -298,16 +313,21 @@ public class InputRecorder {
 
 	/**
 	 * Stops Input-Recording and everything involved with it
+	 * @param log 
 	 */
-	public static void stopRecording() {
+	public static void stopRecording(boolean log) {
 		if (recording) {
 			recording = false;
-			logger.info("Stopping the recording");
+			
+			
 			TutorialHandler tutorial = ClientProxy.getPlaybackTutorial();
 			if (TutorialHandler.istutorial && tutorial.getState() == 4) {
 				tutorial.advanceState();
 			}
-			mc.player.sendMessage(new TextComponentString("Recording stopped"));
+			if(log) {
+				logger.info("Stopping the recording");
+				mc.player.sendMessage(new TextComponentString("Recording stopped"));
+			}
 			fileThread.close();
 //			Thread t2 = new Thread(new FileWriterThread(outputSubtick, fileLocationSubTick, logger), "FileWriterThreadSubtick");
 //			t2.start();
@@ -359,5 +379,11 @@ public class InputRecorder {
 	}
 	public static void saveFile() {
 		fileThread.flush();
+	}
+	public static long getTickCounter() {
+		return tickCounter;
+	}
+	public static boolean isRewind() {
+		return rewind;
 	}
 }

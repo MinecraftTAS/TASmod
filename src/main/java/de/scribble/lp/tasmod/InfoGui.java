@@ -3,6 +3,8 @@ package de.scribble.lp.tasmod;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
+import de.scribble.lp.tasmod.events.TASmodEvents;
+import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.ticksync.TickSync;
 import de.scribble.lp.tasmod.virtual.VirtualKeys;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
@@ -54,6 +56,7 @@ public class InfoGui extends Gui{
 	                }
 	                new Gui().drawString(mc.fontRenderer, out2, 5, height-10, 0xFFFFFF); //Current Pointer location
                 }
+                new Gui().drawString(mc.fontRenderer, InputRecorder.getTickCounter()+"", 5, height-30, 0xFFFFFF); //Current Pointer location
                 new Gui().drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width/2, height-50, 0xFF8400); //Current Pointer location
                 
 //            }

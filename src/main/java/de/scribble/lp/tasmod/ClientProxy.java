@@ -8,6 +8,7 @@ import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.scribble.lp.tasmod.savestates.SavestateEvents;
 import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.launchwrapper.Launch;
@@ -61,6 +62,12 @@ public class ClientProxy extends CommonProxy{
 		ClientRegistry.registerKeyBinding(tickAdvance);
 		ClientRegistry.registerKeyBinding(stopkey);
 		ClientRegistry.registerKeyBinding(showNextLocation);
+		ClientRegistry.registerKeyBinding(savestateSaveKey);
+		ClientRegistry.registerKeyBinding(savestateLoadKey);
+		
+		VirtualKeybindings.registerBlockedKeyBinding(tickratezeroKey);
+		VirtualKeybindings.registerBlockedKeyBinding(tickAdvance);
+		VirtualKeybindings.registerBlockedKeyBinding(stopkey);
 		
 		new File (Minecraft.getMinecraft().mcDataDir,"saves"+File.separator+"savestates").mkdir();
 		super.init(ev);

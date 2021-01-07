@@ -19,6 +19,7 @@ import com.google.common.io.Files;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.misc.MiscEvents;
 import de.scribble.lp.tasmod.recording.InputRecorder;
+import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -349,7 +350,6 @@ public class SavestateHandlerClient {
 	private class SavestateBrake{
 		private int cooldown=loadtimer;
 		private Minecraft mc;
-		private String filename="";
 		public SavestateBrake(Minecraft mc) {
 			this.mc=mc;
 		}
@@ -358,13 +358,12 @@ public class SavestateHandlerClient {
 			if(ev.phase==Phase.START) {
 				if (cooldown==0) {
 					if(InputRecorder.isRecording()) {
-						InputRecorder.stopRecording();
-						filename=InputRecorder.getFilename();						
+						InputRecorder.prepareForRewind();
 					}
 					this.mc.world.sendQuittingDisconnectingPacket();
 					this.mc.loadWorld((WorldClient)null);
 		            
-		            SavestateLoadEventsClient Loader=new SavestateLoadEventsClient(!filename.isEmpty());
+		            SavestateLoadEventsClient Loader=new SavestateLoadEventsClient(InputRecorder.isRewind());
 		            Loader.setName("Savestate Loader");
 		            try {
 		            	Loader.start();
@@ -387,20 +386,15 @@ public class SavestateHandlerClient {
 		
 		@SubscribeEvent
 		public void onLogin(PlayerLoggedInEvent ev) {
-			if(!filename.isEmpty()) {
-	            try {
-					InputRecorder.appendRecording(filename);
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-            }
+			TickrateChangerServer.changeServerTickrate(0F);
+			TickrateChangerServer.changeClientTickrate(0F);
 			MinecraftForge.EVENT_BUS.unregister(this);
 		}
 	}
 	private class SavestateLoadEventsClient extends Thread {
-		boolean isRecording;
-		public SavestateLoadEventsClient(boolean recording) {
-			isRecording=recording;
+		boolean isRewind;
+		public SavestateLoadEventsClient(boolean isRewindTime) {
+			isRewind=isRewindTime;
 		}
 		@Override
 		public void run() {
@@ -415,7 +409,7 @@ public class SavestateHandlerClient {
 			
 			deleteDirContents(currentworldfolder, new String[] { " " });
 			
-			if(isRecording) {
+			if(isRewind) {
 				File tasfolder=new File(targetsavefolder+File.separator+"TASMod");
 			
 				try {
@@ -446,11 +440,7 @@ public class SavestateHandlerClient {
 				tasfolder.mkdir();
 			}
 			InputRecorder.saveFile();
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e1) {
-//				e1.printStackTrace();
-//			}
+			
 			try {
 				Files.copy(InputRecorder.getFileLocation(), new File(tasfolder+File.separator+InputRecorder.getFilename()+".tas"));
 			} catch (IOException e) {
