@@ -84,7 +84,7 @@ public class CommandRecord extends CommandBase{
                 sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments"));
             }
         } else if (InputRecorder.isRecording()) {
-            InputRecorder.stopRecording();
+            InputRecorder.stopRecording(true);
         } else {
             sender.sendMessage(new TextComponentString(TextFormatting.RED + "A playback is running. /play to abort"));
         }

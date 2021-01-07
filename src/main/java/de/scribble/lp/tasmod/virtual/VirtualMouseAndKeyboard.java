@@ -184,6 +184,9 @@ public class VirtualMouseAndKeyboard {
 	 * @return changedKeycode
 	 */
 	public static int runThroughKeyboard(int keyCode, boolean pressed) {
+		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keyCode)) {
+			return keyCode;
+		}
 		VirtualKeys.keyCodes.get(getKeyCodesFromKeyCode(keyCode)).setPressed(pressed);
 		return keyCode;
 	}
@@ -317,6 +320,16 @@ public class VirtualMouseAndKeyboard {
 		});
 		return mouseList;
 	}
+	public static void fillMouseEventsWithCurrentKeyPresses(float mouseX, float mouseY) {
+		keyboardEventList.clear();
+		VirtualKeys.keyCodes.forEach((keycodes, virtualkeys)->{
+			if(keycodes>=0) {
+				if(virtualkeys.isKeyDown()) {
+					keyboardEventList.add(new VirtualKeyboardEvent(keycodes, virtualkeys.isKeyDown(), ' '));
+				}
+			}
+		});
+	}
 	/*==========================Emulating keyboard events==========================*/
 	/**
 	 * Resets the keyboard event list, so it can be recorded. Usually happens right before they are filled
@@ -340,6 +353,7 @@ public class VirtualMouseAndKeyboard {
 	 * character: Every key on the keyboard has a character associated with it (even if it's a null character)<br>
 	 */
 	public static void fillKeyboardEvents(int keycode, boolean keystate, char character) {
+		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode))return;
 		keyboardEventList.add(new VirtualKeyboardEvent(keycode, keystate, character));
 	}
 	/**
@@ -370,7 +384,7 @@ public class VirtualMouseAndKeyboard {
 	public static List<VirtualKeyboardEvent> getKeyboardEvents(){
 		return keyboardEventList;
 	}
-	/*Getters for the keaboard events*/
+	/*Getter for the keyboard buttons*/
 	public static int getEventKeyboardButton() {
 		return keyboardEventList.get(keyboardIndex).getKeyCode();
 	}

@@ -33,7 +33,7 @@ public class AimAssistEvents {
 		Minecraft mc = Minecraft.getMinecraft();
 		
 		// Toggle
-		if (VirtualKeybindings.isKeyDown(ClientProxy.showNextLocation)) {
+		if (VirtualKeybindings.isKeyDownExceptChat(ClientProxy.showNextLocation)) {
 			showNewPos = !showNewPos;
 		}
 		
