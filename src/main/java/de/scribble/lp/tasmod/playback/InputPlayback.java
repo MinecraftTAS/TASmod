@@ -150,6 +150,9 @@ public class InputPlayback {
 				return;
 			}
 			playbackIndex++;
+			if(mc.currentScreen!=null) {
+				subtickPlaybackindex=playbackIndex;
+			}
 		}
 	}
 	public static void nextPlaybackSubtick() {
