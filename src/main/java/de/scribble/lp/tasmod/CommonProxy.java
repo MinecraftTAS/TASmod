@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
+import de.scribble.lp.tasmod.savestatesV2.SavestateChunkLoadingPacket;
+import de.scribble.lp.tasmod.savestatesV2.SavestateChunkLoadingPacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacketHandler;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
@@ -27,6 +29,7 @@ public class CommonProxy {
 		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, 1, Side.CLIENT);
 		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, 2, Side.CLIENT);
 		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, 3, Side.CLIENT);
+		NETWORK.registerMessage(SavestateChunkLoadingPacketHandler.class, SavestateChunkLoadingPacket.class, 4, Side.SERVER);
 	}
 
 	public void init(FMLInitializationEvent ev) {

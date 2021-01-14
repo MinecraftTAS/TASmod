@@ -34,7 +34,7 @@ public class ModLoader {
 	public static final String VERSION="${version}";
 	public static final String MCVERSION="${mcversion}";
 	
-	private MinecraftServer serverInstance;
+	private static MinecraftServer serverInstance;
 	
 	public static final Logger logger= LogManager.getFormatterLogger("TASMod");
 	
@@ -67,7 +67,7 @@ public class ModLoader {
 	public static ModLoader getInstance() {
 		return instance;
 	}
-	public MinecraftServer getServerInstance() {
+	public static MinecraftServer getServerInstance() {
 		return serverInstance;
 	}
 }

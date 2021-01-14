@@ -43,6 +43,13 @@ public class InfoGui extends Gui{
                 
                 new Gui().drawString(mc.fontRenderer, "Server Ticks: "+TickSync.getServertickcounter(), 16, 100, 0xFFFFFF); //Current Pointer location
                 new Gui().drawString(mc.fontRenderer, "Client Ticks: "+TickSync.getClienttickcounter(), 16, 110, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, "PlayerMotion: "+mc.player.motionX, 16, 130, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, "PlayerMotion: "+mc.player.motionY, 16, 140, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, "PlayerMotion: "+mc.player.motionZ, 16, 150, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, "PlayerMotion: "+mc.player.moveForward, 16, 170, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, "PlayerMotion: "+mc.player.moveStrafing, 16, 180, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, "PlayerMotion: "+mc.player.moveVertical, 16, 190, 0xFFFFFF); //Current Pointer location
+                
                 
                 if(Display.isActive()) {
                 	String out1="";
