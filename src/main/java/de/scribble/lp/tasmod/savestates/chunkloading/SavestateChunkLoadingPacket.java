@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestatesV2;
+package de.scribble.lp.tasmod.savestates.chunkloading;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

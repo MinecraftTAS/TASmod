@@ -1,21 +1,33 @@
-package de.scribble.lp.tasmod.savestatesV2;
+package de.scribble.lp.tasmod.savestates.chunkloading;
 
 import java.util.Iterator;
 import java.util.List;
 
 import de.scribble.lp.tasmod.duck.ChunkProviderDuck;
+import de.scribble.lp.tasmod.mixin.MixinChunkProviderClient;
+import de.scribble.lp.tasmod.mixin.MixinChunkProviderServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
+/**
+ * Various methods to unload/reload chunks and make loadless savestates possible
+ * @author ScribbleLP
+ *
+ */
 public class SavestatesChunkControl {
-	
+	/**
+	 * Unloads all chunks and reloads the renderer so no chunks will be visible throughout the unloading progress <br>
+	 * 
+	 * @see MixinChunkProviderClient#unloadAllChunks()
+	 * @Side Client
+	 */
 	@SideOnly(Side.CLIENT)
 	public static void unloadAllClientChunks() {
 		Minecraft mc = Minecraft.getMinecraft();
@@ -25,7 +37,13 @@ public class SavestatesChunkControl {
 		((ChunkProviderDuck)chunkProvider).unloadAllChunks();
 		Minecraft.getMinecraft().renderGlobal.loadRenderers();
 	}
-	
+	/**
+	 * Unloads all chunks on the server
+	 * TODO Maybe change to the vanilla method
+	 * 
+	 * @see MixinChunkProviderServer#unloadAllChunks()
+	 * @Side Server
+	 */
 	public static void unloadAllServerChunks() {
 		
 		WorldServer[] worlds=FMLCommonHandler.instance().getMinecraftServerInstance().worlds;
@@ -35,18 +53,31 @@ public class SavestatesChunkControl {
 			((ChunkProviderDuck)chunkProvider).unloadAllChunks();
 		}
 	}
-	
+	/**
+	 * The player chunk map keeps track of which chunks need to be sent to the client. <br>
+	 * Removing the player stops the server from sending chunks to the client.
+	 * 
+	 * @Side Server
+	 * @see #addPlayersToChunkMap()
+	 */
 	public static void disconnectPlayersFromChunkMap() {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
 		WorldServer[] worlds=server.worlds;
 		for (WorldServer world:worlds) {
 			for (EntityPlayerMP player : players) {
+				System.out.println("Heck");
 				world.getPlayerChunkMap().removePlayer(player);
 			}
 		}
 	}
-	
+	/**
+	 * The player chunk map keeps track of which chunks need to be sent to the client. <br>
+	 * This adds the player to the chunk map so the server knows it can send the information to the client
+	 * 
+	 * @Side Server
+	 * @see #disconnectPlayersFromChunkMap()
+	 */
 	public static void addPlayersToChunkMap() {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
@@ -65,7 +96,11 @@ public class SavestatesChunkControl {
 			}
 		}
 	}
-	
+	/**
+	 * Tells the save handler to save all changes to disk and remove all references to the region files, making them editable on disc
+	 * 
+	 * @Side Server
+	 */
 	public static void flushSaveHandler() {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		WorldServer[] worlds=server.worlds;

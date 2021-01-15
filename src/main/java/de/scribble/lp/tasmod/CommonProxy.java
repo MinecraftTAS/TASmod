@@ -6,8 +6,10 @@ import org.apache.logging.log4j.Logger;
 import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
-import de.scribble.lp.tasmod.savestatesV2.SavestateChunkLoadingPacket;
-import de.scribble.lp.tasmod.savestatesV2.SavestateChunkLoadingPacketHandler;
+import de.scribble.lp.tasmod.savestates.chunkloading.SavestateChunkLoadingPacket;
+import de.scribble.lp.tasmod.savestates.chunkloading.SavestateChunkLoadingPacketHandler;
+import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacket;
+import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacketHandler;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
@@ -30,6 +32,8 @@ public class CommonProxy {
 		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, 2, Side.CLIENT);
 		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, 3, Side.CLIENT);
 		NETWORK.registerMessage(SavestateChunkLoadingPacketHandler.class, SavestateChunkLoadingPacket.class, 4, Side.SERVER);
+		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, 5, Side.CLIENT);
+		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, 6, Side.SERVER);
 	}
 
 	public void init(FMLInitializationEvent ev) {
