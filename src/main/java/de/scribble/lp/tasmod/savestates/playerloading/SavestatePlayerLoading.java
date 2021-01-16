@@ -3,7 +3,6 @@ package de.scribble.lp.tasmod.savestates.playerloading;
 import java.util.List;
 
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.ModLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;

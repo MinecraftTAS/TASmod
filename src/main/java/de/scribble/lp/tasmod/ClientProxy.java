@@ -7,6 +7,7 @@ import org.lwjgl.input.Keyboard;
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.scribble.lp.tasmod.savestates.SavestateEvents;
 import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
+import de.scribble.lp.tasmod.savestates.motion.MotionEvents;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
@@ -55,6 +56,7 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
 		MinecraftForge.EVENT_BUS.register(new SavestateEvents());
+		MinecraftForge.EVENT_BUS.register(new MotionEvents());
 		
 		saveHandler=new SavestateHandlerClient();
 		

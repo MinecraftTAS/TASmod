@@ -8,8 +8,6 @@ import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Maps;
 
-import de.scribble.lp.tasmod.playback.InputPlayback;
-import de.scribble.lp.tasmod.recording.InputRecorder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
