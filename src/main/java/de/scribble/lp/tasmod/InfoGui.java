@@ -3,10 +3,8 @@ package de.scribble.lp.tasmod;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
-import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.ticksync.TickSync;
-import de.scribble.lp.tasmod.virtual.VirtualKeys;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

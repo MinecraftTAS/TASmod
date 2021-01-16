@@ -21,8 +21,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
 public class CommandPlay extends CommandBase{
-	private Minecraft mc = Minecraft.getMinecraft();
-
 
     public List<String> getFilenames() {
         List<String> tab = new ArrayList<String>();

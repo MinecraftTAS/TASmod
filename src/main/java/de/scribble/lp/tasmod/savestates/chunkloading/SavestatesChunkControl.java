@@ -1,6 +1,5 @@
 package de.scribble.lp.tasmod.savestates.chunkloading;
 
-import java.util.Iterator;
 import java.util.List;
 
 import de.scribble.lp.tasmod.duck.ChunkProviderDuck;
@@ -10,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -66,7 +64,6 @@ public class SavestatesChunkControl {
 		WorldServer[] worlds=server.worlds;
 		for (WorldServer world:worlds) {
 			for (EntityPlayerMP player : players) {
-				System.out.println("Heck");
 				world.getPlayerChunkMap().removePlayer(player);
 			}
 		}

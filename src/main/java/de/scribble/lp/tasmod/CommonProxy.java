@@ -8,6 +8,8 @@ import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
 import de.scribble.lp.tasmod.savestates.chunkloading.SavestateChunkLoadingPacket;
 import de.scribble.lp.tasmod.savestates.chunkloading.SavestateChunkLoadingPacketHandler;
+import de.scribble.lp.tasmod.savestates.motion.MotionPacket;
+import de.scribble.lp.tasmod.savestates.motion.MotionPacketHandler;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacket;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacket;
@@ -34,6 +36,7 @@ public class CommonProxy {
 		NETWORK.registerMessage(SavestateChunkLoadingPacketHandler.class, SavestateChunkLoadingPacket.class, 4, Side.SERVER);
 		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, 5, Side.CLIENT);
 		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, 6, Side.SERVER);
+		NETWORK.registerMessage(MotionPacketHandler.class, MotionPacket.class, 7, Side.SERVER);
 	}
 
 	public void init(FMLInitializationEvent ev) {

@@ -1,12 +1,6 @@
 package de.scribble.lp.tasmod.savestates.playerloading;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagFloat;
@@ -17,6 +11,9 @@ public class SavestatePlayerLoadingPacket implements IMessage{
 	private double motionX=0;
 	private double motionY=0;
 	private double motionZ=0;
+	private float moveForward=0;
+	private float moveVertical=0;
+	private float moveStrafe=0;
 	private double posX=0;
 	private double posY=0;
 	private double posZ=0;
@@ -27,12 +24,16 @@ public class SavestatePlayerLoadingPacket implements IMessage{
 	}
 	public SavestatePlayerLoadingPacket(NBTTagCompound nbttagcompound) {
 		NBTTagList nbttaglist = nbttagcompound.getTagList("Pos", 6);
-        NBTTagList nbttaglist2 = nbttagcompound.getTagList("Motion", 6);
         NBTTagList nbttaglist3 = nbttagcompound.getTagList("Rotation", 5);
         
-        this.motionX = nbttaglist2.getDoubleAt(0);
-        this.motionY = nbttaglist2.getDoubleAt(1);
-        this.motionZ = nbttaglist2.getDoubleAt(2);
+        NBTTagCompound nbttagmotion = nbttagcompound.getCompoundTag("clientMotion");
+		
+        this.motionX = nbttagmotion.getDouble("x"); 
+        this.motionY = nbttagmotion.getDouble("y"); 
+        this.motionZ = nbttagmotion.getDouble("z");
+		this.moveForward = nbttagcompound.getFloat("RelativeX");
+		this.moveVertical = nbttagcompound.getFloat("RelativeY");
+		this.moveStrafe = nbttagcompound.getFloat("RelativeZ");
         this.posX = nbttaglist.getDoubleAt(0);
         this.posY = nbttaglist.getDoubleAt(1);
         this.posZ = nbttaglist.getDoubleAt(2);
@@ -69,6 +70,7 @@ public class SavestatePlayerLoadingPacket implements IMessage{
 		compound.setTag("Pos", this.newDoubleNBTList(this.posX, this.posY, this.posZ));
         compound.setTag("Motion", this.newDoubleNBTList(this.motionX, this.motionY, this.motionZ));
         compound.setTag("Rotation", this.newFloatNBTList(this.rotationYaw, this.rotationPitch));
+        compound.setTag("RelMotion", this.newFloatNBTList(this.moveForward, this.moveVertical, this.moveStrafe));
         return compound;
 	}
 	
