@@ -36,6 +36,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
  * This code is heavily 'inspired' from <br> bspkrs on github <br> https://github.com/bspkrs/WorldStateCheckpoints/blob/master/src/main/java/bspkrs/worldstatecheckpoints/CheckpointManager.java <br>
  * but it's more fitted to quickly load and save the savestates and removes extra gui overview. Hey I changed this comment, and it actually supports multithreadding now...
  */
+@Deprecated
 public class SavestateHandlerClient {
 	Minecraft mc=Minecraft.getMinecraft();
 	public static boolean isSaving=false;
@@ -43,19 +44,13 @@ public class SavestateHandlerClient {
 	public static int savetimer=5000;
 	public static int loadtimer=100;
 	
-	private File currentworldfolder;
-	private File targetsavefolder=null;
-	private WorldSettings settings;
-	private String foldername;
-	private String worldname;
-	private BufferedImage screenshot;
-	private String screenshotname;
-	private BufferedImage worldIcon;
+	private static File currentworldfolder;
+	private static File targetsavefolder=null;
+	private static String foldername;
+	private static String worldname;
 	
 	
-	public void saveState() {
-		if(!FMLCommonHandler.instance().getMinecraftServerInstance().isDedicatedServer()) {
-			
+	public static void saveState() {
 			currentworldfolder = new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + Minecraft.getMinecraft().getIntegratedServer().getFolderName());
 			targetsavefolder=null;
 			worldname=Minecraft.getMinecraft().getIntegratedServer().getFolderName();
@@ -80,10 +75,6 @@ public class SavestateHandlerClient {
 							"saves" + File.separator + "savestates" + File.separator
 									+ Minecraft.getMinecraft().getIntegratedServer().getFolderName() + "-Savestate"
 									+ Integer.toString(i));
-					if (!targetsavefolder.exists()) {
-						screenshotname="Savestate "+i+".png";	//Setting the name of the savestate as the ScreenshotName
-						break;
-					}
 					i++;
 				}
 				// Save the info file
@@ -99,30 +90,29 @@ public class SavestateHandlerClient {
 					e.printStackTrace();
 				}
 				
-				if (InputRecorder.isRecording()) {
-					InputRecorder.setPause(true);
-					PropertySaver psaver = new PropertySaver();
-					psaver.start();
-					try {
-						psaver.join();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				SavestateSaveEventsClient Saver = new SavestateSaveEventsClient();
-				Saver.start();
+//				if (InputRecorder.isRecording()) {
+//					InputRecorder.setPause(true);
+//					PropertySaver psaver = new PropertySaver();
+//					psaver.start();
+//					try {
+//						psaver.join();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				SavestateSaveEventsClient Saver = new SavestateSaveEventsClient();
+//				Saver.start();
 			}else {
 				CommonProxy.logger.error("Saving savestate is blocked by another action. If this is permanent, restart the game.");
 			}
-		}
 	}
 	
-	public void loadLastSavestate() {
+	public static void loadLastSavestate() {
 		if(!FMLCommonHandler.instance().getMinecraftServerInstance().isDedicatedServer()) {
 			if(!isSaving&&!isLoading) {
 				isLoading=true;
-				currentworldfolder = new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + mc.getIntegratedServer().getFolderName());
-				worldname=foldername=mc.getIntegratedServer().getFolderName();
+//				currentworldfolder = new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + mc.getIntegratedServer().getFolderName());
+//				worldname=foldername=mc.getIntegratedServer().getFolderName();
 				//getting latest savestate
 				int i=1;
 				while(i<=300) {
@@ -151,11 +141,11 @@ public class SavestateHandlerClient {
 					e.printStackTrace();
 					isLoading = false;
 				}
-				this.mc.ingameGUI.getChatGUI().clearChatMessages(true);
+//				this.mc.ingameGUI.getChatGUI().clearChatMessages(true);
 				FMLCommonHandler.instance().firePlayerLoggedOut(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers().get(0));
 
-				mc.displayGuiScreen(new GuiSavestateLoadingScreen());
-				MinecraftForge.EVENT_BUS.register(new SavestateBrake(mc));
+//				mc.displayGuiScreen(new GuiSavestateLoadingScreen());
+//				MinecraftForge.EVENT_BUS.register(new SavestateBrake(mc));
 			}else {
 				CommonProxy.logger.error("Loading savestate is blocked by another action. If this is permanent, restart the game.");
 			}
@@ -169,9 +159,10 @@ public class SavestateHandlerClient {
      * @param sourceLocation source
      * @param targetLocation target
      * @param ignore array of ignored names (strings)
+	 * @return 
      * @throws IOException
      */
-    protected void copyDirectory(File sourceLocation, File targetLocation, String[] ignore) throws IOException
+    private static void copyDirectory(File sourceLocation, File targetLocation, String[] ignore) throws IOException
     {
         if (sourceLocation.isDirectory())
         {
@@ -227,7 +218,7 @@ public class SavestateHandlerClient {
      * @param ignore ignored files
      * @return true on success
      */
-    protected boolean deleteDirContents(File dir, String[] ignore){
+    private static boolean deleteDirContents(File dir, String[] ignore){
     	
         if (dir.isDirectory())
         {
@@ -257,14 +248,14 @@ public class SavestateHandlerClient {
         return true; 
     }
 
-    public File getInfoFile(String worldname) {
+    public static File getInfoFile(String worldname) {
     	if(!new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator+"savestates").exists()) new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator+"savestates").mkdir();
     	
     	File file = new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator+"savestates"+File.separator+worldname+"-info.txt");
     	return file;
     }
     
-    public int[] getInfoValues(File file) throws IOException {
+    public static int[] getInfoValues(File file) throws IOException {
     	int[] out = {0,0};
     	if (file.exists()){
 			try {
@@ -293,7 +284,7 @@ public class SavestateHandlerClient {
     	}
     	return out;
     }
-    public void saveInfo(File file,@Nullable int[] values) {
+    public static void saveInfo(File file,@Nullable int[] values) {
     	StringBuilder output= new StringBuilder();
     	output.append("#This file was generated by TASTools and diplays info about the usage of savestates!\n\n");
     	if(values==null) {
@@ -307,19 +298,7 @@ public class SavestateHandlerClient {
 			e.printStackTrace();
     	}
     }
-    public void displayLoadingScreen() {
-    	if (mc.currentScreen instanceof GuiSavestateSavingScreen) {
-			mc.displayGuiScreen(null);
-		} else {
-			mc.displayGuiScreen(new GuiSavestateSavingScreen());
-		}
-    }
-
-	public void displayIngameMenu() {
-		mc.displayGuiScreen(new GuiIngameMenu());
-	}
-
-	private class SavestateSaveEventsClient extends Thread {
+    class SavestateSaveEventsClient extends Thread {
 		@Override
 		public void run() {
 			try {
@@ -340,6 +319,7 @@ public class SavestateHandlerClient {
 			}
 		}
 	}
+	
 
 	/**
 	 * Subscribes to the forge event bus for a brief amount of time to keep up a guiscreen. This is needed for the loadstate functions since errors occur when mc is closed when no guiscreen is up.
@@ -431,7 +411,7 @@ public class SavestateHandlerClient {
 			}
 		}
 	}
-	class PropertySaver extends Thread{
+	private class PropertySaver extends Thread{
 		@Override
 		public void run() {
 			this.setName("PropertySaverThread");

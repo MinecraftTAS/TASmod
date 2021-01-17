@@ -4,11 +4,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.tasmod.misc.CommandFolder;
+import de.scribble.lp.tasmod.misc.ModIncompatibleException;
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
+import de.scribble.lp.tasmod.savestates.SavestateHandler;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.tutorial.CommandPlaybacktutorial;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -40,8 +43,28 @@ public class ModLoader {
 	
 	
 	@EventHandler
-	public void preInit(FMLPreInitializationEvent ev) {
+	public void preInit(FMLPreInitializationEvent ev) throws Exception {
 		proxy.preInit(ev);
+		if(Loader.isModLoaded("tastools")) {
+			throw new ModIncompatibleException("\n========================================================================\n"
+												+"\n"
+												+ "Detected TASTools to be loaded. TASMod and TASTools are incompatible!\n"
+												+ "\n"
+												+ "========================================================================");
+			
+		}else if(Loader.isModLoaded("dupemod")) {
+			throw new ModIncompatibleException("\n========================================================================\n"
+												+"\n"
+												+ "Detected Dupemod to be loaded. TASMod and Dupemod are incompatible!\n"
+												+ "\n"
+												+ "========================================================================");
+		}else if(Loader.isModLoaded("tickratechanger")) {
+			throw new ModIncompatibleException("\n========================================================================\n"
+												+"\n"
+												+ "Detected Tickratechanger to be loaded. TASMod and Tickratechanger are incompatible!\n"
+												+ "\n"
+												+ "========================================================================");
+		}
 	}
 	
 	@EventHandler
@@ -56,7 +79,7 @@ public class ModLoader {
 	@EventHandler
 	public void serverStart(FMLServerStartingEvent ev) {
 		serverInstance= ev.getServer();
-		
+		new SavestateHandler();
 		//Command handling
 		ev.registerServerCommand(new CommandTickrate());
 		ev.registerServerCommand(new CommandRecord());
