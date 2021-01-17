@@ -145,21 +145,20 @@ public class InputRecorder {
 		pauseRecording = false;
 	}
 	private static void addHeader() {
-		fileThread.addLine(
-				"################################################# TASFile ###################################################\n"
-						+ "#							This file was generated using the Minecraft TASMod								#\n"
-						+ "#																											#\n"
-						+ "#	If you make a mistake in this file, the mod will notify you via the console, so it's best to keep the	#\n"
-						+ "#										console open at all times											#\n"
-						+ "#																											#\n"
-						+ "#------------------------------------------------ Header ---------------------------------------------------#\n"
-						+ "#Author:" + mc.player.getName() + "\n"
-						+ "#																											#\n"
-						+ "#StartLocation:" + getStartLocation() + ",\n"
-						+ "#																											#\n"
-						+ "#Resolution:" + mc.displayWidth + "x" + mc.displayHeight + "\n"
-						+ "#																											#\n"
-						+ "#############################################################################################################\n");
+		fileThread.addLine("################################################# TASFile ###################################################\n"
+						 + "#							This file was generated using the Minecraft TASMod								#\n"
+						 + "#																											#\n"
+						 + "#	If you make a mistake in this file, the mod will notify you via the console, so it's best to keep the	#\n"
+						 + "#										console open at all times											#\n"
+						 + "#																											#\n"
+						 + "#------------------------------------------------ Header ---------------------------------------------------#\n"
+						 + "#Author:" + mc.player.getName() + "\n"
+						 + "#																											#\n"
+						 + "#StartLocation:" + getStartLocation() + ",\n"
+						 + "#																											#\n"
+						 + "#Resolution:" + mc.displayWidth + "x" + mc.displayHeight + "\n"
+						 + "#																											#\n"
+						 + "#############################################################################################################\n");
 	}
 
 	private static String getStartLocation() {
@@ -197,15 +196,9 @@ public class InputRecorder {
 			String keyboardString = "";
 			String keyboardStateString = "";
 			String charString = "";
-			List<VirtualKeyboardEvent> keyboardEventList = VirtualMouseAndKeyboard.getKeyboardEvents(); // Get all the
-																										// inputs
-																										// currently
-																										// pressed on
-																										// the virtual
-																										// keyboard
+			List<VirtualKeyboardEvent> keyboardEventList = VirtualMouseAndKeyboard.getKeyboardEvents(); // Get all the inputs currently pressed on the virtual keyboard
 
-			for (int i = 0; i < keyboardEventList.size(); i++) { // If there are multiple keyboard events in one tick,
-																	// this will add them all, seperated with comma
+			for (int i = 0; i < keyboardEventList.size(); i++) { // If there are multiple keyboard events in one tick, this will add them all, seperated with comma
 				String ending = ",";
 				if (i == keyboardEventList.size() - 1) { // Prevents a comma at the end of the input list
 					ending = "";
@@ -214,11 +207,7 @@ public class InputRecorder {
 				if (VirtualKeybindings.isKeyCodeBlockedDuringRecording(event.getKeyCode())) { // Removing TASmod keybindings from the recording
 					continue;
 				}
-				keyboardString = keyboardString
-						.concat(VirtualMouseAndKeyboard.getNameFromKeyCode(event.getKeyCode()) + ending); // Add
-																											// everything
-																											// into a
-																											// string
+				keyboardString = keyboardString.concat(VirtualMouseAndKeyboard.getNameFromKeyCode(event.getKeyCode()) + ending); // Add everything into a string
 				keyboardStateString = keyboardStateString.concat(Boolean.toString(event.isState()) + ending);
 				charString = charString.concat(Character.toString(event.getCharacter()));
 			}
@@ -238,8 +227,7 @@ public class InputRecorder {
 					ending = "";
 				}
 				VirtualMouseEvent event = mouseEventList.get(i);
-				mouseString = mouseString
-						.concat(VirtualMouseAndKeyboard.getNameFromKeyCode(event.getKeyCode()) + ending);
+				mouseString = mouseString.concat(VirtualMouseAndKeyboard.getNameFromKeyCode(event.getKeyCode()) + ending);
 				mouseStateString = mouseStateString.concat(Boolean.toString(event.isState()) + ending);
 				if (event.getScrollwheel() == 0) {
 					scrollString = scrollString.concat(" " + ending);
@@ -253,24 +241,19 @@ public class InputRecorder {
 				slotString = slotString.concat(event.getSlotidx() + ending);
 			}
 			/* =====Subticks===== */
-			// Subticks describe camera movement, like rotationPitch, rotationYaw. This is
-			// normally dependant on the framerate hence the name subticks. Before, this was
-			// seperated from the ticks
+			// Subticks describe camera movement, like rotationPitch, rotationYaw.
+			// This is normally dependant on the framerate hence the name subticks.
+			// Before, this was seperated from the ticks
 
 			VirtualSubticks subtick = VirtualMouseAndKeyboard.getSubtick();
 			String pitch = Float.toString(subtick.getPitch());
 			String yaw = Float.toString(subtick.getYaw());
 
 			/* =====Special rules===== */
-			mouseString = mouseString.replace("MOUSEMOVED", " "); // The standard event for moving the mouse is set to
-																	// blank here. Since the mouse is moved VERY often,
-																	// this clutters the whole file
-			charString = StringUtils.replace(charString, "\r", "\\n"); // Replacing \r with \\n for the chars to stop
-																		// gaps from happening in the files
+			mouseString = mouseString.replace("MOUSEMOVED", " "); // The standard event for moving the mouse is set to blank here. Since the mouse is moved VERY often, this clutters the whole file
+			charString = StringUtils.replace(charString, "\r", "\\n"); // Replacing \r with \\n for the chars to stop gaps from happening in the files
 			charString = StringUtils.replace(charString, "\n", "\\n");
-			mouseStateString = mouseStateString.replace("false", " "); // Unpressing buttons makes a false appear. This
-																		// is replaced by a blank to increase visibility
-																		// on the 'true' strings
+			mouseStateString = mouseStateString.replace("false", " "); // Unpressing buttons makes a false appear. This is replaced by a blank to increase visibility on the 'true' strings
 			keyboardStateString = keyboardStateString.replace("false", " ");
 
 			/* =====Add to a line===== */
@@ -343,10 +326,21 @@ public class InputRecorder {
 	 */
 	private static File interpretFilename(String name) {
 		File file = new File(tasdirectory + File.separator + name + ".tas");
-		if (name.contains("/") || name.contains(".") || name.contains("\r") || name.contains("\t")
-				|| name.contains("\0") || name.contains("\f") || name.contains("`") || name.contains("?")
-				|| name.contains("*") || name.contains("\\") || name.contains("<") || name.contains(">")
-				|| name.contains("|") || name.contains("\"") || name.contains(":")) {
+		if (name.contains("/") 
+				|| name.contains(".") 
+				|| name.contains("\r")
+				|| name.contains("\t")
+				|| name.contains("\0")
+				|| name.contains("\f")
+				|| name.contains("`")
+				|| name.contains("?")
+				|| name.contains("*")
+				|| name.contains("\\")
+				|| name.contains("<")
+				|| name.contains(">")
+				|| name.contains("|")
+				|| name.contains("\"")
+				|| name.contains(":")) {
 			return null;
 		} else {
 			return file;

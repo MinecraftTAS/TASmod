@@ -17,15 +17,16 @@ public class MixinEntityPlayerMP {
 		@Inject(method="writeEntityToNBT", at = @At(value="RETURN"))
 		public void writeClientMotion(NBTTagCompound compound, CallbackInfo ci) {
 			NBTTagCompound nbttagcompound = new NBTTagCompound();
-			@SuppressWarnings("unlikely-arg-type")
-			ClientMotionServer.Saver saver=ClientMotionServer.getMotion().get(this);
-            nbttagcompound.setDouble("x", saver.getClientX());
-            nbttagcompound.setDouble("y", saver.getClientY());
-            nbttagcompound.setDouble("z", saver.getClientZ());
-            nbttagcompound.setFloat("RelativeX", saver.getClientrX());
-            nbttagcompound.setFloat("RelativeY", saver.getClientrY());
-            nbttagcompound.setFloat("RelativeZ", saver.getClientrZ());
-            compound.setTag("clientMotion", nbttagcompound);
+			ClientMotionServer.Saver saver=ClientMotionServer.getMotion().get((EntityPlayerMP)(Object)this);
+			if(saver!=null) {
+	            nbttagcompound.setDouble("x", saver.getClientX());
+	            nbttagcompound.setDouble("y", saver.getClientY());
+	            nbttagcompound.setDouble("z", saver.getClientZ());
+	            nbttagcompound.setFloat("RelativeX", saver.getClientrX());
+	            nbttagcompound.setFloat("RelativeY", saver.getClientrY());
+	            nbttagcompound.setFloat("RelativeZ", saver.getClientrZ());
+	            compound.setTag("clientMotion", nbttagcompound);
+			}
 		}
 		
 		@Inject(method = "readEntityFromNBT", at = @At(value="RETURN"))
