@@ -6,7 +6,7 @@ import org.lwjgl.input.Keyboard;
 
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.scribble.lp.tasmod.savestates.SavestateEvents;
-import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
+import de.scribble.lp.tasmod.savestates.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.motion.MotionEvents;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -27,8 +27,6 @@ public class ClientProxy extends CommonProxy{
 	private static TutorialHandler playbackTutorial;
 	
 	public static boolean isDevEnvironment;
-	
-	private static SavestateHandlerClient saveHandler;
 	
 	public static KeyBinding tickratezeroKey= new KeyBinding("Tickrate 0 Key", Keyboard.KEY_F8, "TASmod");
 	
@@ -58,8 +56,6 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(new SavestateEvents());
 		MinecraftForge.EVENT_BUS.register(new MotionEvents());
 		
-		saveHandler=new SavestateHandlerClient();
-		
 		ClientRegistry.registerKeyBinding(tickratezeroKey);
 		ClientRegistry.registerKeyBinding(tickAdvance);
 		ClientRegistry.registerKeyBinding(stopkey);
@@ -79,8 +75,5 @@ public class ClientProxy extends CommonProxy{
 	}
 	public static TutorialHandler getPlaybackTutorial() {
 		return playbackTutorial;
-	}
-	public static SavestateHandlerClient getSaveHandler() {
-		return saveHandler;
 	}
 }

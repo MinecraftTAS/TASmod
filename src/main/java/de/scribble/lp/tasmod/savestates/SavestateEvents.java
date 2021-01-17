@@ -21,8 +21,7 @@ public class SavestateEvents {
 //				TickrateChangerServer.pauseUnpauseGame();
 //			}
 //			ClientProxy.getSaveHandler().saveState();
-			CommonProxy.NETWORK.sendToServer(new SavestateChunkLoadingPacket(false));
-			CommonProxy.NETWORK.sendToServer(new SavestatePlayerLoadingPacket());
+			CommonProxy.NETWORK.sendToServer(new SavestatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptChat(ClientProxy.savestateLoadKey)){
 //			if(InputRecorder.isRecording()) {
