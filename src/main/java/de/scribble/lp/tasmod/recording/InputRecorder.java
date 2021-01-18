@@ -108,7 +108,6 @@ public class InputRecorder {
 	}
 	private static int getLatestTickCounter(File siles) throws IOException {
 		// Create a bunch of variables
-		@SuppressWarnings("resource")
 		BufferedReader buff = new BufferedReader(new FileReader(fileLocation));
 		String wholeLine = "";
 		int ticks=0;
@@ -124,9 +123,11 @@ public class InputRecorder {
 			try {
 				ticks=Integer.parseInt(sections[0]);
 			}catch(NumberFormatException e) {
+				buff.close();
 				throw new IOException("Error while reading the tickcounter in line "+linecounter+". Not a number");
 			}
 			if(compare+1!=ticks) {
+				buff.close();
 				throw new IOException("Error while reading tickcounter in line "+linecounter+". The numbers are not consecutive");
 			}
 			compare=ticks;

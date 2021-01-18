@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.storage.SaveHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -37,7 +38,6 @@ public class SavestatesChunkControl {
 	}
 	/**
 	 * Unloads all chunks on the server
-	 * TODO Maybe change to the vanilla method
 	 * 
 	 * @see MixinChunkProviderServer#unloadAllChunks()
 	 * @Side Server
@@ -101,8 +101,20 @@ public class SavestatesChunkControl {
 	public static void flushSaveHandler() {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		WorldServer[] worlds=server.worlds;
-		for(WorldServer world :worlds) {
+		for(WorldServer world : worlds) {
 			world.getSaveHandler().flush();
+		}
+	}
+	/**
+	 * Updates the session lock to allow for vanilla saving again
+	 * 
+	 * @Side Server
+	 */
+	public static void updateSessionLock() {
+		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+		WorldServer[] worlds=server.worlds;
+		for(WorldServer world : worlds) {
+			((SaveHandler)world.getSaveHandler()).setSessionLock();
 		}
 	}
 }

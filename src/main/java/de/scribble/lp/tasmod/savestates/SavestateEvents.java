@@ -2,9 +2,6 @@ package de.scribble.lp.tasmod.savestates;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.savestates.chunkloading.SavestateChunkLoadingPacket;
-import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
-import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacket;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -32,8 +29,7 @@ public class SavestateEvents {
 //			}
 //			ClientProxy.getSaveHandler().loadLastSavestate();
 			
-			CommonProxy.NETWORK.sendToServer(new SavestateChunkLoadingPacket());
-			SavestatesChunkControl.unloadAllClientChunks();
+			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 		}
 	}
 }

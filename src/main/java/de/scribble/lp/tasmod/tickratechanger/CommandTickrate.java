@@ -10,12 +10,16 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 
 public class CommandTickrate extends CommandBase{
-	private final List<String> aliases = ImmutableList.of("ticks", "tickratechanger", "trc", "settickrate");
 	@Override
 	public String getName() {
 		return "tickrate";
 	}
 
+	@Override
+	public List<String> getAliases() {
+		return ImmutableList.of("ticks", "tickratechanger", "trc", "settickrate");
+	}
+	
 	@Override
 	public String getUsage(ICommandSender sender) {
 		return "/tickrate [ticks per second] [all/server/client/playername]";
