@@ -4,7 +4,10 @@ import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 /**
- * Simple networking packet to initiate savestating on the server
+ * Simple networking packet to initiate things on client and server
+ * 
+ * @OnClient Displays GuiSavestatingScreen. <br>If that is already open, it displays IngameMenu
+ * @OnServer Initiates savestating
  * @author ScribbleLP
  * 
  * @see SavestatePacketHandler

@@ -79,7 +79,6 @@ public class ModLoader {
 	@EventHandler
 	public void serverStart(FMLServerStartingEvent ev) {
 		serverInstance= ev.getServer();
-		new SavestateHandler();
 		//Command handling
 		ev.registerServerCommand(new CommandTickrate());
 		ev.registerServerCommand(new CommandRecord());

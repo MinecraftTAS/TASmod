@@ -19,7 +19,9 @@ public class TickrateChangerClient {
 		if (tickrate > 0) {
 			mc.timer.tickLength = 1000F / tickrate;
 		} else if (tickrate == 0F) {
-			TICKRATE_SAVED=TICKS_PER_SECOND;
+			if(TICKS_PER_SECOND!=0) {
+				TICKRATE_SAVED=TICKS_PER_SECOND;
+			}
 			mc.timer.tickLength = Float.MAX_VALUE;
 		}
 		TICKS_PER_SECOND = tickrate;
