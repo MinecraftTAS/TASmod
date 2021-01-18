@@ -9,7 +9,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class SavestatePlayerLoading {
-	public static void loadPlayersFromFile() {
+	
+	public static void loadAndSendMotionToPlayer() {
 		
 		List<EntityPlayerMP> players=FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers();
 		players.forEach(player->{

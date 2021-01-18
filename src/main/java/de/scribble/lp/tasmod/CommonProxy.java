@@ -6,10 +6,10 @@ import org.apache.logging.log4j.Logger;
 import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
+import de.scribble.lp.tasmod.savestates.LoadstatePacket;
+import de.scribble.lp.tasmod.savestates.LoadstatePacketHandler;
 import de.scribble.lp.tasmod.savestates.SavestatePacket;
 import de.scribble.lp.tasmod.savestates.SavestatePacketHandler;
-import de.scribble.lp.tasmod.savestates.chunkloading.SavestateChunkLoadingPacket;
-import de.scribble.lp.tasmod.savestates.chunkloading.SavestateChunkLoadingPacketHandler;
 import de.scribble.lp.tasmod.savestates.motion.MotionPacket;
 import de.scribble.lp.tasmod.savestates.motion.MotionPacketHandler;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacket;
@@ -19,7 +19,6 @@ import de.scribble.lp.tasmod.tickratechanger.TickratePacketHandler;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
 import de.scribble.lp.tasmod.ticksync.TickSyncPacketHandler;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -37,12 +36,13 @@ public class CommonProxy {
 		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, i++, Side.CLIENT);
-		NETWORK.registerMessage(SavestateChunkLoadingPacketHandler.class, SavestateChunkLoadingPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(MotionPacketHandler.class, MotionPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.CLIENT);
 		
 	}
 

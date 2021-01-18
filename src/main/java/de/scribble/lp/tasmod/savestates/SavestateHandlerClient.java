@@ -1,6 +1,5 @@
 package de.scribble.lp.tasmod.savestates;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,10 +20,8 @@ import de.scribble.lp.tasmod.misc.MiscEvents;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;

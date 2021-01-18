@@ -15,7 +15,7 @@ public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<Save
 		if(ctx.side.isServer()) {
 			ctx.getServerHandler().player.getServerWorld().addScheduledTask(()->{
 				SavestateWorldLoading.loadWorldInfoFromFile();
-				SavestatePlayerLoading.loadPlayersFromFile();
+				SavestatePlayerLoading.loadAndSendMotionToPlayer();
 			});
 		}else {
 			Minecraft.getMinecraft().addScheduledTask(()->{

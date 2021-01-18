@@ -2,10 +2,8 @@ package de.scribble.lp.tasmod.savestates;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.FileHandler;
 
 import javax.annotation.Nullable;
 
@@ -15,17 +13,22 @@ import com.google.common.io.Files;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
+import de.scribble.lp.tasmod.savestates.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
+import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
+import de.scribble.lp.tasmod.savestates.playerloading.SavestateWorldLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 
 /**
- * New and improved savestatehandler. Creates and loads savestates on both client and server without closing the world <br>
- * The old version of this was heavily inspired by bspkrs' <a href="https://www.curseforge.com/minecraft/mc-mods/worldstatecheckpoints">WorldStateCheckpoints</a>, but I can honestly say now
- * that I replaced everything that mod had with new things. This also makes savestates without closing the server...
+ * Creates and loads savestates on both client and server without closing the world <br>
+ * The old version that you may find in TASTools was heavily inspired by bspkrs' <a href="https://www.curseforge.com/minecraft/mc-mods/worldstatecheckpoints">WorldStateCheckpoints</a>,
+ * but this new version is completely self written.
  * 
  * @author ScribbleLP
  *
@@ -38,6 +41,14 @@ public class SavestateHandler {
 	
 	public static boolean isLoading=false;
 	
+	/**
+	 * Creates a copy of the currently played world and saves it in .minecraft/saves/savestates/worldname <br>
+	 * Called in {@link SavestatePacketHandler}
+	 * 
+	 * @Side Server
+	 * @throws SavestateException
+	 * @throws IOException
+	 */
 	public static void saveState() throws SavestateException, IOException {
 		if(isSaving) {
 			throw new SavestateException("A savestating operation is already being carried out");
@@ -45,33 +56,73 @@ public class SavestateHandler {
 		if(isLoading) {
 			throw new SavestateException("A loadstate operation is being carried out");
 		}
+		//Lock savestating and loadstating
 		isSaving=true;
 		
+		//Create a directory just in case
 		createSavestateDirectory();
 		
-		if(server.isDedicatedServer()) {
-			TickrateChangerServer.changeServerTickrate(0);
-			TickrateChangerServer.changeClientTickrate(0);
-		}
+		//Enable tickrate 0
+		TickrateChangerServer.changeServerTickrate(0);
+		TickrateChangerServer.changeClientTickrate(0);
 		
-		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 		
+		//Save the world!
 		server.getPlayerList().saveAllPlayerData();
 		server.saveAllWorlds(true);
 		
+		//Display the loading screen on the client
+		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
+		
+		//Get the current and taget directory for copying
 		String worldname=File.separator+server.getFolderName();
 		File currentfolder=new File(server.getDataDirectory(),"saves"+worldname);
-		File targetfolder=getSavedFolderInDirectory(worldname);
+		File targetfolder=getNextSaveFolderLocation(worldname);
 		
-		AnvilChunkLoader chunkloader=(AnvilChunkLoader)server.worlds[0].getChunkProvider().chunkLoader;
 		incrementSavestates(worldname);
 		
-		while(chunkloader.getPendingSaveCount()>0) {
+		//Wait for the chunkloader to save the game
+		for(WorldServer world:server.worlds) {
+			AnvilChunkLoader chunkloader=(AnvilChunkLoader)world.getChunkProvider().chunkLoader;
+			while(chunkloader.getPendingSaveCount()>0) {
+			}
 		}
 		
+		//Copy the directory
 		FileUtils.copyDirectory(currentfolder, targetfolder);
+		
+		//Send everyone the ingame menu
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
+		
+		//Unlock savestating
 		isSaving=false;
+	}
+	
+	/**
+	 * Searches through the savestate folder to look for the next possible savestate foldername <br>
+	 * Savestate equivalent to {@link SavestateHandler#getLatestSavestateLocation(String)}
+	 * @param worldname
+	 * @return targetsavefolder
+	 * @throws SavestateException if the found savestates count is greater or equal than 300
+	 */
+	private static File getNextSaveFolderLocation(String worldname) throws SavestateException {
+		int i = 1;
+		int limit=300;
+		File targetsavefolder=null;
+		isSaving=true;
+		while (i <= limit) {
+			if (i >= limit) {
+				isSaving = false;
+				throw new SavestateException("Savestatecount is greater or equal than "+limit);
+			}
+			targetsavefolder = new File(savestateDirectory,worldname + "-Savestate" + Integer.toString(i)+File.separator);
+			
+			if (!targetsavefolder.exists()) {
+				break;
+			}
+			i++;
+		}
+		return targetsavefolder;
 	}
 	
 	@Deprecated
@@ -84,13 +135,15 @@ public class SavestateHandler {
 			saveInfo(getInfoFile(worldname), incr);
 		}
 	}
+	
 	@Deprecated
 	private static File getInfoFile(String worldname) {
 		File file = new File(savestateDirectory, worldname + "-info.txt");
 		return file;
 	}
+	
 	@Deprecated
-	public static int[] getInfoValues(File file){
+	private static int[] getInfoValues(File file){
     	int[] out = {0,0};
     	if (file.exists()){
 			try {
@@ -119,8 +172,9 @@ public class SavestateHandler {
     	}
     	return out;
     }
+	
 	@Deprecated
-	public static void saveInfo(File file,@Nullable int[] values) {
+	private static void saveInfo(File file,@Nullable int[] values) {
     	StringBuilder output= new StringBuilder();
     	output.append("#This file was generated by TASTools and diplays info about the usage of savestates!\n\n");
     	if(values==null) {
@@ -134,6 +188,103 @@ public class SavestateHandler {
 			e.printStackTrace();
     	}
     }
+	
+	/**
+	 * Loads the latest savestate it can find in .minecraft/saves/savestates/worldname-Savestate
+	 * 
+	 * @Side Server
+	 * @throws LoadstateException
+	 * @throws IOException
+	 */
+	public static void loadState() throws LoadstateException, IOException {
+		if(isSaving) {
+			throw new LoadstateException("A savestating operation is already being carried out");
+		}
+		if(isLoading) {
+			throw new LoadstateException("A loadstate operation is being carried out");
+		}
+		//Lock savestating and loadstating
+		isLoading=true;
+		
+		//Create a directory just in case
+		createSavestateDirectory();
+		
+		//Enable tickrate 0
+		TickrateChangerServer.changeServerTickrate(0);
+		TickrateChangerServer.changeClientTickrate(0);
+		
+		//Get the current and taget directory for copying
+		String worldname=server.getFolderName();
+		File currentfolder=new File(server.getDataDirectory(),"saves"+File.separator+worldname);
+		File targetfolder=getLatestSavestateLocation(worldname);
+		
+		//Disabeling level saving for all worlds in case the auto save kicks in during world unload
+		for(WorldServer world: server.worlds) {
+			world.disableLevelSaving=true;		
+		}
+		
+		//Unload chunks on the client
+		CommonProxy.NETWORK.sendToAll(new LoadstatePacket());
+		
+		//Unload chunks on the server
+		SavestatesChunkControl.disconnectPlayersFromChunkMap();
+		SavestatesChunkControl.unloadAllServerChunks();
+		SavestatesChunkControl.flushSaveHandler();
+		
+		//Delete and copy directories
+		FileUtils.deleteDirectory(currentfolder);
+		FileUtils.copyDirectory(targetfolder, currentfolder);
+		
+		//Load the chunks and send them to the client
+		SavestatesChunkControl.addPlayersToChunkMap();
+		
+		//Enable level saving again
+		for(WorldServer world: server.worlds) {
+			world.disableLevelSaving=false;
+		}
+		
+		//Update the world info
+		SavestateWorldLoading.loadWorldInfoFromFile();
+		//Update the player and the client
+		SavestatePlayerLoading.loadAndSendMotionToPlayer();
+		//Update the session.lock file so minecraft behaves and saves the world
+		SavestatesChunkControl.updateSessionLock();
+		
+		//Send a notification that the savestate has been loaded
+		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN+"Savestate loaded"));
+		
+		//Unlock loadstating
+		isLoading=false;
+	}
+	/**
+	 * Searches through the savestate folder to look for the latest savestate<br>
+	 * Loadstate equivalent to {@link SavestateHandler#getNextSaveFolderLocation(String)}
+	 * @param worldname
+	 * @return targetsavefolder
+	 * @throws LoadstateException if there is no savestate or more than 300 savestates
+	 */
+	private static File getLatestSavestateLocation(String worldname) throws LoadstateException {
+		int i=1;
+		int limit=300;
+		File targetsavefolder=null;
+		while(i<=300) {
+			targetsavefolder = new File(savestateDirectory,worldname+"-Savestate"+Integer.toString(i));
+			if (!targetsavefolder.exists()) {
+				if(i-1==0) {
+					throw new LoadstateException("Couldn't find any savestates");
+				}
+				if(i>300) {
+					throw new LoadstateException("Savestatecount is greater or equal than "+limit);
+				}
+				targetsavefolder = new File(savestateDirectory,worldname+"-Savestate"+Integer.toString(i-1));
+				break;
+			}
+			i++;
+		}
+		return targetsavefolder;
+	}
+	
+
 	/**
 	 * Creates the savestate directory in case the user deletes it between savestates
 	 */
@@ -141,30 +292,5 @@ public class SavestateHandler {
 		if(!savestateDirectory.exists()) {
 			savestateDirectory.mkdir();
 		}
-	}
-	/**
-	 * Searches through the savestate folder to look for the next possible savestate foldername
-	 * @param worldname
-	 * @return targetsavefolder
-	 * @throws SavestateException if the found savestates count is greater or equal than 300
-	 */
-	private static File getSavedFolderInDirectory(String worldname) throws SavestateException {
-		int i = 1;
-		int limit=300;
-		File targetsavefolder=null;
-		isSaving=true;
-		while (i <= limit) {
-			if (i >= limit) {
-				isSaving = false;
-				throw new SavestateException("Savestatecount is greater or equal than "+limit);
-			}
-			targetsavefolder = new File(savestateDirectory,worldname + "-Savestate" + Integer.toString(i)+File.separator);
-			
-			if (!targetsavefolder.exists()) {
-				break;
-			}
-			i++;
-		}
-		return targetsavefolder;
 	}
 }

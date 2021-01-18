@@ -6,7 +6,6 @@ import org.lwjgl.input.Keyboard;
 
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.scribble.lp.tasmod.savestates.SavestateEvents;
-import de.scribble.lp.tasmod.savestates.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.motion.MotionEvents;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
