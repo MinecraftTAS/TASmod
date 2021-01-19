@@ -9,8 +9,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
+import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.playback.InputPlayback;
+import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import net.minecraft.client.Minecraft;
@@ -78,13 +81,17 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
             Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2 - 20);
             Mouse.setGrabbed(true);
         }
-
+        float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
+        float f1 = f * f * f * 8.0F;
         if (this.mc.currentScreen == null) {
             mc.mouseHelper.mouseXYChange();
-            float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
-            float f1 = f * f * f * 8.0F;
             dX += mc.mouseHelper.deltaX;
             dY += mc.mouseHelper.deltaY;
+        }
+        if (InputPlayback.isPlayingback()) {
+        	dX = 0;
+        	dY = 0;
+        } else {
             CameraInterpolationEvents.rotationYaw = ((float)((double)CameraInterpolationEvents.rotationYaw + (double)mc.mouseHelper.deltaX * f1 * 0.15D));
             CameraInterpolationEvents.rotationPitch = (float)((double)CameraInterpolationEvents.rotationPitch - (double)mc.mouseHelper.deltaY * f1 * 0.15D);
             CameraInterpolationEvents.rotationPitch = MathHelper.clamp(CameraInterpolationEvents.rotationPitch, -90.0F, 90.0F);
@@ -94,8 +101,6 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
 	        {
 	            this.mc.getTutorial().handleMouse(this.mc.mouseHelper);
 	            mc.mouseHelper.mouseXYChange();
-	            float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
-	            float f1 = f * f * f * 8.0F;
 	            float f2 = (float)this.mc.mouseHelper.deltaX * f1;
 	            float f3 = (float)this.mc.mouseHelper.deltaY * f1;
 	            int i = 1;
