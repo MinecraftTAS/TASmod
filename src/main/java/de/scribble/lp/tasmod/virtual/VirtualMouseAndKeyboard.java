@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.scribble.lp.tasmod.playback.InputPlayback;
+import net.minecraft.client.settings.KeyBinding;
 
 /**
  * Emulates a virtual keyboard that is set between the lwjgl.input.Keyboard & lwjgl.input.Mouse and the keybindings.<br>
@@ -72,7 +73,7 @@ public class VirtualMouseAndKeyboard {
 	static VirtualKeys KEY_SLASH=new VirtualKeys("SLASH", 53);
 	static VirtualKeys KEY_RSHIFT=new VirtualKeys("RSHIFT", 54);
 	static VirtualKeys KEY_MULTIPLY=new VirtualKeys("MULTIPLY", 55);
-	static VirtualKeys KEY_LMENU=new VirtualKeys("LMENU", 56);
+	static VirtualKeys KEY_ALT=new VirtualKeys("ALT", 56);
 	static VirtualKeys KEY_SPACE=new VirtualKeys("SPACE", 57);
 	static VirtualKeys KEY_CAPITAL=new VirtualKeys("CAPSLOCK", 58);
 	static VirtualKeys KEY_F1=new VirtualKeys("F1", 59);
@@ -125,6 +126,7 @@ public class VirtualMouseAndKeyboard {
 	static VirtualKeys KEY_NUMPADCOMMA=new VirtualKeys("NUMPADCOMMA", 179);
 	static VirtualKeys KEY_DIVIDE=new VirtualKeys("DIVIDE", 181);
 	static VirtualKeys KEY_PRINT=new VirtualKeys("PRINT", 183);
+	static VirtualKeys Key_ALT_GR=new VirtualKeys("ALT_GR", 184);
 	static VirtualKeys KEY_PAUSE=new VirtualKeys("PAUSE", 197);
 	static VirtualKeys KEY_HOME=new VirtualKeys("HOME", 199);
 	static VirtualKeys KEY_UP=new VirtualKeys("UP", 200);
@@ -136,6 +138,8 @@ public class VirtualMouseAndKeyboard {
 	static VirtualKeys KEY_NEXT=new VirtualKeys("NEXT", 209);
 	static VirtualKeys KEY_INSERT=new VirtualKeys("INSERT", 210);
 	static VirtualKeys KEY_DELETE=new VirtualKeys("DELETE", 211);
+	static VirtualKeys KEY_WIN=new VirtualKeys("WIN", 219);
+	static VirtualKeys KEY_CONTEXT=new VirtualKeys("CONTEXT_MENU", 221);
 	static List<VirtualChar> charList= new ArrayList<VirtualChar>();
 	
 	static VirtualKeys KEY_MOUSEMOVED=new VirtualKeys("MOUSEMOVED", -101);
@@ -159,6 +163,7 @@ public class VirtualMouseAndKeyboard {
 	
 	private static List<String> keyList= new ArrayList<String>();
 	private static List<Character> charsListOut= new ArrayList<Character>();
+	private static List<String> mouseList=new ArrayList<String>();
 	
 	private static List<VirtualMouseEvent> mouseEventList= new ArrayList<VirtualMouseEvent>();
 	
@@ -179,6 +184,9 @@ public class VirtualMouseAndKeyboard {
 	 * @return changedKeycode
 	 */
 	public static int runThroughKeyboard(int keyCode, boolean pressed) {
+		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keyCode)) {
+			return keyCode;
+		}
 		VirtualKeys.keyCodes.get(getKeyCodesFromKeyCode(keyCode)).setPressed(pressed);
 		return keyCode;
 	}
@@ -258,6 +266,7 @@ public class VirtualMouseAndKeyboard {
 		VirtualKeys.keyCodes.forEach((key,virtual)->{
 			virtual.setPressed(false);
 		});
+		KeyBinding.unPressAllKeys();
 	}
 	/**
 	 * Reset things after a tick has passed
@@ -296,6 +305,31 @@ public class VirtualMouseAndKeyboard {
 		});
 		return charsListOut;
 	}
+	/**
+	 * Debug method to return a list of mouse keys currently being pressed. Could be used for a keystroke display
+	 * @return List of keynames currently being pressed
+	 */
+	public static List<String> getCurrentMousePresses() {
+		mouseList.clear();
+		VirtualKeys.keyCodes.forEach((keycodes, virtualkeys)->{
+			if(keycodes<0) {
+				if(virtualkeys.isKeyDown()) {
+					mouseList.add(virtualkeys.getName());
+				}
+			}
+		});
+		return mouseList;
+	}
+	public static void fillMouseEventsWithCurrentKeyPresses(float mouseX, float mouseY) {
+		keyboardEventList.clear();
+		VirtualKeys.keyCodes.forEach((keycodes, virtualkeys)->{
+			if(keycodes>=0) {
+				if(virtualkeys.isKeyDown()) {
+					keyboardEventList.add(new VirtualKeyboardEvent(keycodes, virtualkeys.isKeyDown(), ' '));
+				}
+			}
+		});
+	}
 	/*==========================Emulating keyboard events==========================*/
 	/**
 	 * Resets the keyboard event list, so it can be recorded. Usually happens right before they are filled
@@ -319,6 +353,7 @@ public class VirtualMouseAndKeyboard {
 	 * character: Every key on the keyboard has a character associated with it (even if it's a null character)<br>
 	 */
 	public static void fillKeyboardEvents(int keycode, boolean keystate, char character) {
+		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode))return;
 		keyboardEventList.add(new VirtualKeyboardEvent(keycode, keystate, character));
 	}
 	/**
@@ -349,7 +384,7 @@ public class VirtualMouseAndKeyboard {
 	public static List<VirtualKeyboardEvent> getKeyboardEvents(){
 		return keyboardEventList;
 	}
-	/*Getters for the keaboard events*/
+	/*Getter for the keyboard buttons*/
 	public static int getEventKeyboardButton() {
 		return keyboardEventList.get(keyboardIndex).getKeyCode();
 	}

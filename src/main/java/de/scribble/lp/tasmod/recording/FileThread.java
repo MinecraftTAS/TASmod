@@ -14,8 +14,8 @@ public class FileThread extends Thread {
 	
 	private List<String> output = new ArrayList<String>();
 	
-	public FileThread(File fileLocation) throws FileNotFoundException {
-		stream = new PrintWriter(new FileOutputStream(fileLocation));
+	public FileThread(File fileLocation, boolean append) throws FileNotFoundException {
+		stream = new PrintWriter(new FileOutputStream(fileLocation, append));
 	}
 	
 	public void addLine(String line) {
@@ -42,5 +42,7 @@ public class FileThread extends Thread {
 	public void close() {
 		end = true;
 	}
-	
+	public void flush() {
+		stream.flush();
+	}
 }

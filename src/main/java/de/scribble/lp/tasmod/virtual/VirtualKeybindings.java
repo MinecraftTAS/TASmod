@@ -1,11 +1,15 @@
 package de.scribble.lp.tasmod.virtual;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 import org.lwjgl.input.Keyboard;
 
+import com.google.common.collect.Maps;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
 
 /**
@@ -15,70 +19,75 @@ import net.minecraft.client.settings.KeyBinding;
  *
  */
 public class VirtualKeybindings {
-	private static final int standardCooldown=10;
-	List<KeyCooldown> keyList=new ArrayList<KeyCooldown>();
+	private static Minecraft mc= Minecraft.getMinecraft();
+	private static final long standardCooldown=20;
+	private static HashMap<KeyBinding, Long> cooldownHashMap=Maps.<KeyBinding, Long>newHashMap();
+	private static List<KeyBinding> blockedKeys=new ArrayList<>();
+	private static List<KeyBinding> blockedDuringRecordingKeys=new ArrayList<>();
+	private static long cooldowntimer=0;
 	
-	private void add(KeyBinding keybinding) {
-		keyList.add(new KeyCooldown(keybinding, standardCooldown));
+	public static void increaseCooldowntimer() {
+		cooldowntimer++;
 	}
-	
-	public void decreaseCooldowns() {
-		Stack<Integer> index=new Stack<Integer>();
-		for(KeyCooldown key: keyList) {
-			if(key.getCoooldown()==0) {
-				index.add(keyList.indexOf(key));
-			}else {
-				key.cooldown--;
-			}
+	/**
+	 * Checks whether the key is down, but doesn't execute in chat
+	 * @param keybind
+	 * @return
+	 */
+	public static boolean isKeyDownExceptChat(KeyBinding keybind) {
+		if(mc.currentScreen instanceof GuiChat) {
+			return false;
 		}
-		for (int i = 0; i < index.size(); i++) {
-			keyList.remove((int)index.pop());
-		}
-	}
-	
-	public boolean isKeyDown(KeyBinding key) {
-		boolean down=Keyboard.isKeyDown(key.getKeyCode());
+		boolean down=Keyboard.isKeyDown(keybind.getKeyCode());
 		if(down) {
-			for(KeyCooldown keys: keyList) {
-				if(keys.getKeyName().contentEquals(key.getKeyDescription())) {
-					return false;
+			if(cooldownHashMap.containsKey(keybind)) {
+				if(standardCooldown<=cooldowntimer-(long)cooldownHashMap.get(keybind)) {
+					cooldownHashMap.put(keybind, cooldowntimer);
+					return true;
 				}
+				return false;
+			}else {
+				cooldownHashMap.put(keybind, cooldowntimer);
+				return true;
 			}
-			keyList.add(new KeyCooldown(key, standardCooldown));
 		}
-		return down;
+		return false;
 	}
-	
-	class KeyCooldown{
-		private KeyBinding key;
-		private int standardCooldown;
-		public int cooldown=0;
-		
-		public KeyCooldown(KeyBinding key, int standardCooldown) {
-			this.key=key;
-			this.standardCooldown=standardCooldown;
-			this.cooldown=standardCooldown;
-		}
-		
-		public int getCoooldown() {
-			return cooldown;
-		}
-		
-		public void setPressed() {
-			cooldown=standardCooldown;
-		}
-		
-		public int getKeycode() {
-			return key.getKeyCode();
-		}
-		
-		public void decreaseCooldown() {
-			if(cooldown>0) {
-				cooldown--;
+	public static boolean isKeyDown(KeyBinding keybind) {
+		boolean down=Keyboard.isKeyDown(keybind.getKeyCode());
+		if(down) {
+			if(cooldownHashMap.containsKey(keybind)) {
+				if(standardCooldown<=cooldowntimer-(long)cooldownHashMap.get(keybind)) {
+					cooldownHashMap.put(keybind, cooldowntimer);
+					return true;
+				}
+				return false;
+			}else {
+				cooldownHashMap.put(keybind, cooldowntimer);
+				return true;
 			}
 		}
-		public String getKeyName() {
-			return key.getKeyDescription();
+		return false;
+	}
+	public static void registerBlockedKeyBinding(KeyBinding keybind) {
+		blockedKeys.add(keybind);
+	}
+	public static void registerBlockedDuringRecordingKeyBinding(KeyBinding keybind) {
+		blockedDuringRecordingKeys.add(keybind);
+	}
+	public static boolean isKeyCodeAlwaysBlocked(int keycode) {
+		for(KeyBinding keybind:blockedKeys) {
+			if(keycode==keybind.getKeyCode()) return true;
 		}
+		return false;
+	}
+	public static boolean isKeyCodeBlockedDuringRecording(int keycode) {
+		for(KeyBinding keybind:blockedDuringRecordingKeys) {
+			if(keycode==keybind.getKeyCode()) {
+				blockedDuringRecordingKeys.remove(keybind);
+				return true;
+			}
+		}
+		return false;
 	}
 }

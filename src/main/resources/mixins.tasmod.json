@@ -5,7 +5,9 @@
     "refmap": "mixins.tasmod.refmap.json",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
-        "MixinMinecraftServer"
+        "MixinMinecraftServer",
+        "MixinChunkProviderServer",
+        "MixinEntityPlayerMP"
     ],
     "client": [
         "MixinMinecraft",
@@ -20,6 +22,7 @@
 		"MixinGuiScreenAdvancements",
 		"MixinGuiScreen",
 		"MixinKeyBinding",
-		"MixinGuiMainMenu"
+		"MixinGuiMainMenu",
+		"MixinChunkProviderClient"
 	]
 }

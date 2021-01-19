@@ -1,7 +1,5 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
-import org.lwjgl.input.Keyboard;
-
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -21,7 +19,9 @@ public class TickrateChangerClient {
 		if (tickrate > 0) {
 			mc.timer.tickLength = 1000F / tickrate;
 		} else if (tickrate == 0F) {
-			TICKRATE_SAVED=TICKS_PER_SECOND;
+			if(TICKS_PER_SECOND!=0) {
+				TICKRATE_SAVED=TICKS_PER_SECOND;
+			}
 			mc.timer.tickLength = Float.MAX_VALUE;
 		}
 		TICKS_PER_SECOND = tickrate;
@@ -45,9 +45,9 @@ public class TickrateChangerClient {
      * Bypasses the tick system
      */
     public void bypass() {
-		if (ClientProxy.getVkeys().isKeyDown(ClientProxy.tickratezeroKey)) {
+		if (VirtualKeybindings.isKeyDown(ClientProxy.tickratezeroKey)) {
 			pauseUnpauseGame();
-		} else if (ClientProxy.getVkeys().isKeyDown(ClientProxy.tickAdvance)) {
+		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickAdvance)) {
 			advanceTick();
 		}
     }
