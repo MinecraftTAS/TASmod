@@ -5,6 +5,7 @@ import java.io.File;
 import org.lwjgl.input.Keyboard;
 
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
+import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.savestates.SavestateEvents;
 import de.scribble.lp.tasmod.savestates.motion.MotionEvents;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
@@ -52,6 +53,8 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
+		MinecraftForge.EVENT_BUS.register(new CameraInterpolationEvents());
+		
 		MinecraftForge.EVENT_BUS.register(new SavestateEvents());
 		MinecraftForge.EVENT_BUS.register(new MotionEvents());
 		

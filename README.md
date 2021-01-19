@@ -1,10 +1,11 @@
-﻿# TASmod  
+# TASmod  
 Let's you record and play back tickperfect inputs.  
+
 ## Credits  
 Author of the original mod: tr7zw  
 Author: ScribbleLP  
   
-Contributions by: Famous1622, MGW14(MCPfannkuchenYT)  
+Contributions by: Famous1622, Pancake (MCPfannkuchenYT)  
   
 Tickratechanger: [Guichaguri](https://github.com/Guichaguri/TickrateChanger)  
 Tickrate 0 idea: [Cubitect](https://github.com/Cubitect/Cubitick)  
