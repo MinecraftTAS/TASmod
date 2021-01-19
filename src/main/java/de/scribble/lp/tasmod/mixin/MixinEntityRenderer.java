@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -21,6 +22,7 @@ import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
+import net.minecraft.util.math.MathHelper;
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer implements SubtickDuck{
@@ -48,7 +50,10 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
 	private boolean useShader;
 	@Shadow
 	private long renderEndNanoTime;
-
+	
+	public double dX = 0;
+	public double dY = 0;
+	
 	@Inject(method = "updateCameraAndRender", at = @At("HEAD"), cancellable = true)
 	public void injectUpdateCameraAndRenderer(float partialTicks, long nanoTime, CallbackInfo ci) {
 		boolean flag = Display.isActive();
@@ -73,11 +78,22 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
             Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2 - 20);
             Mouse.setGrabbed(true);
         }
+
+        if (this.mc.currentScreen == null) {
+            mc.mouseHelper.mouseXYChange();
+            float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
+            float f1 = f * f * f * 8.0F;
+            dX += mc.mouseHelper.deltaX;
+            dY += mc.mouseHelper.deltaY;
+            CameraInterpolationEvents.rotationYaw = ((float)((double)CameraInterpolationEvents.rotationYaw + (double)mc.mouseHelper.deltaX * f1 * 0.15D));
+            CameraInterpolationEvents.rotationPitch = (float)((double)CameraInterpolationEvents.rotationPitch - (double)mc.mouseHelper.deltaY * f1 * 0.15D);
+            CameraInterpolationEvents.rotationPitch = MathHelper.clamp(CameraInterpolationEvents.rotationPitch, -90.0F, 90.0F);
+        }
         if(TickrateChangerClient.TICKS_PER_SECOND==0) {
 	        if (this.mc.inGameHasFocus && flag)
 	        {
-	            this.mc.mouseHelper.mouseXYChange();
 	            this.mc.getTutorial().handleMouse(this.mc.mouseHelper);
+	            mc.mouseHelper.mouseXYChange();
 	            float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
 	            float f1 = f * f * f * 8.0F;
 	            float f2 = (float)this.mc.mouseHelper.deltaX * f1;
@@ -97,6 +113,7 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
 	                this.smoothCamPartialTicks = partialTicks;
 	                f2 = this.smoothCamFilterX * f4;
 	                f3 = this.smoothCamFilterY * f4;
+	                
 	                this.mc.player.turn(f2, f3 * (float)i);
 	            }
 	            else
@@ -245,16 +262,20 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
 
         if (mc.inGameHasFocus && flag)
         {
-            mc.mouseHelper.mouseXYChange();
+            
             mc.getTutorial().handleMouse(mc.mouseHelper);
             float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
             float f1 = f * f * f * 8.0F;
-            float f2 = (float)mc.mouseHelper.deltaX * f1;
-            float f3 = (float)mc.mouseHelper.deltaY * f1;
+            float f2 = (float)dX * f1;
+            float f3 = (float)dY * f1;
             int i = 1;
 
+            dX = 0;
+            dY = 0;
+            
+            
             if (mc.gameSettings.invertMouse)
-            {
+            { 
                 i = -1;
             }
 
@@ -280,6 +301,8 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
             VirtualMouseAndKeyboard.fillSubtickWithPlayback();
             mc.player.rotationPitch=VirtualMouseAndKeyboard.getSubtickPitch();
             mc.player.rotationYaw=VirtualMouseAndKeyboard.getSubtickYaw();
+            CameraInterpolationEvents.rotationPitch = mc.player.rotationPitch;
+            CameraInterpolationEvents.rotationYaw = 180f + mc.player.rotationYaw;
         }
     }
 }
