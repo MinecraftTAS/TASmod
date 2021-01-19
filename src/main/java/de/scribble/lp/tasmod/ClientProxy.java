@@ -3,6 +3,7 @@ package de.scribble.lp.tasmod;
 import org.lwjgl.input.Keyboard;
 
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
+import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.savestates.SavestateHandlerClient;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -48,6 +49,7 @@ public class ClientProxy extends CommonProxy{
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
+		MinecraftForge.EVENT_BUS.register(new CameraInterpolationEvents());
 		
 		saveHandler=new SavestateHandlerClient();
 		vkeys=new VirtualKeybindings();
