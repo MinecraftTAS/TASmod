@@ -2,13 +2,19 @@
 {
   "modid": "tasmod",
   "name": "Tool-Assisted Speedrun Mod",
-  "description": "Brings tool-assisted speedrunning to minecraft!",
+  "description": "Saves tickperfect inputs to a file and is able to play it back",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["tr7zw, famous1622, ScribbleLP"],
-  "credits": "\nThanks to tr7zw for the initial idea.\nThanks to famous for setting up and helping.\n\n-Tickrate Code inspired by Guichaguri\n\n-Tickrate 0 Code inspired by Cubitect\n\nRNG Math by Admiral_Stapler\n\nContributors: MCPfannkuchenYT\n\nSpecial thanks to: Darkmoon\n\n",
+  "authorList": ["tr7zw, famous1622, ScribbleLP, Pfannekuchen"],
+  "credits": "
+  Thanks to tr7zw for the initial idea,
+  famous for setting up and helping,
+  Tickrate Code inspired by Guichaguri
+  Tickrate 0 Code inspired by Cubitect
+  RNG Math by Admiral_Stapler
+  Special thanks to Darkmoon",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
