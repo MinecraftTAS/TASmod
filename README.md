@@ -1,4 +1,4 @@
-﻿# TASmod  
+# TASmod  
 Let's you record and play back tickperfect inputs.  
 
 ## Credits  
