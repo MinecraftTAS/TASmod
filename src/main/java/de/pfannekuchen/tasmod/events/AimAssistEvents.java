@@ -7,6 +7,7 @@ import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class AimAssistEvents {
@@ -14,8 +15,11 @@ public class AimAssistEvents {
 	public static boolean showNewPos;
 	
 	@SubscribeEvent
-	public void ingameOverlay(RenderGameOverlayEvent ev) {
+	public void ingameOverlay(RenderGameOverlayEvent.Post ev) {
 		Minecraft mc = Minecraft.getMinecraft();
+        if (ev.isCancelable() || ev.getType() != ElementType.HOTBAR) {
+            return;
+        }
 		if (mc.world == null) return;
 		if (AimAssistEvents.showNewPos) {
 			mc.fontRenderer.drawStringWithShadow("X (predicted): " + PlayerPositionCalculator.xNew, 16, 20, 0x00AAAA); //Show the next Location
