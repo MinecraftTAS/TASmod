@@ -9,7 +9,6 @@ import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -23,7 +22,6 @@ public class InfoGui extends Gui{
 	Minecraft mc= Minecraft.getMinecraft();
     @SubscribeEvent
     public void drawStuff(RenderGameOverlayEvent.Post event) {
-    	//GlStateManager.pushMatrix();
         if (event.isCancelable() || event.getType() != ElementType.HOTBAR) {
             return;
         }

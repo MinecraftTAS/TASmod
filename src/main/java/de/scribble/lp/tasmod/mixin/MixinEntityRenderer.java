@@ -9,11 +9,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
-import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
-import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.playback.InputPlayback;
-import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
 import net.minecraft.client.Minecraft;
