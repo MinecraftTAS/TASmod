@@ -87,14 +87,19 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
             mc.mouseHelper.mouseXYChange();
             dX += mc.mouseHelper.deltaX;
             dY += mc.mouseHelper.deltaY;
+        } else {
+        	dX = 0;
+        	dY = 0;
         }
         if (InputPlayback.isPlayingback()) {
         	dX = 0;
         	dY = 0;
         } else {
-            CameraInterpolationEvents.rotationYaw = ((float)((double)CameraInterpolationEvents.rotationYaw + (double)mc.mouseHelper.deltaX * f1 * 0.15D));
-            CameraInterpolationEvents.rotationPitch = (float)((double)CameraInterpolationEvents.rotationPitch - (double)mc.mouseHelper.deltaY * f1 * 0.15D);
-            CameraInterpolationEvents.rotationPitch = MathHelper.clamp(CameraInterpolationEvents.rotationPitch, -90.0F, 90.0F);
+        	if (this.mc.currentScreen == null) {
+        		CameraInterpolationEvents.rotationYaw = ((float)((double)CameraInterpolationEvents.rotationYaw + (double)mc.mouseHelper.deltaX * f1 * 0.15D));
+            	CameraInterpolationEvents.rotationPitch = (float)((double)CameraInterpolationEvents.rotationPitch - (double)mc.mouseHelper.deltaY * f1 * 0.15D);
+            	CameraInterpolationEvents.rotationPitch = MathHelper.clamp(CameraInterpolationEvents.rotationPitch, -90.0F, 90.0F);
+        	}
         }
         if(TickrateChangerClient.TICKS_PER_SECOND==0) {
 	        if (this.mc.inGameHasFocus && flag)
