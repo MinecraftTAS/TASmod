@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +42,7 @@ public class InputRecorder {
 	private static final String tasdirectory = mc.mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles";
 	private static boolean pauseRecording = false;
 	private static String filenames;
+	private static File temp_names;
 
 	private static FileThread fileThread;
 	
@@ -86,6 +88,7 @@ public class InputRecorder {
 			logger.error("There is already a recording running!");
 		}
 	}
+	
 	public static void appendRecording(@Nullable String filename) throws FileNotFoundException {
 		if(!recording) {
 			if(filename==null) {
@@ -106,6 +109,58 @@ public class InputRecorder {
 			fileThread.start();
 		}
 	}
+	
+	public static void startRecordingAt(@Nullable String filename, int startpoint) throws IOException {
+		if(!recording) {
+			if(filename==null) {
+				filename=filenames;
+			}
+			File files= interpretFilename(filename);
+			if (files == null) {
+				logger.error("The filename is not applicable");
+				return;
+			}
+			File files_temp= interpretFilename(filename+"_temp");
+			if (files_temp == null) {
+				logger.error("The filename is not applicable");
+				return;
+			}
+			prepareRecording(filename, files);
+			temp_names=files_temp;
+			fileThread = new FileThread(files_temp, false);
+			fileThread.start();
+			
+			tickCounter=fillUntil(startpoint, files);
+		}
+	}
+	
+	private static int fillUntil(int line, File read_from) throws IOException {
+		// Create a bunch of variables
+		BufferedReader buff = new BufferedReader(new FileReader(read_from));
+		String wholeLine = "";
+		int ticks = 0;
+		int compare = 0;
+		int linecounter = 0;
+		while (ticks<line) {
+			wholeLine = buff.readLine();
+			linecounter++;
+			while (wholeLine.startsWith("#")) {
+				fileThread.addLine(wholeLine+"\n");
+				wholeLine=buff.readLine();
+			}
+			String[] sections=wholeLine.split("\\|");
+			ticks=Integer.parseInt(sections[0]);
+			if(compare+1!=ticks) {
+				buff.close();
+				throw new IOException("Error while reading tickcounter in line "+linecounter+". The numbers are not consecutive");
+			}
+			fileThread.addLine(wholeLine+"\n");
+			compare=ticks;
+		}
+		buff.close();
+		return ticks;
+	}
+	
 	private static int getLatestTickCounter(File siles) throws IOException {
 		// Create a bunch of variables
 		BufferedReader buff = new BufferedReader(new FileReader(fileLocation));
@@ -135,16 +190,19 @@ public class InputRecorder {
 		buff.close();
 		return ticks;
 	}
+	
 	public static void prepareForRewind() {
 		stopRecording(false);
 		rewind=true;
 	}
+	
 	private static void prepareRecording(String filename, File files) {
 		filenames=filename;
 		fileLocation = files;
 		recording = true;
 		pauseRecording = false;
 	}
+	
 	private static void addHeader() {
 		fileThread.addLine("################################################# TASFile ###################################################\n"
 						 + "#							This file was generated using the Minecraft TASMod								#\n"
@@ -187,10 +245,7 @@ public class InputRecorder {
 			if (pauseRecording) {
 				return;
 			}
-			if(rewind) {
-				VirtualMouseAndKeyboard.fillMouseEventsWithCurrentKeyPresses(0, 0);
-				rewind=false;
-			}
+			
 			tickCounter++; // Tickcounter used as a time reference, not actually used for playback
 
 			/* =====Keyboard inputs===== */
@@ -302,7 +357,6 @@ public class InputRecorder {
 		if (recording) {
 			recording = false;
 			
-			
 			TutorialHandler tutorial = ClientProxy.getPlaybackTutorial();
 			if (TutorialHandler.istutorial && tutorial.getState() == 4) {
 				tutorial.advanceState();
@@ -312,8 +366,15 @@ public class InputRecorder {
 				mc.player.sendMessage(new TextComponentString("Recording stopped"));
 			}
 			fileThread.close();
-//			Thread t2 = new Thread(new FileWriterThread(outputSubtick, fileLocationSubTick, logger), "FileWriterThreadSubtick");
-//			t2.start();
+			
+			if(rewind==true) {
+				try {
+					FileUtils.moveFile(temp_names, fileLocation);
+				} catch (IOException e) {
+					logger.error("Can't rename :(");
+					e.printStackTrace();
+				}
+			}
 		} else {
 			logger.error("There is no recording that can be aborted!");
 		}
@@ -362,21 +423,27 @@ public class InputRecorder {
 	public static boolean isPaused() {
 		return pauseRecording;
 	}
+
 	public static void setPause(boolean pause) {
-		pauseRecording=pause;
+		pauseRecording = pause;
 	}
+
 	public static File getFileLocation() {
 		return fileLocation;
 	}
+
 	public static String getFilename() {
 		return filenames;
 	}
+
 	public static void saveFile() {
 		fileThread.flush();
 	}
+
 	public static long getTickCounter() {
 		return tickCounter;
 	}
+
 	public static boolean isRewind() {
 		return rewind;
 	}

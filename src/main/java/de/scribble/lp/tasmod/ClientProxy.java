@@ -40,6 +40,8 @@ public class ClientProxy extends CommonProxy{
 	
 	public static KeyBinding savestateLoadKey = new KeyBinding("Load Latest Savestate", Keyboard.KEY_K, "TASmod");
 	
+	public static KeyBinding testingKey = new KeyBinding("Various Testing", Keyboard.KEY_F12, "TASmod");
+	
 	
 	public void preInit(FMLPreInitializationEvent ev) {
 		isDevEnvironment=(Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
@@ -64,10 +66,12 @@ public class ClientProxy extends CommonProxy{
 		ClientRegistry.registerKeyBinding(showNextLocation);
 		ClientRegistry.registerKeyBinding(savestateSaveKey);
 		ClientRegistry.registerKeyBinding(savestateLoadKey);
+		ClientRegistry.registerKeyBinding(testingKey);
 		
 		VirtualKeybindings.registerBlockedKeyBinding(tickratezeroKey);
 		VirtualKeybindings.registerBlockedKeyBinding(tickAdvance);
 		VirtualKeybindings.registerBlockedKeyBinding(stopkey);
+		VirtualKeybindings.registerBlockedKeyBinding(testingKey);
 		
 		new File (Minecraft.getMinecraft().mcDataDir,"saves"+File.separator+"savestates").mkdir();
 		super.init(ev);

@@ -13,6 +13,7 @@ import com.google.common.io.Files;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
 import de.scribble.lp.tasmod.savestates.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
@@ -88,10 +89,19 @@ public class SavestateHandler {
 			}
 		}
 		
+		//Copy current recording to TASmod folder in the world save
+		File tasfolder=new File(currentfolder+File.separator+"TASMod");
+		if(!tasfolder.exists()) {
+			tasfolder.mkdir();
+		}
+		InputRecorder.saveFile();
+		
+		Files.copy(InputRecorder.getFileLocation(), new File(tasfolder+File.separator+InputRecorder.getFilename()+".tas"));
+		
 		//Copy the directory
 		FileUtils.copyDirectory(currentfolder, targetfolder);
 		
-		//Send everyone the ingame menu
+		//Close the GuiSavestateScreen
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 		
 		//Unlock savestating
@@ -213,6 +223,9 @@ public class SavestateHandler {
 		TickrateChangerServer.changeServerTickrate(0);
 		TickrateChangerServer.changeClientTickrate(0);
 		
+		//Sends a message to all players to stop recording
+		CommonProxy.NETWORK.sendToAll(new LoadstatePacket(true));
+		
 		//Get the current and taget directory for copying
 		String worldname=server.getFolderName();
 		File currentfolder=new File(server.getDataDirectory(),"saves"+File.separator+worldname);
@@ -252,6 +265,9 @@ public class SavestateHandler {
 		
 		//Send a notification that the savestate has been loaded
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN+"Savestate loaded"));
+		
+		//Sends a message to all players to start the recording again
+		CommonProxy.NETWORK.sendToAll(new LoadstatePacket(true));
 		
 		//Unlock loadstating
 		isLoading=false;
