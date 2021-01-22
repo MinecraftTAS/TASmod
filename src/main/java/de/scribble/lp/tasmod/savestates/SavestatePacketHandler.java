@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.savestates;
 
+import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -41,9 +42,15 @@ public class SavestatePacketHandler implements IMessageHandler<SavestatePacket, 
 			Minecraft mc=Minecraft.getMinecraft();
 			mc.addScheduledTask(()->{
 				if(!(mc.currentScreen instanceof GuiSavestateSavingScreen)) {
+					if(InputRecorder.isRecording()) {
+						InputRecorder.setPause(true);
+					}
 					mc.displayGuiScreen(new GuiSavestateSavingScreen());
 				}else {
 					mc.displayGuiScreen(null);
+					if(InputRecorder.isRecording()) {
+						InputRecorder.setPause(false);
+					}
 				}
 			});
 		}
