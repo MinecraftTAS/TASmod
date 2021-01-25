@@ -13,7 +13,7 @@ import com.google.common.io.Files;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
-import de.scribble.lp.tasmod.recording.InputRecorder;
+import de.scribble.lp.tasmod.recording.savestates.RecordingSavestatePacket;
 import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
 import de.scribble.lp.tasmod.savestates.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
@@ -44,9 +44,9 @@ public class SavestateHandler {
 	
 	/**
 	 * Creates a copy of the currently played world and saves it in .minecraft/saves/savestates/worldname <br>
-	 * Called in {@link SavestatePacketHandler}
-	 * 
-	 * @Side Server
+	 * Called in {@link SavestatePacketHandler}<br>
+	 * <br>
+	 * Side: Server
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
@@ -76,9 +76,11 @@ public class SavestateHandler {
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 		
 		//Get the current and taget directory for copying
-		String worldname=File.separator+server.getFolderName();
-		File currentfolder=new File(server.getDataDirectory(),"saves"+worldname);
+		String worldname=server.getFolderName();
+		File currentfolder=new File(server.getDataDirectory(),"saves"+File.separator+worldname);
 		File targetfolder=getNextSaveFolderLocation(worldname);
+		
+		CommonProxy.NETWORK.sendToAll(new RecordingSavestatePacket(true, nameWhenSaving(worldname)));
 		
 		incrementSavestates(worldname);
 		
@@ -88,15 +90,6 @@ public class SavestateHandler {
 			while(chunkloader.getPendingSaveCount()>0) {
 			}
 		}
-		
-		//Copy current recording to TASmod folder in the world save
-		File tasfolder=new File(currentfolder+File.separator+"TASMod");
-		if(!tasfolder.exists()) {
-			tasfolder.mkdir();
-		}
-		InputRecorder.saveFile();
-		
-		Files.copy(InputRecorder.getFileLocation(), new File(tasfolder+File.separator+InputRecorder.getFilename()+".tas"));
 		
 		//Copy the directory
 		FileUtils.copyDirectory(currentfolder, targetfolder);
@@ -133,6 +126,26 @@ public class SavestateHandler {
 			i++;
 		}
 		return targetsavefolder;
+	}
+	
+	private static String nameWhenSaving(String worldname) {
+		int i = 1;
+		int limit=300;
+		File targetsavefolder=null;
+		String name="";
+		while (i <= limit) {
+			if (i >= limit) {
+				break;
+			}
+			name=worldname + "-Savestate" + Integer.toString(i);
+			targetsavefolder = new File(savestateDirectory,name+File.separator);
+			
+			if (!targetsavefolder.exists()) {
+				break;
+			}
+			i++;
+		}
+		return name;
 	}
 	
 	@Deprecated
@@ -223,13 +236,13 @@ public class SavestateHandler {
 		TickrateChangerServer.changeServerTickrate(0);
 		TickrateChangerServer.changeClientTickrate(0);
 		
-		//Sends a message to all players to stop recording
-		CommonProxy.NETWORK.sendToAll(new LoadstatePacket(true));
 		
 		//Get the current and taget directory for copying
 		String worldname=server.getFolderName();
 		File currentfolder=new File(server.getDataDirectory(),"saves"+File.separator+worldname);
 		File targetfolder=getLatestSavestateLocation(worldname);
+		
+		CommonProxy.NETWORK.sendToAll(new RecordingSavestatePacket(false, nameWhenLoading(worldname)));
 		
 		//Disabeling level saving for all worlds in case the auto save kicks in during world unload
 		for(WorldServer world: server.worlds) {
@@ -282,6 +295,7 @@ public class SavestateHandler {
 	private static File getLatestSavestateLocation(String worldname) throws LoadstateException {
 		int i=1;
 		int limit=300;
+		
 		File targetsavefolder=null;
 		while(i<=300) {
 			targetsavefolder = new File(savestateDirectory,worldname+"-Savestate"+Integer.toString(i));
@@ -300,6 +314,28 @@ public class SavestateHandler {
 		return targetsavefolder;
 	}
 	
+	private static String nameWhenLoading(String worldname) throws LoadstateException {
+		int i=1;
+		int limit=300;
+		String name="";
+		File targetsavefolder=null;
+		while(i<=300) {
+			targetsavefolder = new File(savestateDirectory,worldname+"-Savestate"+Integer.toString(i));
+			if (!targetsavefolder.exists()) {
+				if(i-1==0) {
+					throw new LoadstateException("Couldn't find any savestates");
+				}
+				if(i>300) {
+					throw new LoadstateException("Savestatecount is greater or equal than "+limit);
+				}
+				
+				name=worldname+"-Savestate"+Integer.toString(i-1);
+				break;
+			}
+			i++;
+		}
+		return name;
+	}
 
 	/**
 	 * Creates the savestate directory in case the user deletes it between savestates
