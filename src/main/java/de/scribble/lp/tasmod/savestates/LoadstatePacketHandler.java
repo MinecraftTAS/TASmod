@@ -1,8 +1,5 @@
 package de.scribble.lp.tasmod.savestates;
 
-import java.io.FileNotFoundException;
-
-import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
 import de.scribble.lp.tasmod.savestates.exceptions.LoadstateException;
 import net.minecraft.client.Minecraft;
@@ -39,15 +36,6 @@ public class LoadstatePacketHandler implements IMessageHandler<LoadstatePacket, 
 		}else {
 			Minecraft.getMinecraft().addScheduledTask(()->{
 				if(message.isRewind()) {
-					if(!InputRecorder.isRewind()) {
-						InputRecorder.prepareForRewind();
-					}else {
-						try {
-							InputRecorder.appendRecording(InputRecorder.getFilename());
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						}
-					}
 				}else {
 					SavestatesChunkControl.unloadAllClientChunks();
 				}

@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -201,6 +200,7 @@ public class InputRecorder {
 		fileLocation = files;
 		recording = true;
 		pauseRecording = false;
+		rewind=false;
 	}
 	
 	private static void addHeader() {
@@ -367,14 +367,6 @@ public class InputRecorder {
 			}
 			fileThread.close();
 			
-			if(rewind==true) {
-				try {
-					FileUtils.moveFile(temp_names, fileLocation);
-				} catch (IOException e) {
-					logger.error("Can't rename :(");
-					e.printStackTrace();
-				}
-			}
 		} else {
 			logger.error("There is no recording that can be aborted!");
 		}

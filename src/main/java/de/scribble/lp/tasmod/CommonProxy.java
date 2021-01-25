@@ -6,8 +6,8 @@ import org.apache.logging.log4j.Logger;
 import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
-import de.scribble.lp.tasmod.recording.RecordingPacket;
-import de.scribble.lp.tasmod.recording.RecordingPacketHandler;
+import de.scribble.lp.tasmod.recording.savestates.RecordingSavestatePacket;
+import de.scribble.lp.tasmod.recording.savestates.RecordingSavestatePacketHandler;
 import de.scribble.lp.tasmod.savestates.LoadstatePacket;
 import de.scribble.lp.tasmod.savestates.LoadstatePacketHandler;
 import de.scribble.lp.tasmod.savestates.SavestatePacket;
@@ -45,7 +45,7 @@ public class CommonProxy {
 		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.CLIENT);
-		NETWORK.registerMessage(RecordingPacketHandler.class, RecordingPacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(RecordingSavestatePacketHandler.class, RecordingSavestatePacket.class, i++, Side.CLIENT);
 		
 	}
 
