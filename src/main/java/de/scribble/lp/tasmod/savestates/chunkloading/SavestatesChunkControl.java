@@ -83,12 +83,15 @@ public class SavestatesChunkControl {
 			switch (player.dimension) {
 			case -1:
 				worlds[1].getPlayerChunkMap().addPlayer(player);
+				worlds[1].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
 				break;
 			case 0:
 				worlds[0].getPlayerChunkMap().addPlayer(player);
+				worlds[0].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
 				break;
 			case 1:
 				worlds[2].getPlayerChunkMap().addPlayer(player);
+				worlds[2].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
 				break;
 			}
 		}

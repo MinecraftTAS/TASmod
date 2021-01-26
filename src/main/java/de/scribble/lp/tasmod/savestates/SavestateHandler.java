@@ -20,6 +20,9 @@ import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestateWorldLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
+import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
+import de.scribble.lp.tasmod.ticksync.TickSyncServer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -67,6 +70,8 @@ public class SavestateHandler {
 		TickrateChangerServer.changeServerTickrate(0);
 		TickrateChangerServer.changeClientTickrate(0);
 		
+		//Update the server variable
+		server=ModLoader.getServerInstance();
 		
 		//Save the world!
 		server.getPlayerList().saveAllPlayerData();
@@ -237,7 +242,10 @@ public class SavestateHandler {
 		TickrateChangerServer.changeClientTickrate(0);
 		
 		
-		//Get the current and taget directory for copying
+		//Update the server instance
+		server=ModLoader.getServerInstance();
+		
+		//Get the current and target directory for copying
 		String worldname=server.getFolderName();
 		File currentfolder=new File(server.getDataDirectory(),"saves"+File.separator+worldname);
 		File targetfolder=getLatestSavestateLocation(worldname);
@@ -257,9 +265,18 @@ public class SavestateHandler {
 		SavestatesChunkControl.unloadAllServerChunks();
 		SavestatesChunkControl.flushSaveHandler();
 		
+		
 		//Delete and copy directories
 		FileUtils.deleteDirectory(currentfolder);
 		FileUtils.copyDirectory(targetfolder, currentfolder);
+		
+		
+		//Update the world info
+//		SavestateWorldLoading.loadWorldInfoFromFile();
+		//Update the player and the client
+		SavestatePlayerLoading.loadAndSendMotionToPlayer();
+		//Update the session.lock file so minecraft behaves and saves the world
+		SavestatesChunkControl.updateSessionLock();
 		
 		//Load the chunks and send them to the client
 		SavestatesChunkControl.addPlayersToChunkMap();
@@ -268,13 +285,6 @@ public class SavestateHandler {
 		for(WorldServer world: server.worlds) {
 			world.disableLevelSaving=false;
 		}
-		
-		//Update the world info
-		SavestateWorldLoading.loadWorldInfoFromFile();
-		//Update the player and the client
-		SavestatePlayerLoading.loadAndSendMotionToPlayer();
-		//Update the session.lock file so minecraft behaves and saves the world
-		SavestatesChunkControl.updateSessionLock();
 		
 		//Send a notification that the savestate has been loaded
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN+"Savestate loaded"));
