@@ -12,12 +12,7 @@ public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<Save
 
 	@Override
 	public IMessage onMessage(SavestatePlayerLoadingPacket message, MessageContext ctx) {
-		if(ctx.side.isServer()) {
-			ctx.getServerHandler().player.getServerWorld().addScheduledTask(()->{
-				SavestateWorldLoading.loadWorldInfoFromFile();
-				SavestatePlayerLoading.loadAndSendMotionToPlayer();
-			});
-		}else {
+		if(ctx.side.isClient()) {
 			Minecraft.getMinecraft().addScheduledTask(()->{
 				EntityPlayerSP player=Minecraft.getMinecraft().player;
 				NBTTagCompound compound = message.getNbtTagCompound();
