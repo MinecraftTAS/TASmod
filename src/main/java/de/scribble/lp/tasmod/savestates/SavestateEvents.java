@@ -1,17 +1,8 @@
 package de.scribble.lp.tasmod.savestates;
 
-import java.util.List;
-
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.ModLoader;
-import de.scribble.lp.tasmod.duck.ChunkProviderDuck;
-import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacket;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ChunkProviderClient;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.management.PlayerList;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -27,7 +18,6 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptChat(ClientProxy.testingKey)) {
-			CommonProxy.NETWORK.sendToServer(new SavestatePlayerLoadingPacket());
 		}
 	}
 }

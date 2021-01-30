@@ -4,7 +4,6 @@ import java.util.List;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -16,7 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class SavestatePlayerLoading {
 	
@@ -59,7 +57,7 @@ public class SavestatePlayerLoading {
 	        double posZ = nbttaglist.getDoubleAt(2);
 	        float rotationYaw = nbttaglist3.getFloatAt(0);
 	        float rotationPitch = nbttaglist3.getFloatAt(1);
-	        player.connection.setPlayerLocation(posX, posY, posZ, rotationYaw, rotationPitch);
+	        //player.connection.setPlayerLocation(posX, posY, posZ, rotationYaw, rotationPitch);
 			CommonProxy.NETWORK.sendTo(new SavestatePlayerLoadingPacket(nbttagcompound), player);
 		};
 	}
