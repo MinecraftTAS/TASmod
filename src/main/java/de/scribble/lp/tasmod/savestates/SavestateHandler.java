@@ -267,15 +267,13 @@ public class SavestateHandler {
 		FileUtils.copyDirectory(targetfolder, currentfolder);
 		
 		
-		//Update the world info
-//		SavestateWorldLoading.loadWorldInfoFromFile();
 		//Update the player and the client
 		SavestatePlayerLoading.loadAndSendMotionToPlayer();
 		//Update the session.lock file so minecraft behaves and saves the world
 		SavestatesChunkControl.updateSessionLock();
-		
 		//Load the chunks and send them to the client
 		SavestatesChunkControl.addPlayersToChunkMap();
+		
 		
 		//Enable level saving again
 		for(WorldServer world: server.worlds) {

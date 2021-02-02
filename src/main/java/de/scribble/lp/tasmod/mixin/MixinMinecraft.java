@@ -222,13 +222,16 @@ public abstract class MixinMinecraft {
         for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
         {
 	        if(TickSync.isEnabled()&&Minecraft.getMinecraft().world!=null) {
+	        	
 				if(TickSync.getClienttickcounter()==TickSync.getServertickcounter()) { //If the tickrate matches the server tickrate
 					TickSync.incrementClienttickcounter();
 					if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
 						((SubtickDuck)this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 					}
 					this.runTick();
+					
 				}else if(TickSync.getClienttickcounter()>TickSync.getServertickcounter()) {	//If it's too fast
+					
 					if(!ClientProxy.isDevEnvironment) { //For the Dev environment to stop a disconnect when debugging on the server side
 						softLockTimer++;
 					}
@@ -238,7 +241,9 @@ public abstract class MixinMinecraft {
 						this.displayGuiScreen(new GuiMultiplayerTimeOut());
 					}
 					continue;
+					
 				}else if(TickSync.getClienttickcounter()<TickSync.getServertickcounter()) {
+					
 					for(int h=0;h<TickSync.getServertickcounter()-TickSync.getClienttickcounter();h++) {	//If it's too slow
 						TickSync.incrementClienttickcounter();
 						if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
@@ -246,8 +251,10 @@ public abstract class MixinMinecraft {
 						}
 						this.runTick();
 					}
+					
 				}
 			}else if(Minecraft.getMinecraft().world==null) {
+				
 				if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
 					((SubtickDuck)this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 				}
