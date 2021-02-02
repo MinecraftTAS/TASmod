@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.savestates.playerloading;
 
+import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,6 +26,7 @@ public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<Save
 				player.moveVertical=ry;
 				player.moveStrafing=rz;
 				
+				SavestatesChunkControl.keepPlayerInLoadedEntityList(player);
 			});
 		}
 		return null;

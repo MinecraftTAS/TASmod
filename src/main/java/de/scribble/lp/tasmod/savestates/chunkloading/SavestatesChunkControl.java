@@ -7,6 +7,7 @@ import de.scribble.lp.tasmod.mixin.MixinChunkProviderClient;
 import de.scribble.lp.tasmod.mixin.MixinChunkProviderServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
@@ -22,10 +23,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class SavestatesChunkControl {
 	/**
-	 * Unloads all chunks and reloads the renderer so no chunks will be visible throughout the unloading progress <br>
-	 * 
+	 * Unloads all chunks and reloads the renderer so no chunks will be visible throughout the unloading progress<br>
+	 * <br>
+	 * Side: Client
 	 * @see MixinChunkProviderClient#unloadAllChunks()
-	 * @Side Client
 	 */
 	@SideOnly(Side.CLIENT)
 	public static void unloadAllClientChunks() {
@@ -37,10 +38,10 @@ public class SavestatesChunkControl {
 		Minecraft.getMinecraft().renderGlobal.loadRenderers();
 	}
 	/**
-	 * Unloads all chunks on the server
-	 * 
+	 * Unloads all chunks on the server<br>
+	 * <br>
+	 * Side: Server
 	 * @see MixinChunkProviderServer#unloadAllChunks()
-	 * @Side Server
 	 */
 	public static void unloadAllServerChunks() {
 		
@@ -53,9 +54,9 @@ public class SavestatesChunkControl {
 	}
 	/**
 	 * The player chunk map keeps track of which chunks need to be sent to the client. <br>
-	 * Removing the player stops the server from sending chunks to the client.
-	 * 
-	 * @Side Server
+	 * Removing the player stops the server from sending chunks to the client.<br>
+	 * <br>
+	 * Side: Server
 	 * @see #addPlayersToChunkMap()
 	 */
 	public static void disconnectPlayersFromChunkMap() {
@@ -70,9 +71,9 @@ public class SavestatesChunkControl {
 	}
 	/**
 	 * The player chunk map keeps track of which chunks need to be sent to the client. <br>
-	 * This adds the player to the chunk map so the server knows it can send the information to the client
-	 * 
-	 * @Side Server
+	 * This adds the player to the chunk map so the server knows it can send the information to the client<br>
+	 * <br>
+	 * Side: Server
 	 * @see #disconnectPlayersFromChunkMap()
 	 */
 	public static void addPlayersToChunkMap() {
@@ -97,9 +98,9 @@ public class SavestatesChunkControl {
 		}
 	}
 	/**
-	 * Tells the save handler to save all changes to disk and remove all references to the region files, making them editable on disc
-	 * 
-	 * @Side Server
+	 * Tells the save handler to save all changes to disk and remove all references to the region files, making them editable on disc<br>
+	 * <br>
+	 * Side: Server
 	 */
 	public static void flushSaveHandler() {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
@@ -109,9 +110,9 @@ public class SavestatesChunkControl {
 		}
 	}
 	/**
-	 * Updates the session lock to allow for vanilla saving again
-	 * 
-	 * @Side Server
+	 * Updates the session lock to allow for vanilla saving again<br>
+	 * <br>
+	 * Side: Server
 	 */
 	public static void updateSessionLock() {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
@@ -119,5 +120,14 @@ public class SavestatesChunkControl {
 		for(WorldServer world : worlds) {
 			((SaveHandler)world.getSaveHandler()).setSessionLock();
 		}
+	}
+	/**
+	 * Makes sure that the player is not removed from the loaded entity list<br>
+	 * <br>
+	 * Side: Client
+	 */
+	@SideOnly(Side.CLIENT)
+	public static void keepPlayerInLoadedEntityList(EntityPlayer player) {
+		Minecraft.getMinecraft().world.unloadedEntityList.remove(player);
 	}
 }

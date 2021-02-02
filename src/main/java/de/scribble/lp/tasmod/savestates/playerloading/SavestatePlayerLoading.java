@@ -50,14 +50,6 @@ public class SavestatePlayerLoading {
 	        player.connection.sendPacket(new SPacketHeldItemChange(player.inventory.currentItem));
 	        server.refreshStatusNextTick();
 	        
-	        NBTTagList nbttaglist = nbttagcompound.getTagList("Pos", 6);
-	        NBTTagList nbttaglist3 = nbttagcompound.getTagList("Rotation", 5);
-	        double posX = nbttaglist.getDoubleAt(0);
-	        double posY = nbttaglist.getDoubleAt(1);
-	        double posZ = nbttaglist.getDoubleAt(2);
-	        float rotationYaw = nbttaglist3.getFloatAt(0);
-	        float rotationPitch = nbttaglist3.getFloatAt(1);
-	        //player.connection.setPlayerLocation(posX, posY, posZ, rotationYaw, rotationPitch);
 			CommonProxy.NETWORK.sendTo(new SavestatePlayerLoadingPacket(nbttagcompound), player);
 		};
 	}
