@@ -23,7 +23,8 @@
 		"playbackhooks.MixinGuiScreenAdvancements",
 		"playbackhooks.MixinKeyBinding",
 		"playbackhooks.MixinGuiMainMenu",
-		"savestates.MixinChunkProviderClient",
-		"MixinFrustum"
+		"savestates.MixinChunkProviderClient"
+		"MixinFrustum",
+		"MixinTextfield"
 	]
 }
