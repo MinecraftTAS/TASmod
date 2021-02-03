@@ -24,6 +24,7 @@
 		"playbackhooks.MixinKeyBinding",
 		"playbackhooks.MixinGuiMainMenu",
 		"savestates.MixinChunkProviderClient"
-		"MixinFrustum"
+		"MixinFrustum",
+		"MixinTextfield"
 	]
 }
