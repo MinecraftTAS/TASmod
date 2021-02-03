@@ -9,15 +9,15 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public class SavestateEvents {
 	@SubscribeEvent
 	public void onRender(TickEvent.RenderTickEvent ev) {
-		if(VirtualKeybindings.isKeyDownExceptChat(ClientProxy.savestateSaveKey)){
+		if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.savestateSaveKey)){
 			
 			CommonProxy.NETWORK.sendToServer(new SavestatePacket());
 			
-		}else if(VirtualKeybindings.isKeyDownExceptChat(ClientProxy.savestateLoadKey)){
+		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.savestateLoadKey)){
 			
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
-		}else if(VirtualKeybindings.isKeyDownExceptChat(ClientProxy.testingKey)) {
+		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
 		}
 	}
 }

@@ -25,6 +25,7 @@ public class VirtualKeybindings {
 	private static List<KeyBinding> blockedKeys=new ArrayList<>();
 	private static List<KeyBinding> blockedDuringRecordingKeys=new ArrayList<>();
 	private static long cooldowntimer=0;
+	public static boolean focused = false;
 	
 	public static void increaseCooldowntimer() {
 		cooldowntimer++;
@@ -34,8 +35,8 @@ public class VirtualKeybindings {
 	 * @param keybind
 	 * @return
 	 */
-	public static boolean isKeyDownExceptChat(KeyBinding keybind) {
-		if(mc.currentScreen instanceof GuiChat) {
+	public static boolean isKeyDownExceptTextfield(KeyBinding keybind) {
+		if(mc.currentScreen instanceof GuiChat || focused) {
 			return false;
 		}
 		boolean down=Keyboard.isKeyDown(keybind.getKeyCode());
