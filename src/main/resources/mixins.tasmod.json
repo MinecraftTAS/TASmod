@@ -6,23 +6,25 @@
     "compatibilityLevel": "JAVA_8",
     "mixins": [
         "MixinMinecraftServer",
-        "savestates.MixinChunkProviderServer",
-        "savestates.MixinEntityPlayerMP",
+        "MixinChunkProviderServer",
+        "MixinEntityPlayerMP",
         "MixinDragonFightManager"
     ],
     "client": [
         "MixinMinecraft",
         "MixinEntityRenderer",
-        "MixinGuiScreen",
-		"playbackhooks.MixinGameSettings",
-		"playbackhooks.MixinGuiContainer",
-		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",
-		"playbackhooks.MixinGuiSlot",
-		"playbackhooks.MixinGuiContainerCreative",
-		"playbackhooks.MixinGuiChat",
-		"playbackhooks.MixinGuiScreenAdvancements",
-		"playbackhooks.MixinKeyBinding",
-		"playbackhooks.MixinGuiMainMenu",
-		"savestates.MixinChunkProviderClient"
+		"MixinGameSettings",
+		"MixinGuiContainer",
+		"MixinGuiScreen",
+		"MixinGuiClickableScrolledSelectionListProxy",
+		"MixinGuiSlot",
+		"MixinGuiContainerCreative",
+		"MixinGuiChat",
+		"MixinGuiScreenAdvancements",
+		"MixinGuiScreen",
+		"MixinKeyBinding",
+		"MixinGuiMainMenu",
+		"MixinChunkProviderClient",
+		"MixinFrustum"
 	]
 }
