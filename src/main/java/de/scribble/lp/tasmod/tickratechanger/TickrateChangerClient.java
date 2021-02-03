@@ -36,7 +36,7 @@ public class TickrateChangerClient {
     }
     public static void advanceTick() {
     	if(Minecraft.getMinecraft().world!=null) {
-    		CommonProxy.NETWORK.sendToServer(new TickratePacket(true, 20, false));
+    		advanceServerTick();
     	}else {
     		advanceClientTick();
     	}
@@ -57,6 +57,12 @@ public class TickrateChangerClient {
 		ADVANCE_TICK=true;
 	}
 	
+	/**
+	 * Sends a message to the server so it should advance the server ticks
+	 */
+	public static void advanceServerTick() {
+		CommonProxy.NETWORK.sendToServer(new TickratePacket(true, 20, false));
+	}
 	/**
 	 * Pauses and unpauses the client, used in main menus
 	 */

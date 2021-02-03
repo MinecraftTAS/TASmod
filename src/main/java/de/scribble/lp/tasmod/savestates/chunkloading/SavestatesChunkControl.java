@@ -3,8 +3,8 @@ package de.scribble.lp.tasmod.savestates.chunkloading;
 import java.util.List;
 
 import de.scribble.lp.tasmod.duck.ChunkProviderDuck;
-import de.scribble.lp.tasmod.mixin.MixinChunkProviderClient;
-import de.scribble.lp.tasmod.mixin.MixinChunkProviderServer;
+import de.scribble.lp.tasmod.mixin.savestates.MixinChunkProviderClient;
+import de.scribble.lp.tasmod.mixin.savestates.MixinChunkProviderServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.entity.player.EntityPlayer;
