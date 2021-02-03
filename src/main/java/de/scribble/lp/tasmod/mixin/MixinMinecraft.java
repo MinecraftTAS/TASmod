@@ -181,7 +181,6 @@ public abstract class MixinMinecraft {
     @Shadow
 	protected abstract boolean isFramerateLimitBelowMax();
     
-    public int softLockTimer;
 	/**
 	 * Rewrites 
 	 * 
@@ -219,43 +218,11 @@ public abstract class MixinMinecraft {
 //        }
         VirtualKeybindings.increaseCooldowntimer();
         TickrateChangerClient.INSTANCE.bypass();
+        
         for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
         {
-	        if(TickSync.isEnabled()&&Minecraft.getMinecraft().world!=null) {
-	        	
-				if(TickSync.getClienttickcounter()==TickSync.getServertickcounter()) { //If the tickrate matches the server tickrate
-					TickSync.incrementClienttickcounter();
-					if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
-						((SubtickDuck)this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
-					}
-					this.runTick();
-					
-				}else if(TickSync.getClienttickcounter()>TickSync.getServertickcounter()) {	//If it's too fast
-					
-					if(!ClientProxy.isDevEnvironment) { //For the Dev environment to stop a disconnect when debugging on the server side
-						softLockTimer++;
-					}
-					if(softLockTimer==100) {
-						this.world.sendQuittingDisconnectingPacket();
-						this.loadWorld((WorldClient)null);
-						this.displayGuiScreen(new GuiMultiplayerTimeOut());
-					}
-					continue;
-					
-				}else if(TickSync.getClienttickcounter()<TickSync.getServertickcounter()) {
-					
-					for(int h=0;h<TickSync.getServertickcounter()-TickSync.getClienttickcounter();h++) {	//If it's too slow
-						TickSync.incrementClienttickcounter();
-						if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
-							((SubtickDuck)this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
-						}
-						this.runTick();
-					}
-					
-				}
-			}else if(Minecraft.getMinecraft().world==null) {
-				
-				if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
+        	for (int j2 = 0; j2 < TickSync.getTickAmount((Minecraft)(Object)this); j2++) {
+        		if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
 					((SubtickDuck)this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 				}
 				this.runTick();
@@ -428,7 +395,7 @@ public abstract class MixinMinecraft {
 	
 	@Inject(method="runTick", at=@At(value="HEAD"), cancellable = true)
 	public void injectRunTick(CallbackInfo ci) throws IOException {
-		softLockTimer=0;
+		TickSync.incrementClienttickcounter();
 		if (this.rightClickDelayTimer > 0)
         {
             --this.rightClickDelayTimer;
