@@ -24,6 +24,7 @@
 		"MixinGuiScreen",
 		"MixinKeyBinding",
 		"MixinGuiMainMenu",
-		"MixinChunkProviderClient"
+		"MixinChunkProviderClient",
+		"MixinFrustum"
 	]
 }
