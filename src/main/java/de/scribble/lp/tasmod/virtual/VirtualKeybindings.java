@@ -37,7 +37,7 @@ public class VirtualKeybindings {
 	 * @return
 	 */
 	public static boolean isKeyDownExceptTextfield(KeyBinding keybind) {
-		if(mc.currentScreen instanceof GuiChat || mc.currentScreen instanceof GuiEditSign || focused) {
+		if(mc.currentScreen instanceof GuiChat || mc.currentScreen instanceof GuiEditSign || (focused && mc.currentScreen !=null)) {
 			return false;
 		}
 		boolean down=Keyboard.isKeyDown(keybind.getKeyCode());
