@@ -10,6 +10,7 @@ import net.minecraft.network.play.server.SPacketHeldItemChange;
 import net.minecraft.network.play.server.SPacketPlayerAbilities;
 import net.minecraft.network.play.server.SPacketServerDifficulty;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -27,8 +28,8 @@ public class SavestatePlayerLoading {
 			WorldInfo info=world.getSaveHandler().loadWorldInfo();
 			world.worldInfo=info;
 		}
-		
 		for(EntityPlayerMP player : players) {
+			player.inventory.clear();
 			NBTTagCompound nbttagcompound = server.getPlayerList().readPlayerDataFromFile(player);
 			player.setWorld(server.getWorld(player.dimension));
 			World playerWorld = server.getWorld(player.dimension);
@@ -42,14 +43,8 @@ public class SavestatePlayerLoading {
 	        player.setWorld(playerWorld);
 	        player.interactionManager.setWorld((WorldServer)player.world);
 	        
-	        WorldInfo worldinfo=player.world.getWorldInfo();
-	        
-	        player.connection.sendPacket(new SPacketServerDifficulty(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
-	        player.connection.sendPacket(new SPacketPlayerAbilities(player.capabilities));
-	        player.connection.sendPacket(new SPacketHeldItemChange(player.inventory.currentItem));
-	        server.refreshStatusNextTick();
-	        
+	        player.sendAllContents(player.inventoryContainer, NonNullList.create());
 			CommonProxy.NETWORK.sendTo(new SavestatePlayerLoadingPacket(nbttagcompound), player);
-		};
+		}
 	}
 }

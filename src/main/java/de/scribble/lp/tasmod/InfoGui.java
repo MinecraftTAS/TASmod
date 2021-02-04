@@ -42,6 +42,8 @@ public class InfoGui extends Gui{
                 new Gui().drawString(mc.fontRenderer, "Server Ticks: "+TickSync.getServertickcounter(), 16, 100, 0xFFFFFF); //Current Pointer location
                 new Gui().drawString(mc.fontRenderer, "Client Ticks: "+TickSync.getClienttickcounter(), 16, 110, 0xFFFFFF); //Current Pointer location
                 
+                new Gui().drawString(mc.fontRenderer, "Inv: "+ModLoader.getServerInstance().getPlayerList().getPlayers().get(0).inventory.getStackInSlot(0), 16, 130, 0xFFFFFF); //Current Pointer location
+                new Gui().drawString(mc.fontRenderer, "Inv: "+Minecraft.getMinecraft().player.inventory.getStackInSlot(0), 16, 120, 0xFFFFFF); //Current Pointer location
                 
                 if(Display.isActive()) {
                 	String out1="";
