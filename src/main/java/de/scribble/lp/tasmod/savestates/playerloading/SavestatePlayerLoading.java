@@ -29,7 +29,6 @@ public class SavestatePlayerLoading {
 			world.worldInfo=info;
 		}
 		for(EntityPlayerMP player : players) {
-			player.inventory.clear();
 			NBTTagCompound nbttagcompound = server.getPlayerList().readPlayerDataFromFile(player);
 			player.setWorld(server.getWorld(player.dimension));
 			World playerWorld = server.getWorld(player.dimension);
@@ -43,7 +42,6 @@ public class SavestatePlayerLoading {
 	        player.setWorld(playerWorld);
 	        player.interactionManager.setWorld((WorldServer)player.world);
 	        
-	        player.sendAllContents(player.inventoryContainer, NonNullList.create());
 			CommonProxy.NETWORK.sendTo(new SavestatePlayerLoadingPacket(nbttagcompound), player);
 		}
 	}

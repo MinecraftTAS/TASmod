@@ -2,6 +2,7 @@ package de.scribble.lp.tasmod.savestates;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -18,6 +19,7 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
+			SavestatePlayerLoading.loadAndSendMotionToPlayer();
 		}
 	}
 }
