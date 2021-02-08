@@ -13,6 +13,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.storage.SaveHandler;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -91,8 +92,8 @@ public class SavestatesChunkControl {
 				worlds[0].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
 				break;
 			case 1:
-				worlds[2].getPlayerChunkMap().addPlayer(player);
-				worlds[2].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
+				DimensionManager.getWorld(1).getPlayerChunkMap().addPlayer(player);
+				DimensionManager.getWorld(1).getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
 				break;
 			}
 		}
