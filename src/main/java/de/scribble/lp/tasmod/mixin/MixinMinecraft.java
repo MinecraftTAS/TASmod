@@ -13,10 +13,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.ModLoader;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
-import de.scribble.lp.tasmod.gui.GuiMultiplayerTimeOut;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
