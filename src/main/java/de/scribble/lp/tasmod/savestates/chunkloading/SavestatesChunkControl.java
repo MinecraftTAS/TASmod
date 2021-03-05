@@ -45,13 +45,16 @@ public class SavestatesChunkControl {
 	 * @see MixinChunkProviderServer#unloadAllChunks()
 	 */
 	public static void unloadAllServerChunks() {
-		
-		WorldServer[] worlds=FMLCommonHandler.instance().getMinecraftServerInstance().worlds;
+		//Forge
+		WorldServer[] worlds=DimensionManager.getWorlds();
+		//Vanilla
+		//WorldServer[] worlds=FMLCommonHandler.instance().getMinecraftServerInstance().worlds;
 		for (WorldServer world:worlds) {
 			ChunkProviderServer chunkProvider=world.getChunkProvider();
 			
 			((ChunkProviderDuck)chunkProvider).unloadAllChunks();
 		}
+		
 	}
 	/**
 	 * The player chunk map keeps track of which chunks need to be sent to the client. <br>
@@ -63,7 +66,10 @@ public class SavestatesChunkControl {
 	public static void disconnectPlayersFromChunkMap() {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
-		WorldServer[] worlds=server.worlds;
+		//Forge
+		WorldServer[] worlds=DimensionManager.getWorlds();
+		//Vanilla
+		//WorldServer[] worlds=server.worlds;
 		for (WorldServer world:worlds) {
 			for (EntityPlayerMP player : players) {
 				world.getPlayerChunkMap().removePlayer(player);
@@ -80,22 +86,29 @@ public class SavestatesChunkControl {
 	public static void addPlayersToChunkMap() {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
-		WorldServer[] worlds=server.worlds;
+		//Vanilla
+		//WorldServer[] worlds=server.worlds;
+//		for (EntityPlayerMP player : players) {
+//			switch (player.dimension) {
+//			case -1:
+//				worlds[1].getPlayerChunkMap().addPlayer(player);
+//				worlds[1].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
+//				break;
+//			case 0:
+//				worlds[0].getPlayerChunkMap().addPlayer(player);
+//				worlds[0].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
+//				break;
+//			case 1:
+//				worlds[2].getPlayerChunkMap().addPlayer(player);
+//				worlds[2].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
+//				break;
+//			}
+//		}
+		//Forge
 		for (EntityPlayerMP player : players) {
-			switch (player.dimension) {
-			case -1:
-				worlds[1].getPlayerChunkMap().addPlayer(player);
-				worlds[1].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
-				break;
-			case 0:
-				worlds[0].getPlayerChunkMap().addPlayer(player);
-				worlds[0].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
-				break;
-			case 1:
-				DimensionManager.getWorld(1).getPlayerChunkMap().addPlayer(player);
-				DimensionManager.getWorld(1).getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
-				break;
-			}
+			WorldServer world=DimensionManager.getWorld(player.dimension);
+			world.getPlayerChunkMap().addPlayer(player);
+			world.getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
 		}
 	}
 	/**
@@ -104,8 +117,11 @@ public class SavestatesChunkControl {
 	 * Side: Server
 	 */
 	public static void flushSaveHandler() {
-		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-		WorldServer[] worlds=server.worlds;
+		//Forge
+		WorldServer[] worlds=DimensionManager.getWorlds();
+		//Vanilla
+		//MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+		//WorldServer[] worlds=server.worlds;
 		for(WorldServer world : worlds) {
 			world.getSaveHandler().flush();
 		}
@@ -116,8 +132,11 @@ public class SavestatesChunkControl {
 	 * Side: Server
 	 */
 	public static void updateSessionLock() {
-		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-		WorldServer[] worlds=server.worlds;
+		//Forge
+		WorldServer[] worlds=DimensionManager.getWorlds();
+		//Vanilla
+		//MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+		//WorldServer[] worlds=server.worlds;
 		for(WorldServer world : worlds) {
 			((SaveHandler)world.getSaveHandler()).setSessionLock();
 		}
