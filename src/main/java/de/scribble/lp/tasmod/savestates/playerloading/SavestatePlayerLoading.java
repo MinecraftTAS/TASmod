@@ -10,29 +10,44 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.common.DimensionManager;
 
 public class SavestatePlayerLoading {
 	
+	/**
+	 * Loads all worlds and players from the disk. Also sends the playerdata to the client in {@linkplain SavestatePlayerLoadingPacketHandler}
+	 * 
+	 * Side: Server
+	 */
 	public static void loadAndSendMotionToPlayer() {
 		
 		MinecraftServer server=ModLoader.getServerInstance();
 		List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
 		PlayerList list=server.getPlayerList();
 		
-		WorldServer[] worlds=server.worlds;
+		WorldServer[] worlds=DimensionManager.getWorlds();
 		for (WorldServer world : worlds) {
 			WorldInfo info=world.getSaveHandler().loadWorldInfo();
 			world.worldInfo=info;
 		}
 		for(EntityPlayerMP player : players) {
+			
 			int dimensionPrev=player.dimension;
-			WorldServer worldserver=player.getServerWorld();
-			NBTTagCompound nbttagcompound = server.getPlayerList().readPlayerDataFromFile(player);
-			int dimensionNow=player.dimension;
-			WorldServer worldserver1=player.getServerWorld();
+			
+			NBTTagCompound nbttagcompound = server.getPlayerList().getPlayerNBT(player);
+			
+			int dimensionNow=0;
+			if (nbttagcompound.hasKey("Dimension"))
+            {
+                dimensionNow = nbttagcompound.getInteger("Dimension");
+            }
+			
 			if(dimensionNow!=dimensionPrev) {
 				list.transferPlayerToDimension(player, dimensionNow, new NoPortalTeleporter());
 			}
+			
+			player.readFromNBT(nbttagcompound);
+			
 			CommonProxy.NETWORK.sendTo(new SavestatePlayerLoadingPacket(nbttagcompound), player);
 		}
 	}

@@ -9,6 +9,12 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+/**
+ * Reads the playerdata coming from the server and also applies motion and relative motion from the player
+ * 
+ * @author ScribbleLP
+ *
+ */
 public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<SavestatePlayerLoadingPacket, IMessage>{
 
 	@Override
