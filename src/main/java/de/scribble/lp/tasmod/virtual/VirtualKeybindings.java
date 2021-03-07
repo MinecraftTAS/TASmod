@@ -31,6 +31,7 @@ public class VirtualKeybindings {
 	public static void increaseCooldowntimer() {
 		cooldowntimer++;
 	}
+	
 	/**
 	 * Checks whether the key is down, but doesn't execute in chat
 	 * @param keybind
@@ -55,6 +56,7 @@ public class VirtualKeybindings {
 		}
 		return false;
 	}
+	
 	public static boolean isKeyDown(KeyBinding keybind) {
 		boolean down=Keyboard.isKeyDown(keybind.getKeyCode());
 		if(down) {
@@ -71,18 +73,22 @@ public class VirtualKeybindings {
 		}
 		return false;
 	}
+	
 	public static void registerBlockedKeyBinding(KeyBinding keybind) {
 		blockedKeys.add(keybind);
 	}
+	
 	public static void registerBlockedDuringRecordingKeyBinding(KeyBinding keybind) {
 		blockedDuringRecordingKeys.add(keybind);
 	}
+	
 	public static boolean isKeyCodeAlwaysBlocked(int keycode) {
 		for(KeyBinding keybind:blockedKeys) {
 			if(keycode==keybind.getKeyCode()) return true;
 		}
 		return false;
 	}
+	
 	public static boolean isKeyCodeBlockedDuringRecording(int keycode) {
 		for(KeyBinding keybind:blockedDuringRecordingKeys) {
 			if(keycode==keybind.getKeyCode()) {

@@ -207,15 +207,13 @@ public abstract class MixinMinecraft {
         this.mcProfiler.endSection();
         long l = System.nanoTime();
         this.mcProfiler.startSection("tick");
+        
         //TASmod
-//        if(TickrateChangerClient.cooldownKeyPause>0) {
-//        	TickrateChangerClient.cooldownKeyPause--;
-//        }
-//        if(TickrateChangerClient.cooldownKeyAdvance>0) {
-//        	TickrateChangerClient.cooldownKeyAdvance--;
-//        }
         VirtualKeybindings.increaseCooldowntimer();
         TickrateChangerClient.INSTANCE.bypass();
+        
+        //Clear the LWJGL Keyboard and Mouse buffer during tickrate 0, see https://github.com/ScribbleLP/TASmod/issues/44
+        VirtualMouseAndKeyboard.emptyBuffers(TickrateChangerClient.TICKS_PER_SECOND);
         
         for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
         {
@@ -622,15 +620,17 @@ public abstract class MixinMinecraft {
 	private void modifiedRunTickKeyboard() throws IOException{
 
 		VirtualMouseAndKeyboard.prepareKeyboardEvents();
+		
 		while (Keyboard.next()) {
-			VirtualMouseAndKeyboard.fillKeyboardEvents(
-					Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
+			VirtualMouseAndKeyboard.fillKeyboardEvents(Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
+		
 		VirtualMouseAndKeyboard.fillKeyboardEventsWithPlayback();
 
 		while (VirtualMouseAndKeyboard.nextKeyboardEvent()) {
+			
 			int i = VirtualMouseAndKeyboard.getEventKeyboardButton() == 0 ? VirtualMouseAndKeyboard.getEventChar() + 256 : VirtualMouseAndKeyboard.getEventKeyboardButton();
-			i = VirtualMouseAndKeyboard.runThroughKeyboard(i, VirtualMouseAndKeyboard.getEventKeyboardButtonState());
+			
 			if (this.debugCrashKeyPressTime > 0L) {
 				if (Minecraft.getSystemTime() - this.debugCrashKeyPressTime >= 6000L) {
 					throw new ReportedException(new CrashReport("Manually triggered debug crash", new Throwable()));
