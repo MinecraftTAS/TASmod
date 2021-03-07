@@ -304,7 +304,6 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
             }
             InputPlayback.nextPlaybackSubtick();
             VirtualMouseAndKeyboard.fillSubtick(VirtualMouseAndKeyboard.getTimeSinceLastTick(), mc.player.rotationPitch,  mc.player.rotationYaw);
-//            InputRecorder.recordSubTick();
             VirtualMouseAndKeyboard.fillSubtickWithPlayback();
             mc.player.rotationPitch=VirtualMouseAndKeyboard.getSubtickPitch();
             mc.player.rotationYaw=VirtualMouseAndKeyboard.getSubtickYaw();
