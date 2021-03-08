@@ -215,9 +215,6 @@ public class VirtualMouseAndKeyboard {
 	public static void fillKeyboardEvents(int keycode, boolean keystate, char character) {
 		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode))return;
 		
-		runThroughKeyboard(keycode, keystate);
-		runCharThroughKeyboard(character, keystate);
-		
 		keyboardEventList.add(new VirtualKeyboardEvent(keycode, keystate, character));
 	}
 	
@@ -571,25 +568,6 @@ public class VirtualMouseAndKeyboard {
 	/*Different things need to happen during tickrate 0. As mentioned in https://github.com/ScribbleLP/TASmod/issues/44,
 	 *the lwjgl buffer keeps running full*/
 	
-	private static boolean once=false;
-	
-	private static List<VirtualKeyboardEvent> fillerEventList = new ArrayList<VirtualKeyboardEvent>();
-	
-	public static void emptyBuffers(float tickspersecond) {
-		if(tickspersecond==0) {
-			if(!once) {
-				once=true;
-			}
-			while(Keyboard.next()) {
-				runThroughKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState());
-			}
-		}else {
-			if(once) {
-				once=false;
-				fillerEventList=getCurrentKeyPressEvents();
-			}
-		}
-	}
 	
 	private static void printKeyList() {
 		keyboardEventList.forEach(action->{

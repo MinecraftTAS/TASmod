@@ -212,9 +212,6 @@ public abstract class MixinMinecraft {
         VirtualKeybindings.increaseCooldowntimer();
         TickrateChangerClient.INSTANCE.bypass();
         
-        //Clear the LWJGL Keyboard and Mouse buffer during tickrate 0, see https://github.com/ScribbleLP/TASmod/issues/44
-        VirtualMouseAndKeyboard.emptyBuffers(TickrateChangerClient.TICKS_PER_SECOND);
-        
         for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
         {
         	for (int j2 = 0; j2 < TickSync.getTickAmount((Minecraft)(Object)this); j2++) {
@@ -630,6 +627,8 @@ public abstract class MixinMinecraft {
 		while (VirtualMouseAndKeyboard.nextKeyboardEvent()) {
 			
 			int i = VirtualMouseAndKeyboard.getEventKeyboardButton() == 0 ? VirtualMouseAndKeyboard.getEventChar() + 256 : VirtualMouseAndKeyboard.getEventKeyboardButton();
+			
+			i = VirtualMouseAndKeyboard.runThroughKeyboard(i, VirtualMouseAndKeyboard.getEventKeyboardButtonState());
 			
 			if (this.debugCrashKeyPressTime > 0L) {
 				if (Minecraft.getSystemTime() - this.debugCrashKeyPressTime >= 6000L) {
