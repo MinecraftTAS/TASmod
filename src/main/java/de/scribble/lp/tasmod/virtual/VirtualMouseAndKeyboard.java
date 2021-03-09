@@ -143,6 +143,7 @@ public class VirtualMouseAndKeyboard {
 	static VirtualKeys KEY_DELETE=new VirtualKeys("DELETE", 211);
 	static VirtualKeys KEY_WIN=new VirtualKeys("WIN", 219);
 	static VirtualKeys KEY_CONTEXT=new VirtualKeys("CONTEXT_MENU", 221);
+	
 	static List<VirtualChar> charList= new ArrayList<VirtualChar>();
 	
 	static VirtualKeys KEY_MOUSEMOVED=new VirtualKeys("MOUSEMOVED", -101);

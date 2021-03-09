@@ -20,7 +20,7 @@ public class VirtualKeys {
 		this.name=name;
 		this.keycode=keycode;
 		this.keyNames.put(name, this);
-		this.keyCodes.put(keycode, this);
+	this.keyCodes.put(keycode, this);
 	}
 	public String getName() {
 		return name;
