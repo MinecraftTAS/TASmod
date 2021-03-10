@@ -20,7 +20,7 @@ import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
-import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
+import de.scribble.lp.tasmod.virtual.VirtualInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.SoundHandler;
@@ -616,19 +616,19 @@ public abstract class MixinMinecraft {
 	
 	private void modifiedRunTickKeyboard() throws IOException{
 
-		VirtualMouseAndKeyboard.prepareKeyboardEvents();
+		VirtualInput.prepareKeyboardEvents();
 		
 		while (Keyboard.next()) {
-			VirtualMouseAndKeyboard.fillKeyboardEvents(Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
+			VirtualInput.fillKeyboardEvents(Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
 		
-		VirtualMouseAndKeyboard.fillKeyboardEventsWithPlayback();
+		VirtualInput.fillKeyboardEventsWithPlayback();
 
-		while (VirtualMouseAndKeyboard.nextKeyboardEvent()) {
+		while (VirtualInput.nextKeyboardEvent()) {
 			
-			int i = VirtualMouseAndKeyboard.getEventKeyboardButton() == 0 ? VirtualMouseAndKeyboard.getEventChar() + 256 : VirtualMouseAndKeyboard.getEventKeyboardButton();
+			int i = VirtualInput.getEventKeyboardButton() == 0 ? VirtualInput.getEventChar() + 256 : VirtualInput.getEventKeyboardButton();
 			
-			i = VirtualMouseAndKeyboard.runThroughKeyboard(i, VirtualMouseAndKeyboard.getEventKeyboardButtonState());
+			i = VirtualInput.runThroughKeyboard(i, VirtualInput.getEventKeyboardButtonState());
 			
 			if (this.debugCrashKeyPressTime > 0L) {
 				if (Minecraft.getSystemTime() - this.debugCrashKeyPressTime >= 6000L) {
@@ -636,12 +636,12 @@ public abstract class MixinMinecraft {
 				}
 
 				// Original Line: if (!Keyboard.isKeyDown(46) || !Keyboard.isKeyDown(61))
-				if (!VirtualMouseAndKeyboard.isKeyDown(46) || !VirtualMouseAndKeyboard.isKeyDown(61)) {
+				if (!VirtualInput.isKeyDown(46) || !VirtualInput.isKeyDown(61)) {
 					this.debugCrashKeyPressTime = -1L;
 				}
 			}
 			// Original Line: else if (Keyboard.isKeyDown(46) && Keyboard.isKeyDown(61))
-			else if (VirtualMouseAndKeyboard.isKeyDown(46) && VirtualMouseAndKeyboard.isKeyDown(61)) {
+			else if (VirtualInput.isKeyDown(46) && VirtualInput.isKeyDown(61)) {
 				this.actionKeyF3 = true;
 				this.debugCrashKeyPressTime = Minecraft.getSystemTime();
 			}
@@ -651,7 +651,7 @@ public abstract class MixinMinecraft {
 			if (this.currentScreen != null) {
 				this.currentScreen.handleKeyboardInput();
 			}
-			boolean flag = VirtualMouseAndKeyboard.isKeyDown(i);
+			boolean flag = VirtualInput.isKeyDown(i);
 
 			if (flag) {
 				if (i == 62 && this.entityRenderer != null) {
@@ -665,7 +665,7 @@ public abstract class MixinMinecraft {
 						this.displayInGameMenu();
 					}
 
-					flag1 = VirtualMouseAndKeyboard.isKeyDown(61) && this.processKeyF3(i);
+					flag1 = VirtualInput.isKeyDown(61) && this.processKeyF3(i);
 					this.actionKeyF3 |= flag1;
 
 					if (i == 59) {
@@ -721,20 +721,20 @@ public abstract class MixinMinecraft {
 	protected abstract void processKeyBinds();
 	
 	private void modifiedRunTickMouse() throws IOException {
-		VirtualMouseAndKeyboard.prepareMouseEvents();
+		VirtualInput.prepareMouseEvents();
 		while (Mouse.next()) {
-			VirtualMouseAndKeyboard.fillMouseEvents(Mouse.getEventButton() - 100, Mouse.getEventButtonState(),Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), -1);
+			VirtualInput.fillMouseEvents(Mouse.getEventButton() - 100, Mouse.getEventButtonState(),Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), -1);
 		}
-		VirtualMouseAndKeyboard.fillMouseEventsWithPlayback();
-		while (VirtualMouseAndKeyboard.nextMouseEvent()) {
+		VirtualInput.fillMouseEventsWithPlayback();
+		while (VirtualInput.nextMouseEvent()) {
 
 			if (net.minecraftforge.client.ForgeHooksClient.postMouseEvent()) continue; //Might have to disable this one
 			
-			int i = VirtualMouseAndKeyboard.getEventMouseButton() + 100;
-			VirtualMouseAndKeyboard.runThroughKeyboard(i-100, VirtualMouseAndKeyboard.getEventMouseButtonState());
-			KeyBinding.setKeyBindState(i - 100, VirtualMouseAndKeyboard.getEventMouseButtonState());
+			int i = VirtualInput.getEventMouseButton() + 100;
+			VirtualInput.runThroughKeyboard(i-100, VirtualInput.getEventMouseButtonState());
+			KeyBinding.setKeyBindState(i - 100, VirtualInput.getEventMouseButtonState());
 
-			if (VirtualMouseAndKeyboard.getEventMouseButtonState()) {
+			if (VirtualInput.getEventMouseButtonState()) {
 				if (this.player.isSpectator() && i == 2) {
 					this.ingameGUI.getSpectatorGui().onMiddleClick();
 				} else {
@@ -745,7 +745,7 @@ public abstract class MixinMinecraft {
 			long j = Minecraft.getSystemTime() - this.systemTime;
 			// TASMod: Fix Mousewheel
 			if (j <= (long) Math.max(4000F / TickrateChangerClient.TICKS_PER_SECOND, 200L)) {
-				int k = VirtualMouseAndKeyboard.getEventDWheel();
+				int k = VirtualInput.getEventDWheel();
 				if (k != 0) {
 					if (this.player.isSpectator()) {
 						k = k < 0 ? -1 : 1;
@@ -762,7 +762,7 @@ public abstract class MixinMinecraft {
 				}
 
 				if (this.currentScreen == null) {
-					if (!this.inGameHasFocus && VirtualMouseAndKeyboard.getEventMouseButtonState()) {
+					if (!this.inGameHasFocus && VirtualInput.getEventMouseButtonState()) {
 						this.setIngameFocus();
 					}
 				} else if (this.currentScreen != null) {
@@ -804,7 +804,7 @@ public abstract class MixinMinecraft {
 		if (guiScreenIn != null) {
             this.setIngameNotInFocus();
             KeyBinding.unPressAllKeys();
-			VirtualMouseAndKeyboard.unpressEverything();
+			VirtualInput.unpressEverything();
 //          while (Mouse.next())
 //          {
 //              ;
@@ -814,8 +814,8 @@ public abstract class MixinMinecraft {
 //              ;
 //          }
 			// Added in TASMod
-			while (VirtualMouseAndKeyboard.nextKeyboardEvent()) {;}
-			while (VirtualMouseAndKeyboard.nextMouseEvent()) {;}
+			while (VirtualInput.nextKeyboardEvent()) {;}
+			while (VirtualInput.nextMouseEvent()) {;}
 			ScaledResolution scaledresolution = new ScaledResolution((Minecraft) (Object) this);
 			int i = scaledresolution.getScaledWidth();
 			int j = scaledresolution.getScaledHeight();

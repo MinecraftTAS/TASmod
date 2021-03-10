@@ -10,17 +10,14 @@ import com.google.common.collect.Maps;
  * @author ScribbleLP
  *
  */
-public class VirtualKeys {
-	static Map<String, VirtualKeys> keyNames= Maps.<String, VirtualKeys>newHashMap();
-	static Map<Integer, VirtualKeys> keyCodes= Maps.<Integer, VirtualKeys>newHashMap();
+public class VirtualKey {
+	
 	private String name;
 	private int keycode;
 	private boolean isKeyDown=false;
-	public VirtualKeys(String name, int keycode) {
+	public VirtualKey(String name, int keycode) {
 		this.name=name;
 		this.keycode=keycode;
-		this.keyNames.put(name, this);
-	this.keyCodes.put(keycode, this);
 	}
 	public String getName() {
 		return name;

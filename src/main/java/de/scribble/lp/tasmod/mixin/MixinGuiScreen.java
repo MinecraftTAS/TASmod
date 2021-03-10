@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.playback.InputPlayback;
-import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
+import de.scribble.lp.tasmod.virtual.VirtualInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -38,7 +38,7 @@ public abstract class MixinGuiScreen{
 	public void redirectHandleInput(CallbackInfo ci) throws IOException {
 		if (Mouse.isCreated())
         {
-        	VirtualMouseAndKeyboard.prepareMouseEvents();
+        	VirtualInput.prepareMouseEvents();
         	while (Mouse.next()) {
         		//Get the slot index hovered over with the mouse
         		int slotindex=-1;
@@ -50,11 +50,11 @@ public abstract class MixinGuiScreen{
         				slotindex=container.getSlotAtPosition(X, Y).slotNumber;
         			}
         		}
-        		VirtualMouseAndKeyboard.fillMouseEvents(Mouse.getEventButton()-100, Mouse.getEventButtonState(), Mouse.getDWheel(), calcX(Mouse.getEventX()), calcY(Mouse.getEventY()), slotindex);
+        		VirtualInput.fillMouseEvents(Mouse.getEventButton()-100, Mouse.getEventButtonState(), Mouse.getDWheel(), calcX(Mouse.getEventX()), calcY(Mouse.getEventY()), slotindex);
         		
         	}
-        	VirtualMouseAndKeyboard.fillMouseEventsWithPlayback();
-        	while(VirtualMouseAndKeyboard.nextMouseEvent()) {
+        	VirtualInput.fillMouseEventsWithPlayback();
+        	while(VirtualInput.nextMouseEvent()) {
         		this.mouseHandled=false;
         		if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Pre((GuiScreen)(Object)this))) continue;
         		this.handleMouseInput();
@@ -62,13 +62,13 @@ public abstract class MixinGuiScreen{
         	}
         }
 		if (Keyboard.isCreated()) {
-			VirtualMouseAndKeyboard.prepareKeyboardEvents();
+			VirtualInput.prepareKeyboardEvents();
 			while (Keyboard.next()) {
-				VirtualMouseAndKeyboard.fillKeyboardEvents(Keyboard.getEventKey(), Keyboard.getEventKeyState(),	Keyboard.getEventCharacter());
+				VirtualInput.fillKeyboardEvents(Keyboard.getEventKey(), Keyboard.getEventKeyState(),	Keyboard.getEventCharacter());
 				
 			}
-			VirtualMouseAndKeyboard.fillKeyboardEventsWithPlayback();
-			while (VirtualMouseAndKeyboard.nextKeyboardEvent()) {
+			VirtualInput.fillKeyboardEventsWithPlayback();
+			while (VirtualInput.nextKeyboardEvent()) {
 				this.keyHandled=false;
 				if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.KeyboardInputEvent.Pre((GuiScreen)(Object)this))) continue;
 				this.handleKeyboardInput();
@@ -95,15 +95,15 @@ public abstract class MixinGuiScreen{
     }
 	
     private void customHandleKeyboard() {
-    	char c0 = VirtualMouseAndKeyboard.getEventChar();
+    	char c0 = VirtualInput.getEventChar();
         //TASMod: Run typed key through the virtual keyboard
-        c0=VirtualMouseAndKeyboard.runCharThroughKeyboard(c0, VirtualMouseAndKeyboard.getEventKeyboardButtonState());
+        c0=VirtualInput.runCharThroughKeyboard(c0, VirtualInput.getEventKeyboardButtonState());
         
-        int i = VirtualMouseAndKeyboard.getEventKeyboardButton() == 0 ? VirtualMouseAndKeyboard.getEventChar() + 256 : VirtualMouseAndKeyboard.getEventKeyboardButton();
-        VirtualMouseAndKeyboard.runThroughKeyboard(i, VirtualMouseAndKeyboard.getEventKeyboardButtonState());
-        if (VirtualMouseAndKeyboard.getEventKeyboardButton() == 0 && c0 >= ' ' || VirtualMouseAndKeyboard.getEventKeyboardButtonState())
+        int i = VirtualInput.getEventKeyboardButton() == 0 ? VirtualInput.getEventChar() + 256 : VirtualInput.getEventKeyboardButton();
+        VirtualInput.runThroughKeyboard(i, VirtualInput.getEventKeyboardButtonState());
+        if (VirtualInput.getEventKeyboardButton() == 0 && c0 >= ' ' || VirtualInput.getEventKeyboardButtonState())
         {
-            this.keyTyped(c0, VirtualMouseAndKeyboard.getEventKeyboardButton());
+            this.keyTyped(c0, VirtualInput.getEventKeyboardButton());
         }
 
         this.mc.dispatchKeypresses();
@@ -112,15 +112,15 @@ public abstract class MixinGuiScreen{
 	abstract void keyTyped(char c0, int eventKeyboardButton);
 	
 	private void customHandleMouseInput() {
-		int i = uncalcX(VirtualMouseAndKeyboard.getEventX()) * this.width / this.mc.displayWidth;
-		int j = this.height - uncalcY(VirtualMouseAndKeyboard.getEventY()) * this.height / this.mc.displayHeight - 1;
+		int i = uncalcX(VirtualInput.getEventX()) * this.width / this.mc.displayWidth;
+		int j = this.height - uncalcY(VirtualInput.getEventY()) * this.height / this.mc.displayHeight - 1;
 
-		int k = VirtualMouseAndKeyboard.getEventMouseButton() + 100;
-		VirtualMouseAndKeyboard.runThroughKeyboard(k-100, VirtualMouseAndKeyboard.getEventMouseButtonState());
+		int k = VirtualInput.getEventMouseButton() + 100;
+		VirtualInput.runThroughKeyboard(k-100, VirtualInput.getEventMouseButtonState());
 		if(InputPlayback.isPlayingback()) {
 			Mouse.setCursorPosition(uncalcX(i), uncalcY(j));
 		}
-		if (VirtualMouseAndKeyboard.getEventMouseButtonState()) {
+		if (VirtualInput.getEventMouseButtonState()) {
 			if (this.mc.gameSettings.touchscreen && this.touchValue++ > 0) {
 				return;
 			}

@@ -5,7 +5,7 @@ import org.lwjgl.opengl.Display;
 
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.ticksync.TickSync;
-import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
+import de.scribble.lp.tasmod.virtual.VirtualInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -44,12 +44,12 @@ public class InfoGui extends Gui{
                 
                 if(Display.isActive()) {
                 	String out1="";
-	                for(String mouse : VirtualMouseAndKeyboard.getCurrentMousePresses()) {
+	                for(String mouse : VirtualInput.getCurrentMousePresses()) {
 	                	out1=out1.concat(mouse+" ");
 	                }
 	                new Gui().drawString(mc.fontRenderer, out1, 5, height-20, 0xFFFFFF); //Current Pointer location
 	                String out2="";
-	                for(String key : VirtualMouseAndKeyboard.getCurrentKeyboardPresses()) {
+	                for(String key : VirtualInput.getCurrentKeyboardPresses()) {
 	                	out2=out2.concat(key+" ");
 	                }
 	                new Gui().drawString(mc.fontRenderer, out2, 5, height-10, 0xFFFFFF); //Current Pointer location

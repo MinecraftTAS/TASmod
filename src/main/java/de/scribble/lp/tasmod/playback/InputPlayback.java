@@ -16,7 +16,7 @@ import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
-import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
+import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import net.minecraft.client.Minecraft;
@@ -124,7 +124,7 @@ public class InputPlayback {
 			playingback=false;
 			inputList=new ArrayList<TickFrame>();
 			subtickList=new ArrayList<VirtualSubticks>();
-			VirtualMouseAndKeyboard.unpressEverything();
+			VirtualInput.unpressEverything();
 			mc.player.sendMessage(new TextComponentString("Playback finished"));
 //			RandomLogger.stopRandomLogging();
 		}
@@ -143,7 +143,7 @@ public class InputPlayback {
 				stopPlayback();
 			}
 			if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
-				VirtualMouseAndKeyboard.unpressEverything();
+				VirtualInput.unpressEverything();
 				stopPlayback();
 			}
 			if(pausePlayback) {
@@ -274,8 +274,8 @@ public class InputPlayback {
 				if(isNumber(keys[i])) {
 					out.add(Integer.parseInt(keys[i]));
 				}else {
-					if(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i])!=-1) {
-						out.add(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]));
+					if(VirtualInput.getKeyCodeFromKeyName(keys[i])!=-1) {
+						out.add(VirtualInput.getKeyCodeFromKeyName(keys[i]));
 					} else{
 						throw new IOException("Error while reading 'Keyboard' in "+Filename+ " in line "+linecounter+" and the input in position "+(i+1)+" from the left. Couldn't find the key "+keys[i]+".");
 					}
@@ -337,8 +337,8 @@ public class InputPlayback {
 					if (keys[i].contentEquals(" ")) {
 						keys[i] = "MOUSEMOVED";
 					}
-					if (VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]) != -1) {
-							out.add(VirtualMouseAndKeyboard.getKeyCodeFromKeyName(keys[i]));
+					if (VirtualInput.getKeyCodeFromKeyName(keys[i]) != -1) {
+							out.add(VirtualInput.getKeyCodeFromKeyName(keys[i]));
 					} else {
 						throw new IOException("Error while reading 'Mouse' in " + Filename + " in line " + linecounter
 								+ " and the key in position " + (i + 1) + " from the left. Couldn't find the key "

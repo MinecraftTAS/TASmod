@@ -12,7 +12,7 @@ import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
+import de.scribble.lp.tasmod.virtual.VirtualInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -303,10 +303,10 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
                 mc.player.turn(f2, f3 * (float)i);
             }
             InputPlayback.nextPlaybackSubtick();
-            VirtualMouseAndKeyboard.fillSubtick(VirtualMouseAndKeyboard.getTimeSinceLastTick(), mc.player.rotationPitch,  mc.player.rotationYaw);
-            VirtualMouseAndKeyboard.fillSubtickWithPlayback();
-            mc.player.rotationPitch=VirtualMouseAndKeyboard.getSubtickPitch();
-            mc.player.rotationYaw=VirtualMouseAndKeyboard.getSubtickYaw();
+            VirtualInput.fillSubtick(VirtualInput.getTimeSinceLastTick(), mc.player.rotationPitch,  mc.player.rotationYaw);
+            VirtualInput.fillSubtickWithPlayback();
+            mc.player.rotationPitch=VirtualInput.getSubtickPitch();
+            mc.player.rotationYaw=VirtualInput.getSubtickYaw();
             CameraInterpolationEvents.rotationPitch = mc.player.rotationPitch;
             CameraInterpolationEvents.rotationYaw = 180f + mc.player.rotationYaw;
         }

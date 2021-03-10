@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.scribble.lp.tasmod.virtual.VirtualKeys;
+import de.scribble.lp.tasmod.virtual.VirtualKey;
 
 public class InputContainer {
 	private final List<TickInputContainer> tickinputContainer;
@@ -13,7 +13,7 @@ public class InputContainer {
 		tickinputContainer= new ArrayList<TickInputContainer>();
 	}
 	
-	public void add(Map<Integer, VirtualKeys> keysIn) {
+	public void add(Map<Integer, VirtualKey> keysIn) {
 		tickinputContainer.add(new TickInputContainer());
 	}
 }
