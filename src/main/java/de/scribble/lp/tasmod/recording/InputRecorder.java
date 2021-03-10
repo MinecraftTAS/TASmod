@@ -19,7 +19,7 @@ import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
-import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
+import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import net.minecraft.client.Minecraft;
@@ -252,7 +252,7 @@ public class InputRecorder {
 			String keyboardString = "";
 			String keyboardStateString = "";
 			String charString = "";
-			List<VirtualKeyboardEvent> keyboardEventList = VirtualMouseAndKeyboard.getKeyboardEvents(); // Get all the inputs currently pressed on the virtual keyboard
+			List<VirtualKeyboardEvent> keyboardEventList = VirtualInput.getKeyboardEvents(); // Get all the inputs currently pressed on the virtual keyboard
 
 			for (int i = 0; i < keyboardEventList.size(); i++) { // If there are multiple keyboard events in one tick, this will add them all, seperated with comma
 				String ending = ",";
@@ -263,7 +263,7 @@ public class InputRecorder {
 				if (VirtualKeybindings.isKeyCodeBlockedDuringRecording(event.getKeyCode())) { // Removing TASmod keybindings from the recording
 					continue;
 				}
-				keyboardString = keyboardString.concat(VirtualMouseAndKeyboard.getNameFromKeyCode(event.getKeyCode()) + ending); // Add everything into a string
+				keyboardString = keyboardString.concat(VirtualInput.getNameFromKeyCode(event.getKeyCode()) + ending); // Add everything into a string
 				keyboardStateString = keyboardStateString.concat(Boolean.toString(event.isState()) + ending);
 				charString = charString.concat(Character.toString(event.getCharacter()));
 			}
@@ -275,7 +275,7 @@ public class InputRecorder {
 			String mouseXString = "";
 			String mouseYString = "";
 			String slotString = "";
-			List<VirtualMouseEvent> mouseEventList = VirtualMouseAndKeyboard.getMouseEvents();
+			List<VirtualMouseEvent> mouseEventList = VirtualInput.getMouseEvents();
 
 			for (int i = 0; i < mouseEventList.size(); i++) {
 				String ending = ",";
@@ -283,7 +283,7 @@ public class InputRecorder {
 					ending = "";
 				}
 				VirtualMouseEvent event = mouseEventList.get(i);
-				mouseString = mouseString.concat(VirtualMouseAndKeyboard.getNameFromKeyCode(event.getKeyCode()) + ending);
+				mouseString = mouseString.concat(VirtualInput.getNameFromKeyCode(event.getKeyCode()) + ending);
 				mouseStateString = mouseStateString.concat(Boolean.toString(event.isState()) + ending);
 				if (event.getScrollwheel() == 0) {
 					scrollString = scrollString.concat(" " + ending);
@@ -301,7 +301,7 @@ public class InputRecorder {
 			// This is normally dependant on the framerate hence the name subticks.
 			// Before, this was seperated from the ticks
 
-			VirtualSubticks subtick = VirtualMouseAndKeyboard.getSubtick();
+			VirtualSubticks subtick = VirtualInput.getSubtick();
 			String pitch = Float.toString(subtick.getPitch());
 			String yaw = Float.toString(subtick.getYaw());
 

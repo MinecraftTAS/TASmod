@@ -19,155 +19,15 @@ import net.minecraft.client.settings.KeyBinding;
  * @author ScribbleLP
  *
  */
-public class VirtualMouseAndKeyboard {
-	static VirtualKeys KEY_NONE=new VirtualKeys("0", 0);
-	static VirtualKeys KEY_ESC=new VirtualKeys("ESC", 1);
-	static VirtualKeys KEY_1=new VirtualKeys("KEY_1", 2);
-	static VirtualKeys KEY_2=new VirtualKeys("KEY_2", 3);
-	static VirtualKeys KEY_3=new VirtualKeys("KEY_3", 4);
-	static VirtualKeys KEY_4=new VirtualKeys("KEY_4", 5);
-	static VirtualKeys KEY_5=new VirtualKeys("KEY_5", 6);
-	static VirtualKeys KEY_6=new VirtualKeys("KEY_6", 7);
-	static VirtualKeys KEY_7=new VirtualKeys("KEY_7", 8);
-	static VirtualKeys KEY_8=new VirtualKeys("KEY_8", 9);
-	static VirtualKeys KEY_9=new VirtualKeys("KEY_9", 10);
-	static VirtualKeys KEY_0=new VirtualKeys("KEY_0", 11);
-	static VirtualKeys KEY_MINUS=new VirtualKeys("MINUS", 12);
-	static VirtualKeys KEY_EQUALS=new VirtualKeys("EQUALS", 13);
-	static VirtualKeys KEY_BACK=new VirtualKeys("BACK", 14);
-	static VirtualKeys KEY_TAB=new VirtualKeys("TAB", 15);
-	static VirtualKeys KEY_Q=new VirtualKeys("Q", 16);
-	static VirtualKeys KEY_W=new VirtualKeys("W", 17);
-	static VirtualKeys KEY_E=new VirtualKeys("E", 18);
-	static VirtualKeys KEY_R=new VirtualKeys("R", 19);
-	static VirtualKeys KEY_T=new VirtualKeys("T", 20);
-	static VirtualKeys KEY_Y=new VirtualKeys("Y", 21);
-	static VirtualKeys KEY_U=new VirtualKeys("U", 22);
-	static VirtualKeys KEY_I=new VirtualKeys("I", 23);
-	static VirtualKeys KEY_O=new VirtualKeys("O", 24);
-	static VirtualKeys KEY_P=new VirtualKeys("P", 25);
-	static VirtualKeys KEY_LBRACKET=new VirtualKeys("LBRACKET", 26);
-	static VirtualKeys KEY_RBRACKET=new VirtualKeys("RBRACKET", 27);
-	static VirtualKeys KEY_RETURN=new VirtualKeys("RETURN", 28);
-	static VirtualKeys KEY_LCONTROL=new VirtualKeys("LCONTROL", 29);
-	static VirtualKeys KEY_A=new VirtualKeys("A", 30);
-	static VirtualKeys KEY_S=new VirtualKeys("S", 31);
-	static VirtualKeys KEY_D=new VirtualKeys("D", 32);
-	static VirtualKeys KEY_F=new VirtualKeys("F", 33);
-	static VirtualKeys KEY_G=new VirtualKeys("G", 34);
-	static VirtualKeys KEY_H=new VirtualKeys("H", 35);
-	static VirtualKeys KEY_J=new VirtualKeys("J", 36);
-	static VirtualKeys KEY_K=new VirtualKeys("K", 37);
-	static VirtualKeys KEY_L=new VirtualKeys("L", 38);
-	static VirtualKeys KEY_SEMICOLON=new VirtualKeys("SEMICOLON", 39);
-	static VirtualKeys KEY_APOSTROPHE=new VirtualKeys("APOSTROPHE", 40);
-	static VirtualKeys KEY_GRAVE=new VirtualKeys("GRAVE", 41);
-	static VirtualKeys KEY_LSHIFT=new VirtualKeys("LSHIFT", 42);
-	static VirtualKeys KEY_BACKSLASH=new VirtualKeys("BACKSLASH", 43);
-	static VirtualKeys KEY_Z=new VirtualKeys("Z", 44);
-	static VirtualKeys KEY_X=new VirtualKeys("X", 45);
-	static VirtualKeys KEY_C=new VirtualKeys("C", 46);
-	static VirtualKeys KEY_V=new VirtualKeys("V", 47);
-	static VirtualKeys KEY_B=new VirtualKeys("B", 48);
-	static VirtualKeys KEY_N=new VirtualKeys("N", 49);
-	static VirtualKeys KEY_M=new VirtualKeys("M", 50);
-	static VirtualKeys KEY_COMMA=new VirtualKeys("COMMA", 51);
-	static VirtualKeys KEY_PERIOS=new VirtualKeys("PERIOS", 52);
-	static VirtualKeys KEY_SLASH=new VirtualKeys("SLASH", 53);
-	static VirtualKeys KEY_RSHIFT=new VirtualKeys("RSHIFT", 54);
-	static VirtualKeys KEY_MULTIPLY=new VirtualKeys("MULTIPLY", 55);
-	static VirtualKeys KEY_ALT=new VirtualKeys("ALT", 56);
-	static VirtualKeys KEY_SPACE=new VirtualKeys("SPACE", 57);
-	static VirtualKeys KEY_CAPITAL=new VirtualKeys("CAPSLOCK", 58);
-	static VirtualKeys KEY_F1=new VirtualKeys("F1", 59);
-	static VirtualKeys KEY_F2=new VirtualKeys("F2", 60);
-	static VirtualKeys KEY_F3=new VirtualKeys("F3", 61);
-	static VirtualKeys KEY_F4=new VirtualKeys("F4", 62);
-	static VirtualKeys KEY_F5=new VirtualKeys("F5", 63);
-	static VirtualKeys KEY_F6=new VirtualKeys("F6", 64);
-	static VirtualKeys KEY_F7=new VirtualKeys("F7", 65);
-	static VirtualKeys KEY_F8=new VirtualKeys("F8", 66);
-	static VirtualKeys KEY_F9=new VirtualKeys("F9", 67);
-	static VirtualKeys KEY_F10=new VirtualKeys("F10", 68);
-	static VirtualKeys KEY_NUMLOCK=new VirtualKeys("NUMLOCK", 69);
-	static VirtualKeys KEY_SCROLL=new VirtualKeys("SCROLL", 70);
-	static VirtualKeys KEY_NUMPAD7=new VirtualKeys("NUMPAD7", 71);
-	static VirtualKeys KEY_NUMPAD8=new VirtualKeys("NUMPAD8", 72);
-	static VirtualKeys KEY_NUMPAD9=new VirtualKeys("NUMPAD9", 73);
-	static VirtualKeys KEY_SUBTRACT=new VirtualKeys("SUBTRACT", 74);
-	static VirtualKeys KEY_NUMPAD4=new VirtualKeys("NUMPAD4", 75);
-	static VirtualKeys KEY_NUMPAD5=new VirtualKeys("NUMPAD5", 76);
-	static VirtualKeys KEY_NUMPAD6=new VirtualKeys("NUMPAD6", 77);
-	static VirtualKeys KEY_ADD=new VirtualKeys("ADD", 78);
-	static VirtualKeys KEY_NUMPAD1=new VirtualKeys("NUMPAD1", 79);
-	static VirtualKeys KEY_NUMPAD2=new VirtualKeys("NUMPAD2", 80);
-	static VirtualKeys KEY_NUMPAD3=new VirtualKeys("NUMPAD3", 81);
-	static VirtualKeys KEY_NUMPAD0=new VirtualKeys("NUMPAD0", 82);
-	static VirtualKeys KEY_DECIMAL=new VirtualKeys("DECIMAL", 83);
-	static VirtualKeys KEY_F11=new VirtualKeys("F11", 87);
-	static VirtualKeys KEY_F12=new VirtualKeys("F12", 88);
-	static VirtualKeys KEY_F13=new VirtualKeys("F13", 100);
-	static VirtualKeys KEY_F14=new VirtualKeys("F14", 101);
-	static VirtualKeys KEY_F15=new VirtualKeys("F15", 102);
-	static VirtualKeys KEY_F16=new VirtualKeys("F16", 103);
-	static VirtualKeys KEY_F17=new VirtualKeys("F17", 104);
-	static VirtualKeys KEY_F18=new VirtualKeys("F18", 105);
-	static VirtualKeys KEY_KANA=new VirtualKeys("KANA", 112);
-	static VirtualKeys KEY_F19=new VirtualKeys("F19", 113);
-	static VirtualKeys KEY_CONVERT=new VirtualKeys("CONVERT", 121);
-	static VirtualKeys KEY_NOCONVERT=new VirtualKeys("NOCONVERT", 123);
-	static VirtualKeys KEY_YEN=new VirtualKeys("YEN", 125);
-	static VirtualKeys KEY_NUMPADEQUALS=new VirtualKeys("NUMPADEQUALS", 141);
-	static VirtualKeys KEY_CIRCUMFLEX=new VirtualKeys("CIRCUMFLEX", 144);
-	static VirtualKeys KEY_AT=new VirtualKeys("AT", 145);
-	static VirtualKeys KEY_COLON=new VirtualKeys("COLON", 146);
-	static VirtualKeys KEY_UNDERLINE=new VirtualKeys("UNDERLINE", 147);
-	static VirtualKeys KEY_KANJI=new VirtualKeys("KANJI", 148);
-	static VirtualKeys KEY_STOP=new VirtualKeys("STOP", 149);
-	static VirtualKeys KEY_NUMPADENTER=new VirtualKeys("NUMPADENTER", 156);
-	static VirtualKeys KEY_RCONTROL=new VirtualKeys("RCONTROL", 157);
-	static VirtualKeys KEY_NUMPADCOMMA=new VirtualKeys("NUMPADCOMMA", 179);
-	static VirtualKeys KEY_DIVIDE=new VirtualKeys("DIVIDE", 181);
-	static VirtualKeys KEY_PRINT=new VirtualKeys("PRINT", 183);
-	static VirtualKeys Key_ALT_GR=new VirtualKeys("ALT_GR", 184);
-	static VirtualKeys KEY_PAUSE=new VirtualKeys("PAUSE", 197);
-	static VirtualKeys KEY_HOME=new VirtualKeys("HOME", 199);
-	static VirtualKeys KEY_UP=new VirtualKeys("UP", 200);
-	static VirtualKeys KEY_PRIOR=new VirtualKeys("PRIOR", 201);
-	static VirtualKeys KEY_LEFT=new VirtualKeys("LEFT", 203);
-	static VirtualKeys KEY_RIGHT=new VirtualKeys("RIGHT", 205);
-	static VirtualKeys KEY_END=new VirtualKeys("END", 207);
-	static VirtualKeys KEY_DOWN=new VirtualKeys("DOWN", 208);
-	static VirtualKeys KEY_NEXT=new VirtualKeys("NEXT", 209);
-	static VirtualKeys KEY_INSERT=new VirtualKeys("INSERT", 210);
-	static VirtualKeys KEY_DELETE=new VirtualKeys("DELETE", 211);
-	static VirtualKeys KEY_WIN=new VirtualKeys("WIN", 219);
-	static VirtualKeys KEY_CONTEXT=new VirtualKeys("CONTEXT_MENU", 221);
+public class VirtualInput {
+	
+	private static VirtualKeyboard keyboard=new VirtualKeyboard();
+	
+	private static VirtualMouse mouse=new VirtualMouse();
 	
 	static List<VirtualChar> charList= new ArrayList<VirtualChar>();
 	
-	static VirtualKeys KEY_MOUSEMOVED=new VirtualKeys("MOUSEMOVED", -101);
-	static VirtualKeys KEY_LK=new VirtualKeys("LC", -100);
-	static VirtualKeys KEY_RK=new VirtualKeys("RC", -99);
-	static VirtualKeys KEY_MK=new VirtualKeys("MC", -98);
-	static VirtualKeys KEY_MBUTTON3=new VirtualKeys("MBUTTON3", -97);
-	static VirtualKeys KEY_MBUTTON4=new VirtualKeys("MBUTTON4", -96);
-	static VirtualKeys KEY_MBUTTON5=new VirtualKeys("MBUTTON5", -95);
-	static VirtualKeys KEY_MBUTTON6=new VirtualKeys("MBUTTON6", -94);
-	static VirtualKeys KEY_MBUTTON7=new VirtualKeys("MBUTTON7", -93);
-	static VirtualKeys KEY_MBUTTON8=new VirtualKeys("MBUTTON8", -92);
-	static VirtualKeys KEY_MBUTTON9=new VirtualKeys("MBUTTON9", -91);
-	static VirtualKeys KEY_MBUTTON10=new VirtualKeys("MBUTTON10", -90);
-	static VirtualKeys KEY_MBUTTON11=new VirtualKeys("MBUTTON11", -89);
-	static VirtualKeys KEY_MBUTTON12=new VirtualKeys("MBUTTON12", -88);
-	static VirtualKeys KEY_MBUTTON13=new VirtualKeys("MBUTTON13", -87);
-	static VirtualKeys KEY_MBUTTON14=new VirtualKeys("MBUTTON14", -86);
-	static VirtualKeys KEY_MBUTTON15=new VirtualKeys("MBUTTON15", -85);
-	
-	
-	private static List<String> keyList= new ArrayList<String>();
 	private static List<Character> charsListOut= new ArrayList<Character>();
-	private static List<String> mouseList=new ArrayList<String>();
 	
 	private static VirtualSubticks subtick;
 	
@@ -414,7 +274,7 @@ public class VirtualMouseAndKeyboard {
 		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keyCode)) {
 			return keyCode;
 		}
-		VirtualKeys.keyCodes.get(addKeyCodeIfNecessary(keyCode)).setPressed(pressed);
+		keyboard.get(addKeyCodeIfNecessary(keyCode)).setPressed(pressed);
 		return keyCode;
 	}
 	
@@ -424,8 +284,8 @@ public class VirtualMouseAndKeyboard {
 	 * @return boolean
 	 */
 	public static boolean isKeyDown(int keyCode) {
-		if(VirtualKeys.keyCodes.get(keyCode)!=null) {
-			return VirtualKeys.keyCodes.get(keyCode).isKeyDown();
+		if(keyboard.get(keyCode)!=null) {
+			return keyboard.get(keyCode).isKeyDown();
 		}else return false;
 	}
 	
@@ -459,10 +319,10 @@ public class VirtualMouseAndKeyboard {
 	 * @return
 	 */
 	public static int addKeyCodeIfNecessary(int keyCode) {
-		if(VirtualKeys.keyCodes.get(keyCode)==null) {
+		if(keyboard.get(keyCode)==null) {
 			updateMissingKeyCode(keyCode);
-			return VirtualKeys.keyCodes.get(keyCode).getKeycode();
-		}else return VirtualKeys.keyCodes.get(keyCode).getKeycode();
+			return keyboard.get(keyCode).getKeycode();
+		}else return keyboard.get(keyCode).getKeycode();
 	}
 	
 	/**
@@ -470,8 +330,7 @@ public class VirtualMouseAndKeyboard {
 	 * @param keyCode
 	 */
 	private static void updateMissingKeyCode(int keyCode) {
-		VirtualKeys.keyCodes.put(keyCode, new VirtualKeys(Integer.toString(keyCode), keyCode));
-		VirtualKeys.keyNames.put(Integer.toString(keyCode), new VirtualKeys(Integer.toString(keyCode), keyCode));
+		keyboard.add(keyCode);
 	}
 	
 	/**
@@ -480,8 +339,8 @@ public class VirtualMouseAndKeyboard {
 	 * @return int keycode, else -1
 	 */
 	public static int getKeyCodeFromKeyName(String name) {
-		if(VirtualKeys.keyNames.get(name) != null) {
-			return VirtualKeys.keyNames.get(name).getKeycode();
+		if(keyboard.get(name) != null) {
+			return keyboard.get(name).getKeycode();
 		}else return -1;
 	}
 	
@@ -491,16 +350,14 @@ public class VirtualMouseAndKeyboard {
 	 * @return Name of the keycode
 	 */
 	public static String getNameFromKeyCode(int keycode) {
-		return VirtualKeys.keyCodes.get(keycode).getName();
+		return keyboard.get(keycode).getName();
 	}
 	
 	/**
 	 * Resets every key in the list to be not pressed
 	 */
 	public static void unpressEverything() {
-		VirtualKeys.keyCodes.forEach((key,virtual)->{
-			virtual.setPressed(false);
-		});
+		
 		KeyBinding.unPressAllKeys();
 	}
 	
@@ -510,15 +367,7 @@ public class VirtualMouseAndKeyboard {
 	 * @return List of keynames currently being pressed
 	 */
 	public static List<String> getCurrentKeyboardPresses() {
-		keyList.clear();
-		VirtualKeys.keyCodes.forEach((keycodes, virtualkeys)->{
-			if(keycodes>=0) {
-				if(virtualkeys.isKeyDown()) {
-					keyList.add(virtualkeys.getName());
-				}
-			}
-		});
-		return keyList;
+		return keyboard.getCurrentPresses();
 	}
 	
 	/**
@@ -543,25 +392,7 @@ public class VirtualMouseAndKeyboard {
 	 * @return List of keynames currently being pressed
 	 */
 	public static List<String> getCurrentMousePresses() {
-		mouseList.clear();
-		VirtualKeys.keyCodes.forEach((keycodes, virtualkeys)->{
-			if(keycodes<0) {
-				if(virtualkeys.isKeyDown()) {
-					mouseList.add(virtualkeys.getName());
-				}
-			}
-		});
-		return mouseList;
-	}
-	
-	public static List<VirtualKeyboardEvent> getCurrentKeyPressEvents() {
-		List<VirtualKeyboardEvent> list=new ArrayList<VirtualKeyboardEvent>();
-		VirtualKeys.keyCodes.forEach((keycodes, virtualkeys)->{
-			if(keycodes>=0) {
-					list.add(new VirtualKeyboardEvent(keycodes, virtualkeys.isKeyDown(), ' '));
-			}
-		});
-		return list;
+		return mouse.getCurrentPresses();
 	}
 	
 	/*================================Code for tickrate 0================================*/

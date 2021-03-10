@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import de.scribble.lp.tasmod.virtual.VirtualMouseAndKeyboard;
+import de.scribble.lp.tasmod.virtual.VirtualInput;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 
@@ -13,10 +13,10 @@ public class MixinGameSettings {
 	
 	@Redirect(method = "isKeyDown", at = @At(value= "INVOKE", target = "Lorg/lwjgl/input/Mouse;isButtonDown(I)Z",ordinal = 0, remap=false))
 	private static boolean redirectIsKeyDown1(int i, KeyBinding key) {
-		return VirtualMouseAndKeyboard.isKeyDown(i+100);
+		return VirtualInput.isKeyDown(i+100);
 	}
 	@Redirect(method = "isKeyDown", at = @At(value= "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z",ordinal = 0, remap=false))
 	private static boolean redirectIsKeyDown2(int i, KeyBinding key) {
-		return VirtualMouseAndKeyboard.isKeyDown(i);
+		return VirtualInput.isKeyDown(i);
 	}
 }
