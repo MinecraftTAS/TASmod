@@ -2,7 +2,7 @@ package de.scribble.lp.tasmod.virtual;
 
 /**
  * Class to store which keys on the keyboard have been pressed, similar to how Keybindings work.<br>
- * Also stores the keynames and it's keycodes.
+ * 
  * @author ScribbleLP
  *
  */

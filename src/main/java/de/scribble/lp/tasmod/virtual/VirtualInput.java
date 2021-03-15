@@ -19,7 +19,7 @@ import net.minecraft.client.settings.KeyBinding;
  */
 public class VirtualInput {
 	
-	private static VirtualKeyboard keyboard=new VirtualKeyboard();
+	public static VirtualKeyboard keyboard=new VirtualKeyboard();
 	
 	private static VirtualMouse mouse=new VirtualMouse();
 	

@@ -2,6 +2,8 @@ package de.scribble.lp.tasmod.savestates;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
