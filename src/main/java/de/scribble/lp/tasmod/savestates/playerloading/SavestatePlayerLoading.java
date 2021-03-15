@@ -1,14 +1,21 @@
 package de.scribble.lp.tasmod.savestates.playerloading;
 
 import java.util.List;
+import java.util.UUID;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 
@@ -44,12 +51,66 @@ public class SavestatePlayerLoading {
 			
 			if(dimensionNow!=dimensionPrev) {
 				list.transferPlayerToDimension(player, dimensionNow, new NoPortalTeleporter());
+			}else {
+				player.getServerWorld().unloadedEntityList.remove(player);
 			}
 			
 			player.readFromNBT(nbttagcompound);
 			
+			reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
+			
 			CommonProxy.NETWORK.sendTo(new SavestatePlayerLoadingPacket(nbttagcompound), player);
 		}
+	}
+	
+	private static void reattachEntityToPlayer(NBTTagCompound nbttagcompound, World worldserver, Entity playerIn) {
+		if (nbttagcompound != null && nbttagcompound.hasKey("RootVehicle", 10))
+        {
+            NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("RootVehicle");
+            Entity entity1 = AnvilChunkLoader.readWorldEntity(nbttagcompound1.getCompoundTag("Entity"), worldserver, true);
+            
+            worldserver.loadedEntityList.forEach(action->{
+            	System.out.println(action.getName());
+            });
+            
+            if(entity1==null) {
+            	for (Entity entity : worldserver.unloadedEntityList) {
+            		if(entity.getUniqueID().equals(nbttagcompound1.getUniqueId("Attach"))) entity1=entity;
+            	}
+            }
+            
+            if (entity1 != null)
+            {
+                UUID uuid = nbttagcompound1.getUniqueId("Attach");
+
+                if (entity1.getUniqueID().equals(uuid))
+                {
+                    playerIn.startRiding(entity1, true);
+                }
+                else
+                {
+                    for (Entity entity : entity1.getRecursivePassengers())
+                    {
+                        if (entity.getUniqueID().equals(uuid))
+                        {
+                            playerIn.startRiding(entity, true);
+                            break;
+                        }
+                    }
+                }
+
+                if (!playerIn.isRiding())
+                {
+                    ModLoader.logger.warn("Couldn't reattach entity to player");
+                    worldserver.removeEntityDangerously(entity1);
+
+                    for (Entity entity2 : entity1.getRecursivePassengers())
+                    {
+                        worldserver.removeEntityDangerously(entity2);
+                    }
+                }
+            }
+        }
 	}
 	
 }
