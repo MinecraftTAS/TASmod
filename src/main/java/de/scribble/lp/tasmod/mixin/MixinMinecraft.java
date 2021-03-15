@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.ModLoader;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
+import de.scribble.lp.tasmod.input.InputContainer;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -707,6 +708,7 @@ public abstract class MixinMinecraft {
 			}
 			net.minecraftforge.fml.common.FMLCommonHandler.instance().fireKeyInput();
 		}
+		InputContainer.add(VirtualInput.keyboard);
 		this.processKeyBinds();
 	}
 	@Shadow

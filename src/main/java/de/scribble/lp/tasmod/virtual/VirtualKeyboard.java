@@ -9,10 +9,14 @@ import com.google.common.collect.Maps;
 
 public class VirtualKeyboard {
 	
-	private final Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
+	private final Map<Integer, VirtualKey> keyList;
 	
+	public VirtualKeyboard(VirtualKeyboard keyboardIn){
+		this.keyList=keyboardIn.keyList;
+	}
 
 	public VirtualKeyboard() {
+		keyList = Maps.<Integer, VirtualKey>newHashMap();
 		keyList.put(0, new VirtualKey("0", 0));
 		keyList.put(1, new VirtualKey("ESC", 1));
 		keyList.put(2, new VirtualKey("KEY_1", 2));
@@ -178,5 +182,9 @@ public class VirtualKeyboard {
 		});
 		
 		return out;
+	}
+	
+	public Map<Integer, VirtualKey> getKeyList() {
+		return this.keyList;
 	}
 }
