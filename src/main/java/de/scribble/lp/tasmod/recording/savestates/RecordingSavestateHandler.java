@@ -13,23 +13,33 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * Creating savestates on the client
+ * Creating savestates of the recordings on the client<br>
+ * Side: Client
  * @author ScribbleLP
- *
  */
 @SideOnly(Side.CLIENT)
-public class RecordingSavestateHandler {
+public class RecordingSavestateHandler { //I have no memory of creating this...
+	
 	private static File savestateDirectory=new File(Minecraft.getMinecraft().mcDataDir, "saves"+File.separator+"tasfiles"+File.separator+"savestates");
 	
+	/**
+	 * Makes a copy of the recording that is currently running. Gets triggered when a savestate is made on the server <br>
+	 * Side: Client
+	 * @param nameOfSavestate coming from the server
+	 * @throws SavestateException
+	 * @throws IOException
+	 */
 	public static void savestateRecording(String nameOfSavestate) throws SavestateException, IOException {
 		if(!InputRecorder.isRecording()) {
 			CommonProxy.logger.debug("No recording savestate made since no recording is running");
 			return;
 		}
+		
 		if(nameOfSavestate.isEmpty()) {
 			CommonProxy.logger.error("No savestate was made, name of savestate is empty");
 			return;
 		}
+		
 		InputRecorder.setPause(true);
 		InputRecorder.saveFile();
 		
@@ -49,15 +59,24 @@ public class RecordingSavestateHandler {
 		}
 	}
 	
+	/**
+	 * Makes replaces the current recording with the recording from the savestate. Gets triggered when a savestate is loaded on the server<br>
+	 * Side: Client
+	 * @param nameOfSavestate
+	 * @throws IOException
+	 */
 	public static void loadRecording(String nameOfSavestate) throws IOException {
+		
 		if(!InputRecorder.isRecording()) {
 			CommonProxy.logger.debug("No recording savestate loaded since no recording is running");
 			return;
 		}
+		
 		if(nameOfSavestate.isEmpty()) {
 			CommonProxy.logger.error("No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
+		
 		InputRecorder.prepareForRewind();
 		
 		createSavestateDirectory();
@@ -66,7 +85,8 @@ public class RecordingSavestateHandler {
 		
 		if(!targetfile.exists()) {
 			InputRecorder.startRecording(InputRecorder.getFilename());
-		}else {
+		}
+		else {
 			File currentfolder=InputRecorder.getFileLocation();
 			FileUtils.copyFile(targetfile, currentfolder);
 			InputRecorder.appendRecording(InputRecorder.getFilename());
