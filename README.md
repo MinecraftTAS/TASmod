@@ -1,5 +1,5 @@
 # TASmod  
-Let's you record and play back tickperfect inputs.  
+Lets you record and play back tickperfect inputs.  
 
 ## Credits  
 Author of the original mod: tr7zw  

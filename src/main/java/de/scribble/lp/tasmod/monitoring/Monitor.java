@@ -2,8 +2,6 @@ package de.scribble.lp.tasmod.monitoring;
 
 import java.lang.reflect.Field;
 
-import net.minecraft.entity.player.EntityPlayer;
-
 public class Monitor {
 	
 	

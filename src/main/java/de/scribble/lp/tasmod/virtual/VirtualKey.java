@@ -1,9 +1,5 @@
 package de.scribble.lp.tasmod.virtual;
 
-import java.util.Map;
-
-import com.google.common.collect.Maps;
-
 /**
  * Class to store which keys on the keyboard have been pressed, similar to how Keybindings work.<br>
  * Also stores the keynames and it's keycodes.
