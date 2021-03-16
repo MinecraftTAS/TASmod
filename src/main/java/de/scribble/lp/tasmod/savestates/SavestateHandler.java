@@ -19,6 +19,8 @@ import de.scribble.lp.tasmod.savestates.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -40,6 +42,7 @@ public class SavestateHandler {
 	public static boolean isSaving=false;
 	
 	public static boolean isLoading=false;
+	public static boolean wasLoading=false;
 	
 	/**
 	 * Creates a copy of the currently played world and saves it in .minecraft/saves/savestates/worldname <br>
@@ -288,6 +291,7 @@ public class SavestateHandler {
 		
 		//Unlock loadstating
 		isLoading=false;
+		wasLoading=true;
 	}
 	/**
 	 * Searches through the savestate folder to look for the latest savestate<br>
@@ -348,5 +352,12 @@ public class SavestateHandler {
 		if(!savestateDirectory.exists()) {
 			savestateDirectory.mkdir();
 		}
+	}
+	
+	public static void playerLoadSavestateEvent() {
+		MinecraftServer server=ModLoader.getServerInstance();
+		EntityPlayerMP player=server.getPlayerList().getPlayers().get(0);
+		NBTTagCompound nbttagcompound = ModLoader.getServerInstance().getPlayerList().getPlayerNBT(player);
+		SavestatePlayerLoading.reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
 	}
 }

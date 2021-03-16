@@ -57,24 +57,27 @@ public class SavestatePlayerLoading {
 			
 			player.readFromNBT(nbttagcompound);
 			
-			reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
-			
 			CommonProxy.NETWORK.sendTo(new SavestatePlayerLoadingPacket(nbttagcompound), player);
 		}
 	}
 	
-	private static void reattachEntityToPlayer(NBTTagCompound nbttagcompound, World worldserver, Entity playerIn) {
+	/**
+	 * Tries to reattach the player to an entity, if the player was riding it it while savestating.
+	 * 
+	 * Side: Server
+	 * @param nbttagcompound where the ridden entity is saved
+	 * @param worldserver that needs to spawn the entity
+	 * @param playerIn that needs to ride the entity
+	 */
+	public static void reattachEntityToPlayer(NBTTagCompound nbttagcompound, World worldserver, Entity playerIn) {
 		if (nbttagcompound != null && nbttagcompound.hasKey("RootVehicle", 10))
         {
             NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("RootVehicle");
             Entity entity1 = AnvilChunkLoader.readWorldEntity(nbttagcompound1.getCompoundTag("Entity"), worldserver, true);
             
-            worldserver.loadedEntityList.forEach(action->{
-            	System.out.println(action.getName());
-            });
             
             if(entity1==null) {
-            	for (Entity entity : worldserver.unloadedEntityList) {
+            	for (Entity entity : worldserver.loadedEntityList) {
             		if(entity.getUniqueID().equals(nbttagcompound1.getUniqueId("Attach"))) entity1=entity;
             	}
             }

@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.savestates.SavestateHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
 import de.scribble.lp.tasmod.ticksync.TickSyncServer;
@@ -124,6 +125,12 @@ public abstract class MixinMinecraftServer {
                      {
                          i -= TickrateChangerServer.MILISECONDS_PER_TICK;
                          this.tick();
+                         
+                         if(SavestateHandler.wasLoading) {
+                        	 SavestateHandler.wasLoading=false;
+                        	 SavestateHandler.playerLoadSavestateEvent();
+                         }
+                         
                          if (TickSyncServer.isEnabled()) {
      						if (TickSyncServer.getServertickcounter() == Integer.MAX_VALUE - 1) {
      							TickSyncServer.resetTickCounter();
