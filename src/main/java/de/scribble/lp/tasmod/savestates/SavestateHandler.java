@@ -1,15 +1,9 @@
 package de.scribble.lp.tasmod.savestates;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.io.FileUtils;
-
-import com.google.common.io.Files;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;

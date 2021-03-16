@@ -3,8 +3,6 @@ package de.scribble.lp.tasmod.virtual;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.input.Keyboard;
-
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import net.minecraft.client.settings.KeyBinding;
