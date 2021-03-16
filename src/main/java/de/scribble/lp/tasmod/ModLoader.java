@@ -63,6 +63,12 @@ public class ModLoader {
 												+ "Detected Tickratechanger to be loaded. TASMod and Tickratechanger are incompatible!\n"
 												+ "\n"
 												+ "========================================================================");
+		}else if(Loader.isModLoaded("lotas")) {
+			throw new ModIncompatibleException("\n========================================================================\n"
+												+"\n"
+												+ "Detected LoTASmod to be loaded. TASMod and LoTASmod are incompatible!\n"
+												+ "\n"
+												+ "========================================================================");
 		}
 	}
 	
