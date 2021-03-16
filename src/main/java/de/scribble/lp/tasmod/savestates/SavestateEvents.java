@@ -20,6 +20,7 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
+			InputContainer.print();
 		}
 	}
 }

@@ -708,7 +708,11 @@ public abstract class MixinMinecraft {
 			}
 			net.minecraftforge.fml.common.FMLCommonHandler.instance().fireKeyInput();
 		}
-		InputContainer.add(VirtualInput.keyboard);
+		try {
+			InputContainer.add(VirtualInput.keyboard);
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
 		this.processKeyBinds();
 	}
 	@Shadow

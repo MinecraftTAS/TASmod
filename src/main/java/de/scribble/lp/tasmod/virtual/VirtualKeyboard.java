@@ -2,6 +2,7 @@ package de.scribble.lp.tasmod.virtual;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,10 +10,15 @@ import com.google.common.collect.Maps;
 
 public class VirtualKeyboard {
 	
-	private final Map<Integer, VirtualKey> keyList;
+	private Map<Integer, VirtualKey> keyList;
 	
-	public VirtualKeyboard(VirtualKeyboard keyboardIn){
-		this.keyList=keyboardIn.keyList;
+	public VirtualKeyboard(Map<Integer, VirtualKey> keyListIn){
+		Map<Integer, VirtualKey> copy=new HashMap<Integer, VirtualKey>();
+		
+		keyListIn.forEach((key,value)->{
+			copy.put(key, value.clone());
+		});
+		keyList=copy;
 	}
 
 	public VirtualKeyboard() {
@@ -112,7 +118,7 @@ public class VirtualKeyboard {
 		keyList.put(112, new VirtualKey("KANA", 112));
 		keyList.put(113, new VirtualKey("F19", 113));
 		keyList.put(121, new VirtualKey("CONVERT", 121));
-		keyList.put(1123, new VirtualKey("NOCONVERT", 123));
+		keyList.put(123, new VirtualKey("NOCONVERT", 123));
 		keyList.put(125, new VirtualKey("YEN", 125));
 		keyList.put(141, new VirtualKey("NUMPADEQUALS", 141));
 		keyList.put(144, new VirtualKey("CIRCUMFLEX", 144));
@@ -187,4 +193,10 @@ public class VirtualKeyboard {
 	public Map<Integer, VirtualKey> getKeyList() {
 		return this.keyList;
 	}
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return new VirtualKeyboard(keyList);
+	}
+	
 }
