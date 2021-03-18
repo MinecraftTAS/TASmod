@@ -35,10 +35,7 @@ public class LoadstatePacketHandler implements IMessageHandler<LoadstatePacket, 
 			});
 		}else {
 			Minecraft.getMinecraft().addScheduledTask(()->{
-				if(message.isRewind()) {
-				}else {
-					SavestatesChunkControl.unloadAllClientChunks();
-				}
+				SavestatesChunkControl.unloadAllClientChunks();
 			});
 		}
 		return null;
