@@ -232,8 +232,6 @@ public class SavestateHandler {
 		//Send a notification that the savestate has been loaded
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN+"Savestate loaded"));
 		
-		//Sends a message to all players to start the recording again
-		CommonProxy.NETWORK.sendToAll(new LoadstatePacket(true));
 		
 		//Unlock loadstating
 		isLoading=false;
@@ -308,9 +306,8 @@ public class SavestateHandler {
 	}
 	
 	public static void playerLoadSavestateEvent() {
-		MinecraftServer server=ModLoader.getServerInstance();
 		EntityPlayerMP player=server.getPlayerList().getPlayers().get(0);
-		NBTTagCompound nbttagcompound = ModLoader.getServerInstance().getPlayerList().getPlayerNBT(player);
+		NBTTagCompound nbttagcompound = server.getPlayerList().getPlayerNBT(player);
 		SavestatePlayerLoading.reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
 	}
 }
