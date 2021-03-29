@@ -9,6 +9,7 @@ import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.savestates.SavestateEvents;
 import de.scribble.lp.tasmod.savestates.motion.MotionEvents;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.virtual.VirtualInput2;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -42,6 +43,7 @@ public class ClientProxy extends CommonProxy{
 	
 	public static KeyBinding testingKey = new KeyBinding("Various Testing", Keyboard.KEY_F12, "TASmod");
 	
+	public static VirtualInput2 virtual= new VirtualInput2();
 	
 	public void preInit(FMLPreInitializationEvent ev) {
 		isDevEnvironment=(Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");

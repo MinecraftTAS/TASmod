@@ -9,7 +9,7 @@ public class InputContainer {
 	private static List<VirtualKeyboard> keyboardContainer=new ArrayList<VirtualKeyboard>();
 	
 	public static void add(VirtualKeyboard keyboard) throws CloneNotSupportedException {
-		keyboardContainer.add((VirtualKeyboard) keyboard.clone());
+		keyboardContainer.add(keyboard.clone());
 	}
 	
 	public static void print() {

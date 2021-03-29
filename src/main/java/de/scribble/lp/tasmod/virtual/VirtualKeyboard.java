@@ -3,8 +3,10 @@ package de.scribble.lp.tasmod.virtual;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import com.google.common.collect.Maps;
 
@@ -12,16 +14,34 @@ public class VirtualKeyboard {
 	
 	private Map<Integer, VirtualKey> keyList;
 	
-	public VirtualKeyboard(Map<Integer, VirtualKey> keyListIn){
+	private List<Character> charList;
+	
+	/**
+	 * Creates a copy of the virtual keyboard with the given key list
+	 * @param keyListIn
+	 */
+	public VirtualKeyboard(Map<Integer, VirtualKey> keyListIn, List<Character> charListIn){
 		Map<Integer, VirtualKey> copy=new HashMap<Integer, VirtualKey>();
 		
 		keyListIn.forEach((key,value)->{
 			copy.put(key, value.clone());
 		});
 		keyList=copy;
+		
+		List<Character> charCopy=new ArrayList<Character>();
+		
+		charListIn.forEach(charAction->{
+			charCopy.add(charAction);
+		});
+		charList=charCopy;
 	}
-
+	
+	/**
+	 * Creates a Keyboard, where the keys are all unpressed
+	 */
 	public VirtualKeyboard() {
+		charList=new ArrayList<Character>();
+		
 		keyList = Maps.<Integer, VirtualKey>newHashMap();
 		keyList.put(0, new VirtualKey("0", 0));
 		keyList.put(1, new VirtualKey("ESC", 1));
@@ -155,7 +175,12 @@ public class VirtualKeyboard {
 	}
 	
 	public VirtualKey get(int keycode) {
-		return keyList.get(keycode);
+		VirtualKey key=keyList.get(keycode);
+		if(key==null) {
+			add(keycode);
+			return keyList.get(keycode);
+		}
+		else return key;
 	}
 	
 	public VirtualKey get(String keyname) {
@@ -168,12 +193,6 @@ public class VirtualKeyboard {
 			}
 		}
 		return out;
-	}
-	
-	public void unpressEverything() {
-		keyList.forEach((key,virtual)->{
-			virtual.setPressed(false);
-		});
 	}
 	
 	public List<String> getCurrentPresses(){
@@ -194,9 +213,52 @@ public class VirtualKeyboard {
 		return this.keyList;
 	}
 	
+	public void addChar(char charin) {
+		charList.add(charin);
+	}
+	
+	public List<Character> getCharList(){
+		return charList;
+	}
+	
+	public void clearCharList() {
+		charList.clear();
+	}
+	
+	public void clear() {
+		keyList.forEach((keycode,key)->{
+			key.setPressed(false);
+		});
+		charList.clear();
+	}
+	
+	public List<VirtualKeyboardEvent> getDifference(VirtualKeyboard keyboardToCompare){
+		
+		List<VirtualKeyboardEvent> eventList=new ArrayList<VirtualKeyboardEvent>();
+		
+		Iterator<Character> charIterator= keyboardToCompare.charList.iterator();
+		
+		keyList.forEach((keycodes, virtualkeys)->{
+			
+			VirtualKey keyToCompare=keyboardToCompare.get(keycodes);
+			
+			if(!virtualkeys.equals(keyToCompare)) {
+				
+				if(charIterator.hasNext()) {
+					eventList.add(new VirtualKeyboardEvent(keycodes, keyToCompare.isKeyDown(), charIterator.next()));
+				}else {				
+					eventList.add(new VirtualKeyboardEvent(keycodes, keyToCompare.isKeyDown(), Character.MIN_VALUE));
+				}
+			}
+			
+		});
+		
+		return eventList;
+	}
+	
 	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return new VirtualKeyboard(keyList);
+	public VirtualKeyboard clone() throws CloneNotSupportedException {
+		return new VirtualKeyboard(keyList, charList);
 	}
 	
 }

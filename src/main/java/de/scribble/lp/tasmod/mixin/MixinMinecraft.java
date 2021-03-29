@@ -211,7 +211,7 @@ public abstract class MixinMinecraft {
         
         //TASmod
         VirtualKeybindings.increaseCooldowntimer();
-        TickrateChangerClient.INSTANCE.bypass();
+        TickrateChangerClient.bypass();
         
         for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
         {
@@ -707,11 +707,6 @@ public abstract class MixinMinecraft {
 				}
 			}
 			net.minecraftforge.fml.common.FMLCommonHandler.instance().fireKeyInput();
-		}
-		try {
-			InputContainer.add(VirtualInput.keyboard);
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
 		}
 		this.processKeyBinds();
 	}
