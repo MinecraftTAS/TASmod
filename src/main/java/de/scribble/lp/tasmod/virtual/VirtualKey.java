@@ -40,6 +40,14 @@ public class VirtualKey {
 	}
 	
 	@Override
+	public boolean equals(Object obj) {
+		VirtualKey key = (VirtualKey) obj;
+		if(key.isKeyDown!=isKeyDown) return false;
+		if(key.keycode!=keycode) return false;
+		return true;
+	}
+	
+	@Override
 	public VirtualKey clone() {
 		return new VirtualKey(name, keycode, isKeyDown);
 	}

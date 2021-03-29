@@ -9,7 +9,6 @@ public class TickrateChangerClient {
 	public static float TICKS_PER_SECOND=20f;
 	public static long MILISECONDS_PER_TICK=50L;
 	public static boolean INTERRUPT=false;
-	public static TickrateChangerClient INSTANCE= new TickrateChangerClient();
 	public static float TICKRATE_SAVED=20F;
 	public static boolean ADVANCE_TICK=false;
 	
@@ -44,7 +43,7 @@ public class TickrateChangerClient {
     /**
      * Bypasses the tick system
      */
-    public void bypass() {
+    public static void bypass() {
 		if (VirtualKeybindings.isKeyDown(ClientProxy.tickratezeroKey)) {
 			pauseUnpauseGame();
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickAdvance)) {
