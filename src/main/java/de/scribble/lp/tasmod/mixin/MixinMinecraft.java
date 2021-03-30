@@ -15,9 +15,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.ModLoader;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
-import de.scribble.lp.tasmod.input.InputContainer;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.recording.InputRecorder;
+import de.scribble.lp.tasmod.savestates.SavestateHandler;
+import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
@@ -389,7 +390,14 @@ public abstract class MixinMinecraft {
 	
 	@Inject(method="runTick", at=@At(value="HEAD"), cancellable = true)
 	public void injectRunTick(CallbackInfo ci) throws IOException {
+		
 		TickSync.incrementClienttickcounter();
+		
+		if(SavestatePlayerLoading.wasLoading) {
+			SavestatePlayerLoading.wasLoading=false;
+			SavestateHandler.playerLoadSavestateEventClient();
+		}
+		
 		if (this.rightClickDelayTimer > 0)
         {
             --this.rightClickDelayTimer;

@@ -1,14 +1,8 @@
 package de.scribble.lp.tasmod.savestates;
 
-import java.util.List;
-
-import org.lwjgl.input.Keyboard;
-
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.input.InputContainer;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
-import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -24,7 +18,7 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-			
+	        
 		}
 	}
 }

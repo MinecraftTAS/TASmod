@@ -18,6 +18,8 @@ import net.minecraftforge.common.DimensionManager;
 
 public class SavestatePlayerLoading {
 	
+	public static boolean wasLoading;
+	
 	/**
 	 * Loads all worlds and players from the disk. Also sends the playerdata to the client in {@linkplain SavestatePlayerLoadingPacketHandler}
 	 * 
