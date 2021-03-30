@@ -328,56 +328,7 @@ public abstract class MixinMinecraft {
         this.mcProfiler.endSection();
         ci.cancel();
     }
-    @Shadow
-    protected abstract void loadWorld(WorldClient worldClient);
-//	@Inject(method="runGameLoop",at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;startSection(S)V", shift = At.Shift.AFTER, remap = false, ordinal = 2))
-//	public void injectTick(CallbackInfo ci) {
-//		if(TickrateChangerClient.cooldownKeyPause>0) {
-//        	TickrateChangerClient.cooldownKeyPause--;
-//        }
-//        if(TickrateChangerClient.cooldownKeyAdvance>0) {
-//        	TickrateChangerClient.cooldownKeyAdvance--;
-//        }
-//        TickrateChangerClient.INSTANCE.bypass();
-//        for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
-//        {
-//	        if(TickSync.isEnabled()&&Minecraft.getMinecraft().world!=null) {
-//				if(TickSync.getClienttickcounter()==TickSync.getServertickcounter()) { //If the tickrate matches the server tickrate
-//					TickSync.incrementClienttickcounter();
-//					if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
-//						centityRenderer.runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks,(Minecraft)(Object)this,this.entityRenderer.smoothCamYaw,this.entityRenderer.smoothCamPitch,this.entityRenderer.smoothCamPartialTicks,this.entityRenderer.smoothCamFilterX,this.entityRenderer.smoothCamFilterY);
-//					}
-//					this.runTick();
-//				}else if(TickSync.getClienttickcounter()>TickSync.getServertickcounter()) {	//If it's too fast
-//					continue;
-//				}else if(TickSync.getClienttickcounter()<TickSync.getServertickcounter()) {
-//					for(int h=0;h<TickSync.getServertickcounter()-TickSync.getClienttickcounter();h++) {	//If it's too slow
-//						TickSync.incrementClienttickcounter();
-//						if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
-//							centityRenderer.runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks,(Minecraft)(Object)this,this.entityRenderer.smoothCamYaw,this.entityRenderer.smoothCamPitch,this.entityRenderer.smoothCamPartialTicks,this.entityRenderer.smoothCamFilterX,this.entityRenderer.smoothCamFilterY);
-//						}
-//						this.runTick();
-//					}
-//				}
-//			}else if(Minecraft.getMinecraft().world==null) {
-//				this.runTick();
-//			}else { //If Ticksync is disabled
-//				TickSync.incrementClienttickcounter();
-//				if(TickrateChangerClient.TICKS_PER_SECOND!=0) {
-//					centityRenderer.runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks,(Minecraft)(Object)this,this.entityRenderer.smoothCamYaw,this.entityRenderer.smoothCamPitch,this.entityRenderer.smoothCamPartialTicks,this.entityRenderer.smoothCamFilterX,this.entityRenderer.smoothCamFilterY);
-//				}
-//				this.runTick();
-//			}
-//			if(TickrateChangerClient.ADVANCE_TICK) {
-//				TickrateChangerClient.ADVANCE_TICK=false;
-//				TickrateChangerClient.changeClientTickrate(0F);
-//			}
-//        }
-//	}
-//	@Redirect(method="runGameLoop", at = @At(value="INVOKE",target = "Lnet/minecraft/client/Minecraft;runTick()V"))
-//	public void cancelVanilla() {
-//		return;
-//	}
+    
 	@Shadow
 	protected abstract void runTick();
 	
