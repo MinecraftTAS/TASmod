@@ -128,7 +128,7 @@ public abstract class MixinMinecraftServer {
                          
                          if(SavestateHandler.wasLoading) {
                         	 SavestateHandler.wasLoading=false;
-                        	 SavestateHandler.playerLoadSavestateEvent();
+                        	 SavestateHandler.playerLoadSavestateEventServer();
                          }
                          
                          if (TickSyncServer.isEnabled()) {

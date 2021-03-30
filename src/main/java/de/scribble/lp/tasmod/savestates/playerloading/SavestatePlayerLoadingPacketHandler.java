@@ -33,6 +33,7 @@ public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<Save
 				player.moveStrafing=rz;
 				
 				SavestatesChunkControl.keepPlayerInLoadedEntityList(player);
+				SavestatePlayerLoading.wasLoading=true;
 			});
 		}
 		return null;

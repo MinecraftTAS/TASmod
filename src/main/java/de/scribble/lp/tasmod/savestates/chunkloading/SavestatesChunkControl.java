@@ -10,7 +10,9 @@ import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.storage.SaveHandler;
 import net.minecraftforge.common.DimensionManager;
@@ -151,4 +153,23 @@ public class SavestatesChunkControl {
 	public static void keepPlayerInLoadedEntityList(EntityPlayer player) {
 		Minecraft.getMinecraft().world.unloadedEntityList.remove(player);
 	}
+	
+	/**
+	 * Adds the player to the chunk so he can't place any blocks inside himself <br>
+	 * <br>
+	 * Side: Client
+	 */
+	@SideOnly(Side.CLIENT)
+	public static void addPlayerToChunk(EntityPlayer player) {
+		int i = MathHelper.floor(player.posX / 16.0D);
+        int j = MathHelper.floor(player.posZ / 16.0D);
+        Chunk chunk=Minecraft.getMinecraft().world.getChunkFromChunkCoords(i, j);
+        for (int k = 0; k < chunk.getEntityLists().length; k++) {
+        	if(chunk.getEntityLists()[k].contains(player)) {
+        		return;
+        	}
+		}
+        chunk.addEntity(player);
+	}
+	
 }

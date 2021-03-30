@@ -1,6 +1,5 @@
 package de.scribble.lp.tasmod.virtual;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class VirtualInput2 {

@@ -14,6 +14,7 @@ import de.scribble.lp.tasmod.savestates.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
@@ -21,6 +22,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import net.minecraftforge.common.DimensionManager;
 
 /**
  * Creates and loads savestates on both client and server without closing the world <br>
@@ -232,6 +234,11 @@ public class SavestateHandler {
 		//Send a notification that the savestate has been loaded
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN+"Savestate loaded"));
 		
+		WorldServer[] worlds = DimensionManager.getWorlds();
+        
+        for(WorldServer world : worlds) {
+            world.tick();
+        }
 		
 		//Unlock loadstating
 		isLoading=false;
@@ -305,9 +312,13 @@ public class SavestateHandler {
 		}
 	}
 	
-	public static void playerLoadSavestateEvent() {
+	public static void playerLoadSavestateEventServer() {
 		EntityPlayerMP player=server.getPlayerList().getPlayers().get(0);
 		NBTTagCompound nbttagcompound = server.getPlayerList().getPlayerNBT(player);
 		SavestatePlayerLoading.reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
+	}
+	
+	public static void playerLoadSavestateEventClient() {
+		SavestatesChunkControl.addPlayerToChunk(Minecraft.getMinecraft().player);
 	}
 }
