@@ -15,5 +15,5 @@ public class MixinTextfield {
 	public void injectsetFocused(boolean focused, CallbackInfo ci) {
 		VirtualKeybindings.focused = focused;
 	}
-	
+
 }

@@ -11,6 +11,6 @@ import net.minecraft.client.gui.GuiChat;
 public class MixinGuiChat {
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE",target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I", remap = false))
 	public int redirectHandleMouseInput4() {
-		return VirtualInput.getEventDWheel();
+		return VirtualInput.getEventDWheel(); //TODO
 	}
 }
