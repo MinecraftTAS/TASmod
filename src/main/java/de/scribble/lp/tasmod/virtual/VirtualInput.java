@@ -175,7 +175,7 @@ public class VirtualInput {
 	 */
 	public static void fillMouseEvents(int keycode, boolean state, int scrollwheel, int mouseX, int mouseY, int slotidx) {
 		if (!InputPlayback.isPlayingback()) {
-			mouseEventList.add(new VirtualMouseEvent(keycode, state, scrollwheel, mouseX, mouseY, slotidx));
+			mouseEventList.add(new VirtualMouseEvent(keycode, state, scrollwheel, mouseX, mouseY));
 		}
 	}
 	
