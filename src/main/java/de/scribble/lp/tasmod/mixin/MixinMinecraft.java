@@ -185,7 +185,7 @@ public abstract class MixinMinecraft {
 	 * Rewrites 
 	 * 
 	 */
-    @Inject(method = "runGameLoop", at = @At(value="HEAD"), cancellable = true)
+//    @Inject(method = "runGameLoop", at = @At(value="HEAD"), cancellable = true)
     public void redoentireRunGameLoop(CallbackInfo ci) throws IOException {
     	long i = System.nanoTime();
         this.mcProfiler.startSection("root");
@@ -332,7 +332,7 @@ public abstract class MixinMinecraft {
 	@Shadow
 	protected abstract void runTick();
 	
-	@Inject(method="init",at = @At(value = "RETURN"))
+//	@Inject(method="init",at = @At(value = "RETURN"))
 	public void injectInit(CallbackInfo ci) {
 		ModLoader.logger.debug("Initialising stuff for TASmod");
 		new TickrateChangerClient();
@@ -458,7 +458,7 @@ public abstract class MixinMinecraft {
             }
 
             this.mcProfiler.endStartSection("keyboard");
-            modifiedRunTickKeyboard();
+//            modifiedRunTickKeyboard();
             InputRecorder.recordTick();
         }
 

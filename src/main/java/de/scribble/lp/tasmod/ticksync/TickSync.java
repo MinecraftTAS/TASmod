@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 
 /**
- * Makes tickrate only dependant on the server
+ * Makes tickrate only dependent on the server
  * @author ScribbleLP
  *
  */
