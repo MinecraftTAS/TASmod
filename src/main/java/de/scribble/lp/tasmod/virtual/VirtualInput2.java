@@ -10,16 +10,16 @@ public class VirtualInput2 {
 
 	private VirtualKeyboard nextKeyboard = new VirtualKeyboard();
 
-	private List<VirtualKeyboardEvent> oof = null;
+	private List<VirtualKeyboardEvent> currentKeyboardEvents = null;
 	private Iterator<VirtualKeyboardEvent> currentKeyboardEventIterator = null;
 
 	private VirtualKeyboardEvent currentKeyboardEvent = null;
 
-	public VirtualKeyboard getPreviousKeyboard() {
+	public VirtualKeyboard getCurrentKeyboard() {
 		return currentKeyboard;
 	}
 
-	public VirtualKeyboard getCurrentKeyboard() {
+	public VirtualKeyboard getNextKeyboard() {
 		return nextKeyboard;
 	}
 
@@ -30,13 +30,12 @@ public class VirtualInput2 {
 	}
 
 	public List<VirtualKeyboardEvent> getCurrentKeyboardEvents() {
-		List<VirtualKeyboardEvent> out = currentKeyboard.getDifference(nextKeyboard);
-		return out;
+		return currentKeyboard.getDifference(nextKeyboard);
 	}
 
 	public void updateCurrentKeyboardEvents() {
-		oof=getCurrentKeyboardEvents();
-		currentKeyboardEventIterator = oof.iterator();
+		currentKeyboardEvents = getCurrentKeyboardEvents();
+		currentKeyboardEventIterator = currentKeyboardEvents.iterator();
 
 		nextKeyboard.clearCharList();
 
@@ -86,32 +85,72 @@ public class VirtualInput2 {
 	public boolean willKeyBeDown(String keyname) {
 		return nextKeyboard.get(keyname).isKeyDown();
 	}
-	
-	public List<String> getCurrentKeyboardPresses(){
-		List<String> out=new ArrayList<String>();
-		
-		currentKeyboard.getKeyList().forEach((keycodes, virtualkeys)->{
-			if(keycodes>=0) {
-				if(virtualkeys.isKeyDown()) {
+
+	public List<String> getCurrentKeyboardPresses() {
+		List<String> out = new ArrayList<String>();
+
+		currentKeyboard.getKeyList().forEach((keycodes, virtualkeys) -> {
+			if (keycodes >= 0) {
+				if (virtualkeys.isKeyDown()) {
 					out.add(virtualkeys.getName());
 				}
 			}
 		});
-		
+
 		return out;
 	}
 
-	public List<String>  getNextKeyboardPresses() {
-		List<String> out=new ArrayList<String>();
-		
-		nextKeyboard.getKeyList().forEach((keycodes, virtualkeys)->{
-			if(keycodes>=0) {
-				if(virtualkeys.isKeyDown()) {
+	public List<String> getNextKeyboardPresses() {
+		List<String> out = new ArrayList<String>();
+
+		nextKeyboard.getKeyList().forEach((keycodes, virtualkeys) -> {
+			if (keycodes >= 0) {
+				if (virtualkeys.isKeyDown()) {
 					out.add(virtualkeys.getName());
 				}
 			}
 		});
-		
+
 		return out;
+	}
+
+	// =======================================================================================
+
+	private VirtualMouse currentMouse = new VirtualMouse();
+
+	private VirtualMouse nextMouse = new VirtualMouse();
+
+	public VirtualMouse getCurrentMouse() {
+		return currentMouse;
+	}
+
+	public VirtualMouse getNextMouse() {
+		return nextMouse;
+	}
+
+	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
+		if(!filter) {
+			VirtualKey key = nextMouse.get(keycode);
+	
+			if (keystate) {
+				key.setTimesPressed(key.getTimesPressed() + 1);
+			}
+			key.setPressed(keystate);
+	
+			nextMouse.setScrollWheel(scrollwheel);
+	
+			nextMouse.addCursor(cursorX, cursorY);
+		}
+
+	}
+	
+	public List<VirtualMouseEvent> getCurrentMouseEvents(){
+		return currentMouse.getDifference(nextMouse);
+	}
+
+	public void resetNextMouseLists() {
+		nextMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
+			virtualkeys.resetTimesPressed();
+		});
 	}
 }

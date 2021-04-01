@@ -11,16 +11,25 @@ public class VirtualKey {
 	private String name;
 	private int keycode;
 	private boolean isKeyDown=false;
+	private int timesPressed=0;
 	
 	public VirtualKey(String name, int keycode) {
 		this.name = name;
 		this.keycode = keycode;
+		this.timesPressed=0;
 	}
 	
-	private VirtualKey(String name, int keycode, boolean isKeyDown) {
+	public VirtualKey(String name, int keycode, int timesPressed) {
+		this.name = name;
+		this.keycode = keycode;
+		this.timesPressed=timesPressed;
+	}
+	
+	private VirtualKey(String name, int keycode, boolean isKeyDown, int timesPressed) {
 		this.name = name;
 		this.keycode = keycode;
 		this.isKeyDown = isKeyDown;
+		this.timesPressed=timesPressed;
 	}
 
 	public String getName() {
@@ -39,6 +48,18 @@ public class VirtualKey {
 		isKeyDown=pressed;
 	}
 	
+	public void setTimesPressed(int timesPressed) {
+		this.timesPressed = timesPressed;
+	}
+	
+	public int getTimesPressed() {
+		return timesPressed;
+	}
+	
+	public void resetTimesPressed() {
+		timesPressed=0;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		VirtualKey key = (VirtualKey) obj;
@@ -49,6 +70,6 @@ public class VirtualKey {
 	
 	@Override
 	public VirtualKey clone() {
-		return new VirtualKey(name, keycode, isKeyDown);
+		return new VirtualKey(name, keycode, isKeyDown, timesPressed);
 	}
 }
