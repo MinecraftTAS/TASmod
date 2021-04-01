@@ -12,13 +12,11 @@ public class VirtualMouse {
 
 	private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
 
-	private float camX;
+	private int scrollwheel;
 
-	private float camY;
+	private List<Integer> cursorX;
 
-	private int cursorX;
-
-	private int cursorY;
+	private List<Integer> cursorY;
 
 	public VirtualMouse(Map<Integer, VirtualKey> keyListIn) {
 		Map<Integer, VirtualKey> copy = new HashMap<Integer, VirtualKey>();
@@ -92,23 +90,17 @@ public class VirtualMouse {
 		return this.keyList;
 	}
 
-	public void setCam(float x, float y) {
-		camX = x;
-		camY = y;
-	}
-
-	public void setCursor(int x, int y) {
-		cursorX = x;
-		cursorY = y;
-	}
-
 	public List<VirtualMouseEvent> getDifference(VirtualMouse mouseToCompare) {
-		List<VirtualMouseEvent> eventList= new ArrayList<VirtualMouseEvent>();
-		
-		keyList.forEach((keycodes, virtualkeys)->{
-			VirtualKey keyToCompare=mouseToCompare.get(keycodes);
-			if(!virtualkeys.equals(keyToCompare)) {
-//				eventList.add(new VirtualMouseEvent(keycodes, keyToCompare.isKeyDown(), scrollwheel, mouseX, mouseY, slotidx))
+		List<VirtualMouseEvent> eventList = new ArrayList<VirtualMouseEvent>();
+
+		keyList.forEach((keycodes, virtualkeys) -> {
+			VirtualKey keyToCompare = mouseToCompare.get(keycodes);
+			if (!virtualkeys.equals(keyToCompare)) {
+				for (int i = 0; i < keyToCompare.getTimesPressed(); i++) {
+					if (i == keyToCompare.getTimesPressed() - 1) {
+						eventList.add(new VirtualMouseEvent(keycodes, keyToCompare.isKeyDown(), scrollwheel, mouseX, mouseY));
+					}
+				}
 			}
 		});
 		return eventList;
@@ -117,5 +109,14 @@ public class VirtualMouse {
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		return new VirtualMouse(keyList);
+	}
+
+	public void setScrollWheel(int scrollwheel) {
+		this.scrollwheel = this.scrollwheel + scrollwheel;
+	}
+
+	public void addCursor(int cursorX, int cursorY) {
+		this.cursorX.add(cursorX);
+		this.cursorY.add(cursorY);
 	}
 }
