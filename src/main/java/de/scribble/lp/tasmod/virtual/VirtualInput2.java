@@ -24,7 +24,7 @@ public class VirtualInput2 {
 	}
 
 	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
-		VirtualKey key = nextKeyboard.get(keycode);
+		VirtualKeyboardKey key = nextKeyboard.get(keycode);
 		key.setPressed(keystate);
 		nextKeyboard.addChar(character);
 	}
@@ -54,15 +54,15 @@ public class VirtualInput2 {
 		return hasnext;
 	}
 
-	public int getEventKey() {
+	public int getEventKeyboardKey() {
 		return currentKeyboardEvent.getKeyCode();
 	}
 
-	public boolean getEventState() {
+	public boolean getEventKeyboardState() {
 		return currentKeyboardEvent.isState();
 	}
 
-	public char getEventCharacter() {
+	public char getEventKeyboardCharacter() {
 		return currentKeyboardEvent.getCharacter();
 	}
 
@@ -71,19 +71,39 @@ public class VirtualInput2 {
 	}
 
 	public boolean isKeyDown(int keycode) {
-		return currentKeyboard.get(keycode).isKeyDown();
+		if (keycode >= 0)
+			return currentKeyboard.get(keycode).isKeyDown();
+
+		else
+			return currentMouse.get(keycode).isKeyDown();
 	}
 
 	public boolean isKeyDown(String keyname) {
-		return currentKeyboard.get(keyname).isKeyDown();
+		if (currentKeyboard.get(keyname).isKeyDown()) {
+			return true;
+		} else if (currentMouse.get(keyname).isKeyDown()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public boolean willKeyBeDown(int keycode) {
-		return nextKeyboard.get(keycode).isKeyDown();
+		if (keycode >= 0)
+			return nextKeyboard.get(keycode).isKeyDown();
+
+		else
+			return nextMouse.get(keycode).isKeyDown();
 	}
 
 	public boolean willKeyBeDown(String keyname) {
-		return nextKeyboard.get(keyname).isKeyDown();
+		if (nextKeyboard.get(keyname).isKeyDown()) {
+			return true;
+		} else if (nextMouse.get(keyname).isKeyDown()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public List<String> getCurrentKeyboardPresses() {
@@ -120,6 +140,11 @@ public class VirtualInput2 {
 
 	private VirtualMouse nextMouse = new VirtualMouse();
 
+	private List<VirtualMouseEvent> currentMouseEvents = null;
+	private Iterator<VirtualMouseEvent> currentMouseEventIterator = null;
+
+	private VirtualMouseEvent currentMouseEvent = null;
+
 	public VirtualMouse getCurrentMouse() {
 		return currentMouse;
 	}
@@ -129,28 +154,103 @@ public class VirtualInput2 {
 	}
 
 	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
-		if(!filter) {
-			VirtualKey key = nextMouse.get(keycode);
-	
+		if (!filter) {
+			VirtualMouseButton key = nextMouse.get(keycode-100);
+
 			if (keystate) {
 				key.setTimesPressed(key.getTimesPressed() + 1);
 			}
 			key.setPressed(keystate);
-	
+
 			nextMouse.setScrollWheel(scrollwheel);
-	
+
 			nextMouse.addCursor(cursorX, cursorY);
 		}
 
 	}
-	
-	public List<VirtualMouseEvent> getCurrentMouseEvents(){
+
+	public List<VirtualMouseEvent> getCurrentMouseEvents() {
 		return currentMouse.getDifference(nextMouse);
+	}
+
+	public void updateCurrentMouseEvents() {
+		currentMouseEvents = getCurrentMouseEvents();
+		currentMouseEventIterator = currentMouseEvents.iterator();
+
+		resetNextMouseLists();
+
+		try {
+			currentMouse = nextMouse.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void resetNextMouseLists() {
 		nextMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
 			virtualkeys.resetTimesPressed();
 		});
+		nextMouse.setScrollWheel(0);
+		nextMouse.resetCursor();
+	}
+
+	public boolean nextMouseEvent() {
+		boolean hasnext = currentMouseEventIterator.hasNext();
+		if (hasnext) {
+			currentMouseEvent = currentMouseEventIterator.next();
+		}
+		return hasnext;
+	}
+
+	public int getEventMouseKey() {
+		return currentMouseEvent.getKeyCode();
+	}
+
+	public boolean getEventMouseState() {
+		return currentMouseEvent.isState();
+	}
+
+	public int getEventMouseScrollWheel() {
+		return currentMouseEvent.getScrollwheel();
+	}
+
+	public int getEventCursorX() {
+		return currentMouseEvent.getMouseX();
+	}
+
+	public int getEventCursorY() {
+		return currentMouseEvent.getMouseY();
+	}
+
+	public void clearNextMouse() {
+		nextMouse = new VirtualMouse();
+	}
+
+	public List<String> getCurrentMousePresses() {
+		List<String> out = new ArrayList<String>();
+
+		currentMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
+			if (keycodes <= 0) {
+				if (virtualkeys.isKeyDown()) {
+					out.add(virtualkeys.getName());
+				}
+			}
+		});
+
+		return out;
+	}
+
+	public List<String> getNextMousePresses() {
+		List<String> out = new ArrayList<String>();
+
+		nextMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
+			if (keycodes <= 0) {
+				if (virtualkeys.isKeyDown()) {
+					out.add(virtualkeys.getName());
+				}
+			}
+		});
+
+		return out;
 	}
 }

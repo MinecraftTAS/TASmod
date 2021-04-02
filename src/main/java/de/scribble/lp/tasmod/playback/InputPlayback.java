@@ -236,7 +236,7 @@ public class InputPlayback {
 					if(mouseButtonPresses.size()==mouseStates.size()&&mouseButtonPresses.size()==scrollWheelDeltas.size()&&mouseButtonPresses.size()==mouseX.size()&&mouseButtonPresses.size()==mouseY.size()&&mouseButtonPresses.size()==slotID.size()) {
 						
 						for (int i = 0; i < mouseButtonPresses.size(); i++) {
-							mouseEvents.add(new VirtualMouseEvent(mouseButtonPresses.get(i), mouseStates.get(i), scrollWheelDeltas.get(i), mouseX.get(i), mouseY.get(i), slotID.get(i)));
+//							mouseEvents.add(new VirtualMouseEvent(mouseButtonPresses.get(i), mouseStates.get(i), scrollWheelDeltas.get(i), mouseX.get(i), mouseY.get(i), slotID.get(i)));
 						}
 						
 					}else {
