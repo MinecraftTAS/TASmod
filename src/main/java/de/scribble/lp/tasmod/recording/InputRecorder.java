@@ -294,7 +294,7 @@ public class InputRecorder {
 				double normalizedY = PointerNormalizer.getNormalizedY(event.getMouseY());
 				mouseXString = mouseXString.concat(normalizedX + ending);
 				mouseYString = mouseYString.concat(normalizedY + ending);
-				slotString = slotString.concat(event.getSlotidx() + ending);
+//				slotString = slotString.concat(event.getSlotidx() + ending);
 			}
 			/* =====Subticks===== */
 			// Subticks describe camera movement, like rotationPitch, rotationYaw.
