@@ -24,7 +24,7 @@ public class VirtualInput2 {
 	}
 
 	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
-		VirtualKeyboardKey key = nextKeyboard.get(keycode);
+		VirtualKey key = nextKeyboard.get(keycode);
 		key.setPressed(keystate);
 		nextKeyboard.addChar(character);
 	}
@@ -154,19 +154,20 @@ public class VirtualInput2 {
 	}
 
 	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
-		if (!filter) {
-			VirtualMouseButton key = nextMouse.get(keycode-100);
-
-			if (keystate) {
-				key.setTimesPressed(key.getTimesPressed() + 1);
-			}
-			key.setPressed(keystate);
-
-			nextMouse.setScrollWheel(scrollwheel);
-
-			nextMouse.addCursor(cursorX, cursorY);
+		
+		boolean flag=true;
+		if(filter) {
+			flag=nextMouse.isSomethingDown()||scrollwheel!=0||keycode!=-1;
 		}
-
+		VirtualKey key = nextMouse.get(keycode - 100);
+		
+		key.setPressed(keystate);
+		
+		nextMouse.setScrollWheel(scrollwheel);
+		
+		nextMouse.setCursor(cursorX, cursorY);
+		
+		if(flag==true)nextMouse.addPathNode();
 	}
 
 	public List<VirtualMouseEvent> getCurrentMouseEvents() {
@@ -177,6 +178,10 @@ public class VirtualInput2 {
 		currentMouseEvents = getCurrentMouseEvents();
 		currentMouseEventIterator = currentMouseEvents.iterator();
 
+		currentMouseEvents.forEach(action->{
+			System.out.println(action.getKeyCode()+", "+action.isState()+", "+action.getScrollwheel()+", "+action.getMouseX()+", "+action.getMouseY());
+		});
+		
 		resetNextMouseLists();
 
 		try {
@@ -187,11 +192,7 @@ public class VirtualInput2 {
 	}
 
 	public void resetNextMouseLists() {
-		nextMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
-			virtualkeys.resetTimesPressed();
-		});
-		nextMouse.setScrollWheel(0);
-		nextMouse.resetCursor();
+		nextMouse.resetPath();
 	}
 
 	public boolean nextMouseEvent() {
@@ -252,5 +253,10 @@ public class VirtualInput2 {
 		});
 
 		return out;
+	}
+	
+	public void unpressEverything() {
+		clearNextKeyboard();
+		clearNextMouse();
 	}
 }

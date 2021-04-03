@@ -6,18 +6,18 @@ package de.scribble.lp.tasmod.virtual;
  * @author ScribbleLP
  *
  */
-public class VirtualKeyboardKey {
+public class VirtualKey {
 	
 	private String name;
 	private int keycode;
 	private boolean isKeyDown=false;
 	
-	public VirtualKeyboardKey(String name, int keycode) {
+	public VirtualKey(String name, int keycode) {
 		this.name = name;
 		this.keycode = keycode;
 	}
 	
-	private VirtualKeyboardKey(String name, int keycode, boolean isKeyDown) {
+	private VirtualKey(String name, int keycode, boolean isKeyDown) {
 		this.name = name;
 		this.keycode = keycode;
 		this.isKeyDown = isKeyDown;
@@ -41,14 +41,14 @@ public class VirtualKeyboardKey {
 	
 	@Override
 	public boolean equals(Object obj) {
-		VirtualKeyboardKey key = (VirtualKeyboardKey) obj;
+		VirtualKey key = (VirtualKey) obj;
 		if(key.isKeyDown!=isKeyDown) return false;
 		if(key.keycode!=keycode) return false;
 		return true;
 	}
 	
 	@Override
-	public VirtualKeyboardKey clone() {
-		return new VirtualKeyboardKey(name, keycode, isKeyDown);
+	public VirtualKey clone() {
+		return new VirtualKey(name, keycode, isKeyDown);
 	}
 }

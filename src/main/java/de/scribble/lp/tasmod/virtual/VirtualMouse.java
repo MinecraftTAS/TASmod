@@ -11,16 +11,16 @@ import com.google.common.collect.Maps;
 
 public class VirtualMouse {
 
-	private Map<Integer, VirtualMouseButton> keyList = Maps.<Integer, VirtualMouseButton>newHashMap();
+	private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
 
-	private int scrollwheel;
+	private int scrollwheel = 0;
 
-	private List<Integer> cursorX;
+	private int cursorX = 0;
 
-	private List<Integer> cursorY;
+	private int cursorY = 0;
 
-	public VirtualMouse(Map<Integer, VirtualMouseButton> keyListIn, int scrollwheel, List<Integer> cursorX, List<Integer> cursorY) {
-		Map<Integer, VirtualMouseButton> copy = new HashMap<Integer, VirtualMouseButton>();
+	public VirtualMouse(Map<Integer, VirtualKey> keyListIn, int scrollwheel, int cursorX, int cursorY) {
+		Map<Integer, VirtualKey> copy = new HashMap<Integer, VirtualKey>();
 
 		keyListIn.forEach((key, value) -> {
 			copy.put(key, value.clone());
@@ -29,68 +29,58 @@ public class VirtualMouse {
 
 		this.scrollwheel = scrollwheel;
 
-		List<Integer> copyX = new ArrayList<Integer>();
-		
-		List<Integer> copyY = new ArrayList<Integer>();
-		
-		cursorX.forEach(action->{
-			copyX.add(action);
-		});
-		
-		this.cursorX=copyX;
-		
-		cursorY.forEach(action->{
-			copyY.add(action);
-		});
-		
-		this.cursorY=copyY;
-		
+		this.cursorX = cursorX;
+
+		this.cursorY = cursorY;
+
 	}
 
 	/**
 	 * Creates a Keyboard, where the keys are all unpressed
 	 */
 	public VirtualMouse() {
-		scrollwheel=0;
-		
-		cursorX=new ArrayList<Integer>();
-		
-		cursorY=new ArrayList<Integer>();
-		
-		keyList.put(-101, new VirtualMouseButton("MOUSEMOVED", -101));
-		keyList.put(-100, new VirtualMouseButton("LC", -100));
-		keyList.put(-99, new VirtualMouseButton("RC", -99));
-		keyList.put(-98, new VirtualMouseButton("MC", -98));
-		keyList.put(-97, new VirtualMouseButton("MBUTTON3", -97));
-		keyList.put(-96, new VirtualMouseButton("MBUTTON4", -96));
-		keyList.put(-95, new VirtualMouseButton("MBUTTON5", -95));
-		keyList.put(-94, new VirtualMouseButton("MBUTTON6", -94));
-		keyList.put(-93, new VirtualMouseButton("MBUTTON7", -93));
-		keyList.put(-92, new VirtualMouseButton("MBUTTON8", -92));
-		keyList.put(-91, new VirtualMouseButton("MBUTTON9", -91));
-		keyList.put(-90, new VirtualMouseButton("MBUTTON10", -90));
-		keyList.put(-89, new VirtualMouseButton("MBUTTON11", -89));
-		keyList.put(-88, new VirtualMouseButton("MBUTTON12", -88));
-		keyList.put(-87, new VirtualMouseButton("MBUTTON13", -87));
-		keyList.put(-86, new VirtualMouseButton("MBUTTON14", -86));
-		keyList.put(-85, new VirtualMouseButton("MBUTTON15", -85));
+		keyList.put(-101, new VirtualKey("MOUSEMOVED", -101));
+		keyList.put(-100, new VirtualKey("LC", -100));
+		keyList.put(-99, new VirtualKey("RC", -99));
+		keyList.put(-98, new VirtualKey("MC", -98));
+		keyList.put(-97, new VirtualKey("MBUTTON3", -97));
+		keyList.put(-96, new VirtualKey("MBUTTON4", -96));
+		keyList.put(-95, new VirtualKey("MBUTTON5", -95));
+		keyList.put(-94, new VirtualKey("MBUTTON6", -94));
+		keyList.put(-93, new VirtualKey("MBUTTON7", -93));
+		keyList.put(-92, new VirtualKey("MBUTTON8", -92));
+		keyList.put(-91, new VirtualKey("MBUTTON9", -91));
+		keyList.put(-90, new VirtualKey("MBUTTON10", -90));
+		keyList.put(-89, new VirtualKey("MBUTTON11", -89));
+		keyList.put(-88, new VirtualKey("MBUTTON12", -88));
+		keyList.put(-87, new VirtualKey("MBUTTON13", -87));
+		keyList.put(-86, new VirtualKey("MBUTTON14", -86));
+		keyList.put(-85, new VirtualKey("MBUTTON15", -85));
+
+		this.scrollwheel = 0;
+
+		this.cursorX = 0;
+
+		this.cursorY = 0;
+
+		addPathNode();
 	}
 
 	public void add(int keycode) {
 		String keyString = Integer.toString(keycode);
 
-		keyList.put(keycode, new VirtualMouseButton(keyString, keycode));
+		keyList.put(keycode, new VirtualKey(keyString, keycode));
 	}
 
-	public VirtualMouseButton get(int keycode) {
+	public VirtualKey get(int keycode) {
 		return keyList.get(keycode);
 	}
 
-	public VirtualMouseButton get(String keyname) {
-		Collection<VirtualMouseButton> list = keyList.values();
-		VirtualMouseButton out = null;
+	public VirtualKey get(String keyname) {
+		Collection<VirtualKey> list = keyList.values();
+		VirtualKey out = null;
 
-		for (VirtualMouseButton key : list) {
+		for (VirtualKey key : list) {
 			if (key.getName().equalsIgnoreCase(keyname)) {
 				out = key;
 			}
@@ -102,7 +92,7 @@ public class VirtualMouse {
 		List<String> out = new ArrayList<String>();
 
 		keyList.forEach((keycodes, virtualkeys) -> {
-			if (keycodes >= 0) {
+			if (keycodes <= 0) {
 				if (virtualkeys.isKeyDown()) {
 					out.add(virtualkeys.getName());
 				}
@@ -112,23 +102,54 @@ public class VirtualMouse {
 		return out;
 	}
 
-	public Map<Integer, VirtualMouseButton> getKeyList() {
+	public Map<Integer, VirtualKey> getKeyList() {
 		return this.keyList;
 	}
 
 	public List<VirtualMouseEvent> getDifference(VirtualMouse mouseToCompare) {
 		List<VirtualMouseEvent> eventList = new ArrayList<VirtualMouseEvent>();
 
-		Iterator<Integer> cursorXIterator = cursorX.iterator();
+		List<PathNode> path = mouseToCompare.getPath();
 
-		Iterator<Integer> cursorYIterator = cursorY.iterator();
+		if (path.size() != 1) {
+			for (int i = 0; i < path.size() - 1; i++) {
+				PathNode currentNode = path.get(i);
+				PathNode nextNode = path.get(i + 1);
 
-		keyList.forEach((keycodes, virtualkeys) -> {
+				boolean flag=false;
+				
+				for (VirtualKey key : nextNode.keyList.values()) {
+					if(!key.equals(currentNode.keyList.get(key.getKeycode()))) {
+						eventList.add(new VirtualMouseEvent(key.getKeycode(), key.isKeyDown(), nextNode.scrollwheel, nextNode.cursorX, nextNode.cursorY));
+						flag=true;
+						break;
+					}
+				}
+				if(!flag) {
+					eventList.add(new VirtualMouseEvent(-101, false, nextNode.scrollwheel, nextNode.cursorX, nextNode.cursorY));
+				}
 
-			VirtualMouseButton keyToCompare = mouseToCompare.get(keycodes);
-
-		});
+			}
+		}
 		return eventList;
+	}
+
+	public boolean isSomethingDown() {
+		for (VirtualKey key : keyList.values()) {
+			if (key.isKeyDown()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isSomethingDown(Map<Integer, VirtualKey> keyList) {
+		for (VirtualKey key : keyList.values()) {
+			if (key.isKeyDown()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -136,17 +157,77 @@ public class VirtualMouse {
 		return new VirtualMouse(keyList, scrollwheel, cursorX, cursorY);
 	}
 
+	public void setCursor(int x, int y) {
+		cursorX = x;
+		cursorY = y;
+	}
+
 	public void setScrollWheel(int scrollwheel) {
-		this.scrollwheel = this.scrollwheel + scrollwheel;
+		this.scrollwheel = scrollwheel;
 	}
 
-	public void addCursor(int cursorX, int cursorY) {
-		this.cursorX.add(cursorX);
-		this.cursorY.add(cursorY);
+	List<PathNode> path = new ArrayList<PathNode>();
+
+	public List<PathNode> getPath() {
+		return path;
 	}
 
-	public void resetCursor() {
-		cursorX.clear();
-		cursorY.clear();
+	public void addPathNode() {
+		path.add(new PathNode(keyList, scrollwheel, cursorX, cursorY));
 	}
+
+	public void resetPath() {
+		path.clear();
+		addPathNode();
+	}
+
+	class PathNode {
+		private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
+
+		private int scrollwheel = 0;
+
+		private int cursorX = 0;
+
+		private int cursorY = 0;
+
+		public PathNode(Map<Integer, VirtualKey> keyList, int scrollwheel, int cursorX, int cursorY) {
+			Map<Integer, VirtualKey> copy = new HashMap<Integer, VirtualKey>();
+
+			keyList.forEach((key, value) -> {
+				copy.put(key, value.clone());
+			});
+			this.keyList = copy;
+			this.scrollwheel = scrollwheel;
+			this.cursorX = cursorX;
+			this.cursorY = cursorY;
+		}
+
+		public PathNode() {
+			keyList.put(-101, new VirtualKey("MOUSEMOVED", -101));
+			keyList.put(-100, new VirtualKey("LC", -100));
+			keyList.put(-99, new VirtualKey("RC", -99));
+			keyList.put(-98, new VirtualKey("MC", -98));
+			keyList.put(-97, new VirtualKey("MBUTTON3", -97));
+			keyList.put(-96, new VirtualKey("MBUTTON4", -96));
+			keyList.put(-95, new VirtualKey("MBUTTON5", -95));
+			keyList.put(-94, new VirtualKey("MBUTTON6", -94));
+			keyList.put(-93, new VirtualKey("MBUTTON7", -93));
+			keyList.put(-92, new VirtualKey("MBUTTON8", -92));
+			keyList.put(-91, new VirtualKey("MBUTTON9", -91));
+			keyList.put(-90, new VirtualKey("MBUTTON10", -90));
+			keyList.put(-89, new VirtualKey("MBUTTON11", -89));
+			keyList.put(-88, new VirtualKey("MBUTTON12", -88));
+			keyList.put(-87, new VirtualKey("MBUTTON13", -87));
+			keyList.put(-86, new VirtualKey("MBUTTON14", -86));
+			keyList.put(-85, new VirtualKey("MBUTTON15", -85));
+
+			this.scrollwheel = 0;
+
+			this.cursorX = 0;
+
+			this.cursorY = 0;
+		}
+
+	}
+
 }

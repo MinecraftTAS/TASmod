@@ -16,6 +16,8 @@
         "MixinGuiScreen2",
 		"savestates.MixinChunkProviderClient",
 		"MixinFrustum",
-		"MixinTextfield"
+		"MixinTextfield",
+		"MixinNetHandlerPlayClient",
+		"MixinWOrldClient"
 	]
 }
