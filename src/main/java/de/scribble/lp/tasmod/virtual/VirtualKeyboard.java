@@ -251,6 +251,9 @@ public class VirtualKeyboard {
 			}
 			
 		});
+		charIterator.forEachRemaining(action->{
+			eventList.add(new VirtualKeyboardEvent(0, false, action));
+		});
 		
 		return eventList;
 	}
