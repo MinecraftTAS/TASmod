@@ -154,20 +154,21 @@ public class VirtualInput2 {
 	}
 
 	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
-		
-		boolean flag=true;
-		if(filter) {
-			flag=nextMouse.isSomethingDown()||scrollwheel!=0||keycode!=-1;
+
+		boolean flag = true;
+		if (filter) {
+			flag = nextMouse.isSomethingDown() || scrollwheel != 0 || keycode != -1;
 		}
 		VirtualKey key = nextMouse.get(keycode - 100);
-		
+
 		key.setPressed(keystate);
-		
+
 		nextMouse.setScrollWheel(scrollwheel);
-		
+
 		nextMouse.setCursor(cursorX, cursorY);
-		
-		if(flag==true)nextMouse.addPathNode();
+
+		if (flag == true)
+			nextMouse.addPathNode();
 	}
 
 	public List<VirtualMouseEvent> getCurrentMouseEvents() {
@@ -178,10 +179,6 @@ public class VirtualInput2 {
 		currentMouseEvents = getCurrentMouseEvents();
 		currentMouseEventIterator = currentMouseEvents.iterator();
 
-		currentMouseEvents.forEach(action->{
-			System.out.println(action.getKeyCode()+", "+action.isState()+", "+action.getScrollwheel()+", "+action.getMouseX()+", "+action.getMouseY());
-		});
-		
 		resetNextMouseLists();
 
 		try {
@@ -254,7 +251,7 @@ public class VirtualInput2 {
 
 		return out;
 	}
-	
+
 	public void unpressEverything() {
 		clearNextKeyboard();
 		clearNextMouse();
