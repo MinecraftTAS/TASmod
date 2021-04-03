@@ -3,6 +3,8 @@ package de.scribble.lp.tasmod;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
+
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.ticksync.TickSync;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
@@ -49,12 +51,21 @@ public class InfoGui extends Gui {
 
 			if (Display.isActive()) {
 				String out1 = "";
-				for (String mouse : ClientProxy.virtual.getNextKeyboardPresses()) {
+				for (String mouse : ClientProxy.virtual.getCurrentMousePresses()) {
+					out1 = out1.concat(mouse + " ");
+				}
+				out1=out1.concat(""+ChatFormatting.GREEN);
+				for (String mouse : ClientProxy.virtual.getNextMousePresses()) {
 					out1 = out1.concat(mouse + " ");
 				}
 				new Gui().drawString(mc.fontRenderer, out1, 5, height - 20, 0xFFFFFF); // Current Pointer location
+				
 				String out2 = "";
 				for (String key : ClientProxy.virtual.getCurrentKeyboardPresses()) {
+					out2 = out2.concat(key + " ");
+				}
+				out2=out2.concat(""+ChatFormatting.GREEN);
+				for (String key : ClientProxy.virtual.getNextKeyboardPresses()) {
 					out2 = out2.concat(key + " ");
 				}
 				new Gui().drawString(mc.fontRenderer, out2, 5, height - 10, 0xFFFFFF); // Current Pointer location
