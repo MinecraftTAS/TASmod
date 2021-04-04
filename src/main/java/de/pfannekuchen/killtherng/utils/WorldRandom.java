@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import de.pfannekuchen.killtherng.KillTheRng;
+import de.pfannekuchen.killtherng.KillTheRNG;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 /**
@@ -51,7 +51,7 @@ public final class WorldRandom extends Random {
     		update.set(false);
     		updateSeed(((nextLong() * multiplier + addend) & mask)); // Set the seed to the mathematically next seed.
     	}
-    	if (KillTheRng.ISDISABLED) {
+    	if (KillTheRNG.ISDISABLED) {
     		System.err.println("\n\nKillTheRng shouldn't have been enabled!\n\n");
     		FMLCommonHandler.instance().exitJava(-1, true);
     	}

@@ -179,6 +179,10 @@ public class VirtualInput2 {
 		currentMouseEvents = getCurrentMouseEvents();
 		currentMouseEventIterator = currentMouseEvents.iterator();
 
+		currentMouseEvents.forEach(action->{
+			System.out.println(action.toString());
+		});
+		
 		resetNextMouseLists();
 
 		try {
@@ -221,7 +225,7 @@ public class VirtualInput2 {
 	}
 
 	public void clearNextMouse() {
-		nextMouse = new VirtualMouse();
+		nextMouse.clear();
 	}
 
 	public List<String> getCurrentMousePresses() {

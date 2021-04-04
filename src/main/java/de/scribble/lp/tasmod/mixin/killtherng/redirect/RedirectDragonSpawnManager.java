@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import de.pfannekuchen.killtherng.KillTheRng;
+import de.pfannekuchen.killtherng.KillTheRNG;
 import de.pfannekuchen.killtherng.utils.WorldRandom;
 import net.minecraft.world.end.DragonSpawnManager;
 
@@ -15,7 +15,7 @@ public class RedirectDragonSpawnManager {
 
 	@Redirect(method = "Lnet/minecraft/world/end/DragonSpawnManager$SUMMONING_PILLARS;process", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
 	public Random redirectRandom() {
-		return KillTheRng.ISDISABLED ? new Random() : new WorldRandom();
+		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}
 	
 }

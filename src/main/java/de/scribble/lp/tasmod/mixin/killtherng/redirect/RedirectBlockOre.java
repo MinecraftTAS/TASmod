@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import de.pfannekuchen.killtherng.KillTheRng;
+import de.pfannekuchen.killtherng.KillTheRNG;
 import de.pfannekuchen.killtherng.utils.WorldRandom;
 import net.minecraft.block.BlockOre;
 
@@ -15,7 +15,7 @@ public class RedirectBlockOre {
 
 	@Redirect(method = "getExpDrop", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"), remap = false)
 	public Random redirectRandom() {
-		return KillTheRng.ISDISABLED ? new Random() : new WorldRandom();
+		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}
 	
 }

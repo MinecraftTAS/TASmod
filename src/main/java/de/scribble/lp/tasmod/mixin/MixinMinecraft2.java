@@ -128,58 +128,77 @@ public abstract class MixinMinecraft2 {
 	}
 
 	// =====================================================================================================================================
-	
+
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z"))
 	public boolean redirectGetEventState() {
+		return ClientProxy.virtual.getEventKeyboardState();
+	}
+
+	// =====================================================================================================================================
+
+	@Inject(method = "runTickMouse", at = @At(value = "HEAD"))
+	public void injectRunTickMouse(CallbackInfo ci) {
+		System.out.println("Test");
+		ClientProxy.virtual.updateCurrentMouseEvents();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z"))
+	public boolean redirectMouseNext() {
+		return ClientProxy.virtual.nextMouseEvent();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I"))
+	public int redirectMouseGetEventButton() {
+		return ClientProxy.virtual.getEventMouseKey() + 100;
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z"))
+	public boolean redirectGetEventButtonState() {
+		return ClientProxy.virtual.getEventMouseState();
+	}
+
+	// =====================================================================================================================================
+
+	@ModifyConstant(method = "runTickMouse", constant = @Constant(longValue = 200L))
+	public long fixMouseWheel(long twohundredLong) {
+		return (long) Math.max(4000F / TickrateChangerClient.TICKS_PER_SECOND, 200L);
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I"))
+	public int redirectGetEventDWheel() {
+		return ClientProxy.virtual.getEventMouseScrollWheel();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I"))
+	public int redirectGetEventKeyDPK() {
+		return ClientProxy.virtual.getEventKeyboardKey();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C"))
+	public char redirectGetEventCharacterDPK() {
+		return ClientProxy.virtual.getEventKeyboardCharacter();
+	}
+	
+	// =====================================================================================================================================
+	
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z"))
+	public boolean redirectGetEventKeyStateDPK() {
 		return ClientProxy.virtual.getEventKeyboardState();
 	}
 	
 	// =====================================================================================================================================
 	
-	@Inject(method = "runTickMouse", at = @At(value = "HEAD"))
-	public void injectRunTickMouse(CallbackInfo ci) {
-		ClientProxy.virtual.updateCurrentMouseEvents();
-	}
 	
-	// =====================================================================================================================================
-	
-	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z"))
-	public boolean redirectMouseNext() {
-		return ClientProxy.virtual.nextMouseEvent();
-	}
-	
-	// =====================================================================================================================================
-	
-	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I"))
-	public int redirectMouseGetEventButton() {
-		return ClientProxy.virtual.getEventMouseKey()+100;
-	}
-	
-	// =====================================================================================================================================
-	
-	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z"))
-	public boolean redirectGetEventButtonState() {
-		return ClientProxy.virtual.getEventMouseState();
-	}
-	
-	// =====================================================================================================================================
-	
-	@ModifyConstant(method = "runTickMouse", constant = @Constant(longValue = 200L))
-	public long fixMouseWheel(long twohundredLong) {
-		return (long) Math.max(4000F / TickrateChangerClient.TICKS_PER_SECOND, 200L);
-	}
-	
-	// =====================================================================================================================================
-	
-	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I"))
-	public int redirectGetEventDWheel() {
-		return ClientProxy.virtual.getEventMouseScrollWheel();
-	}
-	
-	// =====================================================================================================================================
-	
-	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I"))
-	public int redirectcorrect_method_name() {
-		return ClientProxy.virtual.getEventKeyboardKey();
-	}
 }

@@ -21,9 +21,18 @@ public abstract class MixinMinecraft {
      * Request a Seed Change for every Key Input
      * @param ci Mixin
      */
-	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V"), method = "runTickKeyboard")
+	@Inject(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V"))
 	public void injectRunTickKeyboard(CallbackInfo ci) {
 		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
 	}
 	
+	/**
+	 * Request a seed change on every mouse input
+	 * @author ScribbleLP
+	 * @param ci
+	 */
+	@Inject(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I"))
+	public void injectRunTickMouse(CallbackInfo ci) {
+		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
+	}
 }

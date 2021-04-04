@@ -229,4 +229,11 @@ public class VirtualMouse {
 
 	}
 
+	public void clear() {
+		keyList.forEach((keycode, key) -> {
+			key.setPressed(false);
+		});
+		resetPath();
+	}
+
 }

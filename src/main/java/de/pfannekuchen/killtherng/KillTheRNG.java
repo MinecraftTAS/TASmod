@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
  * This is the Mod for the Forge Loader
  * @author Pancake
  */
-public class KillTheRng {
+public class KillTheRNG {
 	
 	/** Is Mod disabled */
 	public static boolean ISDISABLED;

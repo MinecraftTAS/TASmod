@@ -7,14 +7,14 @@ package de.scribble.lp.tasmod.virtual;
  *
  */
 public class VirtualMouseEvent {
-	private int keyCode;
+	private int keycode;
 	private boolean state;
 	private int scrollwheel;
 	private int mouseX;
 	private int mouseY;
 
 	public VirtualMouseEvent(int keycode, boolean state, int scrollwheel, int mouseX, int mouseY) {
-		this.keyCode = keycode;
+		this.keycode = keycode;
 		this.state = state;
 		this.scrollwheel = scrollwheel;
 		this.mouseX = mouseX;
@@ -22,7 +22,7 @@ public class VirtualMouseEvent {
 	}
 
 	public int getKeyCode() {
-		return keyCode;
+		return keycode;
 	}
 
 	public boolean isState() {
@@ -40,4 +40,10 @@ public class VirtualMouseEvent {
 	public int getMouseY() {
 		return mouseY;
 	}
+	
+	@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return keycode+", "+state+", "+scrollwheel+", "+mouseX+", "+mouseY;
+		}
 }
