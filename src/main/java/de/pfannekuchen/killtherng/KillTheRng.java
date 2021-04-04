@@ -7,7 +7,6 @@ import java.util.Random;
 import de.pfannekuchen.killtherng.utils.EntityRandom;
 import de.pfannekuchen.killtherng.utils.WorldRandom;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
 /**
@@ -26,7 +25,7 @@ public class KillTheRng {
 	 * @author Pancake
 	 * @param event Initialization Event given by Forge
 	 */	
-	public static void init(FMLInitializationEvent event) {
+	public static void init() {
 		/* Override Math.random() and more */
 		changeField("java.lang.Math$RandomNumberGeneratorHolder", "randomNumberGenerator", new EntityRandom(), true);
 		changeField("net.minecraft.inventory.InventoryHelper", FMLLaunchHandler.isDeobfuscatedEnvironment() ? "RANDOM" : "field_180177_a", new EntityRandom(), true);
