@@ -7,8 +7,9 @@ import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -163,7 +164,7 @@ public abstract class MixinMinecraft2 {
 	
 	// =====================================================================================================================================
 	
-	@ModifyVariable(method = "runTickMouse", at = @At(value = "STORE", target = "200L"))
+	@ModifyConstant(method = "runTickMouse", constant = @Constant(longValue = 200L))
 	public long fixMouseWheel(long twohundredLong) {
 		return (long) Math.max(4000F / TickrateChangerClient.TICKS_PER_SECOND, 200L);
 	}
@@ -173,5 +174,12 @@ public abstract class MixinMinecraft2 {
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I"))
 	public int redirectGetEventDWheel() {
 		return ClientProxy.virtual.getEventMouseScrollWheel();
+	}
+	
+	// =====================================================================================================================================
+	
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I"))
+	public int redirectcorrect_method_name() {
+		return ClientProxy.virtual.getEventKeyboardKey();
 	}
 }

@@ -1,7 +1,6 @@
 package de.scribble.lp.tasmod.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -9,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.ClientProxy;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
 @Mixin(GuiScreen.class)
@@ -45,7 +43,7 @@ public class MixinGuiScreen2 {
 
 	// =====================================================================================================================================
 
-	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "getEventState"))
+	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "getEventKeyState"))
 	public boolean redirectGetEventState() {
 		return ClientProxy.virtual.getEventKeyboardState();
 	}
@@ -91,5 +89,5 @@ public class MixinGuiScreen2 {
 	public int redirectGetEventY() {
 		return ClientProxy.virtual.getEventCursorY();
 	}
-
+	
 }
