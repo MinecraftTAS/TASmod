@@ -3,7 +3,6 @@ package de.scribble.lp.tasmod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import akka.actor.Kill;
 import de.pfannekuchen.killtherng.KillTheRng;
 import de.pfannekuchen.killtherng.networking.UpdateSeedPacket;
 import de.pfannekuchen.killtherng.networking.UpdateSeedPacketHandler;
