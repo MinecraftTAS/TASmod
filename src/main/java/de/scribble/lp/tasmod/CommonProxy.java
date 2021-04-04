@@ -3,6 +3,8 @@ package de.scribble.lp.tasmod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.pfannekuchen.killtherng.networking.UpdateSeedPacket;
+import de.pfannekuchen.killtherng.networking.UpdateSeedPacketHandler;
 import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
@@ -44,6 +46,7 @@ public class CommonProxy {
 		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(UpdateSeedPacketHandler.class, UpdateSeedPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(RecordingSavestatePacketHandler.class, RecordingSavestatePacket.class, i++, Side.CLIENT);
 		
 	}

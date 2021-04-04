@@ -11,6 +11,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.Display;
 
+import de.pfannekuchen.killtherng.utils.EntityRandom;
+import de.pfannekuchen.killtherng.utils.ItemRandom;
+import de.pfannekuchen.killtherng.utils.WorldRandom;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
@@ -84,6 +87,7 @@ public class InputPlayback {
 		String wholeLine="";
 		int linecounter=0;
 		//Read the lines until the line is null
+		WorldRandom.updateSeed(0L);
 		while((wholeLine=buff.readLine()) != null) {
 			linecounter++;
 			if(wholeLine.startsWith("###########################################################################################################")) {
@@ -91,6 +95,12 @@ public class InputPlayback {
 			}
 			if(wholeLine.startsWith("#StartLocation:")) {
 				tpPlayer(wholeLine, linecounter);
+			}
+			if(wholeLine.startsWith("#Entity Seed:")) {
+				EntityRandom.currentSeed.set(Long.parseLong(wholeLine.split(":")[1].replaceFirst("\n", "")));
+			}
+			if(wholeLine.startsWith("#Item Seed:")) {
+				ItemRandom.currentSeed.set(Long.parseLong(wholeLine.split(":")[1].replaceFirst("\n", "")));
 			}
 		}
 		buff.close();

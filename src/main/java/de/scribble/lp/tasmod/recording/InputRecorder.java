@@ -14,6 +14,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.Display;
 
+import de.pfannekuchen.killtherng.utils.EntityRandom;
+import de.pfannekuchen.killtherng.utils.ItemRandom;
+import de.pfannekuchen.killtherng.utils.WorldRandom;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
@@ -204,6 +207,7 @@ public class InputRecorder {
 	}
 	
 	private static void addHeader() {
+		WorldRandom.updateSeed(0L);
 		fileThread.addLine("################################################# TASFile ###################################################\n"
 						 + "#							This file was generated using the Minecraft TASMod								#\n"
 						 + "#																											#\n"
@@ -216,6 +220,10 @@ public class InputRecorder {
 						 + "#StartLocation:" + getStartLocation() + ",\n"
 						 + "#																											#\n"
 						 + "#Resolution:" + mc.displayWidth + "x" + mc.displayHeight + "\n"
+						 + "#																											#\n"
+						 + "#Entity Seed:" + EntityRandom.currentSeed.get() + "\n"
+						 + "#																											#\n"
+						 + "#Item Seed:" + ItemRandom.currentSeed.get() + "\n"
 						 + "#																											#\n"
 						 + "#############################################################################################################\n");
 	}
