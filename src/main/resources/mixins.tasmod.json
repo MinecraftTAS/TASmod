@@ -8,7 +8,27 @@
         "MixinMinecraftServer",
         "savestates.MixinChunkProviderServer",
         "savestates.MixinEntityPlayerMP",
-        "MixinDragonFightManager"
+        "MixinDragonFightManager",
+        "killtherng.MixinUUIDFix",
+        "killtherng.redirect.RedirectBlockCrops",
+    	"killtherng.redirect.RedirectBlockDispenser",
+    	"killtherng.redirect.RedirectBlockLeaves",
+    	"killtherng.redirect.RedirectBlockNetherWart",
+    	"killtherng.redirect.RedirectBlockOre",
+    	"killtherng.redirect.RedirectCommandSpreadPlayers",
+    	"killtherng.redirect.RedirectCommandWeather",
+    	"killtherng.redirect.RedirectContainerEnchantment",
+    	"killtherng.redirect.RedirectEntityRandom",
+    	"killtherng.redirect.RedirectEntityMinecartContainer",
+    	"killtherng.redirect.RedirectEntityLivingRandom",
+    	"killtherng.redirect.RedirectTeleportToTeam",
+    	"killtherng.redirect.RedirectTileEntityLockableLoot",
+    	"killtherng.redirect.RedirectDragonFightManager",
+    	"killtherng.redirect.RedirectMapGenStronghold",
+    	"killtherng.redirect.RedirectMapGenStructure",
+    	"killtherng.redirect.RedirectExplosion",
+    	"killtherng.redirect.RedirectWorld",
+    	"killtherng.redirect.RedirectDragonSpawnManager"
     ],
     "client": [
         "MixinMinecraft2",
@@ -18,6 +38,8 @@
 		"MixinFrustum",
 		"MixinTextfield",
 		"MixinNetHandlerPlayClient",
-		"MixinWOrldClient"
+		"MixinWOrldClient",
+		"killtherng.MixinMainMenu",
+		"killtherng.MixinMinecraft"
 	]
 }
