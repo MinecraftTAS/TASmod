@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import de.pfannekuchen.killtherng.KillTheRng;
+import de.pfannekuchen.killtherng.KillTheRNG;
 import de.pfannekuchen.killtherng.utils.WorldRandom;
 import net.minecraft.world.World;
 
@@ -21,7 +21,7 @@ public class RedirectWorld {
 	
 	@Inject(at = @At("RETURN"), method = "<init>")
 	public void redirectRandom(CallbackInfo ci) {
-		if (!KillTheRng.ISDISABLED) rand = new WorldRandom();
+		if (!KillTheRNG.ISDISABLED) rand = new WorldRandom();
 	}
 	
 }

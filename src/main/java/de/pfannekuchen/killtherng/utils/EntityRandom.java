@@ -3,7 +3,7 @@ package de.pfannekuchen.killtherng.utils;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
-import de.pfannekuchen.killtherng.KillTheRng;
+import de.pfannekuchen.killtherng.KillTheRNG;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 /**
@@ -29,7 +29,7 @@ public final class EntityRandom extends Random {
      */
     @Override
     protected int next(int bits) {
-    	if (KillTheRng.ISDISABLED) {
+    	if (KillTheRNG.ISDISABLED) {
     		System.err.println("\n\nKillTheRng shouldn't have been enabled!\n\n");
     		FMLCommonHandler.instance().exitJava(-1, true);
     	}

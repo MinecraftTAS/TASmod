@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import de.pfannekuchen.killtherng.KillTheRng;
+import de.pfannekuchen.killtherng.KillTheRNG;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 
@@ -27,7 +27,7 @@ public class MixinUUIDFix {
 	 */
 	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;getRandomUUID(Ljava/util/Random;)Ljava/util/UUID;"))
 	public UUID redirectRandom(Random rng) {
-		return KillTheRng.ISDISABLED ? MathHelper.getRandomUUID(rng) : UUID.randomUUID();
+		return KillTheRNG.ISDISABLED ? MathHelper.getRandomUUID(rng) : UUID.randomUUID();
 	}
 	
 }

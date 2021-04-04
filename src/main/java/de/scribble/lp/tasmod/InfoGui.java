@@ -5,6 +5,8 @@ import org.lwjgl.opengl.Display;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 
+import de.pfannekuchen.killtherng.utils.EntityRandom;
+import de.pfannekuchen.killtherng.utils.ItemRandom;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.ticksync.TickSync;
 import net.minecraft.client.Minecraft;
@@ -47,6 +49,9 @@ public class InfoGui extends Gui {
 
 			new Gui().drawString(mc.fontRenderer, "Server Ticks: " + TickSync.getServertickcounter(), 16, 100, 0xFFFFFF); // Current Pointer location
 			new Gui().drawString(mc.fontRenderer, "Client Ticks: " + TickSync.getClienttickcounter(), 16, 110, 0xFFFFFF); // Current Pointer location
+			
+			new Gui().drawString(mc.fontRenderer, "EntitySeed: "+ EntityRandom.currentSeed, 16, 130, 0xFFFFFF); // Current Pointer location
+			new Gui().drawString(mc.fontRenderer, "ItemSeed: "+ ItemRandom.currentSeed, 16, 140, 0xFFFFFF); // Current Pointer location
 
 			if (Display.isActive()) {
 				String out1 = "";

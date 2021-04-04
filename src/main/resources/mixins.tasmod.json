@@ -5,10 +5,18 @@
     "refmap": "mixins.tasmod.refmap.json",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
+    
+        //General
         "MixinMinecraftServer",
+        
+        //Savestates
         "savestates.MixinChunkProviderServer",
         "savestates.MixinEntityPlayerMP",
+        
+        //Fixing forge stuff
         "MixinDragonFightManager",
+        
+        //KillTheRNG
         "killtherng.MixinUUIDFix",
         "killtherng.redirect.RedirectBlockCrops",
     	"killtherng.redirect.RedirectBlockDispenser",
@@ -31,15 +39,38 @@
     	"killtherng.redirect.RedirectDragonSpawnManager"
     ],
     "client": [
+        //General
         "MixinMinecraft2",
         "MixinEntityRenderer",
         "MixinGuiScreen2",
+        
+        //Savestates
 		"savestates.MixinChunkProviderClient",
+		
+		//Interpolation
 		"MixinFrustum",
+		
+		//Keybinding
 		"MixinTextfield",
+		
+		//Join and leave game event on the client
 		"MixinNetHandlerPlayClient",
-		"MixinWOrldClient",
+		"MixinWorldClient",
+		
+		//KillTheRNG
 		"killtherng.MixinMainMenu",
-		"killtherng.MixinMinecraft"
+		"killtherng.MixinMinecraft",
+		
+		//Playbackhooks
+		"playbackhooks.MixinGameSettings",
+		"playbackhooks.MixinGuiChat",
+		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",
+		"playbackhooks.MixinGuiContainer",
+		"playbackhooks.MixinGuiContainerCreative",
+		"playbackhooks.MixinGuiMainMenu",
+		"playbackhooks.MixinGuiScreenAdvancements",
+		"playbackhooks.MixinGuiSlot",
+		"playbackhooks.MixinGuiStats",
+		"playbackhooks.MixinKeyBinding"
 	]
 }

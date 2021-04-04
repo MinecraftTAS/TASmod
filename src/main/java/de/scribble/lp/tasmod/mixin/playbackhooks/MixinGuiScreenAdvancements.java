@@ -4,13 +4,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import de.scribble.lp.tasmod.virtual.VirtualInput;
+import de.scribble.lp.tasmod.ClientProxy;
 import net.minecraft.client.gui.advancements.GuiScreenAdvancements;
 
 @Mixin(GuiScreenAdvancements.class)
 public class MixinGuiScreenAdvancements {
 	@Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;isButtonDown(I)Z", remap = false))
 	public boolean redirectIsButtonDown() {
-		return VirtualInput.isKeyDown(-100);
+		return ClientProxy.virtual.isKeyDown(-100);
 	}
 }
