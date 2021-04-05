@@ -41,8 +41,8 @@
     "client": [
         //General
         "MixinMinecraft2",
-        "MixinEntityRenderer",
         "MixinGuiScreen2",
+        "MixinMouseHelper",
         
         //Savestates
 		"savestates.MixinChunkProviderClient",

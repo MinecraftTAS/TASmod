@@ -27,7 +27,7 @@ public class VirtualInput {
 	
 	private static List<Character> charsListOut= new ArrayList<Character>();
 	
-	private static VirtualSubticks subtick;
+	private static VirtualSubtickEvent subtick;
 	
 	private static int timeSinceLastTick=0;
 	
@@ -233,31 +233,31 @@ public class VirtualInput {
 		return timeSinceLastTick;
 	}
 	
-	public static void fillSubtick(int tick, float pitch, float yaw) {
-		if(!InputPlayback.isPlayingback()) {
-			subtick=new VirtualSubticks(tick, pitch, yaw);
-		}
-	}
+//	public static void fillSubtick(int tick, float pitch, float yaw) {
+//		if(!InputPlayback.isPlayingback()) {
+//			subtick=new VirtualSubtickEvent(tick, pitch, yaw);
+//		}
+//	}
+//	
+//	public static void fillSubtickWithPlayback() {
+//		if(InputPlayback.isPlayingback()) {
+//			subtick=InputPlayback.getCurrentSubtick();
+//		}
+//	}
+//	
+//	public static int getSubtickTick() {
+//		return subtick.getTick();
+//	}
+//	
+//	public static float getSubtickPitch() {
+//		return subtick.getPitch();
+//	}
+//	
+//	public static float getSubtickYaw() {
+//		return subtick.getYaw();
+//	}
 	
-	public static void fillSubtickWithPlayback() {
-		if(InputPlayback.isPlayingback()) {
-			subtick=InputPlayback.getCurrentSubtick();
-		}
-	}
-	
-	public static int getSubtickTick() {
-		return subtick.getTick();
-	}
-	
-	public static float getSubtickPitch() {
-		return subtick.getPitch();
-	}
-	
-	public static float getSubtickYaw() {
-		return subtick.getYaw();
-	}
-	
-	public static VirtualSubticks getSubtick() {
+	public static VirtualSubtickEvent getSubtick() {
 		return subtick;
 	}
 	

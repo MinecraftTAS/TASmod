@@ -24,7 +24,7 @@ import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
-import de.scribble.lp.tasmod.virtual.VirtualSubticks;
+import de.scribble.lp.tasmod.virtual.VirtualSubtickEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
 
@@ -309,9 +309,9 @@ public class InputRecorder {
 			// This is normally dependant on the framerate hence the name subticks.
 			// Before, this was seperated from the ticks
 
-			VirtualSubticks subtick = VirtualInput.getSubtick();
-			String pitch = Float.toString(subtick.getPitch());
-			String yaw = Float.toString(subtick.getYaw());
+			VirtualSubtickEvent subtick = VirtualInput.getSubtick();
+//			String pitch = Float.toString(subtick.getPitch());
+//			String yaw = Float.toString(subtick.getYaw());
 
 			/* =====Special rules===== */
 			mouseString = mouseString.replace("MOUSEMOVED", " "); // The standard event for moving the mouse is set to blank here. Since the mouse is moved VERY often, this clutters the whole file
@@ -345,9 +345,9 @@ public class InputRecorder {
 
 					+ (mouseXString.isEmpty() ? "" : "MouseX/Y:") + mouseXString + ";" + mouseYString + "|" // MouseCoords
 
-					+ (pitch.isEmpty() ? "" : "Pitch:") + pitch + "|" // Pitch
-
-					+ (yaw.isEmpty() ? "" : "Yaw:") + yaw + "|" // Yaw
+//					+ (pitch.isEmpty() ? "" : "Pitch:") + pitch + "|" // Pitch
+//
+//					+ (yaw.isEmpty() ? "" : "Yaw:") + yaw + "|" // Yaw
 
 					+ (slotString.isEmpty() ? "" : "SlotID:") + slotString + "\n"); // SlotID (Unused)
 		}
