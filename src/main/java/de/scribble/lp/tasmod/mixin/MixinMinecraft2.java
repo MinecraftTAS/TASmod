@@ -50,7 +50,6 @@ public abstract class MixinMinecraft2 {
 		while (Mouse.next()) {
 			ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), false);
 		}
-		ClientProxy.virtual.updateNextSubtick(Mouse.getDX(), Mouse.getDY());
 	}
 
 	// =====================================================================================================================================
@@ -68,7 +67,7 @@ public abstract class MixinMinecraft2 {
 	public void redirectRunTick(Minecraft mc) {
 		for (int j2 = 0; j2 < TickSync.getTickAmount((Minecraft) (Object) this); j2++) {
 			if (TickrateChangerClient.TICKS_PER_SECOND != 0) {
-//				((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
+				((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 			}
 			this.runTick();
 		}
@@ -87,7 +86,6 @@ public abstract class MixinMinecraft2 {
 	public void injectRunTick(CallbackInfo ci) throws IOException {
 		TickSync.incrementClienttickcounter();
 
-		ClientProxy.virtual.updateCurrentSubtick();
 		if (SavestatePlayerLoading.wasLoading) {
 			SavestatePlayerLoading.wasLoading = false;
 			SavestateHandler.playerLoadSavestateEventClient();
@@ -191,18 +189,15 @@ public abstract class MixinMinecraft2 {
 	public char redirectGetEventCharacterDPK() {
 		return ClientProxy.virtual.getEventKeyboardCharacter();
 	}
-
+	
 	// =====================================================================================================================================
-
+	
 	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z"))
 	public boolean redirectGetEventKeyStateDPK() {
 		return ClientProxy.virtual.getEventKeyboardState();
 	}
-
+	
 	// =====================================================================================================================================
-
-	@Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/EntityRenderer;updateCameraAndRender(FJ)V"))
-	public void injectUpdateCameraAndRender(CallbackInfo ci) {
-		ClientProxy.virtual.nextSubtick();
-	}
+	
+	
 }
