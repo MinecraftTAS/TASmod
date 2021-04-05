@@ -138,7 +138,6 @@ public abstract class MixinMinecraft2 {
 
 	@Inject(method = "runTickMouse", at = @At(value = "HEAD"))
 	public void injectRunTickMouse(CallbackInfo ci) {
-		System.out.println("Test");
 		ClientProxy.virtual.updateCurrentMouseEvents();
 	}
 

@@ -43,7 +43,6 @@ public class VirtualMouseEvent {
 	
 	@Override
 		public String toString() {
-			// TODO Auto-generated method stub
 			return keycode+", "+state+", "+scrollwheel+", "+mouseX+", "+mouseY;
 		}
 }
