@@ -21,7 +21,7 @@ import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
-import de.scribble.lp.tasmod.virtual.VirtualSubticks;
+import de.scribble.lp.tasmod.virtual.VirtualSubtickEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -42,7 +42,7 @@ public class InputPlayback {
 	private static boolean pausePlayback;
 	private static List<TickFrame> inputList=new ArrayList<TickFrame>();
 	
-	private static List<VirtualSubticks> subtickList= new ArrayList<VirtualSubticks>();
+	private static List<VirtualSubtickEvent> subtickList= new ArrayList<VirtualSubtickEvent>();
 	public static int subtickPlaybackindex=-1;
 	
 	public static void startPlayback(File file, String filename) {
@@ -133,7 +133,7 @@ public class InputPlayback {
 			}
 			playingback=false;
 			inputList=new ArrayList<TickFrame>();
-			subtickList=new ArrayList<VirtualSubticks>();
+			subtickList=new ArrayList<VirtualSubtickEvent>();
 			VirtualInput.unpressEverything();
 			mc.player.sendMessage(new TextComponentString("Playback finished"));
 //			RandomLogger.stopRandomLogging();
@@ -255,7 +255,7 @@ public class InputPlayback {
 					}
 					//Adding every keyboard an mouse event from the current tick into yet another list that contains every input from every tick 
 					inputList.add(new TickFrame(tick, keyboardEvents, mouseEvents));
-					subtickList.add(new VirtualSubticks(tick, pitch, yaw));
+//					subtickList.add(new VirtualSubtickEvent(tick, pitch, yaw));
 				}
 			}
 			buff.close();
@@ -545,10 +545,10 @@ public class InputPlayback {
 		}
 		return y;
 	}
-	public static List<VirtualSubticks> getSubtickList(){
+	public static List<VirtualSubtickEvent> getSubtickList(){
 		return subtickList;
 	}
-	public static VirtualSubticks getCurrentSubtick() {
+	public static VirtualSubtickEvent getCurrentSubtick() {
 		return subtickList.get(subtickPlaybackindex);
 	}
 }

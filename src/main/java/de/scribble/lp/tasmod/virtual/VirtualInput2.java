@@ -179,11 +179,11 @@ public class VirtualInput2 {
 		currentMouseEvents = getCurrentMouseEvents();
 		currentMouseEventIterator = currentMouseEvents.iterator();
 
-		//Prints the mouse events given to the keybindings... very useful
+		// Prints the mouse events given to the keybindings... very useful
 //		currentMouseEvents.forEach(action->{
 //			System.out.println(action.toString());
 //		});
-		
+
 		resetNextMouseLists();
 
 		try {
@@ -260,5 +260,58 @@ public class VirtualInput2 {
 	public void unpressEverything() {
 		clearNextKeyboard();
 		clearNextMouse();
+	}
+
+	// =======================================================================================
+
+	private VirtualSubtick currentSubtick = new VirtualSubtick();
+
+	private VirtualSubtick nextSubtick = new VirtualSubtick();
+
+	private List<VirtualSubtickEvent> currentSubtickEvents = null;
+	private Iterator<VirtualSubtickEvent> currentSubtickEventIterator = null;
+
+	private VirtualSubtickEvent currentSubtickEvent = null;
+
+	public void updateNextSubtick(int pitchDelta, int yawDelta) {
+		System.out.println(pitchDelta+", "+yawDelta);
+		nextSubtick.set(pitchDelta, yawDelta);
+	}
+
+	public List<VirtualSubtickEvent> getCurrentSubtickEvents() {
+		return currentSubtick.getDifference(nextSubtick);
+	}
+
+	public void updateCurrentSubtick() {
+		currentSubtickEvents = getCurrentSubtickEvents();
+		if(currentSubtickEvents.isEmpty()) {
+			currentSubtickEvents.add(new VirtualSubtickEvent(0, 0));
+		}
+		currentSubtickEventIterator = currentSubtickEvents.iterator();
+
+		currentSubtickEvents.forEach(action->{
+			System.out.println(action);
+		});
+		try {
+			currentSubtick = nextSubtick.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public boolean nextSubtick() {
+		boolean hasnext = currentSubtickEventIterator.hasNext();
+		if (hasnext) {
+			currentSubtickEvent = currentSubtickEventIterator.next();
+		}
+		return hasnext;
+	}
+
+	public int getDeltaX() {
+		return currentSubtickEvent.getPitchDelta();
+	}
+
+	public int getDeltaY() {
+		return currentSubtickEvent.getYawDelta();
 	}
 }

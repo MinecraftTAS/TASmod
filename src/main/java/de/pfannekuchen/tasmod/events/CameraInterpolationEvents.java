@@ -8,7 +8,6 @@ public class CameraInterpolationEvents {
 	public static float rotationPitch = 0f;
 	public static float rotationYaw = 0f;
 	
-	@SubscribeEvent
 	public void inter(CameraSetup ev) {
 		ev.setPitch(rotationPitch);
 		ev.setYaw(rotationYaw);
