@@ -179,9 +179,10 @@ public class VirtualInput2 {
 		currentMouseEvents = getCurrentMouseEvents();
 		currentMouseEventIterator = currentMouseEvents.iterator();
 
-		currentMouseEvents.forEach(action->{
-			System.out.println(action.toString());
-		});
+		//Prints the mouse events given to the keybindings... very useful
+//		currentMouseEvents.forEach(action->{
+//			System.out.println(action.toString());
+//		});
 		
 		resetNextMouseLists();
 

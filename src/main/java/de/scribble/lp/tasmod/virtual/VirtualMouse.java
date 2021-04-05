@@ -115,20 +115,30 @@ public class VirtualMouse {
 				PathNode currentNode = path.get(i);
 				PathNode nextNode = path.get(i + 1);
 
-				boolean flag=false;
-				
+				boolean flag = false;
+
 				for (VirtualKey key : nextNode.keyList.values()) {
-					if(!key.equals(currentNode.keyList.get(key.getKeycode()))) {
+					if (!key.equals(currentNode.keyList.get(key.getKeycode()))) {
 						eventList.add(new VirtualMouseEvent(key.getKeycode(), key.isKeyDown(), nextNode.scrollwheel, nextNode.cursorX, nextNode.cursorY));
-						flag=true;
+						flag = true;
 						break;
 					}
 				}
-				if(!flag) {
+				if (!flag) {
 					eventList.add(new VirtualMouseEvent(-101, false, nextNode.scrollwheel, nextNode.cursorX, nextNode.cursorY));
 				}
 
 			}
+		} else {
+			keyList.forEach((keycodes, virtualkeys) -> {
+
+				VirtualKey keyToCompare = mouseToCompare.get(keycodes);
+
+				if (!virtualkeys.equals(keyToCompare)) {
+					eventList.add(new VirtualMouseEvent(keycodes, keyToCompare.isKeyDown(), scrollwheel, cursorX, cursorY));
+				}
+
+			});
 		}
 		return eventList;
 	}
