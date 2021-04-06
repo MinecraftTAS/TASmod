@@ -56,6 +56,7 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
 	
 	@Inject(method = "updateCameraAndRender", at = @At("HEAD"), cancellable = true)
 	public void injectUpdateCameraAndRenderer(float partialTicks, long nanoTime, CallbackInfo ci) {
+		
 		boolean flag = Display.isActive();
 
         if (!flag && this.mc.gameSettings.pauseOnLostFocus && (!this.mc.gameSettings.touchscreen || !Mouse.isButtonDown(1)))
@@ -71,20 +72,18 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
         }
 
         this.mc.mcProfiler.startSection("mouse");
-
-        if (flag && Minecraft.IS_RUNNING_ON_MAC && this.mc.inGameHasFocus && !Mouse.isInsideWindow())
-        {
-            Mouse.setGrabbed(false);
-            Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2 - 20);
-            Mouse.setGrabbed(true);
-        }
+        
+        //Calculate sensitivity
         float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
         float f1 = f * f * f * 8.0F;
+        
+        //No Gui
         if (this.mc.currentScreen == null) {
             mc.mouseHelper.mouseXYChange();
             dX += mc.mouseHelper.deltaX;
             dY += mc.mouseHelper.deltaY;
         } else {
+        //In the gui
         	dX = 0;
         	dY = 0;
         }
@@ -98,6 +97,14 @@ public abstract class MixinEntityRenderer implements SubtickDuck{
             	CameraInterpolationEvents.rotationPitch = MathHelper.clamp(CameraInterpolationEvents.rotationPitch, -90.0F, 90.0F);
         	}
         }
+        
+        if (flag && Minecraft.IS_RUNNING_ON_MAC && this.mc.inGameHasFocus && !Mouse.isInsideWindow())
+        {
+            Mouse.setGrabbed(false);
+            Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2 - 20);
+            Mouse.setGrabbed(true);
+        }
+        
         if(TickrateChangerClient.TICKS_PER_SECOND==0) {
 	        if (this.mc.inGameHasFocus && flag)
 	        {

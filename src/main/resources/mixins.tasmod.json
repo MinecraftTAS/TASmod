@@ -41,7 +41,7 @@
     "client": [
         //General
         "MixinMinecraft2",
-        "MixinEntityRenderer",
+        "MixinEntityRenderer2",
         "MixinGuiScreen2",
         
         //Savestates
