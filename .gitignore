@@ -21,6 +21,3 @@ build
 eclipse
 run
 logs/
-
-# Contains password :(
-gradle.properties
