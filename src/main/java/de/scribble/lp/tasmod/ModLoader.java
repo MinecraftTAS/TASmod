@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -25,7 +26,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
  * @author ScribbleLP
  *
  */
-@Mod(modid = "tasmod", name = "Tool-Assisted Speedrun Mod", version =ModLoader.VERSION)
+@Mod(modid = "tasmod", name = "Tool-Assisted Speedrun Mod", version =ModLoader.VERSION, certificateFingerprint = "98C4CE4BA6CA7A1DECCD8131F091B8859A30417E")
 public class ModLoader {
 	@Instance
 	public static ModLoader instance = new ModLoader();
@@ -39,7 +40,6 @@ public class ModLoader {
 	private static MinecraftServer serverInstance;
 	
 	public static final Logger logger= LogManager.getFormatterLogger("TASMod");
-	
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent ev) throws Exception {
