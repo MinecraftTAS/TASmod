@@ -13,7 +13,7 @@ import net.minecraft.block.BlockOre;
 @Mixin(BlockOre.class)
 public class RedirectBlockOre {
 
-	@Redirect(method = "getExpDrop", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"), remap = false)
+	@Redirect(method = "getExpDrop", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}
