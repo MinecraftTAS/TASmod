@@ -10,8 +10,8 @@ public class VirtualInput2 {
 
 	private VirtualKeyboard nextKeyboard = new VirtualKeyboard();
 
-	private List<VirtualKeyboardEvent> currentKeyboardEvents = new ArrayList<VirtualKeyboardEvent>();
-	private Iterator<VirtualKeyboardEvent> currentKeyboardEventIterator = currentKeyboardEvents.iterator();
+	private List<VirtualKeyboardEvent> currentKeyboardEvents = null;
+	private Iterator<VirtualKeyboardEvent> currentKeyboardEventIterator = null;
 
 	private VirtualKeyboardEvent currentKeyboardEvent = null;
 
@@ -24,6 +24,9 @@ public class VirtualInput2 {
 	}
 
 	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
+		
+		System.out.println(keycode+" "+keystate+" "+character);
+		
 		VirtualKey key = nextKeyboard.get(keycode);
 		key.setPressed(keystate);
 		nextKeyboard.addChar(character);
@@ -37,6 +40,10 @@ public class VirtualInput2 {
 		currentKeyboardEvents = getCurrentKeyboardEvents();
 		currentKeyboardEventIterator = currentKeyboardEvents.iterator();
 
+		currentKeyboardEvents.forEach(action->{
+			System.out.println(action.toString());
+		});
+		
 		nextKeyboard.clearCharList();
 
 		try {
@@ -140,8 +147,8 @@ public class VirtualInput2 {
 
 	private VirtualMouse nextMouse = new VirtualMouse();
 
-	private List<VirtualMouseEvent> currentMouseEvents = new ArrayList<VirtualMouseEvent>();
-	private Iterator<VirtualMouseEvent> currentMouseEventIterator = currentMouseEvents.iterator();
+	private List<VirtualMouseEvent> currentMouseEvents = null;
+	private Iterator<VirtualMouseEvent> currentMouseEventIterator = null;
 
 	private VirtualMouseEvent currentMouseEvent = null;
 
@@ -179,11 +186,11 @@ public class VirtualInput2 {
 		currentMouseEvents = getCurrentMouseEvents();
 		currentMouseEventIterator = currentMouseEvents.iterator();
 
-		//Prints the mouse events given to the keybindings... very useful
+		// Prints the mouse events given to the keybindings... very useful
 //		currentMouseEvents.forEach(action->{
 //			System.out.println(action.toString());
 //		});
-		
+
 		resetNextMouseLists();
 
 		try {
@@ -260,5 +267,21 @@ public class VirtualInput2 {
 	public void unpressEverything() {
 		clearNextKeyboard();
 		clearNextMouse();
+	}
+	
+	// =======================================================================================
+	
+	VirtualSubticks currentSubtick= new VirtualSubticks(0, 0);
+	
+	public void updateSubtick(float pitch, float yaw) {
+		currentSubtick=new VirtualSubticks(pitch, yaw);
+	}
+	
+	public float getSubtickPitch() {
+		return currentSubtick.getPitch();
+	}
+	
+	public float getSubtickYaw() {
+		return currentSubtick.getYaw();
 	}
 }

@@ -233,11 +233,11 @@ public class VirtualInput {
 		return timeSinceLastTick;
 	}
 	
-	public static void fillSubtick(int tick, float pitch, float yaw) {
-		if(!InputPlayback.isPlayingback()) {
-			subtick=new VirtualSubticks(tick, pitch, yaw);
-		}
-	}
+//	public static void fillSubtick(int tick, float pitch, float yaw) {
+//		if(!InputPlayback.isPlayingback()) {
+//			subtick=new VirtualSubticks(tick, pitch, yaw);
+//		}
+//	}
 	
 	public static void fillSubtickWithPlayback() {
 		if(InputPlayback.isPlayingback()) {
@@ -245,9 +245,9 @@ public class VirtualInput {
 		}
 	}
 	
-	public static int getSubtickTick() {
-		return subtick.getTick();
-	}
+//	public static int getSubtickTick() {
+//		return subtick.getTick();
+//	}
 	
 	public static float getSubtickPitch() {
 		return subtick.getPitch();

@@ -111,49 +111,49 @@ public abstract class MixinMinecraft2 {
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
-	private int redirectKeyboardGetEventKey() {
+	public int redirectKeyboardGetEventKey() {
 		return ClientProxy.virtual.getEventKeyboardKey();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
-	private char redirectKeyboardGetEventCharacter() {
+	public char redirectKeyboardGetEventCharacter() {
 		return ClientProxy.virtual.getEventKeyboardCharacter();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
-	private boolean redirectIsKeyDown(int keyCode) {
+	public boolean redirectIsKeyDown(int keyCode) {
 		return ClientProxy.virtual.isKeyDown(keyCode);
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
-	private boolean redirectGetEventState() {
+	public boolean redirectGetEventState() {
 		return ClientProxy.virtual.getEventKeyboardState();
 	}
 
 	// =====================================================================================================================================
 
 	@Inject(method = "runTickMouse", at = @At(value = "HEAD"))
-	private void injectRunTickMouse(CallbackInfo ci) {
+	public void injectRunTickMouse(CallbackInfo ci) {
 		ClientProxy.virtual.updateCurrentMouseEvents();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z", remap = false))
-	private boolean redirectMouseNext() {
+	public boolean redirectMouseNext() {
 		return ClientProxy.virtual.nextMouseEvent();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
-	private int redirectMouseGetEventButton() {
+	public int redirectMouseGetEventButton() {
 		return ClientProxy.virtual.getEventMouseKey() + 100;
 	}
 
@@ -207,18 +207,11 @@ public abstract class MixinMinecraft2 {
      */
 	@Inject(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V"))
 	public void injectRunTickKeyboard2(CallbackInfo ci) {
-		System.out.println("Heck");
 		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
 	}
 	
-	/**
-	 * Request a seed change on every mouse input
-	 * @author ScribbleLP
-	 * @param ci
-	 */
-	@Inject(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
+	@Inject(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton"))
 	public void injectRunTickMouse2(CallbackInfo ci) {
 		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
 	}
-	
 }
