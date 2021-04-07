@@ -255,7 +255,7 @@ public class InputPlayback {
 					}
 					//Adding every keyboard an mouse event from the current tick into yet another list that contains every input from every tick 
 					inputList.add(new TickFrame(tick, keyboardEvents, mouseEvents));
-					subtickList.add(new VirtualSubticks(tick, pitch, yaw));
+//					subtickList.add(new VirtualSubticks(tick, pitch, yaw));
 				}
 			}
 			buff.close();

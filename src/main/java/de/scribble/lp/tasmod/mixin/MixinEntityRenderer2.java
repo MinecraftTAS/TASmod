@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -121,11 +122,9 @@ public class MixinEntityRenderer2 implements SubtickDuck{
                 smoothCamPitch = 0.0F;
                 mc.player.turn(f2, f3 * (float)i);
             }
-            InputPlayback.nextPlaybackSubtick();
-            VirtualInput.fillSubtick(VirtualInput.getTimeSinceLastTick(), mc.player.rotationPitch,  mc.player.rotationYaw);
-            VirtualInput.fillSubtickWithPlayback();
-            mc.player.rotationPitch=VirtualInput.getSubtickPitch();
-            mc.player.rotationYaw=VirtualInput.getSubtickYaw();
+            ClientProxy.virtual.updateSubtick(mc.player.rotationPitch, mc.player.rotationYaw);
+            mc.player.rotationPitch= ClientProxy.virtual.getSubtickPitch();
+            mc.player.rotationYaw= ClientProxy.virtual.getSubtickYaw();
             CameraInterpolationEvents.rotationPitch = mc.player.rotationPitch;
             CameraInterpolationEvents.rotationYaw = 180f + mc.player.rotationYaw;
         }
