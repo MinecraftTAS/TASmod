@@ -10,8 +10,8 @@ public class VirtualInput2 {
 
 	private VirtualKeyboard nextKeyboard = new VirtualKeyboard();
 
-	private List<VirtualKeyboardEvent> currentKeyboardEvents = null;
-	private Iterator<VirtualKeyboardEvent> currentKeyboardEventIterator = null;
+	private List<VirtualKeyboardEvent> currentKeyboardEvents = new ArrayList<VirtualKeyboardEvent>();
+	private Iterator<VirtualKeyboardEvent> currentKeyboardEventIterator = currentKeyboardEvents.iterator();
 
 	private VirtualKeyboardEvent currentKeyboardEvent = null;
 
@@ -140,8 +140,8 @@ public class VirtualInput2 {
 
 	private VirtualMouse nextMouse = new VirtualMouse();
 
-	private List<VirtualMouseEvent> currentMouseEvents = null;
-	private Iterator<VirtualMouseEvent> currentMouseEventIterator = null;
+	private List<VirtualMouseEvent> currentMouseEvents = new ArrayList<VirtualMouseEvent>();
+	private Iterator<VirtualMouseEvent> currentMouseEventIterator = currentMouseEvents.iterator();
 
 	private VirtualMouseEvent currentMouseEvent = null;
 

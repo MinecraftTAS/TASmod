@@ -13,7 +13,7 @@ import net.minecraft.entity.item.EntityMinecartContainer;
 @Mixin(EntityMinecartContainer.class)
 public class RedirectEntityMinecartContainer {
 
-	@Redirect(method = "addLoot", at = @At(value = "NEW", ordinal = 0, target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "addLoot", at = @At(value = "NEW", ordinal = 0, target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}

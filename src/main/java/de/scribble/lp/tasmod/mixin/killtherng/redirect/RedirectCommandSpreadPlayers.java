@@ -13,7 +13,7 @@ import net.minecraft.command.CommandSpreadPlayers;
 @Mixin(CommandSpreadPlayers.class)
 public class RedirectCommandSpreadPlayers {
 
-	@Redirect(method = "spread", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "spread", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}

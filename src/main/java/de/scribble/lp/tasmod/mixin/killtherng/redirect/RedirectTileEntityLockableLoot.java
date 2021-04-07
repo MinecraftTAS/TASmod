@@ -13,7 +13,7 @@ import net.minecraft.tileentity.TileEntityLockableLoot;
 @Mixin(TileEntityLockableLoot.class)
 public class RedirectTileEntityLockableLoot {
 
-	@Redirect(method = "fillWithLoot", at = @At(value = "NEW", ordinal = 0, target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "fillWithLoot", at = @At(value = "NEW", ordinal = 0, target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}
