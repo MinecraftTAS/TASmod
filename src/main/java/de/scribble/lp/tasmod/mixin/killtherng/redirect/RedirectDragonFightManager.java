@@ -12,12 +12,12 @@ import net.minecraft.world.end.DragonFightManager;
 
 @Mixin(DragonFightManager.class)
 public class RedirectDragonFightManager {
-	@Redirect(method = "<init>", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "<init>", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom2() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}
 	
-	@Redirect(method = "generatePortal", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "generatePortal", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}

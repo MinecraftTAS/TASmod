@@ -13,7 +13,7 @@ import net.minecraft.entity.Entity;
 @Mixin(Entity.class)
 public class RedirectEntityRandom {
 
-	@Redirect(method = "<init>", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "<init>", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new EntityRandom();
 	}

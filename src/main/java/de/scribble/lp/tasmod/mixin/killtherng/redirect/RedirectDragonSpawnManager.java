@@ -13,7 +13,7 @@ import net.minecraft.world.end.DragonSpawnManager;
 @Mixin(DragonSpawnManager.class)
 public class RedirectDragonSpawnManager {
 
-	@Redirect(method = "Lnet/minecraft/world/end/DragonSpawnManager$SUMMONING_PILLARS;process", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "Lnet/minecraft/world/end/DragonSpawnManager$SUMMONING_PILLARS;process", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}

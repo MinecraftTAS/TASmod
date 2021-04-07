@@ -11,7 +11,7 @@ import net.minecraft.entity.EntityLiving;
 @Mixin(EntityLiving.class)
 public class RedirectEntityLivingRandom {
 
-	@Redirect(method = "dropLoot", at = @At(value = "NEW", target = "Ljava/util/Random;<init>(J)Ljava/util/Random;"))
+	@Redirect(method = "dropLoot", at = @At(value = "NEW", target = "Ljava/util/Random;<init>(J)Ljava/util/Random;", remap = false))
 	public Random redirectRandom(long originalSeed) {
 		return new Random(originalSeed);
 	}

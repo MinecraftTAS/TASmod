@@ -13,7 +13,7 @@ import net.minecraft.world.gen.structure.MapGenStronghold;
 @Mixin(MapGenStronghold.class)
 public class RedirectMapGenStronghold {
 
-	@Redirect(method = "generatePositions", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "generatePositions", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom2() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}

@@ -13,7 +13,7 @@ import net.minecraft.command.CommandWeather;
 @Mixin(CommandWeather.class)
 public class RedirectCommandWeather {
 
-	@Redirect(method = "execute", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "execute", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}

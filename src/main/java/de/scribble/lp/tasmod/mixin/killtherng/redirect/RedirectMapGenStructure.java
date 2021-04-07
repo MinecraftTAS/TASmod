@@ -13,7 +13,7 @@ import net.minecraft.world.gen.structure.MapGenStructure;
 @Mixin(MapGenStructure.class)
 public class RedirectMapGenStructure {
 
-	@Redirect(method = "findNearestStructurePosBySpacing", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "findNearestStructurePosBySpacing", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	private static Random redirectRandom2() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}

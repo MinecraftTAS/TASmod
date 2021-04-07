@@ -13,7 +13,7 @@ import net.minecraft.client.gui.spectator.categories.TeleportToTeam;
 @Mixin(TeleportToTeam.class)
 public class RedirectTeleportToTeam {
 
-	@Redirect(method = "<init>", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"))
+	@Redirect(method = "<init>", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}

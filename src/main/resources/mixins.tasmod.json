@@ -59,7 +59,6 @@
 		
 		//KillTheRNG
 		"killtherng.MixinMainMenu",
-		"killtherng.MixinMinecraft",
 		
 		//Playbackhooks
 		"playbackhooks.MixinGameSettings",
