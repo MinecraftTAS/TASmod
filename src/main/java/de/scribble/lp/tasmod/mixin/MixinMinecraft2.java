@@ -35,7 +35,7 @@ public abstract class MixinMinecraft2 {
 	@Inject(method = "init", at = @At(value = "RETURN"))
 	public void injectInit(CallbackInfo ci) {
 		ModLoader.logger.info("Initialising stuff for TASmod");
-		new TickrateChangerClient();
+		new TickrateChangerClient(); //TODO Remove
 		new TickSync();
 	}
 
@@ -210,7 +210,7 @@ public abstract class MixinMinecraft2 {
 		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
 	}
 	
-	@Inject(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton"))
+	@Inject(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
 	public void injectRunTickMouse2(CallbackInfo ci) {
 		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
 	}
