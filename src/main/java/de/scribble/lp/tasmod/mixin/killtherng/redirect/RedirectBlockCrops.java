@@ -13,7 +13,7 @@ import net.minecraft.block.BlockCrops;
 @Mixin(BlockCrops.class)
 public class RedirectBlockCrops {
 
-	@Redirect(method = "getDrops", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;"), remap = false)
+	@Redirect(method = "getDrops", at = @At(value = "NEW", target = "Ljava/util/Random;<init>()Ljava/util/Random;", remap = false))
 	public Random redirectRandom() {
 		return KillTheRNG.ISDISABLED ? new Random() : new WorldRandom();
 	}
