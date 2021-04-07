@@ -40,9 +40,9 @@ public class VirtualInput2 {
 		currentKeyboardEvents = getCurrentKeyboardEvents();
 		currentKeyboardEventIterator = currentKeyboardEvents.iterator();
 
-//		currentKeyboardEvents.forEach(action->{
-//			System.out.println(action.toString());
-//		});
+		currentKeyboardEvents.forEach(action->{
+			System.out.println(action.toString());
+		});
 		
 		nextKeyboard.clearCharList();
 

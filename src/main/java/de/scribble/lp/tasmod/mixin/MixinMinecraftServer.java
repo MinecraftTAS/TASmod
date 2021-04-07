@@ -64,7 +64,6 @@ public abstract class MixinMinecraftServer {
 	@Shadow
 	private static Logger LOGGER;
 	
-	private static long msToTick;
 	/**
 	 * This mixin changes the ticking behaviour of minecraft servers.<br>
 	 * The way this is usually done is set the Thread.sleep from 50 Milliseconds to your desired tickrate in milliseconds<br>
@@ -151,7 +150,7 @@ public abstract class MixinMinecraftServer {
                  }
                  //Added Methods similar to Cubitick Mod
                  //Original line Thread.sleep(Math.max(1L, 50L - i));
-					msToTick = (long) (TickrateChangerServer.MILISECONDS_PER_TICK - i);
+					long msToTick = (long) (TickrateChangerServer.MILISECONDS_PER_TICK - i);
 					if (msToTick <= 0L) {
 						if (TickrateChangerServer.TICKS_PER_SECOND > 20.0)
 							msToTick = 0L;
