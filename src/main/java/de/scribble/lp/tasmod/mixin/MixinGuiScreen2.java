@@ -50,7 +50,7 @@ public class MixinGuiScreen2 {
 
 	// =====================================================================================================================================
 
-	@Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;isCreated()V", shift = Shift.AFTER, remap = false))
+	@Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;isCreated()Z", shift = Shift.AFTER, remap = false))
 	public void injectAfterMouseCreated(CallbackInfo ci) {
 		ClientProxy.virtual.updateCurrentMouseEvents();
 	}
