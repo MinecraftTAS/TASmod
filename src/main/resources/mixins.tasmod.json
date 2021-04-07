@@ -7,7 +7,7 @@
     "mixins": [
     
         //General
-        "MixinMinecraftServer",
+        "MixinMinecraftServer2",
         
         //Savestates
         "savestates.MixinChunkProviderServer",

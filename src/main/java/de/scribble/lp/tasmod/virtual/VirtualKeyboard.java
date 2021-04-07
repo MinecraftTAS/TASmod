@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.lwjgl.input.Keyboard;
+
 import com.google.common.collect.Maps;
 
 public class VirtualKeyboard {
@@ -94,7 +96,7 @@ public class VirtualKeyboard {
 		keyList.put(49, new VirtualKey("N", 49));
 		keyList.put(50, new VirtualKey("M", 50));
 		keyList.put(51, new VirtualKey("COMMA", 51));
-		keyList.put(52, new VirtualKey("PERIOS", 52));
+		keyList.put(52, new VirtualKey("PERIOD", 52));
 		keyList.put(53, new VirtualKey("SLASH", 53));
 		keyList.put(54, new VirtualKey("RSHIFT", 54));
 		keyList.put(55, new VirtualKey("MULTIPLY", 55));
@@ -164,7 +166,7 @@ public class VirtualKeyboard {
 		keyList.put(210, new VirtualKey("INSERT", 210));
 		keyList.put(211, new VirtualKey("DELETE", 211));
 		keyList.put(219, new VirtualKey("WIN", 219));
-		keyList.put(221, new VirtualKey("CONTEXT_MENU", 221));
+		keyList.put(221, new VirtualKey("APPS", 221));
 	}
 
 	public void add(int keycode) {
@@ -240,15 +242,22 @@ public class VirtualKeyboard {
 			VirtualKey keyToCompare = keyboardToCompare.get(keycodes);
 
 			if (!virtualkeys.equals(keyToCompare)) {
+				if (Keyboard.areRepeatEventsEnabled()) {
+					switch (keycodes) {
+					case 14:
+					case 203: //TODO Add hardcoded stuff from GuiChat
+						return;
+					}
+				}
 				eventList.add(new VirtualKeyboardEvent(keycodes, keyToCompare.isKeyDown(), Character.MIN_VALUE));
 			}
 
 		});
 		keyboardToCompare.charList.forEach(action -> {
-			if (action == '\b') {
+			if (action == '\b' && Keyboard.areRepeatEventsEnabled()) {
 				eventList.add(new VirtualKeyboardEvent(14, true, action));
 			} else {
-				eventList.add(new VirtualKeyboardEvent(0, false, action));
+				eventList.add(new VirtualKeyboardEvent(0, true, action));
 			}
 		});
 		return eventList;
