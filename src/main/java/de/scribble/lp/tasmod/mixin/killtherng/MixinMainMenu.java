@@ -2,6 +2,7 @@ package de.scribble.lp.tasmod.mixin.killtherng;
 
 import java.io.IOException;
 
+import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -120,8 +121,15 @@ public abstract class MixinMainMenu extends GuiScreen {
 				WorldRandom.updateSeed(Long.parseLong(currentSeed));
 				break;
 			}
-		} 
+		} else if (keyCode==1) {
+			return;
+		}
 		super.keyTyped(typedChar, keyCode);
 	}
 	
+	@Override
+	public void onGuiClosed() {
+		Keyboard.enableRepeatEvents(false);
+		super.onGuiClosed();
+	}
 }

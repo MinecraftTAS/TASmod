@@ -15,7 +15,7 @@ public class MixinGuiScreen2 {
 
 	// =====================================================================================================================================
 
-	@Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isCreated()V", shift = Shift.AFTER, remap = false))
+	@Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isCreated()Z", shift = Shift.AFTER, remap = false))
 	public void injectAfterKeyboardCreated(CallbackInfo ci) {
 		ClientProxy.virtual.updateCurrentKeyboardEvents();
 	}
@@ -29,21 +29,21 @@ public class MixinGuiScreen2 {
 
 	// =====================================================================================================================================
 
-	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventCharacter()C", remap = false))
+	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
 	public char redirectGetEventCharacter() {
 		return ClientProxy.virtual.getEventKeyboardCharacter();
 	}
 
 	// =====================================================================================================================================
 
-	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventKey()I", remap = false))
+	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int redirectGetEventKey() {
 		return ClientProxy.virtual.getEventKeyboardKey();
 	}
 
 	// =====================================================================================================================================
 
-	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventKeyState()Z", remap = false))
+	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
 	public boolean redirectGetEventState() {
 		return ClientProxy.virtual.getEventKeyboardState();
 	}

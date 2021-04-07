@@ -10,8 +10,8 @@ public class VirtualInput2 {
 
 	private VirtualKeyboard nextKeyboard = new VirtualKeyboard();
 
-	private List<VirtualKeyboardEvent> currentKeyboardEvents = null;
-	private Iterator<VirtualKeyboardEvent> currentKeyboardEventIterator = null;
+	private List<VirtualKeyboardEvent> currentKeyboardEvents = new ArrayList<VirtualKeyboardEvent>();
+	private Iterator<VirtualKeyboardEvent> currentKeyboardEventIterator = currentKeyboardEvents.iterator();
 
 	private VirtualKeyboardEvent currentKeyboardEvent = null;
 
@@ -25,7 +25,7 @@ public class VirtualInput2 {
 
 	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
 		
-		System.out.println(keycode+" "+keystate+" "+character);
+//		System.out.println(keycode+" "+keystate+" "+character);
 		
 		VirtualKey key = nextKeyboard.get(keycode);
 		key.setPressed(keystate);
@@ -40,9 +40,9 @@ public class VirtualInput2 {
 		currentKeyboardEvents = getCurrentKeyboardEvents();
 		currentKeyboardEventIterator = currentKeyboardEvents.iterator();
 
-		currentKeyboardEvents.forEach(action->{
-			System.out.println(action.toString());
-		});
+//		currentKeyboardEvents.forEach(action->{
+//			System.out.println(action.toString());
+//		});
 		
 		nextKeyboard.clearCharList();
 
@@ -147,8 +147,8 @@ public class VirtualInput2 {
 
 	private VirtualMouse nextMouse = new VirtualMouse();
 
-	private List<VirtualMouseEvent> currentMouseEvents = null;
-	private Iterator<VirtualMouseEvent> currentMouseEventIterator = null;
+	private List<VirtualMouseEvent> currentMouseEvents = new ArrayList<VirtualMouseEvent>();
+	private Iterator<VirtualMouseEvent> currentMouseEventIterator = currentMouseEvents.iterator();
 
 	private VirtualMouseEvent currentMouseEvent = null;
 
