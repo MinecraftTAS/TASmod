@@ -24,9 +24,10 @@ public abstract class MixinMinecraftServer2 {
 
 	// =====================================================================================================================================
 	
-	@ModifyConstant(method = "run", constant = @Constant(longValue = 50L))
+	@ModifyConstant(method = "run", constant = @Constant(longValue = 50L, ordinal = 0))
 	public long modifyMSPT(long fiftyLong) {
-		return TickrateChangerServer.MILISECONDS_PER_TICK;
+		redirectTick((MinecraftServer) (Object) this);
+		return Long.MAX_VALUE;
 	}
 
 	// =====================================================================================================================================
