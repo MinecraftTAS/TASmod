@@ -25,10 +25,13 @@ public class VirtualInput2 {
 
 	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
 		
-//		System.out.println(keycode+" "+keystate+" "+character);
+		System.out.println(keycode+" "+keystate+" "+character);
 		
 		VirtualKey key = nextKeyboard.get(keycode);
 		key.setPressed(keystate);
+		if(keystate) {
+			character=nextKeyboard.encodeUnicode(keycode, character);
+		}
 		nextKeyboard.addChar(character);
 	}
 
