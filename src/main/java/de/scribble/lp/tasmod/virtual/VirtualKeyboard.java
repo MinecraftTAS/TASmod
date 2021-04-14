@@ -243,9 +243,7 @@ public class VirtualKeyboard {
 
 			if (!virtualkeys.equals(keyToCompare)) {
 				if (Keyboard.areRepeatEventsEnabled()) {
-					switch (keycodes) {
-					case 14:
-					case 203: //TODO Add hardcoded stuff from GuiChat
+					if (isUnicodeInList(keycodes)) {
 						return;
 					}
 				}
@@ -254,13 +252,83 @@ public class VirtualKeyboard {
 
 		});
 		keyboardToCompare.charList.forEach(action -> {
-			if (action == '\b' && Keyboard.areRepeatEventsEnabled()) {
-				eventList.add(new VirtualKeyboardEvent(14, true, action));
+			if (Keyboard.areRepeatEventsEnabled()) {
+				eventList.add(decodeUnicode(action));
 			} else {
 				eventList.add(new VirtualKeyboardEvent(0, true, action));
 			}
 		});
 		return eventList;
+	}
+	
+	public char encodeUnicode(int keycode, char character) {
+		switch (keycode) {
+		case 15: // Tab
+			return '\u21A6';
+		case 199: // Pos1
+			return '\u21E4';
+		case 200: // Arrow Up
+			return '\u2191';
+		case 201: // Next
+			return '\u21E7';
+		case 203: // Arrow Left
+			return '\u2190';
+		case 205: // Arrow Right
+			return '\u2192';
+		case 207: // End
+			return '\u21E5';
+		case 208: // Arrow Down
+			return '\u2193';
+		case 209: // Next
+			return '\u21E9';
+		default:
+			return character;
+		}
+	}
+
+	public VirtualKeyboardEvent decodeUnicode(char character) {
+		switch (character) {
+		case '\b':
+			return new VirtualKeyboardEvent(14, true, character);
+		case '\u21A6':
+			return new VirtualKeyboardEvent(15, true, Character.MIN_VALUE);
+		case '\u21E4':
+			return new VirtualKeyboardEvent(199, true, character);
+		case '\u2191':
+			return new VirtualKeyboardEvent(200, true, character);
+		case '\u21E7':
+			return new VirtualKeyboardEvent(201, true, character);
+		case '\u2190':
+			return new VirtualKeyboardEvent(203, true, character);
+		case '\u2192':
+			return new VirtualKeyboardEvent(205, true, character);
+		case '\u21E5':
+			return new VirtualKeyboardEvent(207, true, character);
+		case '\u2193':
+			return new VirtualKeyboardEvent(208, true, character);
+		case '\u21E9':
+			return new VirtualKeyboardEvent(209, true, character);
+		default:
+			return new VirtualKeyboardEvent(0, true, character);
+		}
+	}
+
+	public boolean isUnicodeInList(int keycode) {
+		switch (keycode) {
+		case 14:
+		case 15:
+		case 199:
+		case 200:
+		case 201:
+		case 203:
+		case 205:
+		case 207:
+		case 208:
+		case 209:
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	@Override
