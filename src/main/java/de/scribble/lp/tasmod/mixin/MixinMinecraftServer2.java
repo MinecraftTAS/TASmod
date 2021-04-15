@@ -62,6 +62,13 @@ public abstract class MixinMinecraftServer2 {
 	public abstract void tick();
 
 	// =====================================================================================================================================
+	
+	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(JJ)J"))
+	public long redirectcorrect_method_name(long oneLong, long i) {
+		return Math.abs(i-50L); //Getting the original value of i
+	}
+	
+	// =====================================================================================================================================
 
 	@Shadow
 	private long currentTime;
