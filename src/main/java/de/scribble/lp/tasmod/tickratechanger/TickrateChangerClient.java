@@ -48,7 +48,7 @@ public class TickrateChangerClient {
 			pauseUnpauseGame();
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickAdvance)) {
 			advanceTick();
-		} //TODO changeto VKeybindings
+		}
     }
 
 	public static void advanceClientTick() {

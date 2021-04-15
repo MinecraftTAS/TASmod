@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.virtual.VirtualInput2;
 import net.minecraft.client.gui.GuiScreen;
 
 @Mixin(GuiScreen.class)
@@ -66,11 +67,11 @@ public class MixinGuiScreen2 {
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
 	public int redirectGetEventButton() {
-		return ClientProxy.virtual.getEventMouseKey()+100;
+		return ClientProxy.virtual.getEventMouseKey() + 100;
 	}
 
 	// =====================================================================================================================================
-	
+
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", remap = false))
 	public boolean redirectGetEventButtonState() {
 		return ClientProxy.virtual.getEventMouseState();
@@ -89,7 +90,27 @@ public class MixinGuiScreen2 {
 	public int redirectGetEventY() {
 		return ClientProxy.virtual.getEventCursorY();
 	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "isCtrlKeyDown", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
+	private static boolean redirectIsCtrlKeyDown(int i) {
+		return ClientProxy.virtual.isKeyDown(i);
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "isShiftKeyDown", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
+	private static boolean redirectIsShiftKeyDown(int i) {
+		return ClientProxy.virtual.isKeyDown(i);
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "isAltKeyDown", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
+	private static boolean redirectIsAltKeyDown(int i) {
+		return ClientProxy.virtual.isKeyDown(i);
+	}
 	
 	// =====================================================================================================================================
-	
 }

@@ -16,6 +16,6 @@ public class MixinGuiContainer {
 
 	@Redirect(method = "mouseReleased", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", ordinal = 0, remap = false))
 	private boolean redirectIsKeyDown2(int i) {
-		return ClientProxy.virtual.isKeyDown(i); // TODO
+		return ClientProxy.virtual.isKeyDown(i);
 	}
 }
