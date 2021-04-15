@@ -209,4 +209,9 @@ public abstract class MixinMinecraft2 {
 	}
 	
 	// =====================================================================================================================================
+	
+	@Inject(method = "runTick", at = @At(value = "RETURN"))
+	public void injectRunTickReturn(CallbackInfo ci) {
+		ClientProxy.virtual.getContainer().nextTick();
+	}
 }

@@ -332,8 +332,12 @@ public class VirtualKeyboard {
 	}
 
 	@Override
-	public VirtualKeyboard clone() throws CloneNotSupportedException {
+	public VirtualKeyboard clone(){
 		return new VirtualKeyboard(keyList, charList);
 	}
 
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 }

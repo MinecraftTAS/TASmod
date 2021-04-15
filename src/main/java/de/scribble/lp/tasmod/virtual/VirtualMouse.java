@@ -18,7 +18,7 @@ public class VirtualMouse {
 
 	private int cursorY = 0;
 
-	public VirtualMouse(Map<Integer, VirtualKey> keyListIn, int scrollwheel, int cursorX, int cursorY) {
+	public VirtualMouse(Map<Integer, VirtualKey> keyListIn, int scrollwheel, int cursorX, int cursorY, List<PathNode> path) {
 		Map<Integer, VirtualKey> copy = new HashMap<Integer, VirtualKey>();
 
 		keyListIn.forEach((key, value) -> {
@@ -31,6 +31,8 @@ public class VirtualMouse {
 		this.cursorX = cursorX;
 
 		this.cursorY = cursorY;
+		
+		this.path.addAll(path);
 
 	}
 
@@ -162,8 +164,8 @@ public class VirtualMouse {
 	}
 
 	@Override
-	protected VirtualMouse clone() throws CloneNotSupportedException {
-		return new VirtualMouse(keyList, scrollwheel, cursorX, cursorY);
+	public VirtualMouse clone() {
+		return new VirtualMouse(keyList, scrollwheel, cursorX, cursorY, path);
 	}
 
 	public void setCursor(int x, int y) {
