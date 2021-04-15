@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import de.scribble.lp.tasmod.CommonProxy;
@@ -23,14 +22,14 @@ import net.minecraft.server.MinecraftServer;
 public abstract class MixinMinecraftServer2 {
 
 	// =====================================================================================================================================
-	
+
 	@ModifyConstant(method = "run", constant = @Constant(longValue = 50L))
 	public long modifyMSPT(long fiftyLong) {
 		return TickrateChangerServer.MILISECONDS_PER_TICK;
 	}
 
 	// =====================================================================================================================================
-	
+
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick()V"))
 	public void redirectTick(MinecraftServer server) {
 		this.tick();
@@ -62,12 +61,12 @@ public abstract class MixinMinecraftServer2 {
 	public abstract void tick();
 
 	// =====================================================================================================================================
-	
+
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(JJ)J"))
-	public long redirectcorrect_method_name(long oneLong, long i) {
-		return Math.abs(i-50L); //Getting the original value of i
+	public long redirectMathMax(long oneLong, long i) {
+		return Math.abs(i - 50L); // Getting the original value of i
 	}
-	
+
 	// =====================================================================================================================================
 
 	@Shadow
@@ -78,7 +77,7 @@ public abstract class MixinMinecraftServer2 {
 
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Thread;sleep(J)V"))
 	public void redirectThreadSleep(long i) {
-		
+
 		long msToTick = (long) (TickrateChangerServer.MILISECONDS_PER_TICK - i);
 		if (msToTick <= 0L) {
 			if (TickrateChangerServer.TICKS_PER_SECOND > 20.0)
@@ -109,6 +108,6 @@ public abstract class MixinMinecraftServer2 {
 			}
 		}
 	}
-	
+
 	// =====================================================================================================================================
 }
