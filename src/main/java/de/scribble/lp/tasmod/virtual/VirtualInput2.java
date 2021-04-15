@@ -24,13 +24,13 @@ public class VirtualInput2 {
 	}
 
 	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
-		
-		System.out.println(keycode+" "+keystate+" "+character);
-		
+
+//		System.out.println(keycode+" "+keystate+" "+character);
+
 		VirtualKey key = nextKeyboard.get(keycode);
 		key.setPressed(keystate);
-		if(keystate) {
-			character=nextKeyboard.encodeUnicode(keycode, character);
+		if (keystate) {
+			character = nextKeyboard.encodeUnicode(keycode, character);
 		}
 		nextKeyboard.addChar(character);
 	}
@@ -43,10 +43,10 @@ public class VirtualInput2 {
 		currentKeyboardEvents = getCurrentKeyboardEvents();
 		currentKeyboardEventIterator = currentKeyboardEvents.iterator();
 
-		currentKeyboardEvents.forEach(action->{
-			System.out.println(action.toString());
-		});
-		
+//		currentKeyboardEvents.forEach(action->{
+//			System.out.println(action.toString());
+//		});
+
 		nextKeyboard.clearCharList();
 
 		try {
@@ -271,19 +271,19 @@ public class VirtualInput2 {
 		clearNextKeyboard();
 		clearNextMouse();
 	}
-	
+
 	// =======================================================================================
-	
-	VirtualSubticks currentSubtick= new VirtualSubticks(0, 0);
-	
+
+	VirtualSubticks currentSubtick = new VirtualSubticks(0, 0);
+
 	public void updateSubtick(float pitch, float yaw) {
-		currentSubtick=new VirtualSubticks(pitch, yaw);
+		currentSubtick = new VirtualSubticks(pitch, yaw);
 	}
-	
+
 	public float getSubtickPitch() {
 		return currentSubtick.getPitch();
 	}
-	
+
 	public float getSubtickYaw() {
 		return currentSubtick.getYaw();
 	}

@@ -16,10 +16,6 @@ public class TickSync {
 	private static boolean enabled=true;
 	private static int softLockTimer;
 	
-	public TickSync() {
-		enabled=true;
-	}
-	
 	/**
 	 * Turns the ticksync on and off
 	 * @param enable
