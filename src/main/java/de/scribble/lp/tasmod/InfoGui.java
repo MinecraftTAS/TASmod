@@ -52,6 +52,8 @@ public class InfoGui extends Gui {
 			
 			new Gui().drawString(mc.fontRenderer, "EntitySeed: "+ EntityRandom.currentSeed, 16, 130, 0xFFFFFF); // Current Pointer location
 			new Gui().drawString(mc.fontRenderer, "ItemSeed: "+ ItemRandom.currentSeed, 16, 140, 0xFFFFFF); // Current Pointer location
+			
+			new Gui().drawString(mc.fontRenderer, "InputContainer: "+ ClientProxy.virtual.getContainer().size(), 16, 150, 0xFFFFFF); // Current Pointer location
 
 			if (Display.isActive()) {
 				String out1 = "";

@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.scribble.lp.tasmod.virtual.container.InputContainer;
+
 public class VirtualInput2 {
+
+	private final InputContainer container = new InputContainer();
+
+	// ============================================================
 
 	private VirtualKeyboard currentKeyboard = new VirtualKeyboard();
 
@@ -36,7 +42,7 @@ public class VirtualInput2 {
 	}
 
 	public List<VirtualKeyboardEvent> getCurrentKeyboardEvents() {
-		return currentKeyboard.getDifference(nextKeyboard);
+		return currentKeyboard.getDifference(container.addKeyboardToContainer(nextKeyboard));
 	}
 
 	public void updateCurrentKeyboardEvents() {
@@ -49,11 +55,7 @@ public class VirtualInput2 {
 
 		nextKeyboard.clearCharList();
 
-		try {
-			currentKeyboard = nextKeyboard.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
+		currentKeyboard = nextKeyboard.clone();
 	}
 
 	public boolean nextKeyboardEvent() {
@@ -182,7 +184,7 @@ public class VirtualInput2 {
 	}
 
 	public List<VirtualMouseEvent> getCurrentMouseEvents() {
-		return currentMouse.getDifference(nextMouse);
+		return currentMouse.getDifference(container.addMouseToContainer(nextMouse));
 	}
 
 	public void updateCurrentMouseEvents() {
@@ -196,11 +198,7 @@ public class VirtualInput2 {
 
 		resetNextMouseLists();
 
-		try {
-			currentMouse = nextMouse.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
+		currentMouse = nextMouse.clone();
 	}
 
 	public void resetNextMouseLists() {
@@ -277,7 +275,7 @@ public class VirtualInput2 {
 	VirtualSubticks currentSubtick = new VirtualSubticks(0, 0);
 
 	public void updateSubtick(float pitch, float yaw) {
-		currentSubtick = new VirtualSubticks(pitch, yaw);
+		currentSubtick = container.addSubticksToContainer(new VirtualSubticks(pitch, yaw));
 	}
 
 	public float getSubtickPitch() {
@@ -287,4 +285,9 @@ public class VirtualInput2 {
 	public float getSubtickYaw() {
 		return currentSubtick.getYaw();
 	}
+
+	public InputContainer getContainer() {
+		return container;
+	}
+	
 }
