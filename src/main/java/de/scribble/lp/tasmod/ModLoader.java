@@ -1,5 +1,8 @@
 package de.scribble.lp.tasmod;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -7,6 +10,7 @@ import de.scribble.lp.tasmod.misc.CommandFolder;
 import de.scribble.lp.tasmod.misc.ModIncompatibleException;
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
+import de.scribble.lp.tasmod.savestates.SavestateTrackerFile;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.tutorial.CommandPlaybacktutorial;
 import net.minecraft.server.MinecraftServer;
@@ -90,6 +94,14 @@ public class ModLoader {
 		ev.registerServerCommand(new CommandPlay());
 		ev.registerServerCommand(new CommandPlaybacktutorial());
 		ev.registerServerCommand(new CommandFolder());
+		
+		// Save Loadstate Count
+		File savestateDirectory=new File(serverInstance.getDataDirectory()+File.separator+"saves"+File.separator+"savestates"+File.separator);
+		try {
+			new SavestateTrackerFile(new File(savestateDirectory, ev.getServer().getFolderName()+"-info.txt"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public static ModLoader getInstance() {
 		return instance;
