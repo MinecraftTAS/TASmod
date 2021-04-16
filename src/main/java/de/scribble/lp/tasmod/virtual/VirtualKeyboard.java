@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Maps;
@@ -260,7 +261,7 @@ public class VirtualKeyboard {
 		});
 		return eventList;
 	}
-	
+
 	public char encodeUnicode(int keycode, char character) {
 		switch (keycode) {
 		case 15: // Tab
@@ -332,12 +333,39 @@ public class VirtualKeyboard {
 	}
 
 	@Override
-	public VirtualKeyboard clone(){
+	public VirtualKeyboard clone() {
 		return new VirtualKeyboard(keyList, charList);
 	}
 
 	@Override
 	public String toString() {
-		return super.toString();
+		List<String> stringy = getCurrentPresses();
+		String keyString = "";
+		if (!stringy.isEmpty()) {
+			String seperator = ",";
+			for (int i = 0; i < stringy.size(); i++) {
+				if (i == stringy.size() - 1) {
+					seperator = "";
+				}
+				keyString = keyString.concat(stringy.get(i) + seperator);
+			}
+		}
+		String charString = "";
+		if (!charList.isEmpty()) {
+			for (int i = 0; i < charList.size(); i++) {
+				charString = charString.concat(Character.toString(charList.get(i)));
+			}
+			charString = StringUtils.replace(charString, "\r", "\\n");
+			charString = StringUtils.replace(charString, "\n", "\\n");
+		}
+		if (!keyString.isEmpty() && !charString.isEmpty()) {
+			return keyString + ";" + charString;
+		} else if (keyString.isEmpty()) {
+			return charString;
+		} else if (charString.isEmpty()) {
+			return keyString;
+		} else {
+			return "";
+		}
 	}
 }

@@ -19,7 +19,7 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-	       System.out.println(Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown());
+	       System.out.println(ClientProxy.virtual.getContainer().toString());
 		}
 	}
 }
