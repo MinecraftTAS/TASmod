@@ -94,7 +94,7 @@ public class SettingsGui extends GuiScreen {
 		int y = height;
 		int index = 0;
 		for (Settings s : Settings.values()) {
-			addButton(new GuiCheckBox(index, 1, y -= 13, s.name(), Boolean.parseBoolean(p.getProperty(s.name() + "_visible"))));
+			addButton(new GuiCheckBox(index, 1, y -= 13, s.name().toLowerCase(), Boolean.parseBoolean(p.getProperty(s.name() + "_visible"))));
 			index++;
 		}
 		super.initGui();
@@ -102,7 +102,6 @@ public class SettingsGui extends GuiScreen {
 	
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException {
-//		((GuiCheckBox) button).(!((GuiCheckBox) button).isChecked());
 		super.actionPerformed(button);
 		p.setProperty(Settings.values()[button.id].name() + "_visible", ((GuiCheckBox) button).isChecked() + "");
 		try {
@@ -138,6 +137,7 @@ public class SettingsGui extends GuiScreen {
 	}
 	
 	public static void drawOverlay() {
+		if (Minecraft.getMinecraft().currentScreen instanceof SettingsGui) Minecraft.getMinecraft().currentScreen.drawDefaultBackground();
 		boolean showXYZ = Boolean.parseBoolean(p.getProperty("XYZ_visible"));
 		if (showXYZ) {
 			int x = Integer.parseInt(p.getProperty("XYZ_x"));
@@ -185,15 +185,15 @@ public class SettingsGui extends GuiScreen {
 		if (showTICKS) {
 			int x = Integer.parseInt(p.getProperty("TICKS_x"));
 			int y = Integer.parseInt(p.getProperty("TICKS_y"));
-			int i = widths.replace(Settings.TICKS, drawRectWithText("Client Ticks: " + TickSync.getClienttickcounter(), x, y, Boolean.parseBoolean(p.getProperty("TICKS_hideRect"))));
-			drawRectWithTextFixedWidth("Server Ticks: " + TickSync.getServertickcounter(), x, y + 14, Boolean.parseBoolean(p.getProperty("TICKS_hideRect")), i);
+			int i = widths.replace(Settings.TICKS, drawRectWithText("Server Ticks: " + TickSync.getServertickcounter(), x, y + 14, Boolean.parseBoolean(p.getProperty("TICKS_hideRect"))));
+			drawRectWithTextFixedWidth("Client Ticks: " + TickSync.getClienttickcounter(), x, y, Boolean.parseBoolean(p.getProperty("TICKS_hideRect")), i);
 		}
 		
 		boolean showTICKRATE= Boolean.parseBoolean(p.getProperty("TICKRATE_visible"));
 		if (showTICKRATE) {
 			int x = Integer.parseInt(p.getProperty("TICKRATE_x"));
 			int y = Integer.parseInt(p.getProperty("TICKRATE_y"));
-			widths.replace(Settings.TICKRATE, drawRectWithText("Tickrate: " + TickrateChangerClient.TICKS_PER_SECOND, x, y, Boolean.parseBoolean(p.getProperty("TICKRATE_hideRect"))));
+			widths.replace(Settings.TICKRATE, drawRectWithText("Tickrate: " + (int) (TickrateChangerClient.TICKS_PER_SECOND), x, y, Boolean.parseBoolean(p.getProperty("TICKRATE_hideRect"))));
 		}
 		
 		boolean showSAVESTATECOUNT = Boolean.parseBoolean(p.getProperty("SAVESTATECOUNT_visible"));
@@ -201,7 +201,7 @@ public class SettingsGui extends GuiScreen {
 			int x = Integer.parseInt(p.getProperty("SAVESTATECOUNT_x"));
 			int y = Integer.parseInt(p.getProperty("SAVESTATECOUNT_y"));
 			int i = widths.replace(Settings.SAVESTATECOUNT, drawRectWithText("Savestates: " + SavestateTrackerFile.savestatecount, x, y, Boolean.parseBoolean(p.getProperty("SAVESTATECOUNT_hideRect"))));
-			drawRectWithTextFixedWidth("Rerecords: " + SavestateTrackerFile.loadstatecount, x, y + 14, Boolean.parseBoolean(p.getProperty("SAVESTATECOUNT_hideRect")), i);
+			drawRectWithTextFixedWidth("Loadstates: " + SavestateTrackerFile.loadstatecount, x, y + 14, Boolean.parseBoolean(p.getProperty("SAVESTATECOUNT_hideRect")), i);
 		}
 		
 		boolean showPREDICTEDXYZ = Boolean.parseBoolean(p.getProperty("PREDICTEDXYZ_visible"));
