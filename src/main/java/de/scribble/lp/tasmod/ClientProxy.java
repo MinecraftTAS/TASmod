@@ -1,9 +1,13 @@
 package de.scribble.lp.tasmod;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
 
+import de.pfannekuchen.infogui.gui.SettingsGui;
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.savestates.SavestateEvents;
@@ -43,6 +47,8 @@ public class ClientProxy extends CommonProxy{
 	
 	public static KeyBinding testingKey = new KeyBinding("Various Testing", Keyboard.KEY_F12, "TASmod");
 	
+	public static KeyBinding infoGuiKey = new KeyBinding("Open InfoGui Editor", Keyboard.KEY_F6, "TASmod");
+	
 	public static VirtualInput2 virtual= new VirtualInput2();
 	
 	public void preInit(FMLPreInitializationEvent ev) {
@@ -53,6 +59,76 @@ public class ClientProxy extends CommonProxy{
 		super.preInit(ev);
 	}
 	public void init(FMLInitializationEvent ev) {
+		try {
+			SettingsGui.load(); // This goes first.. muhahahahaha
+			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					try {
+						SettingsGui.save();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}));
+		} catch (IOException e) {
+			SettingsGui.p = new Properties();
+			SettingsGui.p.setProperty("XYZ_visible", "true");
+			SettingsGui.p.setProperty("XYZPRECISE_visible", "false");
+			SettingsGui.p.setProperty("CXZ_visible", "false");
+			SettingsGui.p.setProperty("WORLDSEED_visible", "true");
+			SettingsGui.p.setProperty("RNGSEEDS_visible", "false");
+			SettingsGui.p.setProperty("FACING_visible", "true");
+			SettingsGui.p.setProperty("TICKS_visible", "false");
+			SettingsGui.p.setProperty("TICKRATE_visible", "true");
+			SettingsGui.p.setProperty("SAVESTATECOUNT_visible", "true");
+			SettingsGui.p.setProperty("PREDICTEDXYZ_visible", "false");
+			SettingsGui.p.setProperty("MOUSEPOS_visible", "false");
+			
+			SettingsGui.p.setProperty("XYZ_x", "0");
+			SettingsGui.p.setProperty("XYZPRECISE_x", "0");
+			SettingsGui.p.setProperty("CXZ_x", "0");
+			SettingsGui.p.setProperty("WORLDSEED_x", "0");
+			SettingsGui.p.setProperty("RNGSEEDS_x", "0");
+			SettingsGui.p.setProperty("FACING_x", "0");
+			SettingsGui.p.setProperty("TICKS_x", "0");
+			SettingsGui.p.setProperty("TICKRATE_x", "0");
+			SettingsGui.p.setProperty("SAVESTATECOUNT_x", "0");
+			SettingsGui.p.setProperty("PREDICTEDXYZ_x", "0");
+			SettingsGui.p.setProperty("MOUSEPOS_x", "0");
+			
+			SettingsGui.p.setProperty("XYZ_y", "0");
+			SettingsGui.p.setProperty("XYZPRECISE_y", "0");
+			SettingsGui.p.setProperty("CXZ_y", "0");
+			SettingsGui.p.setProperty("WORLDSEED_y", "0");
+			SettingsGui.p.setProperty("RNGSEEDS_y", "0");
+			SettingsGui.p.setProperty("FACING_y", "0");
+			SettingsGui.p.setProperty("TICKS_y", "0");
+			SettingsGui.p.setProperty("TICKRATE_y", "0");
+			SettingsGui.p.setProperty("SAVESTATECOUNT_y", "0");
+			SettingsGui.p.setProperty("PREDICTEDXYZ_y", "0");
+			SettingsGui.p.setProperty("MOUSEPOS_y", "0");
+			
+			SettingsGui.p.setProperty("XYZ_hideRect", "false");
+			SettingsGui.p.setProperty("XYZPRECISE_hideRect", "false");
+			SettingsGui.p.setProperty("CXZ_hideRect", "false");
+			SettingsGui.p.setProperty("WORLDSEED_hideRect", "false");
+			SettingsGui.p.setProperty("RNGSEEDS_hideRect", "false");
+			SettingsGui.p.setProperty("FACING_hideRect", "false");
+			SettingsGui.p.setProperty("TICKS_hideRect", "false");
+			SettingsGui.p.setProperty("TICKRATE_hideRect", "false");
+			SettingsGui.p.setProperty("SAVESTATECOUNT_hideRect", "false");
+			SettingsGui.p.setProperty("PREDICTEDXYZ_hideRect", "false");
+			SettingsGui.p.setProperty("MOUSEPOS_hideRect", "false");
+			
+			try {
+				SettingsGui.save();
+			} catch (IOException e420) {
+				e420.printStackTrace();
+			}
+		}
+		
 		playbackTutorial=new TutorialHandler((short)1);
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
@@ -69,7 +145,9 @@ public class ClientProxy extends CommonProxy{
 		ClientRegistry.registerKeyBinding(savestateSaveKey);
 		ClientRegistry.registerKeyBinding(savestateLoadKey);
 		ClientRegistry.registerKeyBinding(testingKey);
+		ClientRegistry.registerKeyBinding(infoGuiKey);
 		
+		VirtualKeybindings.registerBlockedKeyBinding(infoGuiKey);
 		VirtualKeybindings.registerBlockedKeyBinding(tickratezeroKey);
 		VirtualKeybindings.registerBlockedKeyBinding(tickAdvance);
 		VirtualKeybindings.registerBlockedKeyBinding(stopkey);

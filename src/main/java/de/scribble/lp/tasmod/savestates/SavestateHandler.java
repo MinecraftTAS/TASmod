@@ -34,7 +34,7 @@ import net.minecraftforge.common.DimensionManager;
  */
 public class SavestateHandler {
 	private static MinecraftServer server=ModLoader.getServerInstance();
-	private static final File savestateDirectory=new File(server.getDataDirectory()+File.separator+"saves"+File.separator+"savestates"+File.separator);
+	public static final File savestateDirectory=new File(server.getDataDirectory()+File.separator+"saves"+File.separator+"savestates"+File.separator);
 	
 	public static boolean isSaving=false;
 	
