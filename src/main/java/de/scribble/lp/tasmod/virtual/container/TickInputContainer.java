@@ -30,8 +30,7 @@ public class TickInputContainer {
 	
 	@Override
 	public String toString() {
-		String out="";
-		return super.toString();
+		return tick+"|"+keyboard.toString()+"|"+mouse.toString()+"|"+subticks.toString();
 	}
 	
 }

@@ -8,62 +8,60 @@ import de.scribble.lp.tasmod.virtual.VirtualMouse;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 
 public class InputContainer {
-	private boolean playback=false;
-	
-	private boolean recording=false;
-	
+	private boolean playback = false;
+
+	private boolean recording = false;
+
 	private int index;
-	
+
 	private VirtualKeyboard keyboard = new VirtualKeyboard();
-	
+
 	private VirtualMouse mouse = new VirtualMouse();
-	
+
 	private VirtualSubticks subticks = new VirtualSubticks();
-	
-	private List<TickInputContainer> inputs= new ArrayList<TickInputContainer>();
-	
+
+	private List<TickInputContainer> inputs = new ArrayList<TickInputContainer>();
+
 	public boolean isPlayingback() {
 		return playback;
 	}
-	
+
 	public boolean isRecording() {
 		return recording;
 	}
-	
-	public VirtualKeyboard addKeyboardToContainer(VirtualKeyboard keyboard)  {
-		this.keyboard=keyboard.clone();
+
+	public VirtualKeyboard addKeyboardToContainer(VirtualKeyboard keyboard) {
+		this.keyboard = keyboard.clone();
 		return keyboard;
 	}
-	
+
 	public VirtualMouse addMouseToContainer(VirtualMouse mouse) {
-		this.mouse=mouse.clone();
+		this.mouse = mouse.clone();
 		return mouse;
 	}
-	
+
 	public VirtualSubticks addSubticksToContainer(VirtualSubticks subticks) {
-		this.subticks=subticks.clone();
+		this.subticks = subticks.clone();
 		return subticks;
 	}
-	
+
 	public void nextTick() {
-		if(index<=20) {
-			index++;
-			inputs.add(new TickInputContainer(index, keyboard, mouse, subticks));
-		}
+		index++;
+		inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
 	}
-	
+
 	public int size() {
 		return inputs.size();
 	}
-	
+
 	@Override
 	public String toString() {
-		if(inputs.isEmpty()) {
+		if (inputs.isEmpty()) {
 			return "null";
 		}
-		String out="";
+		String out = "";
 		for (int i = 0; i < inputs.size(); i++) {
-			out=out.concat(i+"|"+inputs.get(i).toString()+"\n");
+			out = out.concat(inputs.get(i).toString() + "\n");
 		}
 		return out;
 	}
