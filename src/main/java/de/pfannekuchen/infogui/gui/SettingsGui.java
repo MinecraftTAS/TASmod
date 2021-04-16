@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import de.pfannekuchen.killtherng.utils.EntityRandom;
 import de.pfannekuchen.killtherng.utils.ItemRandom;
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
+import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.savestates.SavestateTrackerFile;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -19,6 +20,7 @@ import de.scribble.lp.tasmod.ticksync.TickSync;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 
 public class SettingsGui extends GuiScreen {
@@ -41,7 +43,7 @@ public class SettingsGui extends GuiScreen {
 	}
 	
 	public static enum Settings {
-		XYZ, XYZPRECISE, CXZ, WORLDSEED, RNGSEEDS, FACING, TICKS, TICKRATE, SAVESTATECOUNT, PREDICTEDXYZ, MOUSEPOS;
+		XYZ, XYZPRECISE, CXZ, WORLDSEED, RNGSEEDS, FACING, TICKS, TICKRATE, SAVESTATECOUNT, PREDICTEDXYZ, MOUSEPOS, TRAJECTORIES;
 	}
 	
 	public static Properties p;
@@ -216,6 +218,18 @@ public class SettingsGui extends GuiScreen {
 			int x = Integer.parseInt(p.getProperty("MOUSEPOS_x"));
 			int y = Integer.parseInt(p.getProperty("MOUSEPOS_y"));
 			widths.replace(Settings.MOUSEPOS, drawRectWithText("Mouse Cursor: " + ClientProxy.virtual.nextMouse.getPath().get(0).cursorX + " " + ClientProxy.virtual.nextMouse.getPath().get(0).cursorY, x, y, Boolean.parseBoolean(p.getProperty("MOUSEPOS_hideRect"))));
+		}
+		
+		boolean showTRAJECTORIES = Boolean.parseBoolean(p.getProperty("TRAJECTORIES_visible"));
+		if (showTRAJECTORIES) {
+			int x = Integer.parseInt(p.getProperty("TRAJECTORIES_x"));
+			int y = Integer.parseInt(p.getProperty("TRAJECTORIES_y"));
+			String message = "Invalid Item";
+			Vec3d vec = TrajectoriesCalculator.calculate();
+			if (vec != null) {
+				message = String.format("%.3f %.3f %.3f", vec.x, vec.y, vec.z);
+			}
+			widths.replace(Settings.TRAJECTORIES, drawRectWithText("Trajectories: " + message, x, y, Boolean.parseBoolean(p.getProperty("TRAJECTORIES_hideRect"))));
 		}
 	}
 	
