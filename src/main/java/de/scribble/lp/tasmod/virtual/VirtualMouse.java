@@ -198,14 +198,14 @@ public class VirtualMouse {
 		addPathNode();
 	}
 
-	class PathNode {
+	public class PathNode {
 		private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
 
 		private int scrollwheel = 0;
 
-		private int cursorX = 0;
+		public int cursorX = 0;
 
-		private int cursorY = 0;
+		public int cursorY = 0;
 
 		public PathNode(Map<Integer, VirtualKey> keyList, int scrollwheel, int cursorX, int cursorY) {
 			Map<Integer, VirtualKey> copy = new HashMap<Integer, VirtualKey>();

@@ -1,14 +1,5 @@
 package de.scribble.lp.tasmod;
 
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-
-import com.mojang.realmsclient.gui.ChatFormatting;
-
-import de.pfannekuchen.killtherng.utils.EntityRandom;
-import de.pfannekuchen.killtherng.utils.ItemRandom;
-import de.scribble.lp.tasmod.recording.InputRecorder;
-import de.scribble.lp.tasmod.ticksync.TickSync;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -17,7 +8,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
- * The InfoGui returns!
+ * The InfoGui returns! 
+ * Pancake says: No it doesn't.
  * 
  * @author ScribbleLP
  *
@@ -41,42 +33,42 @@ public class InfoGui extends Gui {
 
 			// moved coordinates out of Tick Based Stuff
 
-			new Gui().drawString(mc.fontRenderer, "Pitch: " + mc.player.rotationPitch, 16, 60, 0xFFFFFF); // Show the current Pitch
-			new Gui().drawString(mc.fontRenderer, "Yaw: " + mc.player.rotationYaw, 16, 70, 0xFFFFFF); // Show the current Yaw (This comes from the modversion for 1.7.10 since 1.7 has
-																										// just SOUTH as a yaw in F3)
+//			new Gui().drawString(mc.fontRenderer, "Pitch: " + mc.player.rotationPitch, 16, 60, 0xFFFFFF); // Show the current Pitch
+//			new Gui().drawString(mc.fontRenderer, "Yaw: " + mc.player.rotationYaw, 16, 70, 0xFFFFFF); // Show the current Yaw (This comes from the modversion for 1.7.10 since 1.7 has
+//																										// just SOUTH as a yaw in F3)
+//
+//			new Gui().drawString(mc.fontRenderer, "Mouse " + Mouse.getEventX() + " " + Mouse.getEventY(), 16, 80, 0xFFFFFF); // Current Pointer location
+//
+//			new Gui().drawString(mc.fontRenderer, "Server Ticks: " + TickSync.getServertickcounter(), 16, 100, 0xFFFFFF); // Current Pointer location
+//			new Gui().drawString(mc.fontRenderer, "Client Ticks: " + TickSync.getClienttickcounter(), 16, 110, 0xFFFFFF); // Current Pointer location
+//			
+//			new Gui().drawString(mc.fontRenderer, "EntitySeed: "+ EntityRandom.currentSeed, 16, 130, 0xFFFFFF); // Current Pointer location
+//			new Gui().drawString(mc.fontRenderer, "ItemSeed: "+ ItemRandom.currentSeed, 16, 140, 0xFFFFFF); // Current Pointer location
+//			
+//			new Gui().drawString(mc.fontRenderer, "InputContainer: "+ ClientProxy.virtual.getContainer().size(), 16, 150, 0xFFFFFF); // Current Pointer location
 
-			new Gui().drawString(mc.fontRenderer, "Mouse " + Mouse.getEventX() + " " + Mouse.getEventY(), 16, 80, 0xFFFFFF); // Current Pointer location
-
-			new Gui().drawString(mc.fontRenderer, "Server Ticks: " + TickSync.getServertickcounter(), 16, 100, 0xFFFFFF); // Current Pointer location
-			new Gui().drawString(mc.fontRenderer, "Client Ticks: " + TickSync.getClienttickcounter(), 16, 110, 0xFFFFFF); // Current Pointer location
-			
-			new Gui().drawString(mc.fontRenderer, "EntitySeed: "+ EntityRandom.currentSeed, 16, 130, 0xFFFFFF); // Current Pointer location
-			new Gui().drawString(mc.fontRenderer, "ItemSeed: "+ ItemRandom.currentSeed, 16, 140, 0xFFFFFF); // Current Pointer location
-			
-			new Gui().drawString(mc.fontRenderer, "InputContainer: "+ ClientProxy.virtual.getContainer().size(), 16, 150, 0xFFFFFF); // Current Pointer location
-
-			if (Display.isActive()) {
-				String out1 = "";
-				for (String mouse : ClientProxy.virtual.getCurrentMousePresses()) {
-					out1 = out1.concat(mouse + " ");
-				}
-				out1=out1.concat(""+ChatFormatting.GREEN);
-				for (String mouse : ClientProxy.virtual.getNextMousePresses()) {
-					out1 = out1.concat(mouse + " ");
-				}
-				new Gui().drawString(mc.fontRenderer, out1, 5, height - 20, 0xFFFFFF); // Current Pointer location
-				
-				String out2 = "";
-				for (String key : ClientProxy.virtual.getCurrentKeyboardPresses()) {
-					out2 = out2.concat(key + " ");
-				}
-				out2=out2.concat(""+ChatFormatting.GREEN);
-				for (String key : ClientProxy.virtual.getNextKeyboardPresses()) {
-					out2 = out2.concat(key + " ");
-				}
-				new Gui().drawString(mc.fontRenderer, out2, 5, height - 10, 0xFFFFFF); // Current Pointer location
-			}
-			new Gui().drawString(mc.fontRenderer, InputRecorder.getTickCounter() + "", 5, height - 30, 0xFFFFFF); // Current Pointer location
+//			if (Display.isActive()) {
+//				String out1 = "";
+//				for (String mouse : ClientProxy.virtual.getCurrentMousePresses()) {
+//					out1 = out1.concat(mouse + " ");
+//				}
+//				out1=out1.concat(""+ChatFormatting.GREEN);
+//				for (String mouse : ClientProxy.virtual.getNextMousePresses()) {
+//					out1 = out1.concat(mouse + " ");
+//				}
+//				new Gui().drawString(mc.fontRenderer, out1, 5, height - 20, 0xFFFFFF); // Current Pointer location
+//				
+//				String out2 = "";
+//				for (String key : ClientProxy.virtual.getCurrentKeyboardPresses()) {
+//					out2 = out2.concat(key + " ");
+//				}
+//				out2=out2.concat(""+ChatFormatting.GREEN);
+//				for (String key : ClientProxy.virtual.getNextKeyboardPresses()) {
+//					out2 = out2.concat(key + " ");
+//				}
+//				new Gui().drawString(mc.fontRenderer, out2, 5, height - 10, 0xFFFFFF); // Current Pointer location
+//			}
+//			new Gui().drawString(mc.fontRenderer, InputRecorder.getTickCounter() + "", 5, height - 30, 0xFFFFFF); // Current Pointer location
 			new Gui().drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width / 2, height - 50, 0xFF8400); // Current Pointer location
 
 //            }

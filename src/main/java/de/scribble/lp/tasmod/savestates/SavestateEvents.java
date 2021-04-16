@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.savestates;
 
+import de.pfannekuchen.infogui.gui.SettingsGui;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -19,7 +20,9 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-	       System.out.println(ClientProxy.virtual.getContainer().toString());
+	       System.out.println(Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown());
+		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) { // Sorry.. 
+			Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
 		}
 	}
 }

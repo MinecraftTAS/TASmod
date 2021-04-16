@@ -150,7 +150,7 @@ public class VirtualInput2 {
 
 	private VirtualMouse currentMouse = new VirtualMouse();
 
-	private VirtualMouse nextMouse = new VirtualMouse();
+	public VirtualMouse nextMouse = new VirtualMouse();
 
 	private List<VirtualMouseEvent> currentMouseEvents = new ArrayList<VirtualMouseEvent>();
 	private Iterator<VirtualMouseEvent> currentMouseEventIterator = currentMouseEvents.iterator();
