@@ -3,7 +3,6 @@ package de.scribble.lp.tasmod;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
 
@@ -77,12 +76,12 @@ public class ClientProxy extends CommonProxy{
 			SettingsGui.p.setProperty("XYZ_visible", "true");
 			SettingsGui.p.setProperty("XYZPRECISE_visible", "false");
 			SettingsGui.p.setProperty("CXZ_visible", "false");
-			SettingsGui.p.setProperty("WORLDSEED_visible", "true");
+			SettingsGui.p.setProperty("WORLDSEED_visible", "false");
 			SettingsGui.p.setProperty("RNGSEEDS_visible", "false");
-			SettingsGui.p.setProperty("FACING_visible", "true");
+			SettingsGui.p.setProperty("FACING_visible", "false");
 			SettingsGui.p.setProperty("TICKS_visible", "false");
-			SettingsGui.p.setProperty("TICKRATE_visible", "true");
-			SettingsGui.p.setProperty("SAVESTATECOUNT_visible", "true");
+			SettingsGui.p.setProperty("TICKRATE_visible", "false");
+			SettingsGui.p.setProperty("SAVESTATECOUNT_visible", "false");
 			SettingsGui.p.setProperty("PREDICTEDXYZ_visible", "false");
 			SettingsGui.p.setProperty("MOUSEPOS_visible", "false");
 			SettingsGui.p.setProperty("TRAJECTORIES_visible", "false");
