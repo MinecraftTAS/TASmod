@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Maps;
 
 public class VirtualMouse {
@@ -31,8 +33,12 @@ public class VirtualMouse {
 		this.cursorX = cursorX;
 
 		this.cursorY = cursorY;
-		
-		this.path.addAll(path);
+
+		List<PathNode> pathCopy= new ArrayList<PathNode>();
+		path.forEach(pathNode->{
+			pathCopy.add(pathNode);
+		});
+		this.path=pathCopy;
 
 	}
 
@@ -239,6 +245,32 @@ public class VirtualMouse {
 			this.cursorY = 0;
 		}
 
+		@Override
+		public String toString() {
+			String keyString = "";
+			List<String> strings = new ArrayList<String>();
+
+			keyList.forEach((keycodes, virtualkeys) -> {
+				if (virtualkeys.isKeyDown()) {
+					strings.add(virtualkeys.getName());
+				}
+			});
+			if (!strings.isEmpty()) {
+				String seperator = ",";
+				for (int i = 0; i < strings.size(); i++) {
+					if (i == strings.size() - 1) {
+						seperator = "";
+					}
+					keyString = keyString.concat(strings.get(i) + seperator);
+				}
+			}
+			if (keyString.isEmpty()) {
+				return "MOUSEMOVED;"+scrollwheel + ";" + cursorX + ";" + cursorY;
+			} else {
+				return keyString + ";" + scrollwheel + ";" + cursorX + ";" + cursorY;
+			}
+		}
+
 	}
 
 	public void clear() {
@@ -246,6 +278,40 @@ public class VirtualMouse {
 			key.setPressed(false);
 		});
 		resetPath();
+	}
+
+	@Override
+	public String toString() {
+		List<String> stringy = getCurrentPresses();
+		String keyString = "";
+		if (!stringy.isEmpty()) {
+			String seperator = ",";
+			for (int i = 0; i < stringy.size(); i++) {
+				if (i == stringy.size() - 1) {
+					seperator = "";
+				}
+				keyString = keyString.concat(stringy.get(i) + seperator);
+			}
+		}
+		String pathString = "";
+		if (!path.isEmpty()) {
+			String seperator = "->";
+			for (int i = 0; i < path.size(); i++) {
+				if (i == path.size() - 1) {
+					seperator = "";
+				}
+				pathString = pathString.concat("[" + path.get(i).toString() + "]" + seperator);
+			}
+		}
+		if (!keyString.isEmpty() && !pathString.isEmpty()) {
+			return keyString + "|" + pathString;
+		} else if (keyString.isEmpty()) {
+			return pathString;
+		} else if (pathString.isEmpty()) {
+			return keyString;
+		} else {
+			return "";
+		}
 	}
 
 }
