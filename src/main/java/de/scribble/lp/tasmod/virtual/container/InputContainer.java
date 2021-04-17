@@ -21,8 +21,10 @@ public class InputContainer {
 	private VirtualMouse mouse = new VirtualMouse();
 
 	private VirtualSubticks subticks = new VirtualSubticks();
+	
+	public final File directory= new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles");
 
-	private BigArrayList<TickInputContainer> inputs = new BigArrayList(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles"+ File.separator +"temp");
+	private BigArrayList<TickInputContainer> inputs = new BigArrayList(directory+ File.separator +"temp");
 
 	public boolean isPlayingback() {
 		return playback;
@@ -49,7 +51,9 @@ public class InputContainer {
 
 	public void nextTick() {
 		index++;
-		inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
+		if(recording) {
+			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
+		}
 	}
 
 	public long size() {
