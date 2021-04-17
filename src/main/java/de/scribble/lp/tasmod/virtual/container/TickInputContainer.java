@@ -1,10 +1,12 @@
 package de.scribble.lp.tasmod.virtual.container;
 
+import java.io.Serializable;
+
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 
-public class TickInputContainer {
+public class TickInputContainer implements Serializable {
 	
 	private int tick;
 	

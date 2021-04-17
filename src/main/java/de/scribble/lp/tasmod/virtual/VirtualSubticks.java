@@ -1,6 +1,8 @@
 package de.scribble.lp.tasmod.virtual;
 
-public class VirtualSubticks {
+import java.io.Serializable;
+
+public class VirtualSubticks implements Serializable{
 	private float pitch;
 	private float yaw;
 
