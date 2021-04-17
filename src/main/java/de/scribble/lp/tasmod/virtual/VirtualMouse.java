@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.virtual;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
-public class VirtualMouse {
+public class VirtualMouse implements Serializable {
 
 	private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
 
@@ -198,7 +199,7 @@ public class VirtualMouse {
 		addPathNode();
 	}
 
-	public class PathNode {
+	public class PathNode implements Serializable{
 		private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
 
 		private int scrollwheel = 0;

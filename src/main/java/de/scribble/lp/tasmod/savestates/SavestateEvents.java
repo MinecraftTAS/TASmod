@@ -20,7 +20,7 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-	       System.out.println(Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown());
+	       System.out.println(ClientProxy.virtual.getContainer().toString());
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) { // Sorry.. 
 			Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
 		}

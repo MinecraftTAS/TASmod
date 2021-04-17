@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.virtual;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 
-public class VirtualKeyboard {
+public class VirtualKeyboard implements Serializable {
 
 	private Map<Integer, VirtualKey> keyList;
 

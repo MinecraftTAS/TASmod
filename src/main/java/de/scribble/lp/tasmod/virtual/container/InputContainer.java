@@ -1,11 +1,13 @@
 package de.scribble.lp.tasmod.virtual.container;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+
+import com.dselent.bigarraylist.BigArrayList;
 
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
+import net.minecraft.client.Minecraft;
 
 public class InputContainer {
 	private boolean playback = false;
@@ -20,7 +22,7 @@ public class InputContainer {
 
 	private VirtualSubticks subticks = new VirtualSubticks();
 
-	private List<TickInputContainer> inputs = new ArrayList<TickInputContainer>();
+	private BigArrayList<TickInputContainer> inputs = new BigArrayList(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles"+ File.separator +"temp");
 
 	public boolean isPlayingback() {
 		return playback;
@@ -50,7 +52,7 @@ public class InputContainer {
 		inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
 	}
 
-	public int size() {
+	public long size() {
 		return inputs.size();
 	}
 

@@ -1,12 +1,14 @@
 package de.scribble.lp.tasmod.virtual;
 
+import java.io.Serializable;
+
 /**
  * Class to store which keys on the keyboard have been pressed, similar to how Keybindings work.<br>
  * 
  * @author ScribbleLP
  *
  */
-public class VirtualKey {
+public class VirtualKey implements Serializable {
 	
 	private String name;
 	private int keycode;
