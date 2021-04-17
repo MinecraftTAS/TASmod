@@ -30,7 +30,7 @@ public abstract class MixinMinecraftServer2 {
 
 	// =====================================================================================================================================
 
-	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick()V"))
+	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick()V", ordinal = 1))
 	public void redirectTick(MinecraftServer server) {
 		this.tick();
 
@@ -64,7 +64,7 @@ public abstract class MixinMinecraftServer2 {
 
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(JJ)J"))
 	public long redirectMathMax(long oneLong, long i) {
-		return Math.abs(i - 50L); // Getting the original value of i
+		return i; // Getting the original value of i
 	}
 
 	// =====================================================================================================================================
@@ -76,9 +76,8 @@ public abstract class MixinMinecraftServer2 {
 	private Queue<FutureTask<?>> futureTaskQueue;
 
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Thread;sleep(J)V"))
-	public void redirectThreadSleep(long i) {
+	public void redirectThreadSleep(long msToTick) {
 
-		long msToTick = (long) (TickrateChangerServer.MILISECONDS_PER_TICK - i);
 		if (msToTick <= 0L) {
 			if (TickrateChangerServer.TICKS_PER_SECOND > 20.0)
 				msToTick = 0L;
