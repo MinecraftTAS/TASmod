@@ -34,7 +34,7 @@ public class MiscEvents {
 //				ev.player.portalCounter=new MiscReapplying().getPortalTime(file);
 //			}
 //		}
-		if(ev.player instanceof EntityPlayerMP) {
+		if(ev.player instanceof EntityPlayerMP) { //Why is this here????????????????
 			if (ignorerespawntimerClient||ignorerespawntimerServer) {
 				EntityPlayerMP playa=(EntityPlayerMP)ev.player;
 				playa.respawnInvulnerabilityTicks=0;
