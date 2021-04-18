@@ -35,4 +35,19 @@ public class TickInputContainer implements Serializable {
 		return tick+"|"+keyboard.toString()+"|"+mouse.toString()+"|"+subticks.toString();
 	}
 	
+	public VirtualKeyboard getKeyboard() {
+		return keyboard;
+	}
+	
+	public VirtualMouse getMouse() {
+		return mouse;
+	}
+	
+	public VirtualSubticks getSubticks() {
+		return subticks;
+	}
+	
+	public int getTick() {
+		return tick;
+	}
 }

@@ -72,7 +72,7 @@ public class InfoGui extends Gui {
 				}
 				new Gui().drawString(mc.fontRenderer, out2, 5, height - 10, 0xFFFFFF); // Current Pointer location
 			}
-//			new Gui().drawString(mc.fontRenderer, InputRecorder.getTickCounter() + "", 5, height - 30, 0xFFFFFF); // Current Pointer location
+			new Gui().drawString(mc.fontRenderer, ClientProxy.virtual.getContainer().index() + "", 5, height - 30, 0xFFFFFF); // Current Pointer location
 			new Gui().drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width / 2, height - 50, 0xFF8400); // Current Pointer location
 
 //            }

@@ -33,31 +33,70 @@ public class InputContainer {
 	public boolean isRecording() {
 		return recording;
 	}
+	
+	public void toggleRecording() {
+		if(playback)return;
+		recording=!recording;
+	}
 
+	public void togglePlayback() {
+		if(recording)return;
+		playback=!playback;
+		if(playback) {
+			index=0;
+		}
+	}
+	
 	public VirtualKeyboard addKeyboardToContainer(VirtualKeyboard keyboard) {
-		this.keyboard = keyboard.clone();
+		if(recording) {
+			this.keyboard = keyboard.clone();
+		}else if(playback) {
+			keyboard=this.keyboard.clone();
+		}
 		return keyboard;
 	}
 
 	public VirtualMouse addMouseToContainer(VirtualMouse mouse) {
-		this.mouse = mouse.clone();
+		if(recording) {
+			this.mouse = mouse.clone();
+		}else if(playback) {
+			mouse=this.mouse.clone();
+		}
 		return mouse;
 	}
 
 	public VirtualSubticks addSubticksToContainer(VirtualSubticks subticks) {
-		this.subticks = subticks.clone();
+		if(recording) {
+			this.subticks = subticks.clone();
+		}else if(playback) {
+			subticks=this.subticks.clone();
+		}
 		return subticks;
 	}
 
 	public void nextTick() {
-		index++;
 		if(recording) {
+			index++;
 			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
+		}else if(playback) {
+			index++;
+			if(index>=inputs.size()) {
+				playback=false;
+			}else {
+				TickInputContainer tickcontainer=inputs.get(index);
+				this.keyboard=tickcontainer.getKeyboard();
+				this.mouse=tickcontainer.getMouse();
+				this.subticks=tickcontainer.getSubticks();
+			}
 		}
 	}
 
 	public long size() {
 		return inputs.size();
+	}
+	
+	public int index() {
+		return index;
 	}
 
 	@Override
