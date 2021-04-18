@@ -10,11 +10,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.duck.GuiScreenDuck;
+import de.scribble.lp.tasmod.util.PointerNormalizer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
 @Mixin(GuiScreen.class)
-public class MixinGuiScreen2 {
+public class MixinGuiScreen2 implements GuiScreenDuck {
 
 	// =====================================================================================================================================
 
@@ -77,7 +79,7 @@ public class MixinGuiScreen2 {
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", remap = false))
 	public boolean redirectGetEventButtonState() {
 		if (ClientProxy.virtual.getContainer().isPlayingback()) {
-			Mouse.setCursorPosition(ClientProxy.virtual.getEventCursorX(), ClientProxy.virtual.getEventCursorY());
+			Mouse.setCursorPosition(uncalcX(ClientProxy.virtual.getEventCursorX()), uncalcY(ClientProxy.virtual.getEventCursorY()));
 		}
 		return ClientProxy.virtual.getEventMouseState();
 	}
@@ -86,14 +88,14 @@ public class MixinGuiScreen2 {
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventX()I", remap = false))
 	public int redirectGetEventX() {
-		return ClientProxy.virtual.getEventCursorX();
+		return uncalcX(ClientProxy.virtual.getEventCursorX());
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventY()I", remap = false))
 	public int redirectGetEventY() {
-		return ClientProxy.virtual.getEventCursorY();
+		return uncalcY(ClientProxy.virtual.getEventCursorY());
 	}
 
 	// =====================================================================================================================================
@@ -115,6 +117,37 @@ public class MixinGuiScreen2 {
 	@Redirect(method = "isAltKeyDown", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
 	private static boolean redirectIsAltKeyDown(int i) {
 		return ClientProxy.virtual.isKeyDown(i);
+	}
+
+	// =====================================================================================================================================
+
+	@Shadow
+	private int width;
+
+	@Shadow
+	private int height;
+
+	@Shadow
+	private Minecraft mc;
+
+	@Override
+	public int calcX(int X) {
+		return X * this.width / this.mc.displayWidth;
+	}
+
+	@Override
+	public int calcY(int Y) {
+		return this.height - Y * this.height / this.mc.displayHeight - 1;
+	}
+
+	@Override
+	public int uncalcX(int X) {
+		return X * this.mc.displayWidth / this.width;
+	}
+
+	@Override
+	public int uncalcY(int Y) {
+		return (this.mc.displayHeight * (this.height - Y - 1) / this.height);
 	}
 
 }
