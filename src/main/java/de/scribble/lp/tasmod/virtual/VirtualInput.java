@@ -17,6 +17,7 @@ import net.minecraft.client.settings.KeyBinding;
  * @author ScribbleLP
  *
  */
+@Deprecated
 public class VirtualInput {
 	
 	public static VirtualKeyboard keyboard=new VirtualKeyboard();

@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 
+@Deprecated
 @Mixin(GuiScreen.class)
 public abstract class MixinGuiScreen{
 	@Shadow

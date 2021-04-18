@@ -32,7 +32,10 @@ public class VirtualInput2 {
 	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
 
 //		System.out.println(keycode+" "+keystate+" "+character);
-
+		
+		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
+			return;
+		}
 		VirtualKey key = nextKeyboard.get(keycode);
 		key.setPressed(keystate);
 		if (keystate) {
@@ -42,7 +45,7 @@ public class VirtualInput2 {
 	}
 
 	public List<VirtualKeyboardEvent> getCurrentKeyboardEvents() {
-		return currentKeyboard.getDifference(container.addKeyboardToContainer(nextKeyboard));
+		return currentKeyboard.getDifference(nextKeyboard);
 	}
 
 	public void updateCurrentKeyboardEvents() {
@@ -184,7 +187,7 @@ public class VirtualInput2 {
 	}
 
 	public List<VirtualMouseEvent> getCurrentMouseEvents() {
-		return currentMouse.getDifference(container.addMouseToContainer(nextMouse));
+		return currentMouse.getDifference(nextMouse);
 	}
 
 	public void updateCurrentMouseEvents() {
@@ -290,4 +293,8 @@ public class VirtualInput2 {
 		return container;
 	}
 	
+	public void updateContainer() {
+		nextKeyboard=container.addKeyboardToContainer(nextKeyboard);
+		nextMouse=container.addMouseToContainer(nextMouse);
+	}
 }

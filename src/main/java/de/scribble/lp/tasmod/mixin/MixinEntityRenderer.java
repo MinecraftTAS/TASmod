@@ -24,6 +24,7 @@ import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.math.MathHelper;
 
+@Deprecated
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer implements SubtickDuck{
 	@Shadow

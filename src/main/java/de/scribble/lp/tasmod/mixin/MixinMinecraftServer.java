@@ -25,6 +25,7 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 
+@Deprecated
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer {
 	@Shadow

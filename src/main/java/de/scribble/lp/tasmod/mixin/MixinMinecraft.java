@@ -66,6 +66,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.EnumDifficulty;
 
+@Deprecated
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
 	

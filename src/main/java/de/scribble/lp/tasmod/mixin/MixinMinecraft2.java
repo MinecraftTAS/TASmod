@@ -48,6 +48,7 @@ public abstract class MixinMinecraft2 {
 		while (Mouse.next()) {
 			ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.TICKS_PER_SECOND==0);
 		}
+		ClientProxy.virtual.updateContainer();
 	}
 
 	// =====================================================================================================================================
