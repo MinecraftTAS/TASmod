@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.scribble.lp.tasmod.util.PointerNormalizer;
 import de.scribble.lp.tasmod.virtual.container.InputContainer;
 
 public class VirtualInput2 {
@@ -180,7 +181,7 @@ public class VirtualInput2 {
 
 		nextMouse.setScrollWheel(scrollwheel);
 
-		nextMouse.setCursor(cursorX, cursorY);
+		nextMouse.setCursor(PointerNormalizer.getNormalizedX(cursorX), PointerNormalizer.getNormalizedY(cursorY));
 
 		if (flag == true)
 			nextMouse.addPathNode();
@@ -229,11 +230,11 @@ public class VirtualInput2 {
 	}
 
 	public int getEventCursorX() {
-		return currentMouseEvent.getMouseX();
+		return PointerNormalizer.getCoordsX(currentMouseEvent.getMouseX());
 	}
 
 	public int getEventCursorY() {
-		return currentMouseEvent.getMouseY();
+		return PointerNormalizer.getCoordsY(currentMouseEvent.getMouseY());
 	}
 
 	public void clearNextMouse() {

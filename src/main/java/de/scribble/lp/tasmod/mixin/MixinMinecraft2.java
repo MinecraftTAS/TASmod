@@ -17,6 +17,7 @@ import de.pfannekuchen.killtherng.networking.UpdateSeedPacket;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.duck.GuiScreenDuck;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.savestates.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
@@ -46,7 +47,12 @@ public abstract class MixinMinecraft2 {
 			ClientProxy.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
 		while (Mouse.next()) {
-			ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.TICKS_PER_SECOND==0);
+			if(this.currentScreen==null) {
+				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.TICKS_PER_SECOND==0);
+			} else {
+				GuiScreenDuck screen=(GuiScreenDuck) currentScreen;
+				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.TICKS_PER_SECOND==0);
+			}
 		}
 		ClientProxy.virtual.updateContainer();
 	}
