@@ -1,6 +1,8 @@
 package de.scribble.lp.tasmod.mixin;
 
+import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -8,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.virtual.VirtualInput2;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
 @Mixin(GuiScreen.class)
@@ -74,6 +76,9 @@ public class MixinGuiScreen2 {
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", remap = false))
 	public boolean redirectGetEventButtonState() {
+		if (ClientProxy.virtual.getContainer().isPlayingback()) {
+			Mouse.setCursorPosition(ClientProxy.virtual.getEventCursorX(), ClientProxy.virtual.getEventCursorY());
+		}
 		return ClientProxy.virtual.getEventMouseState();
 	}
 
@@ -111,6 +116,5 @@ public class MixinGuiScreen2 {
 	private static boolean redirectIsAltKeyDown(int i) {
 		return ClientProxy.virtual.isKeyDown(i);
 	}
-	
-	// =====================================================================================================================================
+
 }
