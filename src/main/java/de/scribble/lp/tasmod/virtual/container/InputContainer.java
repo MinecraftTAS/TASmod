@@ -1,6 +1,7 @@
 package de.scribble.lp.tasmod.virtual.container;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.dselent.bigarraylist.BigArrayList;
 
@@ -38,6 +39,10 @@ public class InputContainer {
 		if (playback)
 			return;
 		recording = !recording;
+		if (recording) {
+			inputs = new BigArrayList(directory + File.separator + "temp");
+			index = 0;
+		}
 	}
 
 	public void togglePlayback() {
