@@ -20,9 +20,11 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-	       System.out.println(ClientProxy.virtual.getContainer().toString());
+			ClientProxy.virtual.getContainer().togglePlayback();
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) { // Sorry.. 
 			Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
+		}else if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
+			ClientProxy.virtual.getContainer().toggleRecording();
 		}
 	}
 }
