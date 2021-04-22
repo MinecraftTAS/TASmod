@@ -27,6 +27,17 @@ public class InputContainer {
 
 	private BigArrayList<TickInputContainer> inputs = new BigArrayList(directory + File.separator + "temp");
 
+	//=====================================================================================================
+	
+	private String authors="Insert author here";
+	
+	private String title="Insert TAS category here";
+	
+	private int rerecords=0;
+	
+	private String playtime="00:00.0";
+	//=====================================================================================================
+	
 	public boolean isPlayingback() {
 		return playback;
 	}
@@ -40,7 +51,7 @@ public class InputContainer {
 			return;
 		recording = !recording;
 		if (recording) {
-			inputs = new BigArrayList(directory + File.separator + "temp");
+			clear();
 			index = 0;
 		}
 	}
@@ -104,9 +115,25 @@ public class InputContainer {
 	public long size() {
 		return inputs.size();
 	}
+	
+	public boolean isEmpty() {
+		return inputs.isEmpty();
+	}
 
 	public int index() {
 		return index;
+	}
+	
+	public BigArrayList<TickInputContainer> getInputs() {
+		return inputs;
+	}
+
+	public void setInputs(BigArrayList<TickInputContainer> inputs) {
+		this.inputs = inputs;
+	}
+
+	public void setIndex(int index) {
+		this.index=index;
 	}
 
 	@Override
@@ -120,4 +147,41 @@ public class InputContainer {
 		}
 		return out;
 	}
+	
+	public void clear() {
+		inputs=new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
+	}
+
+	public String getAuthors() {
+		return authors;
+	}
+
+	public void setAuthors(String authors) {
+		this.authors = authors;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public int getRerecords() {
+		return rerecords;
+	}
+
+	public void setRerecords(int rerecords) {
+		this.rerecords = rerecords;
+	}
+
+	public String getPlaytime() {
+		return playtime;
+	}
+
+	public void setSavestates(String playtime) {
+		this.playtime = playtime;
+	}
+	
 }
