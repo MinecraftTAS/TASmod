@@ -441,7 +441,7 @@ public class InputPlayback {
 			String[] keys = xpart[0].split(",");
 			for (int i = 0; i < keys.length; i++) {
 				double pointer=getDouble("MouseX", keys[i], linecounter, i);
-				out.add(PointerNormalizer.getCoordsX(pointer));
+//				out.add(PointerNormalizer.getCoordsX(pointer));
 			}
 		}
 		return out;
@@ -457,7 +457,7 @@ public class InputPlayback {
 			String[] keys = ypart[1].split(",");
 			for (int i = 0; i < keys.length; i++) {
 				double pointer=getDouble("MouseY", keys[i], linecounter, i);
-				out.add(PointerNormalizer.getCoordsY(pointer));
+//				out.add(PointerNormalizer.getCoordsY(pointer));
 			}
 		}
 		return out;
