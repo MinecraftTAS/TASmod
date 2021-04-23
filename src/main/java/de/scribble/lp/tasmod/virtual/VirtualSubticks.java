@@ -31,6 +31,6 @@ public class VirtualSubticks implements Serializable{
 	
 	@Override
 	public String toString() {
-		return pitch+";"+yaw;
+		return "Camera:"+pitch+";"+yaw;
 	}
 }

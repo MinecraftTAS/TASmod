@@ -362,14 +362,7 @@ public class VirtualKeyboard implements Serializable {
 			charString = StringUtils.replace(charString, "\r", "\\n");
 			charString = StringUtils.replace(charString, "\n", "\\n");
 		}
-		if (!keyString.isEmpty() && !charString.isEmpty()) {
-			return keyString + ";" + charString;
-		} else if (keyString.isEmpty()) {
-			return charString;
-		} else if (charString.isEmpty()) {
-			return keyString;
-		} else {
-			return "";
-		}
+		
+		return "Keyboard:"+keyString + ";" + charString;
 	}
 }
