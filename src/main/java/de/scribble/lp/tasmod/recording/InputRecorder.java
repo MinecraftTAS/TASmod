@@ -41,7 +41,6 @@ public class InputRecorder {
 	private static File fileLocation;
 	private static boolean recording = false;
 	private static long tickCounter;
-	private static final String tasdirectory = mc.mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles";
 	private static boolean pauseRecording = false;
 	private static String filenames;
 	private static File temp_names;
@@ -387,7 +386,7 @@ public class InputRecorder {
 	 * @return file
 	 */
 	private static File interpretFilename(String name) {
-		File file = new File(tasdirectory + File.separator + name + ".tas");
+		File file = new File(ClientProxy.tasdirectory + File.separator + name + ".tas");
 		if (name.contains("/") 
 				|| name.contains(".") 
 				|| name.contains("\r")
@@ -413,7 +412,7 @@ public class InputRecorder {
 	 * Makes a directory under .minecraft/saves/tasfiles
 	 */
 	private static void makeTASDir() {
-		new File(tasdirectory).mkdir();
+		new File(ClientProxy.tasdirectory).mkdir();
 	}
 
 	public static boolean isRecording() {

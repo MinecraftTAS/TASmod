@@ -35,11 +35,11 @@ public class VirtualMouse implements Serializable {
 
 		this.cursorY = cursorY;
 
-		List<PathNode> pathCopy= new ArrayList<PathNode>();
-		path.forEach(pathNode->{
+		List<PathNode> pathCopy = new ArrayList<PathNode>();
+		path.forEach(pathNode -> {
 			pathCopy.add(pathNode);
 		});
-		this.path=pathCopy;
+		this.path = pathCopy;
 
 	}
 
@@ -199,7 +199,7 @@ public class VirtualMouse implements Serializable {
 		addPathNode();
 	}
 
-	public class PathNode implements Serializable{
+	public class PathNode implements Serializable {
 		private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
 
 		private int scrollwheel = 0;
@@ -266,7 +266,7 @@ public class VirtualMouse implements Serializable {
 				}
 			}
 			if (keyString.isEmpty()) {
-				return "MOUSEMOVED;"+scrollwheel + ";" + cursorX + ";" + cursorY;
+				return "MOUSEMOVED;" + scrollwheel + ";" + cursorX + ";" + cursorY;
 			} else {
 				return keyString + ";" + scrollwheel + ";" + cursorX + ";" + cursorY;
 			}
@@ -304,15 +304,7 @@ public class VirtualMouse implements Serializable {
 				pathString = pathString.concat("[" + path.get(i).toString() + "]" + seperator);
 			}
 		}
-		if (!keyString.isEmpty() && !pathString.isEmpty()) {
-			return keyString + "|" + pathString;
-		} else if (keyString.isEmpty()) {
-			return pathString;
-		} else if (pathString.isEmpty()) {
-			return keyString;
-		} else {
-			return "";
-		}
+		return "Mouse:"+keyString + ";" + pathString;
 	}
 
 }
