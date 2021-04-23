@@ -18,21 +18,41 @@ import de.scribble.lp.tasmod.virtual.container.TickInputContainer;
 import net.minecraft.client.Minecraft;
 
 public class ContainerSerialiser {
-
+	
 	public void saveToFileV1(File file, InputContainer container) throws FileNotFoundException {
-		if (container.size() == 0) {
+		if(container.size()==0) {
 			return;
 		}
-		FileThread fileThread = new FileThread(file, false);
-
+		FileThread fileThread=new FileThread(file, false);
+		
 		fileThread.start();
-
-		fileThread.addLine("################################################# TASFile ###################################################\n" + "#												Version:1													#\n" + "#							This file was generated using the Minecraft TASMod								#\n" + "#																											#\n" + "#	If you make a mistake in this file, the mod will notify you via the console, so it's best to keep the	#\n" + "#										console open at all times											#\n" + "#																											#\n" + "#------------------------------------------------ Header ---------------------------------------------------#\n" + "#Author:" + container.getAuthors() + "\n" + "#																											#\n" + "#Title:" + container.getTitle() + "\n" + "#																											#\n" + "#Playing Time:" + container.getPlaytime() + "\n" + "#																											#\n" + "#Rerecords:" + container.getRerecords() + "\n" + "#																											#\n" + "#----------------------------------------------- Settings --------------------------------------------------#\n" + "#Entity Seed:" + EntityRandom.currentSeed.get() + "\n" + "#Item Seed:" + ItemRandom.currentSeed.get() + "\n" + "#StartPosition:\n" + "#############################################################################################################\n");
-
-		BigArrayList<TickInputContainer> ticks = container.getInputs();
+		
+		fileThread.addLine("################################################# TASFile ###################################################\n"
+				 + "#												Version:1													#\n"
+				 + "#							This file was generated using the Minecraft TASMod								#\n"
+				 + "#																											#\n"
+				 + "#	If you make a mistake in this file, the mod will notify you via the console, so it's best to keep the	#\n"
+				 + "#										console open at all times											#\n"
+				 + "#																											#\n"
+				 + "#------------------------------------------------ Header ---------------------------------------------------#\n"
+				 + "#Author:" + container.getAuthors() + "\n"
+				 + "#																											#\n"
+				 + "#Title:" + container.getTitle() + "\n"
+				 + "#																											#\n"
+				 + "#Playing Time:" + container.getPlaytime() + "\n"
+				 + "#																											#\n"
+				 + "#Rerecords:"+container.getRerecords() + "\n"
+				 + "#																											#\n"
+				 + "#----------------------------------------------- Settings --------------------------------------------------#\n"
+				 + "#Entity Seed:" + EntityRandom.currentSeed.get() + "\n"
+				 + "#Item Seed:" + ItemRandom.currentSeed.get() + "\n"
+				 + "#StartPosition:\n"
+				 + "#############################################################################################################\n");
+		
+		BigArrayList<TickInputContainer> ticks= container.getInputs();
 		for (int i = 0; i < ticks.size(); i++) {
-			TickInputContainer tick = ticks.get(i);
-			fileThread.addLine(tick.toString() + "\n");
+			TickInputContainer tick=ticks.get(i);
+			fileThread.addLine(tick.toString()+"\n");
 		}
 		fileThread.close();
 	}
