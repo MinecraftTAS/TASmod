@@ -202,7 +202,7 @@ public class VirtualMouse implements Serializable {
 	public class PathNode implements Serializable {
 		private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
 
-		private int scrollwheel = 0;
+		public int scrollwheel = 0;
 
 		public int cursorX = 0;
 
@@ -271,6 +271,18 @@ public class VirtualMouse implements Serializable {
 				return keyString + ";" + scrollwheel + ";" + cursorX + ";" + cursorY;
 			}
 		}
+		
+		public VirtualKey get(String keyname) {
+			Collection<VirtualKey> list = keyList.values();
+			VirtualKey out = null;
+
+			for (VirtualKey key : list) {
+				if (key.getName().equalsIgnoreCase(keyname)) {
+					out = key;
+				}
+			}
+			return out;
+		}
 
 	}
 
@@ -305,6 +317,14 @@ public class VirtualMouse implements Serializable {
 			}
 		}
 		return "Mouse:"+keyString + ";" + pathString;
+	}
+	
+	public void setPath(List<PathNode> path) {
+		List<PathNode> pathCopy = new ArrayList<PathNode>();
+		path.forEach(pathNode -> {
+			pathCopy.add(pathNode);
+		});
+		this.path = pathCopy;
 	}
 
 }
