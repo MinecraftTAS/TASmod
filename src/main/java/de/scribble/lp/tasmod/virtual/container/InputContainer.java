@@ -179,9 +179,15 @@ public class InputContainer {
 	public String getPlaytime() {
 		return playtime;
 	}
+	
+	public void setPlaytime(String playtime) {
+		this.playtime=playtime;
+	}
 
 	public void setSavestates(String playtime) {
 		this.playtime = playtime;
 	}
+
+	
 	
 }
