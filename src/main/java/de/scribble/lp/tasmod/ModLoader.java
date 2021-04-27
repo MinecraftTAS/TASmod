@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.tasmod.misc.CommandFolder;
 import de.scribble.lp.tasmod.misc.ModIncompatibleException;
+import de.scribble.lp.tasmod.playback.CommandLoadTAS;
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandSaveTAS;
 import de.scribble.lp.tasmod.savestates.SavestateTrackerFile;
@@ -75,7 +76,7 @@ public class ModLoader {
 		// Command handling
 		ev.registerServerCommand(new CommandTickrate());
 		ev.registerServerCommand(new CommandSaveTAS());
-		ev.registerServerCommand(new CommandPlay());
+		ev.registerServerCommand(new CommandLoadTAS());
 		ev.registerServerCommand(new CommandPlaybacktutorial());
 		ev.registerServerCommand(new CommandFolder());
 

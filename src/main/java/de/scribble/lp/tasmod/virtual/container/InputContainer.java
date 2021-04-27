@@ -128,10 +128,6 @@ public class InputContainer {
 		return inputs;
 	}
 
-	public void setInputs(BigArrayList<TickInputContainer> inputs) {
-		this.inputs = inputs;
-	}
-
 	public void setIndex(int index) {
 		this.index=index;
 	}

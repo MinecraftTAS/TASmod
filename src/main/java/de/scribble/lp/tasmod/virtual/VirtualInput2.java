@@ -9,7 +9,7 @@ import de.scribble.lp.tasmod.virtual.container.InputContainer;
 
 public class VirtualInput2 {
 
-	private final InputContainer container = new InputContainer();
+	private InputContainer container = new InputContainer();
 
 	// ============================================================
 
@@ -297,5 +297,9 @@ public class VirtualInput2 {
 	public void updateContainer() {
 		nextKeyboard=container.addKeyboardToContainer(nextKeyboard);
 		nextMouse=container.addMouseToContainer(nextMouse);
+	}
+	
+	public void setContainer(InputContainer container) {
+		this.container=container;
 	}
 }
