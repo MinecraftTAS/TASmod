@@ -19,12 +19,12 @@ public class CommandSaveTAS extends CommandBase {
 
 	@Override
 	public String getName() {
-		return "savetas";
+		return "save";
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "/savetas <filename>";
+		return "/save <filename>";
 	}
 
 	@Override

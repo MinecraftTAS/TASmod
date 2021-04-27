@@ -16,6 +16,7 @@ import de.pfannekuchen.killtherng.utils.ItemRandom;
 import de.scribble.lp.tasmod.recording.FileThread;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
+import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import de.scribble.lp.tasmod.virtual.VirtualMouse.PathNode;
 import de.scribble.lp.tasmod.virtual.container.InputContainer;
 import de.scribble.lp.tasmod.virtual.container.TickInputContainer;
@@ -65,8 +66,14 @@ public class ContainerSerialiser {
 		List<String> lines = FileUtils.readLines(file, Charset.defaultCharset());
 		for (String line : lines) {
 			if (line.contains("Version")) {
-				String trimmed = line.replaceAll("#| ", "");
-				return Integer.parseInt(trimmed.split(":")[1]);
+				String trimmed = line.replaceAll("#|\t", "");
+				int tick=0;
+				try {
+					tick=Integer.parseInt(trimmed.split(":")[1]);
+				} catch (NumberFormatException e) {
+					throw new IOException("Can't read the file version: "+trimmed);
+				}
+				return tick;
 			}
 		}
 		return 0;
@@ -102,20 +109,20 @@ public class ContainerSerialiser {
 					rerecords = Integer.parseInt(line.split(":")[1]);
 				}
 			} else {
-				String[] sections = line.split("|");
+				String[] sections = line.split("\\|");
 
 				if (sections.length != 4) {
 					throw new IOException("Error in line " + linenumber + ". Cannot read the line correctly");
 				}
 
-//				container.getInputs().add(element)
+				container.getInputs().add(new TickInputContainer(readTicks(sections[0], linenumber), readKeyboard(sections[1], linenumber), readMouse(sections[2], linenumber), readSubtick(sections[3], linenumber)));
 			}
 		}
 		container.setAuthors(author);
 		container.setTitle(title);
 		container.setPlaytime(playtime);
 		container.setRerecords(rerecords);
-		return null;
+		return container;
 	}
 
 	private int readTicks(String section, int linenumber) throws IOException {
@@ -129,11 +136,21 @@ public class ContainerSerialiser {
 	}
 	
 	private VirtualKeyboard readKeyboard(String section, int linenumber) throws IOException {
-		section=section.replace("Keyboard:", "");
-		String[] keys = section.split(";")[0].split(",");
-		char[] chars = section.split(";")[1].replace("\\n", "\n").toCharArray();
-
 		VirtualKeyboard keyboard = new VirtualKeyboard();
+		section=section.replace("Keyboard:", "");
+		String[] keys = section.split(";");
+		if(keys.length==0) {
+			return keyboard;
+		}
+		keys=keys[0].split(",");
+		
+		
+		String[] charsString = section.split(";");
+		char[] chars= {};
+		if(charsString.length==2) {
+			chars=charsString[1].replace("\\n", "\n").toCharArray();
+		}
+		
 		for (String key : keys) {
 			if (keyboard.get(key) == null) {
 				throw new IOException(key + " is not a recognised keyboard key in line " + linenumber);
@@ -147,31 +164,33 @@ public class ContainerSerialiser {
 	}
 
 	private VirtualMouse readMouse(String section, int linenumber) throws IOException {
-		section = section.replace("Mouse:", "");
-		String[] buttons = section.split(";")[0].split(",");
-		String path=section.split(";")[1];
-
 		VirtualMouse mouse = new VirtualMouse();
-		for (String button : buttons) {
-			if (mouse.get(button) == null) {
-				throw new IOException(button + " is not a recognised mouse key in line " + linenumber);
-			}
-			mouse.get(button).setPressed(true);
-		}
-
-		mouse.setPath(readPath(path, linenumber, mouse));
+		section = section.replace("Mouse:", "");
+		String buttons = section.split(";")[0];
+		String path = section.split(";")[1];
 		
+		if(!buttons.isEmpty()) {
+			String[] splitButtons=buttons.split(",");
+			for (String button : splitButtons) {
+				if (mouse.get(button) == null) {
+					throw new IOException(button + " is not a recognised mouse key in line " + linenumber);
+				}
+				mouse.get(button).setPressed(true);
+			}
+		}
+		mouse.setPath(readPath(path, linenumber, mouse));
+
 		return mouse;
 	}
 
 	private List<PathNode> readPath(String section, int linenumber, VirtualMouse mouse) throws IOException {
+		List<PathNode> path = new ArrayList<VirtualMouse.PathNode>();
+		
 		section = section.replace("[", "").replace("]", "");
 		String[] pathNodes = section.split("->");
 
-		List<PathNode> path = new ArrayList<VirtualMouse.PathNode>();
-
 		for (String pathNode : pathNodes) {
-			String[] split = pathNode.split(";");
+			String[] split = pathNode.split(",");
 			String key = split[0];
 			int scrollWheel = 0;
 			int cursorX = 0;
@@ -191,6 +210,23 @@ public class ContainerSerialiser {
 			path.add(node);
 		}
 		return path;
+	}
+	
+	private VirtualSubticks readSubtick(String section, int linenumber) throws IOException {
+		section = section.replace("Camera:", "");
+		String[] split=section.split(";");
+		
+		float x=0F;
+		float y=0F;
+		
+		try {
+			x=Float.parseFloat(split[0]);
+			y=Float.parseFloat(split[1]);
+		} catch (NumberFormatException e){
+			throw new IOException(split[0]+" or/and "+split[1]+" are not float numbers in line "+ linenumber);
+		}
+		
+		return new VirtualSubticks(x, y);
 	}
 
 	private static String getStartLocation() {

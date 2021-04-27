@@ -266,9 +266,9 @@ public class VirtualMouse implements Serializable {
 				}
 			}
 			if (keyString.isEmpty()) {
-				return "MOUSEMOVED;" + scrollwheel + ";" + cursorX + ";" + cursorY;
+				return "MOUSEMOVED," + scrollwheel + "," + cursorX + "," + cursorY;
 			} else {
-				return keyString + ";" + scrollwheel + ";" + cursorX + ";" + cursorY;
+				return keyString + "," + scrollwheel + "," + cursorX + "," + cursorY;
 			}
 		}
 		
