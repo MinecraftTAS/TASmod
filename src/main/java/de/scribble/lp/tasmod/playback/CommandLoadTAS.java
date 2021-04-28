@@ -41,6 +41,8 @@ public class CommandLoadTAS extends CommandBase {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			ClientProxy.virtual.getContainer().fixTicks();
+			ClientProxy.virtual.getContainer().setIndexToLatest();
 		}
 	}
 

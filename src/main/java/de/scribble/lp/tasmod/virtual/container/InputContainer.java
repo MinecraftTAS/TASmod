@@ -27,18 +27,18 @@ public class InputContainer {
 
 	private BigArrayList<TickInputContainer> inputs = new BigArrayList(directory + File.separator + "temp");
 
-	//=====================================================================================================
-	
-	private String authors="Insert author here";
-	
-	private String title="Insert TAS category here";
-	
-	private int rerecords=0;
-	
-	private String playtime="00:00.0";
-	
-	//=====================================================================================================
-	
+	// =====================================================================================================
+
+	private String authors = "Insert author here";
+
+	private String title = "Insert TAS category here";
+
+	private int rerecords = 0;
+
+	private String playtime = "00:00.0";
+
+	// =====================================================================================================
+
 	public boolean isPlayingback() {
 		return playback;
 	}
@@ -117,7 +117,7 @@ public class InputContainer {
 	public long size() {
 		return inputs.size();
 	}
-	
+
 	public boolean isEmpty() {
 		return inputs.isEmpty();
 	}
@@ -125,13 +125,13 @@ public class InputContainer {
 	public int index() {
 		return index;
 	}
-	
+
 	public BigArrayList<TickInputContainer> getInputs() {
 		return inputs;
 	}
 
 	public void setIndex(int index) {
-		this.index=index;
+		this.index = index;
 	}
 
 	@Override
@@ -145,9 +145,9 @@ public class InputContainer {
 		}
 		return out;
 	}
-	
+
 	public void clear() {
-		inputs=new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
+		inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 	}
 
 	public String getAuthors() {
@@ -177,15 +177,23 @@ public class InputContainer {
 	public String getPlaytime() {
 		return playtime;
 	}
-	
+
 	public void setPlaytime(String playtime) {
-		this.playtime=playtime;
+		this.playtime = playtime;
 	}
 
 	public void setSavestates(String playtime) {
 		this.playtime = playtime;
 	}
 
+	public void fixTicks() {
+		for (int i = 0; i < inputs.size(); i++) {
+			inputs.get(i).setTick(i+1);
+		}
+	}
 	
-	
+	public void setIndexToLatest() {
+		index=(int) (inputs.size()-1);
+	}
+
 }

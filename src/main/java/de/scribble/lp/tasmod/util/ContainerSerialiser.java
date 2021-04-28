@@ -86,7 +86,7 @@ public class ContainerSerialiser {
 
 		InputContainer container = new InputContainer();
 
-		String author = "Insert author here";
+		String author = "Insert author here"; //TODO
 
 		String title = "Insert TAS category here";
 
