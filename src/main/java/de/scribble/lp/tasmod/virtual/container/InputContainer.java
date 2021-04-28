@@ -36,6 +36,7 @@ public class InputContainer {
 	private int rerecords=0;
 	
 	private String playtime="00:00.0";
+	
 	//=====================================================================================================
 	
 	public boolean isPlayingback() {
@@ -103,6 +104,7 @@ public class InputContainer {
 				this.mouse = new VirtualMouse();
 			} else if (index > inputs.size()) {
 				playback = false;
+				index--;
 			} else {
 				TickInputContainer tickcontainer = inputs.get(index);
 				this.keyboard = tickcontainer.getKeyboard();

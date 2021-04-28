@@ -14,10 +14,11 @@ import com.dselent.bigarraylist.BigArrayList;
 import de.pfannekuchen.killtherng.utils.EntityRandom;
 import de.pfannekuchen.killtherng.utils.ItemRandom;
 import de.scribble.lp.tasmod.recording.FileThread;
+import de.scribble.lp.tasmod.virtual.VirtualKey;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
-import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import de.scribble.lp.tasmod.virtual.VirtualMouse.PathNode;
+import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import de.scribble.lp.tasmod.virtual.container.InputContainer;
 import de.scribble.lp.tasmod.virtual.container.TickInputContainer;
 import net.minecraft.client.Minecraft;
@@ -137,26 +138,48 @@ public class ContainerSerialiser {
 	
 	private VirtualKeyboard readKeyboard(String section, int linenumber) throws IOException {
 		VirtualKeyboard keyboard = new VirtualKeyboard();
-		section=section.replace("Keyboard:", "");
+
+		// Remove the prefix
+		section = section.replace("Keyboard:", "");
+
+		// Split in keys and characters
 		String[] keys = section.split(";");
-		if(keys.length==0) {
+
+		// If there is nothing, return the empty keyboard
+		if (keys.length == 0) {
 			return keyboard;
 		}
-		keys=keys[0].split(",");
-		
-		
-		String[] charsString = section.split(";");
-		char[] chars= {};
-		if(charsString.length==2) {
-			chars=charsString[1].replace("\\n", "\n").toCharArray();
-		}
-		
-		for (String key : keys) {
-			if (keyboard.get(key) == null) {
-				throw new IOException(key + " is not a recognised keyboard key in line " + linenumber);
+
+		// Check if the keylist is empty
+		if (!keys[0].isEmpty()) {
+
+			// Split multiple keys
+			String[] splitKeys = keys[0].split(",");
+
+			for (String key : splitKeys) {
+
+				VirtualKey vkey = null;
+				// Check if the key is a keycode
+				if (isNumeric(key)) {
+					vkey = keyboard.get(Integer.parseInt(key));
+				} else {
+					vkey = keyboard.get(key);
+				}
+
+				if (vkey == null) {
+					throw new IOException(key + " is not a recognised keyboard key in line " + linenumber);
+				}
+
+				vkey.setPressed(true);
 			}
-			keyboard.get(key).setPressed(true);
 		}
+		
+		char[] chars = {};
+		//Check if the characterlist is empty
+		if (keys.length == 2) {
+			chars = keys[1].replace("\\n", "\n").toCharArray(); //Replacing the "\n" in lines to the character \n
+		}
+		
 		for (char onechar : chars) {
 			keyboard.addChar(onechar);
 		}
@@ -165,13 +188,28 @@ public class ContainerSerialiser {
 
 	private VirtualMouse readMouse(String section, int linenumber) throws IOException {
 		VirtualMouse mouse = new VirtualMouse();
+		
+		// Remove the prefix
 		section = section.replace("Mouse:", "");
+		
+		//Split into buttons and paths...
 		String buttons = section.split(";")[0];
 		String path = section.split(";")[1];
 		
+		//Check whether the button is empty
 		if(!buttons.isEmpty()) {
+			
+			//Splitting multiple buttons
 			String[] splitButtons=buttons.split(",");
 			for (String button : splitButtons) {
+				
+				VirtualKey vkey = null;
+				// Check if the key is a keycode
+				if (isNumeric(button)) {
+					vkey = mouse.get(Integer.parseInt(button));
+				} else {
+					vkey = mouse.get(button);
+				}
 				if (mouse.get(button) == null) {
 					throw new IOException(button + " is not a recognised mouse key in line " + linenumber);
 				}
@@ -200,7 +238,9 @@ public class ContainerSerialiser {
 				cursorX = Integer.parseInt(split[2]);
 				cursorY = Integer.parseInt(split[3]);
 			} catch (NumberFormatException e) {
-				throw new IOException("'" + pathNode + "' couldn't be read in line " + linenumber);
+				throw new IOException("'" + pathNode + "' couldn't be read in line " + linenumber+": Something is not a number");
+			} catch (ArrayIndexOutOfBoundsException e) {
+				throw new IOException("'" + pathNode + "' couldn't be read in line " + linenumber+": Something is missing or is too much");
 			}
 			PathNode node = mouse.new PathNode();
 			node.get(key).setPressed(true);
@@ -229,7 +269,7 @@ public class ContainerSerialiser {
 		return new VirtualSubticks(x, y);
 	}
 
-	private static String getStartLocation() {
+	private String getStartLocation() {
 		Minecraft mc = Minecraft.getMinecraft();
 		String pos = mc.player.getPositionVector().toString();
 		pos = pos.replace("(", "");
@@ -238,5 +278,14 @@ public class ContainerSerialiser {
 		String pitch = Float.toString(mc.player.rotationPitch);
 		String yaw = Float.toString(mc.player.rotationYaw);
 		return pos + "," + yaw + "," + pitch;
+	}
+	
+	private boolean isNumeric(String in){
+		try {
+			Integer.parseInt(in);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
 	}
 }
