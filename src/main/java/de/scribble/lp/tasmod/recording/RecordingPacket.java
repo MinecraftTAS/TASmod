@@ -6,27 +6,25 @@ import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class RecordingPacket implements IMessage{
-	String name;
+	boolean enabled;
 	
 	public RecordingPacket() {
 	}
-	public RecordingPacket(String name) {
-		this.name=name;
+	public RecordingPacket(boolean enabled) {
+		this.enabled=enabled;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		int length=buf.readInt();
-		name=(String) buf.readCharSequence(length, Charset.defaultCharset());
-		
+		enabled=buf.readBoolean();
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(name.length());
-		buf.writeCharSequence(name, Charset.defaultCharset());
+		buf.writeBoolean(enabled);
 	}
-	public String getName() {
-		return name;
+	
+	public boolean isEnabled() {
+		return enabled;
 	}
 }

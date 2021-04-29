@@ -34,6 +34,7 @@ import net.minecraft.util.text.TextComponentString;
  * @author ScribbleLP
  *
  */
+@Deprecated
 public class InputRecorder {
 	private static Minecraft mc = Minecraft.getMinecraft();
 	// private static StringBuilder output;
