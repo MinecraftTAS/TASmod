@@ -24,7 +24,7 @@ public class SaveTASPacket implements IMessage {
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(name.length());
+		buf.writeInt(name.getBytes().length);
 		buf.writeCharSequence(name, Charset.defaultCharset());
 	}
 
