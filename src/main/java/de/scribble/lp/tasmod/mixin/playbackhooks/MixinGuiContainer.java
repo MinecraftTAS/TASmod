@@ -21,7 +21,7 @@ public class MixinGuiContainer {
 		return ClientProxy.virtual.isKeyDown(i);
 	}
 
-	@Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/settings/KeyBinding;isActiveAndMatches(I)Z"))
+	@Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/settings/KeyBinding;isActiveAndMatches(I)Z", remap = false))
 	public boolean redirectIsActiveAndMatches(KeyBinding keyBindInventory, int keyCode) {
 		return keyBindInventory.isActiveAndMatches(keyCode) && !((GuiContainer)(Object)this).isFocused();
 	}

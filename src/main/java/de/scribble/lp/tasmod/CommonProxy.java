@@ -7,6 +7,8 @@ import de.pfannekuchen.killtherng.KillTheRNG;
 import de.pfannekuchen.killtherng.networking.UpdateSeedPacket;
 import de.pfannekuchen.killtherng.networking.UpdateSeedPacketHandler;
 import de.scribble.lp.tasmod.events.TASmodEvents;
+import de.scribble.lp.tasmod.loadtas.LoadTASPacket;
+import de.scribble.lp.tasmod.loadtas.LoadTASPacketHandler;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
 import de.scribble.lp.tasmod.recording.savestates.RecordingSavestatePacket;
@@ -19,6 +21,8 @@ import de.scribble.lp.tasmod.savestates.motion.MotionPacket;
 import de.scribble.lp.tasmod.savestates.motion.MotionPacketHandler;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacket;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacketHandler;
+import de.scribble.lp.tasmod.savetas.SaveTASPacket;
+import de.scribble.lp.tasmod.savetas.SaveTASPacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacketHandler;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
@@ -49,6 +53,10 @@ public class CommonProxy {
 		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(UpdateSeedPacketHandler.class, UpdateSeedPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(RecordingSavestatePacketHandler.class, RecordingSavestatePacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(SaveTASPacketHandler.class, SaveTASPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(SaveTASPacketHandler.class, SaveTASPacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.SERVER);
 		KillTheRNG.init();
 	}
 

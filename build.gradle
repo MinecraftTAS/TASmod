@@ -20,7 +20,7 @@ apply plugin: 'org.spongepowered.mixin'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "Alpha5"
+version = "Alpha5-WIP"
 group = "de.scribble.lp.tastools" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "TASmod-1.12.2"
 

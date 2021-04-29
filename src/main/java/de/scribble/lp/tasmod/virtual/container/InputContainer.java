@@ -9,6 +9,7 @@ import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.TextFormatting;
 
 public class InputContainer {
 	private boolean playback = false;
@@ -47,22 +48,25 @@ public class InputContainer {
 		return recording;
 	}
 
-	public void toggleRecording() {
+	public String setRecording(boolean enabled) {
 		if (playback)
-			return;
-		recording = !recording;
+			return TextFormatting.RED + "A playback is already running";
+		recording = enabled;
 		if (recording) {
-			clear();
-			index = 0;
+			return TextFormatting.GREEN + "Starting the recording";
+		} else {
+			return TextFormatting.GREEN + "Stopping the recording";
 		}
 	}
 
-	public void togglePlayback() {
+	public String setPlayback(boolean enabled) {
 		if (recording)
-			return;
-		playback = !playback;
+			return TextFormatting.RED + "A recording is already running";
+		playback = enabled;
 		if (playback) {
-			index = 0;
+			return TextFormatting.GREEN + "Starting playback";
+		} else {
+			return TextFormatting.GREEN + "Aborting playback";
 		}
 	}
 
@@ -188,12 +192,12 @@ public class InputContainer {
 
 	public void fixTicks() {
 		for (int i = 0; i < inputs.size(); i++) {
-			inputs.get(i).setTick(i+1);
+			inputs.get(i).setTick(i + 1);
 		}
 	}
-	
+
 	public void setIndexToLatest() {
-		index=(int) (inputs.size()-1);
+		index = (int) (inputs.size() - 1);
 	}
 
 }

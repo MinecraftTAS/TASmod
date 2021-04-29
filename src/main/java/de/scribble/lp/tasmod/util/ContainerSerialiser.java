@@ -25,9 +25,9 @@ import net.minecraft.client.Minecraft;
 
 public class ContainerSerialiser {
 	
-	public void saveToFileV1(File file, InputContainer container) throws FileNotFoundException {
+	public void saveToFileV1(File file, InputContainer container) throws IOException {
 		if (container.size() == 0) {
-			return;
+			throw new IOException("There are no inputs to save to a file");
 		}
 		FileThread fileThread = new FileThread(file, false);
 
@@ -37,8 +37,7 @@ public class ContainerSerialiser {
 				 + "#												Version:1													#\n"
 				 + "#							This file was generated using the Minecraft TASMod								#\n"
 				 + "#																											#\n"
-				 + "#	If you make a mistake in this file, the mod will notify you via the console, so it's best to keep the	#\n"
-				 + "#										console open at all times											#\n"
+				 + "#			Any errors while reading this file will be printed out in the console and the chat				#\n"
 				 + "#																											#\n"
 				 + "#------------------------------------------------ Header ---------------------------------------------------#\n"
 				 + "#Author:" + container.getAuthors() + "\n"

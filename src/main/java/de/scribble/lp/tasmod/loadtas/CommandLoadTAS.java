@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.playback;
+package de.scribble.lp.tasmod.loadtas;
 
 import java.io.File;
 import java.io.IOException;

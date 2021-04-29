@@ -6,12 +6,13 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.scribble.lp.tasmod.loadtas.CommandLoadTAS;
 import de.scribble.lp.tasmod.misc.CommandFolder;
 import de.scribble.lp.tasmod.misc.ModIncompatibleException;
-import de.scribble.lp.tasmod.playback.CommandLoadTAS;
 import de.scribble.lp.tasmod.playback.CommandPlay;
-import de.scribble.lp.tasmod.recording.CommandSaveTAS;
+import de.scribble.lp.tasmod.recording.CommandRecord;
 import de.scribble.lp.tasmod.savestates.SavestateTrackerFile;
+import de.scribble.lp.tasmod.savetas.CommandSaveTAS;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.tutorial.CommandPlaybacktutorial;
 import net.minecraft.server.MinecraftServer;
@@ -50,7 +51,6 @@ public class ModLoader {
 		proxy.preInit(ev);
 		if (Loader.isModLoaded("tastools")) {
 			throw new ModIncompatibleException("\n========================================================================\n" + "\n" + "Detected TASTools to be loaded. TASMod and TASTools are incompatible!\n" + "\n" + "========================================================================");
-
 		} else if (Loader.isModLoaded("dupemod")) {
 			throw new ModIncompatibleException("\n========================================================================\n" + "\n" + "Detected Dupemod to be loaded. TASMod and Dupemod are incompatible!\n" + "\n" + "========================================================================");
 		} else if (Loader.isModLoaded("tickratechanger")) {
@@ -75,6 +75,8 @@ public class ModLoader {
 		serverInstance = ev.getServer();
 		// Command handling
 		ev.registerServerCommand(new CommandTickrate());
+		ev.registerServerCommand(new CommandRecord());
+		ev.registerServerCommand(new CommandPlay());
 		ev.registerServerCommand(new CommandSaveTAS());
 		ev.registerServerCommand(new CommandLoadTAS());
 		ev.registerServerCommand(new CommandPlaybacktutorial());

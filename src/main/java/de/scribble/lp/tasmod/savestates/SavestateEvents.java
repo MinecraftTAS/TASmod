@@ -3,6 +3,7 @@ package de.scribble.lp.tasmod.savestates;
 import de.pfannekuchen.infogui.gui.SettingsGui;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.savetas.SaveTASPacket;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -20,11 +21,9 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-			ClientProxy.virtual.getContainer().togglePlayback();
+			CommonProxy.NETWORK.sendToServer(new SaveTASPacket("test"));
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) { // Sorry.. 
 			Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
-		}else if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
-			ClientProxy.virtual.getContainer().toggleRecording();
 		}
 	}
 }
