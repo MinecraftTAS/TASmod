@@ -12,7 +12,7 @@ import com.dselent.bigarraylist.BigArrayList;
 
 import de.pfannekuchen.killtherng.utils.EntityRandom;
 import de.pfannekuchen.killtherng.utils.ItemRandom;
-import de.scribble.lp.tasmod.recording.FileThread;
+import de.scribble.lp.tasmod.savetas.FileThread;
 import de.scribble.lp.tasmod.virtual.VirtualKey;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
