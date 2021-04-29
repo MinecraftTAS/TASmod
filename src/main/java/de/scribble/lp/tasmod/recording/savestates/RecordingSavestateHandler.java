@@ -81,7 +81,8 @@ public class RecordingSavestateHandler {
 		}
 		else {
 			ClientProxy.virtual.setContainer(ClientProxy.serialiser.fromEntireFileV1(targetfile));
-			ClientProxy.virtual.getContainer().setIndexToLatest();
+			ClientProxy.virtual.getContainer().setIndexToSize();
+			ClientProxy.virtual.getContainer().fixTicks();
 			ClientProxy.virtual.getContainer().setRecording(true);
 		}
 	}
