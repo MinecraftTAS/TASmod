@@ -63,7 +63,7 @@ public class InputContainer {
 			return TextFormatting.RED + "A recording is already running";
 		playback = enabled;
 		if (enabled) {
-			index=0;
+			index = 0;
 			return TextFormatting.GREEN + "Starting playback";
 		} else {
 			return TextFormatting.GREEN + "Aborting playback";
@@ -152,6 +152,7 @@ public class InputContainer {
 
 	public void clear() {
 		inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
+		index = 0;
 	}
 
 	public String getAuthors() {
@@ -200,4 +201,7 @@ public class InputContainer {
 		index = (int) (inputs.size() - 1);
 	}
 
+	public void setIndexToSize() {
+		index = (int) inputs.size();
+	}
 }

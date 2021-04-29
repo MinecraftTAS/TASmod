@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import de.pfannekuchen.killtherng.KillTheRNG;
 import de.pfannekuchen.killtherng.networking.UpdateSeedPacket;
 import de.pfannekuchen.killtherng.networking.UpdateSeedPacketHandler;
+import de.scribble.lp.tasmod.clearinputs.ClearInputsPacket;
+import de.scribble.lp.tasmod.clearinputs.ClearInputsPacketHandler;
 import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.loadtas.LoadTASPacket;
 import de.scribble.lp.tasmod.loadtas.LoadTASPacketHandler;
@@ -62,6 +64,8 @@ public class CommonProxy {
 		NETWORK.registerMessage(SaveTASPacketHandler.class, SaveTASPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.SERVER);
 		KillTheRNG.init();
 	}
 

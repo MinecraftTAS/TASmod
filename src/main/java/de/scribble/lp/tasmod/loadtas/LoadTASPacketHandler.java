@@ -16,21 +16,22 @@ public class LoadTASPacketHandler implements IMessageHandler<LoadTASPacket, IMes
 
 	@Override
 	public IMessage onMessage(LoadTASPacket message, MessageContext ctx) {
-		if (ctx.side.isClient()) {
+		if (ctx.side.isServer()) {
+			ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
+				if (ctx.getServerHandler().player.canUseCommand(2, "loadtas")) {
+					CommonProxy.NETWORK.sendToAll(message);
+				}
+			});
+		} else {
 			Minecraft.getMinecraft().addScheduledTask(() -> {
 				try {
 					ClientProxy.virtual.setContainer(ClientProxy.serialiser.fromEntireFileV1(new File(ClientProxy.tasdirectory + "/" + message.getName() + ".tas")));
+					ClientProxy.virtual.getContainer().fixTicks();
 				} catch (IOException e) {
 					Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
 					return;
 				}
 				Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Loaded inputs from " + message.getName() + ".tas"));
-			});
-		} else {
-			ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-				if (ctx.getServerHandler().player.canUseCommand(2, "loadtas")) {
-					CommonProxy.NETWORK.sendToAll(message);
-				}
 			});
 		}
 		return null;

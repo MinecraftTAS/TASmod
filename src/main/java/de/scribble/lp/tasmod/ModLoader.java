@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.scribble.lp.tasmod.clearinputs.CommandClearInputs;
 import de.scribble.lp.tasmod.loadtas.CommandLoadTAS;
 import de.scribble.lp.tasmod.misc.CommandFolder;
 import de.scribble.lp.tasmod.misc.ModIncompatibleException;
@@ -81,6 +82,7 @@ public class ModLoader {
 		ev.registerServerCommand(new CommandLoadTAS());
 		ev.registerServerCommand(new CommandPlaybacktutorial());
 		ev.registerServerCommand(new CommandFolder());
+		ev.registerServerCommand(new CommandClearInputs());
 
 		// Save Loadstate Count
 		File savestateDirectory = new File(serverInstance.getDataDirectory() + File.separator + "saves" + File.separator + "savestates" + File.separator);
