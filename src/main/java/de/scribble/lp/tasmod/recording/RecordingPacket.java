@@ -1,7 +1,5 @@
 package de.scribble.lp.tasmod.recording;
 
-import java.nio.charset.Charset;
-
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 

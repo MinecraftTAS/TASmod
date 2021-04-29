@@ -12,9 +12,6 @@ import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Maps;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
-
 public class VirtualKeyboard implements Serializable {
 
 	private Map<Integer, VirtualKey> keyList;
