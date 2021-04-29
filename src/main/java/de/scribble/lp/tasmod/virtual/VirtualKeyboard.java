@@ -294,6 +294,8 @@ public class VirtualKeyboard implements Serializable {
 			return new VirtualKeyboardEvent(14, true, character);
 		case '\u21A6':
 			return new VirtualKeyboardEvent(15, true, Character.MIN_VALUE);
+		case '\u2907':
+			return new VirtualKeyboardEvent(15, false, Character.MIN_VALUE);
 		case '\u21E4':
 			return new VirtualKeyboardEvent(199, true, character);
 		case '\u2191':

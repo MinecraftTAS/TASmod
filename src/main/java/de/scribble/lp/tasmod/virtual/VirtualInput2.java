@@ -32,7 +32,7 @@ public class VirtualInput2 {
 
 	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
 
-//		System.out.println(keycode+" "+keystate+" "+character);
+		System.out.println(keycode+" "+keystate+" "+character);
 		
 		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
 			return;
@@ -41,6 +41,10 @@ public class VirtualInput2 {
 		key.setPressed(keystate);
 		if (keystate) {
 			character = nextKeyboard.encodeUnicode(keycode, character);
+		} else {
+			if(keycode==15) {
+				character = '\u2907';
+			}
 		}
 		nextKeyboard.addChar(character);
 	}
@@ -53,9 +57,9 @@ public class VirtualInput2 {
 		currentKeyboardEvents = getCurrentKeyboardEvents();
 		currentKeyboardEventIterator = currentKeyboardEvents.iterator();
 
-//		currentKeyboardEvents.forEach(action->{
-//			System.out.println(action.toString());
-//		});
+		currentKeyboardEvents.forEach(action->{
+			System.out.println(action.toString());
+		});
 
 		nextKeyboard.clearCharList();
 
