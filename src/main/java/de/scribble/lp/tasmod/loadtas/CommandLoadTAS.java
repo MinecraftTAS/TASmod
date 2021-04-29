@@ -6,10 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.savetas.SaveTASPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -29,23 +32,24 @@ public class CommandLoadTAS extends CommandBase {
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		File file=new File(ClientProxy.tasdirectory + "/test.tas");
-		int version=0;
-		try {
-			version=ClientProxy.serialiser.getFileVersion(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if(version==0) {
-			sender.sendMessage(new TextComponentString(TextFormatting.RED+"Couldn't find the file version. Aborting"));
-		}else if(version==1) {
-			try {
-				ClientProxy.virtual.setContainer(ClientProxy.serialiser.fromEntireFileV1(file));
-			} catch (IOException e) {
-				e.printStackTrace();
+		if (sender instanceof EntityPlayer) {
+			if (sender.canUseCommand(2, "load")) {
+				if (args.length < 1) {
+					sender.sendMessage(new TextComponentString(TextFormatting.RED + "Please add a filename, " + getUsage(sender)));
+				} else {
+					String name = "";
+					String spacer = " ";
+					for (int i = 0; i < args.length; i++) {
+						if (i == args.length - 1) {
+							spacer="";
+						}
+						name=name.concat(args[i]+spacer);
+					}
+					CommonProxy.NETWORK.sendToAll(new LoadTASPacket(name));
+				}
+			} else {
+				sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));
 			}
-			ClientProxy.virtual.getContainer().fixTicks();
-			ClientProxy.virtual.getContainer().setIndexToLatest();
 		}
 	}
 	

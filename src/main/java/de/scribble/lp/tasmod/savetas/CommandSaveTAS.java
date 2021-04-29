@@ -54,6 +54,7 @@ public class CommandSaveTAS extends CommandBase {
 					CommonProxy.NETWORK.sendToAll(new SaveTASPacket(name));
 				}
 			} else {
+				sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));
 			}
 		}
 	}

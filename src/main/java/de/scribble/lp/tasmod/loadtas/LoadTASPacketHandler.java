@@ -19,7 +19,7 @@ public class LoadTASPacketHandler implements IMessageHandler<LoadTASPacket, IMes
 		if (ctx.side.isClient()) {
 			Minecraft.getMinecraft().addScheduledTask(() -> {
 				try {
-					ClientProxy.serialiser.fromEntireFileV1(new File(ClientProxy.tasdirectory + "/" + message.getName() + ".tas"));
+					ClientProxy.virtual.setContainer(ClientProxy.serialiser.fromEntireFileV1(new File(ClientProxy.tasdirectory + "/" + message.getName() + ".tas")));
 				} catch (IOException e) {
 					Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
 					return;
