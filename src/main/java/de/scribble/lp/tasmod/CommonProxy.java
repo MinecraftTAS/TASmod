@@ -11,6 +11,8 @@ import de.scribble.lp.tasmod.loadtas.LoadTASPacket;
 import de.scribble.lp.tasmod.loadtas.LoadTASPacketHandler;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
+import de.scribble.lp.tasmod.recording.RecordingPacket;
+import de.scribble.lp.tasmod.recording.RecordingPacketHandler;
 import de.scribble.lp.tasmod.recording.savestates.RecordingSavestatePacket;
 import de.scribble.lp.tasmod.recording.savestates.RecordingSavestatePacketHandler;
 import de.scribble.lp.tasmod.savestates.LoadstatePacket;
@@ -45,6 +47,9 @@ public class CommonProxy {
 		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(RecordingPacketHandler.class, RecordingPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(RecordingPacketHandler.class, RecordingPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(MotionPacketHandler.class, MotionPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.SERVER);

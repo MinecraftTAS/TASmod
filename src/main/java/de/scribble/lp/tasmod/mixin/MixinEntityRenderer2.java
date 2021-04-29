@@ -16,7 +16,6 @@ import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.playback.InputPlayback;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.virtual.VirtualInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.util.math.MathHelper;

@@ -5,6 +5,7 @@ import java.util.List;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
 import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 
+@Deprecated
 public class TickFrame {
 	private int tick;
 	private List<VirtualMouseEvent> mouseevent;

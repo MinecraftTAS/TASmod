@@ -16,7 +16,6 @@ import de.pfannekuchen.killtherng.utils.ItemRandom;
 import de.pfannekuchen.killtherng.utils.WorldRandom;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
-import de.scribble.lp.tasmod.util.PointerNormalizer;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
@@ -32,6 +31,7 @@ import net.minecraft.util.text.TextFormatting;
  * @author ScribbleLP
  *
  */
+@Deprecated
 public class InputPlayback {
 	private static Minecraft mc= Minecraft.getMinecraft();
 	private static boolean playingback;

@@ -1,7 +1,6 @@
 package de.scribble.lp.tasmod.virtual.container;
 
 import java.io.File;
-import java.io.IOException;
 
 import com.dselent.bigarraylist.BigArrayList;
 
@@ -63,7 +62,8 @@ public class InputContainer {
 		if (recording)
 			return TextFormatting.RED + "A recording is already running";
 		playback = enabled;
-		if (playback) {
+		if (enabled) {
+			index=0;
 			return TextFormatting.GREEN + "Starting playback";
 		} else {
 			return TextFormatting.GREEN + "Aborting playback";
