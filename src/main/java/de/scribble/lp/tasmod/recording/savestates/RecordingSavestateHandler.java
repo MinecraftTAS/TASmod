@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.recording.InputRecorder;
 import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
@@ -18,9 +19,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author ScribbleLP
  */
 @SideOnly(Side.CLIENT)
-public class RecordingSavestateHandler { //I have no memory of creating this...
+public class RecordingSavestateHandler {
 	
-	private static File savestateDirectory=new File(Minecraft.getMinecraft().mcDataDir, "saves"+File.separator+"tasfiles"+File.separator+"savestates");
+	private static File savestateDirectory=new File(ClientProxy.tasdirectory+File.separator+"savestates");
 	
 	/**
 	 * Makes a copy of the recording that is currently running. Gets triggered when a savestate is made on the server <br>
@@ -30,27 +31,21 @@ public class RecordingSavestateHandler { //I have no memory of creating this...
 	 * @throws IOException
 	 */
 	public static void savestateRecording(String nameOfSavestate) throws SavestateException, IOException {
-		if(!InputRecorder.isRecording()) {
-			CommonProxy.logger.debug("No recording savestate made since no recording is running");
+		if(!ClientProxy.virtual.getContainer().isRecording()) {
+			CommonProxy.logger.info("No recording savestate made since no recording is running");
 			return;
 		}
 		
 		if(nameOfSavestate.isEmpty()) {
-			CommonProxy.logger.error("No savestate was made, name of savestate is empty");
+			CommonProxy.logger.error("No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
 		
-		InputRecorder.setPause(true);
-		InputRecorder.saveFile();
-		
 		createSavestateDirectory();
 		
-		File targetfile=new File(savestateDirectory,InputRecorder.getFilename() + "-"+nameOfSavestate+".tas");
-		File currentfile=InputRecorder.getFileLocation();
+		File targetfile=new File(savestateDirectory, nameOfSavestate+".tas");
 		
-		FileUtils.copyFile(currentfile, targetfile);
-		
-		InputRecorder.setPause(false);
+		ClientProxy.serialiser.saveToFileV1(targetfile, ClientProxy.virtual.getContainer());
 	}
 	
 	private static void createSavestateDirectory() {
@@ -67,8 +62,8 @@ public class RecordingSavestateHandler { //I have no memory of creating this...
 	 */
 	public static void loadRecording(String nameOfSavestate) throws IOException {
 		
-		if(!InputRecorder.isRecording()) {
-			CommonProxy.logger.debug("No recording savestate loaded since no recording is running");
+		if(!ClientProxy.virtual.getContainer().isRecording()) {
+			CommonProxy.logger.info("No recording savestate made since no recording is running");
 			return;
 		}
 		
@@ -77,19 +72,17 @@ public class RecordingSavestateHandler { //I have no memory of creating this...
 			return;
 		}
 		
-		InputRecorder.prepareForRewind();
-		
 		createSavestateDirectory();
 		
-		File targetfile=new File(savestateDirectory,InputRecorder.getFilename() + "-"+nameOfSavestate+".tas");
+		File targetfile=new File(savestateDirectory, nameOfSavestate+".tas");
 		
 		if(!targetfile.exists()) {
-			InputRecorder.startRecording(InputRecorder.getFilename());
+			ClientProxy.virtual.getContainer().clear();
 		}
 		else {
-			File currentfolder=InputRecorder.getFileLocation();
-			FileUtils.copyFile(targetfile, currentfolder);
-			InputRecorder.appendRecording(InputRecorder.getFilename());
+			ClientProxy.virtual.setContainer(ClientProxy.serialiser.fromEntireFileV1(targetfile));
+			ClientProxy.virtual.getContainer().setIndexToLatest();
+			ClientProxy.virtual.getContainer().setRecording(true);
 		}
 	}
 }
