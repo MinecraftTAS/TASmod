@@ -9,6 +9,8 @@ import de.pfannekuchen.killtherng.networking.UpdateSeedPacketHandler;
 import de.scribble.lp.tasmod.clearinputs.ClearInputsPacket;
 import de.scribble.lp.tasmod.clearinputs.ClearInputsPacketHandler;
 import de.scribble.lp.tasmod.events.TASmodEvents;
+import de.scribble.lp.tasmod.folder.FolderPacket;
+import de.scribble.lp.tasmod.folder.FolderPacketHandler;
 import de.scribble.lp.tasmod.loadtas.LoadTASPacket;
 import de.scribble.lp.tasmod.loadtas.LoadTASPacketHandler;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
@@ -66,6 +68,7 @@ public class CommonProxy {
 		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(FolderPacketHandler.class, FolderPacket.class, i++, Side.CLIENT);
 		KillTheRNG.init();
 	}
 

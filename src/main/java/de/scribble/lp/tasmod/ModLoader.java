@@ -7,15 +7,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.tasmod.clearinputs.CommandClearInputs;
+import de.scribble.lp.tasmod.folder.CommandFolder;
 import de.scribble.lp.tasmod.loadtas.CommandLoadTAS;
-import de.scribble.lp.tasmod.misc.CommandFolder;
-import de.scribble.lp.tasmod.misc.ModIncompatibleException;
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
 import de.scribble.lp.tasmod.savestates.SavestateTrackerFile;
 import de.scribble.lp.tasmod.savetas.CommandSaveTAS;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.tutorial.CommandPlaybacktutorial;
+import de.scribble.lp.tasmod.util.ModIncompatibleException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
