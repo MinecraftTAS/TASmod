@@ -55,7 +55,7 @@ public class ClientProxy extends CommonProxy {
 
 	public static final String tasdirectory = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles";
 
-	public static final String savestatedirectory = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + "saves" + File.separator + "savestates";
+	public static final String savestatedirectory = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "savestates";
 
 	public void preInit(FMLPreInitializationEvent ev) {
 		isDevEnvironment = (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");

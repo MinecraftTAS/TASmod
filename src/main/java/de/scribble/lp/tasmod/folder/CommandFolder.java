@@ -1,16 +1,13 @@
-package de.scribble.lp.tasmod.misc;
+package de.scribble.lp.tasmod.folder;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.scribble.lp.tasmod.CommonProxy;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
@@ -30,23 +27,9 @@ public class CommandFolder extends CommandBase{
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length==1) {
 			if(args[0].equalsIgnoreCase("savestates")) {
-				File file = new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + "savestates");
-				try {
-					if(!file.exists())file.mkdir();
-					Desktop.getDesktop().open(file);
-				} catch (IOException e) {
-					CommonProxy.logger.fatal("Something went wrong while opening ", new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + "savestates").getPath());
-					e.printStackTrace();
-				}
+				CommonProxy.NETWORK.sendTo(new FolderPacket(0), (EntityPlayerMP)sender);
 			}else if(args[0].equalsIgnoreCase("tasfiles")){
-				File file = new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + "tasfiles");
-				try {
-					if(!file.exists())file.mkdir();
-					Desktop.getDesktop().open(file);
-				} catch (IOException e) {
-					CommonProxy.logger.fatal("Something went wrong while opening ", new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + "savestates").getPath());
-					e.printStackTrace();
-				}
+				CommonProxy.NETWORK.sendTo(new FolderPacket(1), (EntityPlayerMP)sender);
 			}
 		}
 	}
