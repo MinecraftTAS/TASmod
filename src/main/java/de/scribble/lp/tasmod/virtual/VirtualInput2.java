@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.scribble.lp.tasmod.mixin.AccessorRunStuff;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
 import de.scribble.lp.tasmod.virtual.container.InputContainer;
+import de.scribble.lp.tasmod.virtual.container.TickInputContainer;
+import net.minecraft.client.Minecraft;
 
 public class VirtualInput2 {
 
@@ -306,4 +309,23 @@ public class VirtualInput2 {
 	public void setContainer(InputContainer container) {
 		this.container = container;
 	}
+
+	public void loadSavestate(InputContainer container) {
+		this.container = container;
+		container.setIndexToSize();
+		TickInputContainer tickcontainer = container.get(container.index() - 1);
+		nextKeyboard=tickcontainer.getKeyboard();
+		nextMouse=tickcontainer.getMouse();
+		currentSubtick=tickcontainer.getSubticks();
+		
+		((AccessorRunStuff)Minecraft.getMinecraft()).runTickKeyboardAccessor();
+		((AccessorRunStuff)Minecraft.getMinecraft()).runTickMouseAccessor();
+		
+		nextKeyboard=new VirtualKeyboard();
+		nextMouse=new VirtualMouse();
+		
+		container.setRecording(true);
+	}
+	
+	
 }

@@ -5,6 +5,7 @@ import org.lwjgl.opengl.Display;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -49,7 +50,8 @@ public class InfoGui extends Gui {
 //			new Gui().drawString(mc.fontRenderer, "EntitySeed: "+ EntityRandom.currentSeed, 16, 130, 0xFFFFFF); // Current Pointer location
 //			new Gui().drawString(mc.fontRenderer, "ItemSeed: "+ ItemRandom.currentSeed, 16, 140, 0xFFFFFF); // Current Pointer location
 //			
-//			new Gui().drawString(mc.fontRenderer, "InputContainer: "+ ClientProxy.virtual.getContainer().size(), 16, 150, 0xFFFFFF); // Current Pointer location
+			EntityPlayerSP player=Minecraft.getMinecraft().player;
+			new Gui().drawString(mc.fontRenderer, "Velocity: "+ player.motionX+" "+player.motionY, 10, 100, 0xFFFFFF); // Current Pointer location
 
 			if (Display.isActive()) {
 				String out1 = "";
