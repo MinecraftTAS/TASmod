@@ -112,7 +112,7 @@ public class InputPlayback {
 			logger.error("Error while reading header in "+Filename+" in line "+linecounter+". Incorrect tp position");
 			throw new IOException();
 		}
-		Minecraft.getMinecraft().player.sendChatMessage("/tp "+section[0]+" "+section[1]+" "+section[2]+" "+section[3]+" "+section[4]); //I don't care anymore TODO
+		Minecraft.getMinecraft().player.sendChatMessage("/tp "+section[0]+" "+section[1]+" "+section[2]+" "+section[3]+" "+section[4]); //I don't care anymore 
 		
 	}
 	/* This was part in my journey of making the cursor scale with the window (See pointernormalizer. Maybe I'll find a use for this again
@@ -324,7 +324,7 @@ public class InputPlayback {
 			if (sections[sectionnumber].startsWith("CharacterTyped:")) {
 				sections[sectionnumber] = sections[sectionnumber].replace("CharacterTyped:", "");
 			}
-				sections[sectionnumber]= sections[sectionnumber].replace("\\n","\n"); //TODO Seperate CR and LF for linux users
+				sections[sectionnumber]= sections[sectionnumber].replace("\\n","\n"); //Seperate CR and LF for linux users
 				char[] chars = sections[sectionnumber].toCharArray();
 				for (int j = 0; j < chars.length; j++) {
 					out.add(chars[j]);

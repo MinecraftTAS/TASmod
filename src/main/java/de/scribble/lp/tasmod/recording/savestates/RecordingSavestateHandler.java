@@ -76,10 +76,7 @@ public class RecordingSavestateHandler {
 			ClientProxy.virtual.getContainer().clear();
 		}
 		else {
-			ClientProxy.virtual.setContainer(ClientProxy.serialiser.fromEntireFileV1(targetfile));
-			ClientProxy.virtual.getContainer().setIndexToSize();
-			ClientProxy.virtual.getContainer().fixTicks();
-			ClientProxy.virtual.getContainer().setRecording(true);
+			ClientProxy.virtual.loadSavestate(ClientProxy.serialiser.fromEntireFileV1(targetfile));
 		}
 	}
 }

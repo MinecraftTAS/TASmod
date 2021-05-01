@@ -137,6 +137,10 @@ public class InputContainer {
 	public void setIndex(int index) {
 		this.index = index;
 	}
+	
+	public TickInputContainer get(int index) {
+		return inputs.get(index);
+	}
 
 	@Override
 	public String toString() {

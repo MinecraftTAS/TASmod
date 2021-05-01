@@ -46,6 +46,7 @@
         
         //Savestates
 		"savestates.MixinChunkProviderClient",
+		"AccessorRunStuff",
 		
 		//Interpolation
 		"MixinFrustum",
