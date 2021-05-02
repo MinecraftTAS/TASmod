@@ -12,6 +12,8 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
 public class CommandRecord extends CommandBase {
 
@@ -40,22 +42,20 @@ public class CommandRecord extends CommandBase {
 		if (!(sender instanceof EntityPlayer)) {
 			return;
 		}
-//		if (args.length < 1) {
-//			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too few arguments. " + getUsage(sender)));
-//		} else if (args.length == 1) {
-//			if (args[0].equalsIgnoreCase("true")) {
-//				CommonProxy.NETWORK.sendToAll(new RecordingPacket(true));
-//			} else if (args[0].equalsIgnoreCase("false")) {
-//				CommonProxy.NETWORK.sendToAll(new RecordingPacket(false));
-//			} else {
-//				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Couldn't process the argument " + args[0] + ". Must be either true or false"));
-//			}
-//		} else if (args.length > 1) {
-//			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments. " + getUsage(sender)));
-//		}
+		if (args.length < 1) {
+			CommonProxy.NETWORK.sendToServer(new RecordingPacket(!ClientProxy.virtual.getContainer().isRecording()));
+		} else if (args.length == 1) {
+			if (args[0].equalsIgnoreCase("true")) {
+				CommonProxy.NETWORK.sendToAll(new RecordingPacket(true));
+			} else if (args[0].equalsIgnoreCase("false")) {
+				CommonProxy.NETWORK.sendToAll(new RecordingPacket(false));
+			} else {
+				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Couldn't process the argument " + args[0] + ". Must be either true or false"));
+			}
+		} else if (args.length > 1) {
+			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments. " + getUsage(sender)));
+		}
 		
-		//temporary... hopfully...
-		CommonProxy.NETWORK.sendToServer(new RecordingPacket(!ClientProxy.virtual.getContainer().isRecording()));
 	}
 
 	@Override

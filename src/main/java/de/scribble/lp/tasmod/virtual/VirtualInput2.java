@@ -327,5 +327,4 @@ public class VirtualInput2 {
 		container.setRecording(true);
 	}
 	
-	
 }
