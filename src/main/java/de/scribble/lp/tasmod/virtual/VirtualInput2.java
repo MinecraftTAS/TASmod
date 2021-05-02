@@ -312,6 +312,7 @@ public class VirtualInput2 {
 
 	public void loadSavestate(InputContainer container) {
 		this.container = container;
+		String start=container.getStartLocation();
 		container.setIndexToSize();
 		TickInputContainer tickcontainer = container.get(container.index() - 1);
 		nextKeyboard=tickcontainer.getKeyboard();
@@ -325,6 +326,8 @@ public class VirtualInput2 {
 		nextMouse=new VirtualMouse();
 		
 		container.setRecording(true);
+		container.setStartLocation(start);
+		
 	}
 	
 }
