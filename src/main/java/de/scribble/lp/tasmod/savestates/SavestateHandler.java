@@ -7,6 +7,7 @@ import org.apache.commons.io.FileUtils;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.playback.savestates.PlaybackSavestateHandler;
 import de.scribble.lp.tasmod.recording.savestates.RecordingSavestateHandler;
 import de.scribble.lp.tasmod.recording.savestates.RecordingSavestatePacket;
 import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
@@ -83,6 +84,7 @@ public class SavestateHandler {
 		
 		//Send the name of the world to all players. This will make a savestate of the recording on the client with that name
 		CommonProxy.NETWORK.sendToAll(new RecordingSavestatePacket(true, nameWhenSaving(worldname)));
+		PlaybackSavestateHandler.savestatePlayback(nameWhenSaving(worldname));
 		
 		//Wait for the chunkloader to save the game
 		for(WorldServer world:server.worlds) {
@@ -193,6 +195,7 @@ public class SavestateHandler {
 		File targetfolder=getLatestSavestateLocation(worldname);
 		
 		CommonProxy.NETWORK.sendToAll(new RecordingSavestatePacket(false, nameWhenLoading(worldname)));
+		PlaybackSavestateHandler.loadPlayback(nameWhenLoading(worldname)); //TODO This will break in multiplayer!
 		
 		//Disabeling level saving for all worlds in case the auto save kicks in during world unload
 		for(WorldServer world: server.worlds) {

@@ -50,7 +50,7 @@ public class ContainerSerialiser {
 				 + "#----------------------------------------------- Settings --------------------------------------------------#\n"
 				 + "#Entity Seed:" + EntityRandom.currentSeed.get() + "\n"
 				 + "#Item Seed:" + ItemRandom.currentSeed.get() + "\n"
-				 + "#StartPosition:\n"
+				 + "#StartPosition:"+container.getStartLocation()+"\n"
 				 + "#############################################################################################################\n");
 		
 		BigArrayList<TickInputContainer> ticks = container.getInputs();
@@ -84,13 +84,15 @@ public class ContainerSerialiser {
 
 		InputContainer container = new InputContainer();
 
-		String author = "Insert author here"; //TODO
+		String author = "Insert author here"; //TODO Make this print out in chat
 
 		String title = "Insert TAS category here";
 
 		String playtime = "00:00.0";
 
 		int rerecords = 0;
+		
+		String startLocation="";
 
 		container.clear();
 
@@ -106,6 +108,8 @@ public class ContainerSerialiser {
 					playtime = line.split(":")[1];
 				} else if (line.startsWith("#Rerecords:")) {
 					rerecords = Integer.parseInt(line.split(":")[1]);
+				} else if (line.startsWith("#StartPosition:")) {
+					startLocation = line.replace("#StartPosition:", "");
 				}
 			} else {
 				String[] sections = line.split("\\|");
@@ -121,6 +125,7 @@ public class ContainerSerialiser {
 		container.setTitle(title);
 		container.setPlaytime(playtime);
 		container.setRerecords(rerecords);
+		container.setStartLocation(startLocation);
 		return container;
 	}
 
