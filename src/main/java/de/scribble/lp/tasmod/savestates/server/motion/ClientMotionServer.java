@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestates.motion;
+package de.scribble.lp.tasmod.savestates.server.motion;
 
 import java.util.Map;
 
@@ -37,6 +37,7 @@ public class ClientMotionServer {
 	}
 	
 	//===========================================================
+	
 	public static class Saver{
 		double clientX;
 		double clientY;

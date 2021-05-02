@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestates.chunkloading;
+package de.scribble.lp.tasmod.savestates.server.chunkloading;
 
 import java.util.List;
 

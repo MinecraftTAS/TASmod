@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import de.scribble.lp.tasmod.savestates.motion.ClientMotionServer;
-import de.scribble.lp.tasmod.savestates.motion.ClientMotionServer.Saver;
+import de.scribble.lp.tasmod.savestates.server.motion.ClientMotionServer;
+import de.scribble.lp.tasmod.savestates.server.motion.ClientMotionServer.Saver;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 

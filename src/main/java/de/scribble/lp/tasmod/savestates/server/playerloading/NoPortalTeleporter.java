@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestates.playerloading;
+package de.scribble.lp.tasmod.savestates.server.playerloading;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;

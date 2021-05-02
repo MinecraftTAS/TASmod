@@ -1,6 +1,6 @@
-package de.scribble.lp.tasmod.savestates;
+package de.scribble.lp.tasmod.savestates.server;
 
-import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
+import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;

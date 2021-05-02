@@ -1,7 +1,7 @@
-package de.scribble.lp.tasmod.savestates;
+package de.scribble.lp.tasmod.savestates.server;
 
-import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
-import de.scribble.lp.tasmod.savestates.exceptions.LoadstateException;
+import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
+import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;

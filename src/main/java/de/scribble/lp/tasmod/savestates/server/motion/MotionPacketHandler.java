@@ -1,6 +1,6 @@
-package de.scribble.lp.tasmod.savestates.motion;
+package de.scribble.lp.tasmod.savestates.server.motion;
 
-import de.scribble.lp.tasmod.savestates.motion.ClientMotionServer.Saver;
+import de.scribble.lp.tasmod.savestates.server.motion.ClientMotionServer.Saver;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;

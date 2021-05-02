@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestates;
+package de.scribble.lp.tasmod.savestates.server;
 
 import de.pfannekuchen.infogui.gui.SettingsGui;
 import de.scribble.lp.tasmod.ClientProxy;

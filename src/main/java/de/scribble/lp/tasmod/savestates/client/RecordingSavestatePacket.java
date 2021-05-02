@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.recording.savestates;
+package de.scribble.lp.tasmod.savestates.client;
 
 import java.nio.charset.Charset;
 

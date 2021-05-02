@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.playback.savestates;
+package de.scribble.lp.tasmod.savestates.client;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableList;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
+import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
 
 public class PlaybackSavestateHandler {
 	private static File savestateDirectory = new File(ClientProxy.tasdirectory + File.separator + "savestates");

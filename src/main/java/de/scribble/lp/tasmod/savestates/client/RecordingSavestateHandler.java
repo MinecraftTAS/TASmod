@@ -1,11 +1,11 @@
-package de.scribble.lp.tasmod.recording.savestates;
+package de.scribble.lp.tasmod.savestates.client;
 
 import java.io.File;
 import java.io.IOException;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
+import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 

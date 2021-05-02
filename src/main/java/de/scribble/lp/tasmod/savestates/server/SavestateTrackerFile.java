@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestates;
+package de.scribble.lp.tasmod.savestates.server;
 
 import java.io.File;
 import java.io.IOException;
