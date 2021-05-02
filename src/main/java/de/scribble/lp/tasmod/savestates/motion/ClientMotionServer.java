@@ -4,15 +4,39 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.ModLoader;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ClientMotionServer {
+	
 	private static Map<EntityPlayerMP, Saver> motion=Maps.<EntityPlayerMP, Saver>newHashMap();
 	
 	public static Map<EntityPlayerMP, Saver> getMotion() {
 		return motion;
 	}
 	
+	public static void requestMotionFromClient() {
+		motion.clear();
+		CommonProxy.NETWORK.sendToAll(new RequestMotionPacket());
+		
+		int i=0;
+		while(motion.size()!=ModLoader.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
+			i++;
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if(i==3000) {
+				CommonProxy.logger.warn("Client motion timed out!");
+				break;
+			}
+			
+		}
+	}
+	
+	//===========================================================
 	public static class Saver{
 		double clientX;
 		double clientY;

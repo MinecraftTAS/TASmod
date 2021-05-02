@@ -28,7 +28,7 @@ public class RecordingSavestateHandler {
 	 */
 	public static void savestateRecording(String nameOfSavestate) throws SavestateException, IOException {
 		if(!ClientProxy.virtual.getContainer().isRecording()) {
-			CommonProxy.logger.info("No recording savestate made since no recording is running");
+			CommonProxy.logger.debug("No recording savestate made since no recording is running");
 			return;
 		}
 		
@@ -59,7 +59,7 @@ public class RecordingSavestateHandler {
 	public static void loadRecording(String nameOfSavestate) throws IOException {
 		
 		if(!ClientProxy.virtual.getContainer().isRecording()) {
-			CommonProxy.logger.info("No recording savestate made since no recording is running");
+			CommonProxy.logger.debug("No recording savestate made since no recording is running");
 			return;
 		}
 		

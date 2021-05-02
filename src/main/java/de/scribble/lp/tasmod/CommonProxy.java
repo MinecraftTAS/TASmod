@@ -25,6 +25,8 @@ import de.scribble.lp.tasmod.savestates.SavestatePacket;
 import de.scribble.lp.tasmod.savestates.SavestatePacketHandler;
 import de.scribble.lp.tasmod.savestates.motion.MotionPacket;
 import de.scribble.lp.tasmod.savestates.motion.MotionPacketHandler;
+import de.scribble.lp.tasmod.savestates.motion.RequestMotionPacket;
+import de.scribble.lp.tasmod.savestates.motion.RequestMotionPacketHandler;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacket;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoadingPacketHandler;
 import de.scribble.lp.tasmod.savetas.SaveTASPacket;
@@ -69,6 +71,7 @@ public class CommonProxy {
 		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(FolderPacketHandler.class, FolderPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(RequestMotionPacketHandler.class, RequestMotionPacket.class, i++, Side.CLIENT);
 		KillTheRNG.init();
 	}
 

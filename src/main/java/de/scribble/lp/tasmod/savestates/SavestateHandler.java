@@ -13,6 +13,7 @@ import de.scribble.lp.tasmod.recording.savestates.RecordingSavestatePacket;
 import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
 import de.scribble.lp.tasmod.savestates.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
+import de.scribble.lp.tasmod.savestates.motion.ClientMotionServer;
 import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import net.minecraft.client.Minecraft;
@@ -70,12 +71,13 @@ public class SavestateHandler {
 		//Update the server variable
 		server=ModLoader.getServerInstance();
 		
+		//Get the motion from the client
+		ClientMotionServer.requestMotionFromClient();
+		
 		//Save the world!
 		server.getPlayerList().saveAllPlayerData();
 		server.saveAllWorlds(true);
 		
-		//Display the loading screen on the client
-		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 		
 		//Get the current and target directory for copying
 		String worldname=server.getFolderName();
