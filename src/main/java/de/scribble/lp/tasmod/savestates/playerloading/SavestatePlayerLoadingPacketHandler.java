@@ -24,10 +24,17 @@ public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<Save
 				EntityPlayerSP player=Minecraft.getMinecraft().player;
 				NBTTagCompound compound = message.getNbtTagCompound();
 				player.readFromNBT(compound);
-				NBTTagList relmotion=compound.getTagList("RelMotion", 5);
-				float rx=relmotion.getFloatAt(0);
-				float ry=relmotion.getFloatAt(1);
-				float rz=relmotion.getFloatAt(2);
+				NBTTagCompound motion=compound.getCompoundTag("clientMotion");
+				float x=motion.getFloat("x");
+				float y=motion.getFloat("y");
+				float z=motion.getFloat("z");
+				player.motionX=x;
+				player.motionY=y;
+				player.motionZ=z;
+				
+				float rx=motion.getFloat("RelativeX");
+				float ry=motion.getFloat("RelativeY");
+				float rz=motion.getFloat("RelativeZ");
 				player.moveForward=rx;
 				player.moveVertical=ry;
 				player.moveStrafing=rz;
