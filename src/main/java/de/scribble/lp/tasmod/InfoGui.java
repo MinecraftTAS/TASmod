@@ -51,7 +51,7 @@ public class InfoGui extends Gui {
 //			new Gui().drawString(mc.fontRenderer, "ItemSeed: "+ ItemRandom.currentSeed, 16, 140, 0xFFFFFF); // Current Pointer location
 //			
 			EntityPlayerSP player=Minecraft.getMinecraft().player;
-			new Gui().drawString(mc.fontRenderer, "Velocity: "+ player.motionX+" "+player.motionY+" "+player.motionY, 10, 100, 0xFFFFFF); // Current Pointer location
+			new Gui().drawString(mc.fontRenderer, "Velocity: "+ player.motionX+" "+player.motionY+" "+player.motionZ, 10, 100, 0xFFFFFF); // Current Pointer location
 
 			if (Display.isActive()) {
 				String out1 = "";

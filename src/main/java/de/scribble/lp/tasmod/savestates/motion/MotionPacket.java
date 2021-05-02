@@ -4,12 +4,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class MotionPacket implements IMessage{
-	double x=0;
-	double y=0;
-	double z=0;
-	float rx=0;
-	float ry=0;
-	float rz=0;
+	private double x=0;
+	private double y=0;
+	private double z=0;
+	private float rx=0;
+	private float ry=0;
+	private float rz=0;
+	
 	public MotionPacket() {
 	}
 	public MotionPacket(double x, double y, double z, float moveForward, float moveVertical, float moveStrafe) {

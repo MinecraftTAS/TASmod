@@ -153,7 +153,6 @@ public class VirtualInput2 {
 				}
 			}
 		});
-
 		return out;
 	}
 
