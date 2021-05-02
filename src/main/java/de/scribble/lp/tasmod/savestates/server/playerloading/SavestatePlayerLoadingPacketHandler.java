@@ -1,6 +1,6 @@
-package de.scribble.lp.tasmod.savestates.playerloading;
+package de.scribble.lp.tasmod.savestates.server.playerloading;
 
-import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
+import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.nbt.NBTTagCompound;

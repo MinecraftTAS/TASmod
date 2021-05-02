@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestates;
+package de.scribble.lp.tasmod.savestates.server;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,14 +7,14 @@ import org.apache.commons.io.FileUtils;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
-import de.scribble.lp.tasmod.playback.savestates.PlaybackSavestateHandler;
-import de.scribble.lp.tasmod.recording.savestates.RecordingSavestateHandler;
-import de.scribble.lp.tasmod.recording.savestates.RecordingSavestatePacket;
-import de.scribble.lp.tasmod.savestates.chunkloading.SavestatesChunkControl;
-import de.scribble.lp.tasmod.savestates.exceptions.LoadstateException;
-import de.scribble.lp.tasmod.savestates.exceptions.SavestateException;
-import de.scribble.lp.tasmod.savestates.motion.ClientMotionServer;
-import de.scribble.lp.tasmod.savestates.playerloading.SavestatePlayerLoading;
+import de.scribble.lp.tasmod.savestates.client.PlaybackSavestateHandler;
+import de.scribble.lp.tasmod.savestates.client.RecordingSavestateHandler;
+import de.scribble.lp.tasmod.savestates.client.RecordingSavestatePacket;
+import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
+import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
+import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
+import de.scribble.lp.tasmod.savestates.server.motion.ClientMotionServer;
+import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;

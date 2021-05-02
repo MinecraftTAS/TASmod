@@ -11,7 +11,7 @@ import de.scribble.lp.tasmod.folder.CommandFolder;
 import de.scribble.lp.tasmod.loadtas.CommandLoadTAS;
 import de.scribble.lp.tasmod.playback.CommandPlay;
 import de.scribble.lp.tasmod.recording.CommandRecord;
-import de.scribble.lp.tasmod.savestates.SavestateTrackerFile;
+import de.scribble.lp.tasmod.savestates.server.SavestateTrackerFile;
 import de.scribble.lp.tasmod.savetas.CommandSaveTAS;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.tutorial.CommandPlaybacktutorial;

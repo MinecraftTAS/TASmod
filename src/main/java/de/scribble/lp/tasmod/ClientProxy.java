@@ -9,7 +9,7 @@ import org.lwjgl.input.Keyboard;
 import de.pfannekuchen.infogui.gui.SettingsGui;
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
-import de.scribble.lp.tasmod.savestates.SavestateEvents;
+import de.scribble.lp.tasmod.savestates.server.SavestateEvents;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.virtual.VirtualInput2;

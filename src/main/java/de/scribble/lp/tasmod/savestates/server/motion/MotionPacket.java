@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestates.motion;
+package de.scribble.lp.tasmod.savestates.server.motion;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

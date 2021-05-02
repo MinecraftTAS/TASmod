@@ -1,7 +1,7 @@
-package de.scribble.lp.tasmod.savestates.motion;
+package de.scribble.lp.tasmod.savestates.server.motion;
 
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.savestates.GuiSavestateSavingScreen;
+import de.scribble.lp.tasmod.savestates.server.GuiSavestateSavingScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

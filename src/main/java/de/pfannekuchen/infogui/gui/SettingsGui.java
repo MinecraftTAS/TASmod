@@ -14,7 +14,7 @@ import de.pfannekuchen.killtherng.utils.ItemRandom;
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
 import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.savestates.SavestateTrackerFile;
+import de.scribble.lp.tasmod.savestates.server.SavestateTrackerFile;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
 import net.minecraft.client.Minecraft;
