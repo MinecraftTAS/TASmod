@@ -20,6 +20,7 @@ jobs:
       run: chmod +x gradlew
     - name: Build TASmod with Gradle
       run: ./gradlew shadowJar --no-daemon
+    - run: find . -type f ! -name "*forge.jar" -delete
     - uses: actions/upload-artifact@v2
       with:
         name: Package
