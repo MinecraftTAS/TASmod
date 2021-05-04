@@ -40,10 +40,11 @@ public class SettingsGui extends GuiScreen {
 		widths.put(Settings.SAVESTATECOUNT, 0);
 		widths.put(Settings.PREDICTEDXYZ, 0);
 		widths.put(Settings.MOUSEPOS, 0);
+		widths.put(Settings.VELOCITY, 0);
 	}
 	
 	public static enum Settings {
-		XYZ, XYZPRECISE, CXZ, WORLDSEED, RNGSEEDS, FACING, TICKS, TICKRATE, SAVESTATECOUNT, PREDICTEDXYZ, MOUSEPOS, TRAJECTORIES;
+		XYZ, XYZPRECISE, CXZ, WORLDSEED, RNGSEEDS, FACING, TICKS, TICKRATE, SAVESTATECOUNT, PREDICTEDXYZ, MOUSEPOS, TRAJECTORIES, VELOCITY;
 	}
 	
 	public static Properties p;
@@ -230,6 +231,13 @@ public class SettingsGui extends GuiScreen {
 				message = String.format("%.3f %.3f %.3f", vec.x, vec.y, vec.z);
 			}
 			widths.replace(Settings.TRAJECTORIES, drawRectWithText("Trajectories: " + message, x, y, Boolean.parseBoolean(p.getProperty("TRAJECTORIES_hideRect"))));
+		}
+		
+		boolean showVELOCITY = Boolean.parseBoolean(p.getProperty("VELOCITY_visible"));
+		if (showVELOCITY) {
+			int x = Integer.parseInt(p.getProperty("VELOCITY_x"));
+			int y = Integer.parseInt(p.getProperty("VELOCITY_y"));
+			widths.replace(Settings.VELOCITY, drawRectWithText("Velocity: " + Minecraft.getMinecraft().player.motionX + " " + Minecraft.getMinecraft().player.motionY + " " + Minecraft.getMinecraft().player.motionZ, x, y, Boolean.parseBoolean(p.getProperty("VELOCITY_hideRect"))));
 		}
 	}
 	

@@ -92,6 +92,7 @@ public class ClientProxy extends CommonProxy {
 			SettingsGui.p.setProperty("PREDICTEDXYZ_visible", "false");
 			SettingsGui.p.setProperty("MOUSEPOS_visible", "false");
 			SettingsGui.p.setProperty("TRAJECTORIES_visible", "false");
+			SettingsGui.p.setProperty("VELOCITY_visible", "false");
 
 			SettingsGui.p.setProperty("XYZ_x", "0");
 			SettingsGui.p.setProperty("XYZPRECISE_x", "0");
@@ -105,6 +106,7 @@ public class ClientProxy extends CommonProxy {
 			SettingsGui.p.setProperty("PREDICTEDXYZ_x", "0");
 			SettingsGui.p.setProperty("MOUSEPOS_x", "0");
 			SettingsGui.p.setProperty("TRAJECTORIES_x", "0");
+			SettingsGui.p.setProperty("VELOCITY_x", "0");
 
 			SettingsGui.p.setProperty("XYZ_y", "0");
 			SettingsGui.p.setProperty("XYZPRECISE_y", "0");
@@ -118,7 +120,8 @@ public class ClientProxy extends CommonProxy {
 			SettingsGui.p.setProperty("PREDICTEDXYZ_y", "0");
 			SettingsGui.p.setProperty("MOUSEPOS_y", "0");
 			SettingsGui.p.setProperty("TRAJECTORIES_y", "0");
-
+			SettingsGui.p.setProperty("VELOCITY_y", "0");
+			
 			SettingsGui.p.setProperty("XYZ_hideRect", "false");
 			SettingsGui.p.setProperty("XYZPRECISE_hideRect", "false");
 			SettingsGui.p.setProperty("CXZ_hideRect", "false");
@@ -131,6 +134,7 @@ public class ClientProxy extends CommonProxy {
 			SettingsGui.p.setProperty("PREDICTEDXYZ_hideRect", "false");
 			SettingsGui.p.setProperty("MOUSEPOS_hideRect", "false");
 			SettingsGui.p.setProperty("TRAJECTORIES_hideRect", "false");
+			SettingsGui.p.setProperty("VELOCITY_hideRect", "false");
 
 			try {
 				SettingsGui.save();
