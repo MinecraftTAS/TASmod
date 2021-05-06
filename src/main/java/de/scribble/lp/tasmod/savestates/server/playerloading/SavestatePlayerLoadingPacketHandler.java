@@ -24,9 +24,9 @@ public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<Save
 				NBTTagCompound compound = message.getNbtTagCompound();
 				player.readFromNBT(compound);
 				NBTTagCompound motion=compound.getCompoundTag("clientMotion");
-				float x=motion.getFloat("x");
-				float y=motion.getFloat("y");
-				float z=motion.getFloat("z");
+				double x=motion.getDouble("x");
+				double y=motion.getDouble("y");
+				double z=motion.getDouble("z");
 				player.motionX=x;
 				player.motionY=y;
 				player.motionZ=z;
