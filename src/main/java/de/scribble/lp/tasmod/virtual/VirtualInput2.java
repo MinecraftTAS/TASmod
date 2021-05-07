@@ -310,23 +310,31 @@ public class VirtualInput2 {
 	}
 
 	public void loadSavestate(InputContainer container) {
-		this.container = container;
-		String start=container.getStartLocation();
-		container.setIndexToSize();
-		TickInputContainer tickcontainer = container.get(container.index() - 1);
-		nextKeyboard=tickcontainer.getKeyboard();
-		nextMouse=tickcontainer.getMouse();
-		currentSubtick=tickcontainer.getSubticks();
-		
-		((AccessorRunStuff)Minecraft.getMinecraft()).runTickKeyboardAccessor();
-		((AccessorRunStuff)Minecraft.getMinecraft()).runTickMouseAccessor();
-		
-		nextKeyboard=new VirtualKeyboard();
-		nextMouse=new VirtualMouse();
-		
-		container.setRecording(true);
-		container.setStartLocation(start);
-		
+		if (this.container.isPlayingback()) {
+			this.container.setIndex(container.size());
+			preloadInput(this.container, container.size() - 1);
+		} else {
+			String start = container.getStartLocation();
+			preloadInput(container, container.size() - 1);
+			
+			container.setIndex(container.size());
+			container.setRecording(true);
+			container.setStartLocation(start);
+			this.container = container;
+		}
 	}
-	
+
+	private void preloadInput(InputContainer container, int index) {
+		TickInputContainer tickcontainer = container.get(index);
+
+		nextKeyboard = tickcontainer.getKeyboard();
+		nextMouse = tickcontainer.getMouse();
+		currentSubtick = tickcontainer.getSubticks();
+
+		((AccessorRunStuff) Minecraft.getMinecraft()).runTickKeyboardAccessor();
+		((AccessorRunStuff) Minecraft.getMinecraft()).runTickMouseAccessor();
+
+		nextKeyboard = new VirtualKeyboard();
+		nextMouse = new VirtualMouse();
+	}
 }

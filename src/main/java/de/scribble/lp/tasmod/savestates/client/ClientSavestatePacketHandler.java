@@ -8,14 +8,14 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class RecordingSavestatePacketHandler implements IMessageHandler<RecordingSavestatePacket, IMessage> {
+public class ClientSavestatePacketHandler implements IMessageHandler<ClientSavestatePacket, IMessage> {
 
 	@Override
-	public IMessage onMessage(RecordingSavestatePacket message, MessageContext ctx) {
+	public IMessage onMessage(ClientSavestatePacket message, MessageContext ctx) {
 		if (ctx.side.isClient()) {
 			if (message.getMode() == true) {
 				try {
-					RecordingSavestateHandler.savestateRecording(message.getName());
+					ClientSavestateHandler.savestate(message.getName());
 				} catch (SavestateException e) {
 					CommonProxy.logger.error(e.getMessage());
 				} catch (IOException e) {
@@ -23,7 +23,7 @@ public class RecordingSavestatePacketHandler implements IMessageHandler<Recordin
 				}
 			} else {
 				try {
-					RecordingSavestateHandler.loadRecording(message.getName());
+					ClientSavestateHandler.loadstate(message.getName());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

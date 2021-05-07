@@ -127,8 +127,8 @@ public class InputContainer {
 		}
 	}
 
-	public long size() {
-		return inputs.size();
+	public int size() {
+		return (int) inputs.size();
 	}
 
 	public boolean isEmpty() {
@@ -210,14 +210,6 @@ public class InputContainer {
 		}
 	}
 
-	public void setIndexToLatest() {
-		index = (int) (inputs.size() - 1);
-	}
-
-	public void setIndexToSize() {
-		index = (int) inputs.size();
-	}
-	
 	public String getStartLocation() {
 		return startLocation;
 	}
