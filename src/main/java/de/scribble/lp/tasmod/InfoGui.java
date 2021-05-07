@@ -4,7 +4,6 @@ import org.lwjgl.opengl.Display;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 
-import de.scribble.lp.tasmod.monitoring.Monitor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.Gui;
@@ -52,9 +51,6 @@ public class InfoGui extends Gui {
 //			new Gui().drawString(mc.fontRenderer, "ItemSeed: "+ ItemRandom.currentSeed, 16, 140, 0xFFFFFF); // Current Pointer location
 //			
 			EntityPlayerSP player=Minecraft.getMinecraft().player;
-			new Gui().drawString(mc.fontRenderer, "Velocity: "+ player.motionX+" "+player.motionY+" "+player.motionZ, 10, 100, 0xFFFFFF); // Current Pointer location
-			new Gui().drawString(mc.fontRenderer, "Sprinting: "+ player.getAIMoveSpeed(), 10, 110, 0xFFFFFF); // Current Pointer location
-			new Gui().drawString(mc.fontRenderer, "JumpMovementFactor: "+ player.jumpMovementFactor, 10, 120, 0xFFFFFF); // Current Pointer location
 
 			if (Display.isActive()) {
 				String out1 = "";

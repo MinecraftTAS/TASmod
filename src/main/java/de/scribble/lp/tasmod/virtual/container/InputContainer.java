@@ -145,6 +145,12 @@ public class InputContainer {
 
 	public void setIndex(int index) {
 		this.index = index;
+		if(playback) {
+			TickInputContainer tickcontainer = inputs.get(index);
+			this.keyboard = tickcontainer.getKeyboard();
+			this.mouse = tickcontainer.getMouse();
+			this.subticks = tickcontainer.getSubticks();
+		}
 	}
 	
 	public TickInputContainer get(int index) {

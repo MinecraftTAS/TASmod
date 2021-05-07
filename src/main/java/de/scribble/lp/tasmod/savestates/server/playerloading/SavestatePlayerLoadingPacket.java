@@ -39,23 +39,4 @@ public class SavestatePlayerLoadingPacket implements IMessage{
         return compound;
 	}
 	
-	private NBTTagList newDoubleNBTList(double... numbers)
-    {
-        NBTTagList nbttaglist = new NBTTagList();
-        for (double d0 : numbers)
-        {
-            nbttaglist.appendTag(new NBTTagDouble(d0));
-        }
-        return nbttaglist;
-    }
-
-	private NBTTagList newFloatNBTList(float... numbers)
-    {
-        NBTTagList nbttaglist = new NBTTagList();
-        for (float f : numbers)
-        {
-            nbttaglist.appendTag(new NBTTagFloat(f));
-        }
-        return nbttaglist;
-    }
 }

@@ -10,7 +10,7 @@ public class MotionPacketHandler implements IMessageHandler<MotionPacket, IMessa
 	@Override
 	public IMessage onMessage(MotionPacket message, MessageContext ctx) {
 		if(ctx.side.isServer()) {
-			ClientMotionServer.getMotion().put(ctx.getServerHandler().player, new Saver(message.getX(), message.getY(), message.getZ(), message.getRx(), message.getRy(), message.getRz()));
+			ClientMotionServer.getMotion().put(ctx.getServerHandler().player, new Saver(message.getX(), message.getY(), message.getZ(), message.getRx(), message.getRy(), message.getRz(), message.isSprinting(), message.getJumpMovementVector()));
 		}
 		return null;
 	}
