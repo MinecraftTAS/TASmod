@@ -24,9 +24,6 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-			Minecraft.getMinecraft().player.setSprinting(true);
-			EntityPlayerSP player=Minecraft.getMinecraft().player;
-			player.jumpMovementFactor=(float)((double)player.jumpMovementFactor + (double)0.02F * 0.3D);
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) { // Sorry.. 
 			Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());

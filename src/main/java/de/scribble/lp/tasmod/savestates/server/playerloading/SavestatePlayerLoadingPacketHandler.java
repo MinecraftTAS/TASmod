@@ -38,6 +38,11 @@ public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<Save
 				player.moveVertical=ry;
 				player.moveStrafing=rz;
 				
+				boolean sprinting=motion.getBoolean("Sprinting");
+				float jumpVector=motion.getFloat("JumpFactor");
+				player.setSprinting(sprinting);
+				player.jumpMovementFactor=jumpVector;
+				
 				SavestatesChunkControl.keepPlayerInLoadedEntityList(player);
 				SavestatePlayerLoading.wasLoading=true;
 			});

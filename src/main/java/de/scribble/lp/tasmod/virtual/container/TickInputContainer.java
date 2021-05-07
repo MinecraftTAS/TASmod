@@ -54,4 +54,9 @@ public class TickInputContainer implements Serializable {
 	public void setTick(int tick) {
 		this.tick = tick;
 	}
+	
+	@Override
+	public TickInputContainer clone() {
+		return new TickInputContainer(tick, keyboard, mouse, subticks);
+	}
 }

@@ -311,11 +311,15 @@ public class VirtualInput2 {
 
 	public void loadSavestate(InputContainer container) {
 		if (this.container.isPlayingback()) {
-			this.container.setIndex(container.size());
 			preloadInput(this.container, container.size() - 1);
-		} else {
+			this.container.setIndex(container.size());
+			
+		} else if(this.container.isRecording()) {
 			String start = container.getStartLocation();
 			preloadInput(container, container.size() - 1);
+			
+			nextKeyboard = new VirtualKeyboard();
+			nextMouse = new VirtualMouse();
 			
 			container.setIndex(container.size());
 			container.setRecording(true);
@@ -325,16 +329,13 @@ public class VirtualInput2 {
 	}
 
 	private void preloadInput(InputContainer container, int index) {
-		TickInputContainer tickcontainer = container.get(index);
+		TickInputContainer tickcontainer = container.get(index).clone();
 
-		nextKeyboard = tickcontainer.getKeyboard();
-		nextMouse = tickcontainer.getMouse();
-		currentSubtick = tickcontainer.getSubticks();
+		nextKeyboard = tickcontainer.getKeyboard().clone();
+		nextMouse = tickcontainer.getMouse().clone();
 
 		((AccessorRunStuff) Minecraft.getMinecraft()).runTickKeyboardAccessor();
 		((AccessorRunStuff) Minecraft.getMinecraft()).runTickMouseAccessor();
 
-		nextKeyboard = new VirtualKeyboard();
-		nextMouse = new VirtualMouse();
 	}
 }

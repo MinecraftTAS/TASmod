@@ -24,6 +24,8 @@ public class MixinEntityPlayerMP {
 			nbttagcompound.setFloat("RelativeX", saver.getClientrX());
 			nbttagcompound.setFloat("RelativeY", saver.getClientrY());
 			nbttagcompound.setFloat("RelativeZ", saver.getClientrZ());
+			nbttagcompound.setBoolean("Sprinting", saver.isSprinting());
+			nbttagcompound.setFloat("JumpFactor", saver.getJumpMovementVector());
 			compound.setTag("clientMotion", nbttagcompound);
 		} else {
 			nbttagcompound.setDouble("x", 0D);
@@ -46,8 +48,10 @@ public class MixinEntityPlayerMP {
 		float clientmotionrX = nbttagcompound.getFloat("RelativeX");
 		float clientmotionrY = nbttagcompound.getFloat("RelativeY");
 		float clientmotionrZ = nbttagcompound.getFloat("RelativeZ");
-
-		ClientMotionServer.Saver saver = new Saver(clientmotionX, clientmotionY, clientmotionZ, clientmotionrX, clientmotionrY, clientmotionrZ);
+		boolean sprinting = nbttagcompound.getBoolean("Sprinting");
+		float jumpVector = nbttagcompound.getFloat("JumpFactor");
+		
+		ClientMotionServer.Saver saver = new Saver(clientmotionX, clientmotionY, clientmotionZ, clientmotionrX, clientmotionrY, clientmotionrZ, sprinting, jumpVector);
 		ClientMotionServer.getMotion().put((EntityPlayerMP) (Object) this, saver);
 
 	}
