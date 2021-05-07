@@ -25,6 +25,11 @@ import net.minecraft.client.Minecraft;
 public class ContainerSerialiser {
 	
 	public void saveToFileV1(File file, InputContainer container) throws IOException {
+		saveToFileV1Until(file, container, -1);
+	}
+	
+	public void saveToFileV1Until(File file, InputContainer container, int index) throws IOException{
+		
 		if (container.size() == 0) {
 			throw new IOException("There are no inputs to save to a file");
 		}
@@ -55,6 +60,9 @@ public class ContainerSerialiser {
 		
 		BigArrayList<TickInputContainer> ticks = container.getInputs();
 		for (int i = 0; i < ticks.size(); i++) {
+			if(i==index) {
+				break;
+			}
 			TickInputContainer tick = ticks.get(i);
 			fileThread.addLine(tick.toString() + "\n");
 		}

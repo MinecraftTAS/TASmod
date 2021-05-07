@@ -5,18 +5,18 @@ import java.nio.charset.Charset;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
-public class RecordingSavestatePacket implements IMessage{
+public class ClientSavestatePacket implements IMessage{
 	private boolean mode;
 	private String name;
 	
-	public RecordingSavestatePacket() {
+	public ClientSavestatePacket() {
 	}
 	/**
 	 * Makes a savestate of the recording
 	 * @param mode If true: Make a savestate, else load the savestate
 	 * @param name Name of the savestated file
 	 */
-	public RecordingSavestatePacket(boolean mode,String name) {
+	public ClientSavestatePacket(boolean mode,String name) {
 		this.mode=mode;
 		this.name=name;
 	}

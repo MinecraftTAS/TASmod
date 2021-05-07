@@ -3,10 +3,12 @@ package de.scribble.lp.tasmod.savestates.server;
 import de.pfannekuchen.infogui.gui.SettingsGui;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.monitoring.Monitor;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.savetas.SaveTASPacket;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -22,7 +24,10 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-			CommonProxy.NETWORK.sendToServer(new SaveTASPacket("test"));
+			Minecraft.getMinecraft().player.setSprinting(true);
+			EntityPlayerSP player=Minecraft.getMinecraft().player;
+			player.jumpMovementFactor=(float)((double)player.jumpMovementFactor + (double)0.02F * 0.3D);
+			
 		}else if(VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) { // Sorry.. 
 			Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
 		}else if(VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
