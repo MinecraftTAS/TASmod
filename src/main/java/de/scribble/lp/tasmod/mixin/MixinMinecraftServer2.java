@@ -3,15 +3,20 @@ package de.scribble.lp.tasmod.mixin;
 import java.util.Queue;
 import java.util.concurrent.FutureTask;
 
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.savestates.server.SavestateEvents;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
@@ -109,4 +114,25 @@ public abstract class MixinMinecraftServer2 {
 	}
 
 	// =====================================================================================================================================
+	
+	@Inject(method = "tick", at = @At("HEAD"))
+	public void lagServer(CallbackInfo ci) {
+		if(SavestateEvents.lagServer) {
+			SavestateEvents.lagServer=false;
+			try {
+				Thread.sleep(5000L);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
+	public long limitLag(long j) {
+		if(j>(500L*(20/TickrateChangerServer.TICKS_PER_SECOND))){
+			return 50L;
+		}
+		return j;
+	}
+	
 }
