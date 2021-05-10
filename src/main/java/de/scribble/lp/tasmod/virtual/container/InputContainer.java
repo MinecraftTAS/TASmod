@@ -37,8 +37,8 @@ public class InputContainer {
 	private int rerecords = 0;
 
 	private String playtime = "00:00.0";
-	
-	private String startLocation="";
+
+	private String startLocation = "";
 
 	// =====================================================================================================
 
@@ -55,8 +55,8 @@ public class InputContainer {
 			return TextFormatting.RED + "A playback is already running";
 		recording = enabled;
 		if (recording) {
-			if(Minecraft.getMinecraft().player!=null) {
-				startLocation=getStartLocation(Minecraft.getMinecraft().player);
+			if (Minecraft.getMinecraft().player != null) {
+				startLocation = getStartLocation(Minecraft.getMinecraft().player);
 			}
 			return TextFormatting.GREEN + "Starting the recording";
 		} else {
@@ -70,7 +70,7 @@ public class InputContainer {
 		playback = enabled;
 		if (playback) {
 			index = 0;
-			if(Minecraft.getMinecraft().player!=null&&!startLocation.isEmpty()) {
+			if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
 				tpPlayer(startLocation);
 			}
 			return TextFormatting.GREEN + "Starting playback";
@@ -145,16 +145,22 @@ public class InputContainer {
 
 	public void setIndex(int index) {
 		this.index = index;
-		if(playback) {
+		if (playback) {
 			TickInputContainer tickcontainer = inputs.get(index);
 			this.keyboard = tickcontainer.getKeyboard();
 			this.mouse = tickcontainer.getMouse();
 			this.subticks = tickcontainer.getSubticks();
 		}
 	}
-	
+
 	public TickInputContainer get(int index) {
-		return inputs.get(index);
+		TickInputContainer tickcontainer = null;
+		try {
+			tickcontainer = inputs.get(index);
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		}
+		return tickcontainer;
 	}
 
 	@Override
@@ -219,12 +225,12 @@ public class InputContainer {
 	public String getStartLocation() {
 		return startLocation;
 	}
-	
+
 	public void setStartLocation(String startLocation) {
 		this.startLocation = startLocation;
 	}
-	
-	private String getStartLocation(EntityPlayerSP player) { //TODO Can easily break...
+
+	private String getStartLocation(EntityPlayerSP player) { // TODO Can easily break...
 		String pos = player.getPositionVector().toString();
 		pos = pos.replace("(", "");
 		pos = pos.replace(")", "");
@@ -233,10 +239,10 @@ public class InputContainer {
 		String yaw = Float.toString(player.rotationYaw);
 		return pos + "," + yaw + "," + pitch;
 	}
-	
+
 	private void tpPlayer(String startLocation) {
 		String[] section = startLocation.split(",");
-		Minecraft.getMinecraft().player.sendChatMessage("/tp "+section[0]+" "+section[1]+" "+section[2]+" "+section[3]+" "+section[4]); //I don't care anymore 
-		
+		Minecraft.getMinecraft().player.sendChatMessage("/tp " + section[0] + " " + section[1] + " " + section[2] + " " + section[3] + " " + section[4]); // I don't care anymore
+
 	}
 }

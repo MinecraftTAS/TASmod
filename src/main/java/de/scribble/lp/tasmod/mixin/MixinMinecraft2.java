@@ -53,7 +53,6 @@ public abstract class MixinMinecraft2 {
 				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.TICKS_PER_SECOND==0);
 			}
 		}
-		ClientProxy.virtual.updateContainer();
 	}
 
 	// =====================================================================================================================================
@@ -70,6 +69,7 @@ public abstract class MixinMinecraft2 {
 	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;runTick()V"))
 	public void redirectRunTick(Minecraft mc) {
 		for (int j2 = 0; j2 < TickSync.getTickAmount((Minecraft) (Object) this); j2++) {
+			ClientProxy.virtual.updateContainer();
 			if (TickrateChangerClient.TICKS_PER_SECOND != 0) {
 				((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 			}

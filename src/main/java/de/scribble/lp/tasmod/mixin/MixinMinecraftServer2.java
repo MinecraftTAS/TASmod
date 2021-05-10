@@ -127,12 +127,12 @@ public abstract class MixinMinecraftServer2 {
 		}
 	}
 	
-	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
-	public long limitLag(long j) {
-		if(j>(500L*(20/TickrateChangerServer.TICKS_PER_SECOND))){
-			return 50L;
-		}
-		return j;
-	}
+//	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
+//	public long limitLag(long j) {
+//		if(j>(500L*(20/TickrateChangerServer.TICKS_PER_SECOND))){
+//			return 50L;
+//		}
+//		return j;
+//	}
 	
 }
