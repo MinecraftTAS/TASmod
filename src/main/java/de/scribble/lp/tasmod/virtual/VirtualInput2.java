@@ -133,10 +133,8 @@ public class VirtualInput2 {
 		List<String> out = new ArrayList<String>();
 
 		currentKeyboard.getKeyList().forEach((keycodes, virtualkeys) -> {
-			if (keycodes >= 0) {
-				if (virtualkeys.isKeyDown()) {
-					out.add(virtualkeys.getName());
-				}
+			if (virtualkeys.isKeyDown()) {
+				out.add(virtualkeys.getName());
 			}
 		});
 
@@ -144,15 +142,21 @@ public class VirtualInput2 {
 	}
 
 	public List<String> getNextKeyboardPresses() {
-		List<String> out = new ArrayList<String>();
 
-		nextKeyboard.getKeyList().forEach((keycodes, virtualkeys) -> {
-			if (keycodes >= 0) {
+		List<String> out = new ArrayList<String>();
+		if (container.isPlayingback() && container.get(container.index()) != null) {
+			container.get(container.index()).getKeyboard().getKeyList().forEach((keycodes, virtualkeys) -> {
 				if (virtualkeys.isKeyDown()) {
 					out.add(virtualkeys.getName());
 				}
-			}
-		});
+			});
+		} else {
+			nextKeyboard.getKeyList().forEach((keycodes, virtualkeys) -> {
+				if (virtualkeys.isKeyDown()) {
+					out.add(virtualkeys.getName());
+				}
+			});
+		}
 		return out;
 	}
 
@@ -251,10 +255,8 @@ public class VirtualInput2 {
 		List<String> out = new ArrayList<String>();
 
 		currentMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
-			if (keycodes <= 0) {
-				if (virtualkeys.isKeyDown()) {
-					out.add(virtualkeys.getName());
-				}
+			if (virtualkeys.isKeyDown()) {
+				out.add(virtualkeys.getName());
 			}
 		});
 
@@ -264,13 +266,19 @@ public class VirtualInput2 {
 	public List<String> getNextMousePresses() {
 		List<String> out = new ArrayList<String>();
 
-		nextMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
-			if (keycodes <= 0) {
+		if (container.isPlayingback() && container.get(container.index()) != null) {
+			container.get(container.index()).getMouse().getKeyList().forEach((keycodes, virtualkeys) -> {
 				if (virtualkeys.isKeyDown()) {
 					out.add(virtualkeys.getName());
 				}
-			}
-		});
+			});
+		} else {
+			nextMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
+				if (virtualkeys.isKeyDown()) {
+					out.add(virtualkeys.getName());
+				}
+			});
+		}
 
 		return out;
 	}
@@ -313,14 +321,14 @@ public class VirtualInput2 {
 		if (this.container.isPlayingback()) {
 			preloadInput(this.container, container.size() - 1);
 			this.container.setIndex(container.size());
-			
-		} else if(this.container.isRecording()) {
+
+		} else if (this.container.isRecording()) {
 			String start = container.getStartLocation();
 			preloadInput(container, container.size() - 1);
-			
+
 			nextKeyboard = new VirtualKeyboard();
 			nextMouse = new VirtualMouse();
-			
+
 			container.setIndex(container.size());
 			container.setRecording(true);
 			container.setStartLocation(start);
