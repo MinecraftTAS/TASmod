@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.dselent.bigarraylist.BigArrayList;
 
+import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
@@ -27,6 +28,8 @@ public class InputContainer {
 	public final File directory = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles");
 
 	private BigArrayList<TickInputContainer> inputs = new BigArrayList(directory + File.separator + "temp");
+	
+	public DesyncMonitoring dMonitor= new DesyncMonitoring();
 
 	// =====================================================================================================
 
@@ -110,6 +113,7 @@ public class InputContainer {
 		if (recording) {
 			index++;
 			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
+			dMonitor.capturePosition();
 		} else if (playback) {
 			index++;
 			if (index == inputs.size()) {
@@ -178,6 +182,7 @@ public class InputContainer {
 	public void clear() {
 		inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 		index = 0;
+		dMonitor.getPos().clear();
 	}
 
 	public String getAuthors() {

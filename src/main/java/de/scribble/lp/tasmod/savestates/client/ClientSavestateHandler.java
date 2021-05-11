@@ -44,7 +44,7 @@ public class ClientSavestateHandler {
 		InputContainer container = ClientProxy.virtual.getContainer();
 		if (container.isRecording()) {
 			ClientProxy.serialiser.saveToFileV1(targetfile, container);
-		} else {
+		} else if(container.isPlayingback()){
 			ClientProxy.serialiser.saveToFileV1Until(targetfile, container, container.index());
 		}
 	}
