@@ -34,8 +34,10 @@ public class ContainerSerialiser {
 			throw new IOException("There are no inputs to save to a file");
 		}
 		FileThread fileThread = new FileThread(file, false);
+		FileThread monitorThread= new FileThread(new File(file, "../"+file.getName().replace(".tas", "")+".mon"), false);
 
 		fileThread.start();
+		monitorThread.start();
 		
 		fileThread.addLine("################################################# TASFile ###################################################\n"
 				 + "#												Version:1													#\n"
@@ -65,8 +67,10 @@ public class ContainerSerialiser {
 			}
 			TickInputContainer tick = ticks.get(i);
 			fileThread.addLine(tick.toString() + "\n");
+			monitorThread.addLine(container.dMonitor.get(i) + "\n");
 		}
 		fileThread.close();
+		monitorThread.close();
 	}
 
 	public int getFileVersion(File file) throws IOException {
@@ -89,6 +93,14 @@ public class ContainerSerialiser {
 	public InputContainer fromEntireFileV1(File file) throws IOException {
 
 		List<String> lines = FileUtils.readLines(file, Charset.defaultCharset());
+		
+		File monitorFile=new File(file, "../"+file.getName().replace(".tas", "")+".mon");
+		
+		List<String> monitorLines=null;
+		
+		if(monitorFile.exists()) {
+			monitorLines = FileUtils.readLines(monitorFile, Charset.defaultCharset());
+		}
 
 		InputContainer container = new InputContainer();
 
@@ -134,6 +146,10 @@ public class ContainerSerialiser {
 		container.setPlaytime(playtime);
 		container.setRerecords(rerecords);
 		container.setStartLocation(startLocation);
+		if(monitorLines!=null) {
+			container.dMonitor.setPos(monitorLines);
+		}
+		
 		return container;
 	}
 

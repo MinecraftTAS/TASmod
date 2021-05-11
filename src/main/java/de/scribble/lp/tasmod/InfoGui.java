@@ -4,6 +4,7 @@ import org.lwjgl.opengl.Display;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 
+import ca.weblite.objc.Client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.Gui;
@@ -52,6 +53,9 @@ public class InfoGui extends Gui {
 //			
 			EntityPlayerSP player=Minecraft.getMinecraft().player;
 
+			new Gui().drawString(mc.fontRenderer, player.posX+" "+player.posY+" "+player.posZ, 16, 100, 0xFFFFFF); // Current Pointer location
+			new Gui().drawString(mc.fontRenderer, ClientProxy.virtual.getContainer().dMonitor.getMonitoring(ClientProxy.virtual.getContainer().index()-1, player), 16, 110, 0xFFFFFF); // Current Pointer location
+			
 			if (Display.isActive()) {
 				String out1 = "";
 				for (String mouse : ClientProxy.virtual.getCurrentMousePresses()) {
@@ -73,6 +77,8 @@ public class InfoGui extends Gui {
 				}
 				new Gui().drawString(mc.fontRenderer, out2, 5, height - 10, 0xFFFFFF); // Current Pointer location
 			}
+			
+			
 			new Gui().drawString(mc.fontRenderer, ClientProxy.virtual.getContainer().index() + "", 5, height - 30, 0xFFFFFF); // Current Pointer location
 			new Gui().drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width / 2, height - 50, 0xFF8400); // Current Pointer location
 
