@@ -8,6 +8,7 @@
     
         //General
         "MixinMinecraftServer2",
+        "MixinEntityPlayer",
         
         //Savestates
         "savestates.MixinChunkProviderServer",

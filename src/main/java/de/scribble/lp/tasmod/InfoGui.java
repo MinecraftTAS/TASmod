@@ -56,6 +56,8 @@ public class InfoGui extends Gui {
 			new Gui().drawString(mc.fontRenderer, player.posX+" "+player.posY+" "+player.posZ+" "+player.motionX+" "+player.motionY+" "+player.motionZ, 16, 100, 0xFFFFFF); // Current Pointer location
 			new Gui().drawString(mc.fontRenderer, ClientProxy.virtual.getContainer().dMonitor.getMonitoring(ClientProxy.virtual.getContainer().index()-1, player), 16, 110, 0xFFFFFF); // Current Pointer location
 			
+			new Gui().drawString(mc.fontRenderer, player.jumpMovementFactor+" ", 16, 130, 0xFFFFFF); // Current Pointer location
+			
 			if (Display.isActive()) {
 				String out1 = "";
 				for (String mouse : ClientProxy.virtual.getCurrentMousePresses()) {
