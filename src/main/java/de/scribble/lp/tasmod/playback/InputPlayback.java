@@ -72,9 +72,9 @@ public class InputPlayback {
 			subtickPlaybackindex=-1;
 			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();
 			Minecraft.getMinecraft().gameSettings.chatLinks=false;
-			if(tutorial.istutorial&&tutorial.getState()==6) {
-				tutorial.advanceState();
-			}
+//			if(tutorial.istutorial&&tutorial.getState()==6) {
+//				tutorial.advanceState();
+//			}
 //			Minecraft.getMinecraft().randommanager.setEntityRandomnessAll(0);
 //			RandomLogger.startRandomLogging();
 		}else {
@@ -128,9 +128,9 @@ public class InputPlayback {
 	public static void stopPlayback() {
 		if(isPlayingback()) {
 			TutorialHandler tutorial= ClientProxy.getPlaybackTutorial();
-			if(tutorial.istutorial&&tutorial.getState()==7) {
-				tutorial.advanceState();
-			}
+//			if(tutorial.istutorial&&tutorial.getState()==7) {
+//				tutorial.advanceState();
+//			}
 			playingback=false;
 			inputList=new ArrayList<TickFrame>();
 			subtickList=new ArrayList<VirtualSubticks>();

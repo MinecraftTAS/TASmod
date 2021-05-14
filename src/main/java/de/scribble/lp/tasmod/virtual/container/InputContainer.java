@@ -2,6 +2,8 @@ package de.scribble.lp.tasmod.virtual.container;
 
 import java.io.File;
 
+import org.lwjgl.opengl.Display;
+
 import com.dselent.bigarraylist.BigArrayList;
 
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
@@ -115,12 +117,15 @@ public class InputContainer {
 			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
 			dMonitor.capturePosition();
 		} else if (playback) {
+			if(!Display.isActive()) {
+				setPlayback(false);
+			}
 			index++;
 			if (index == inputs.size()) {
 				this.keyboard = new VirtualKeyboard();
 				this.mouse = new VirtualMouse();
 			} else if (index > inputs.size()) {
-				playback = false;
+				setPlayback(false);
 				index--;
 			} else {
 				TickInputContainer tickcontainer = inputs.get(index);

@@ -84,9 +84,9 @@ public class InputRecorder {
 			addHeader();
 			
 			TutorialHandler tutorial = ClientProxy.getPlaybackTutorial();
-			if (TutorialHandler.istutorial && tutorial.getState() == 3) {
-				tutorial.advanceState();
-			}
+//			if (TutorialHandler.istutorial && tutorial.getState() == 3) {
+//				tutorial.advanceState();
+//			}
 		} else {
 			logger.error("There is already a recording running!");
 		}
@@ -367,9 +367,9 @@ public class InputRecorder {
 			recording = false;
 			
 			TutorialHandler tutorial = ClientProxy.getPlaybackTutorial();
-			if (TutorialHandler.istutorial && tutorial.getState() == 4) {
-				tutorial.advanceState();
-			}
+//			if (TutorialHandler.istutorial && tutorial.getState() == 4) {
+//				tutorial.advanceState();
+//			}
 			if(log) {
 				logger.info("Stopping the recording");
 				mc.player.sendMessage(new TextComponentString("Recording stopped"));
