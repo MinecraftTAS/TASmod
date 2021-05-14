@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  */
 public class TutorialHandler {
 
-	public static boolean istutorial;
+	private boolean istutorial;
 	
 	private int state;
 	
@@ -41,6 +41,14 @@ public class TutorialHandler {
 	
 	public int getState() {
 		return state;
+	}
+	
+	public void setTutorial(boolean isActive) {
+//		istutorial=isActive; //TODO Update tutorial
+	}
+	
+	public boolean isTutorial() {
+		return istutorial;
 	}
 	/**
 	 * Get the current text depending on the state
@@ -189,7 +197,7 @@ public class TutorialHandler {
 	private final String[] text3= {"3. This mod can record your inputs and save them to a file.",
 			"To start a recording type in '/record' and then followed by a filename",
 			"",
-			"Objective: Open the chat and type '/record tas'"};
+			"Objective: Open the chat and type '/record'"};
 	
 	private final String[] text4={"4. Now move around open your inventory etc...",
 			"",

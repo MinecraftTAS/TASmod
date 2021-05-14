@@ -9,7 +9,7 @@ public class Config {
 	}
 	public static void reloadClientConfig(Configuration clientconfig) {
 		clientconfig.load();
-		TutorialHandler.istutorial=clientconfig.get("Tutorial","Enabled",true,"If the tutorial is enabled").getBoolean();
+		ClientProxy.getPlaybackTutorial().setTutorial(clientconfig.get("Tutorial","Enabled",true,"If the tutorial is enabled").getBoolean());
 		clientconfig.save();
 	}
 }
