@@ -24,13 +24,13 @@ public class CommandPlaybacktutorial extends CommandBase{
 		if(sender instanceof EntityPlayer) {
 			if(!server.isDedicatedServer()) {
 				TutorialHandler handler=ClientProxy.getPlaybackTutorial();
-				if(handler.istutorial) {
-					handler.istutorial=false;
+				if(handler.isTutorial()) {
+					handler.setTutorial(false);
 					ClientProxy.config.get("Tutorial","Enabled",true,"If the tutorial is enabled").set(false);
 					ClientProxy.config.save();
 				}else {
 					handler.setState((short)1);
-					handler.istutorial=true;
+					handler.setTutorial(true);
 				}
 			}
 		}

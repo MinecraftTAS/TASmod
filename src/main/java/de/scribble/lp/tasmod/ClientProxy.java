@@ -58,6 +58,8 @@ public class ClientProxy extends CommonProxy {
 
 	public void preInit(FMLPreInitializationEvent ev) {
 		isDevEnvironment = (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+		playbackTutorial = new TutorialHandler((short) 1);
+		
 		config = new Configuration(ev.getSuggestedConfigurationFile());
 		Config.reloadClientConfig(config);
 
@@ -143,7 +145,6 @@ public class ClientProxy extends CommonProxy {
 			}
 		}
 
-		playbackTutorial = new TutorialHandler((short) 1);
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
