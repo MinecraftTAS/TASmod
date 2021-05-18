@@ -10,6 +10,7 @@ import com.google.common.collect.Maps;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.client.settings.KeyBinding;
 
@@ -43,7 +44,7 @@ public class VirtualKeybindings {
 	 * @return
 	 */
 	public static boolean isKeyDownExceptTextfield(KeyBinding keybind) {
-		if (mc.currentScreen instanceof GuiChat || mc.currentScreen instanceof GuiEditSign || (focused && mc.currentScreen != null)) {
+		if (mc.currentScreen instanceof GuiChat || mc.currentScreen instanceof GuiEditSign || (focused && mc.currentScreen != null) || mc.currentScreen instanceof GuiControls) {
 			return false;
 		}
 		boolean down = Keyboard.isKeyDown(keybind.getKeyCode());
