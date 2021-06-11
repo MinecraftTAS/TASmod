@@ -113,6 +113,11 @@ public class SavestatePlayerLoading {
                 }
             }
         }
+		else {
+			if(playerIn.isRiding()) {
+				playerIn.dismountRidingEntity();
+			}
+		}
 	}
 	
 }
