@@ -1,408 +1,349 @@
 package de.scribble.lp.tasmod.virtual;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import de.scribble.lp.tasmod.playback.InputPlayback;
-import de.scribble.lp.tasmod.recording.InputRecorder;
-import net.minecraft.client.settings.KeyBinding;
+import de.scribble.lp.tasmod.mixin.AccessorRunStuff;
+import de.scribble.lp.tasmod.util.PointerNormalizer;
+import de.scribble.lp.tasmod.virtual.container.InputContainer;
+import de.scribble.lp.tasmod.virtual.container.TickInputContainer;
+import net.minecraft.client.Minecraft;
 
-/**
- * Emulates a virtual keyboard that is set between the lwjgl.input.Keyboard & lwjgl.input.Mouse and the keybindings.<br>
- * After each tick, it loads every keyboard/mouse event from lwjgl, then passes this to the keybindings.<br>
- * That way, it is possible to read out that information and save it to a file, or load other events into the slot where the lwjgl would put it's events, creating a playback functionality.<br>
- * This also stores keynames and it's keycodes, since lwjgl only has a handful of keynames saved via the Keyboard#getKeyName method<br>
- * Also records behaviour that is executed outside of tickbased methods.<br>
- * 
- * @author ScribbleLP
- *
- */
-@Deprecated
 public class VirtualInput {
-	
-	public static VirtualKeyboard keyboard=new VirtualKeyboard();
-	
-	private static VirtualMouse mouse=new VirtualMouse();
-	
-	static List<VirtualChar> charList= new ArrayList<VirtualChar>();
-	
-	private static List<Character> charsListOut= new ArrayList<Character>();
-	
-	private static VirtualSubticks subtick;
-	
-	private static int timeSinceLastTick=0;
-	
-	
-	/*==========================Emulating keyboard events==========================*/
-	
-	/**
-	 * The index of the keyboard signalising which event should be returned from the {@linkplain #keyboardEventList}
-	 */
-	private static int keyboardIndex=-1;
-	
-	/**
-	 * A list of keyboard events that will be excecuted in the next tick.<br>
-	 * <br>
-	 * These events will get filled in {@linkplain #fillKeyboardEvents(int, boolean, char)} or in {@linkplain #fillKeyboardEventsWithPlayback()}<br>
-	 * <br>
-	 * The current index is saved in {@linkplain #keyboardIndex} and the list will be cleared in {@linkplain #prepareKeyboardEvents()} at the start of the tick <br>
-	 */
-	private static List<VirtualKeyboardEvent> keyboardEventList= new ArrayList<VirtualKeyboardEvent>();
-	
-	/**
-	 * Resets the keyboard event list, so it can be recorded. Usually happens right before they are filled
-	 */
-	public static void prepareKeyboardEvents() {
-		keyboardEventList.clear();
-		keyboardIndex=-1;
-		resetCharList();
-	}
-	
-	/**
-	 * Records a keyboard event and adds it to a list.<br>
-	 * <br>
-	 * <i>Example:</i><br>
-	 * If you press and release the "W" key in a tick, 2 events will be created:<br>
-	 * <i>17,true,'w'</i><br>
-	 * and<br>
-	 * <i>17,false,'w'</i><br>
-	 * These events will all be recorded and put into a list.<br>
-	 * <br>
-	 * keycode The key in question<br>
-	 * keystate What state it has, true for pressed, false for released<br>
-	 * character Every key on the keyboard has a character associated with it (even if it's a null character)<br>
-	 */
-	public static void fillKeyboardEvents(int keycode, boolean keystate, char character) {
-		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode))return;
-		
-		keyboardEventList.add(new VirtualKeyboardEvent(keycode, keystate, character));
-	}
-	
-	/**
-	 * Only active when InputPlayback.isPlayingback()<br>
-	 * This fills the keyboard events list with events from a file<br>
-	 * <br>
-	 * In contrast to the mouse methods, I am allowing manual keyboard inputs while a playback is executing, to stop the playback or something.<br>
-	 * <br>
-	 */
-	public static void fillKeyboardEventsWithPlayback() {
-		if(InputPlayback.isPlayingback()) {
-			List<VirtualKeyboardEvent>events=InputPlayback.getCurrentKeyEvent();
-			keyboardEventList.addAll(events);
-		}
-	}
-	
-	/**
-	 * Switches o the next keyboard event in the list similar to how Keyboard.next() would function
-	 */
-	public static boolean nextKeyboardEvent() {
-		if (keyboardIndex<keyboardEventList.size()-1&&!keyboardEventList.isEmpty()) {
-			keyboardIndex++;
-			return true;
-		}else return false;
-	}
-	
-	/**
-	 * Get the complete list of keyboard events, used by {@link InputRecorder}.
-	 */
-	public static List<VirtualKeyboardEvent> getKeyboardEvents(){
-		return keyboardEventList;
-	}
-	
-	/**
-	 * Get's the current keycode from the {@link #keyboardEventList}
-	 * 
-	 * @return Current keycode
-	 */
-	public static int getEventKeyboardButton() {
-		return keyboardEventList.get(keyboardIndex).getKeyCode();
-	}
-	
-	/**
-	 * Get's the current keystate from the {@link #keyboardEventList}
-	 * 
-	 * @return Current keystate, true for pressed, false for unpressed
-	 */
-	public static boolean getEventKeyboardButtonState() {
-		return keyboardEventList.get(keyboardIndex).isState();
-	}
-	
-	/**
-	 * Returns the current character from the {@link #keyboardEventList}
-	 * 
-	 * @return Character associated with the keyboard key
-	 */
-	public static char getEventChar() {
-		return keyboardEventList.get(keyboardIndex).getCharacter();
-	}
-	
-	/*==============================Emulating mouse events==============================*/
 
-	/**
-	 * The index of the mouse signalising which event should be returned from the {@linkplain #mouseEventList}
-	 */
-	private static int mouseIndex=-1;
-	
-	/**
-	 * A list of mouse events that will be excecuted in the next tick.<br>
-	 * <br>
-	 * These events will get filled in {@linkplain #fillMouseEvents(int, boolean, char)} or in {@linkplain #fillMouseEventsWithPlayback()}<br>
-	 * <br>
-	 * The current index is saved in {@linkplain #mouseIndex} and the list will be cleared in {@linkplain #prepareMouseEvents()} at the start of the tick <br>
-	 */
-	private static List<VirtualMouseEvent> mouseEventList= new ArrayList<VirtualMouseEvent>();
-	
-	/**
-	 * Resets the mouse event list, so it can be recorded. Usually happens right before they are filled
-	 */
-	public static void prepareMouseEvents() {
-		mouseEventList.clear();
-		mouseIndex=-1;
+	private InputContainer container = new InputContainer();
+
+	// ============================================================
+
+	private VirtualKeyboard currentKeyboard = new VirtualKeyboard();
+
+	private VirtualKeyboard nextKeyboard = new VirtualKeyboard();
+
+	private List<VirtualKeyboardEvent> currentKeyboardEvents = new ArrayList<VirtualKeyboardEvent>();
+	private Iterator<VirtualKeyboardEvent> currentKeyboardEventIterator = currentKeyboardEvents.iterator();
+
+	private VirtualKeyboardEvent currentKeyboardEvent = null;
+
+	public VirtualKeyboard getCurrentKeyboard() {
+		return currentKeyboard;
 	}
-	
-	/**
-	 * Records a mouse event and adds it to a list.<br>
-	 * <br>
-	 * <i>Example:</i><br>
-	 * If you press and release the "KEY_LC" key in a tick, 2 events will be created:<br>
-	 * <i>17,true,'w'</i><br>
-	 * and<br>
-	 * <i>17,false,'w'</i><br>
-	 * These events will all be recorded and put into a list.<br>
-	 * <br>
-	 * keycode: The key in question<br>
-	 * keystate: What state it has, true for pressed, false for released<br>
-	 * character: Every key on the keyboard has a character associated with it (even if it's a null character)<br>
-	 */
-	public static void fillMouseEvents(int keycode, boolean state, int scrollwheel, int mouseX, int mouseY, int slotidx) {
-		if (!InputPlayback.isPlayingback()) {
-			mouseEventList.add(new VirtualMouseEvent(keycode, state, scrollwheel, mouseX, mouseY));
+
+	public VirtualKeyboard getNextKeyboard() {
+		return nextKeyboard;
+	}
+
+	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
+
+//		System.out.println(keycode+" "+keystate+" "+character);
+
+		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
+			return;
 		}
-	}
-	
-	public static void fillMouseEventsWithPlayback() {
-		if(InputPlayback.isPlayingback()) {
-			List<VirtualMouseEvent>events=InputPlayback.getCurrentMouseEvent();
-			mouseEventList.addAll(events);
+		VirtualKey key = nextKeyboard.get(keycode);
+		key.setPressed(keystate);
+		if (keystate) {
+			character = nextKeyboard.encodeUnicode(keycode, character);
+		} else {
+			if (keycode == 15) {
+				character = '\u2907';
+			}
 		}
+		nextKeyboard.addChar(character);
 	}
-	
-	public static boolean nextMouseEvent() {
-		if (mouseIndex<mouseEventList.size()-1&&!mouseEventList.isEmpty()) {
-			mouseIndex++;
+
+	public List<VirtualKeyboardEvent> getCurrentKeyboardEvents() {
+		return currentKeyboard.getDifference(nextKeyboard);
+	}
+
+	public void updateCurrentKeyboardEvents() {
+		currentKeyboardEvents = getCurrentKeyboardEvents();
+		currentKeyboardEventIterator = currentKeyboardEvents.iterator();
+
+//		currentKeyboardEvents.forEach(action->{
+//			System.out.println(action.toString());
+//		});
+
+		nextKeyboard.clearCharList();
+
+		currentKeyboard = nextKeyboard.clone();
+	}
+
+	public boolean nextKeyboardEvent() {
+		boolean hasnext = currentKeyboardEventIterator.hasNext();
+		if (hasnext) {
+			currentKeyboardEvent = currentKeyboardEventIterator.next();
+		}
+		return hasnext;
+	}
+
+	public int getEventKeyboardKey() {
+		return currentKeyboardEvent.getKeyCode();
+	}
+
+	public boolean getEventKeyboardState() {
+		return currentKeyboardEvent.isState();
+	}
+
+	public char getEventKeyboardCharacter() {
+		return currentKeyboardEvent.getCharacter();
+	}
+
+	public void clearNextKeyboard() {
+		nextKeyboard.clear();
+	}
+
+	public boolean isKeyDown(int keycode) {
+		if (keycode >= 0)
+			return currentKeyboard.get(keycode).isKeyDown();
+
+		else
+			return currentMouse.get(keycode).isKeyDown();
+	}
+
+	public boolean isKeyDown(String keyname) {
+		if (currentKeyboard.get(keyname).isKeyDown()) {
 			return true;
-		}else return false;
-	}
-	
-	public static List<VirtualMouseEvent> getMouseEvents(){
-		return mouseEventList;
-	}
-	
-	public static int getEventMouseButton() {
-		return mouseEventList.get(mouseIndex).getKeyCode();
-	}
-	
-	public static boolean getEventMouseButtonState() {
-		return mouseEventList.get(mouseIndex).isState();
-	}
-	
-	public static int getEventDWheel() {
-		return mouseEventList.get(mouseIndex).getScrollwheel();
-	}
-	
-	public static int getEventX() {
-		return mouseEventList.get(mouseIndex).getMouseX();
-	}
-	
-	public static int getEventY() {
-		return mouseEventList.get(mouseIndex).getMouseY();
-	}
-	
-	/*==========================Tick Independant Behaviour=================================*/
-	/*					This section will execute every game loop						   */
-	
-	public static void resetTimeSinceLastTick() {
-		timeSinceLastTick=0;
-	}
-	
-	public static void incrementTimeSinceLastTick() {
-		timeSinceLastTick++;
-	}
-	
-	/*Unused*/
-	public static int getTimeSinceLastTick() {
-		return timeSinceLastTick;
-	}
-	
-//	public static void fillSubtick(int tick, float pitch, float yaw) {
-//		if(!InputPlayback.isPlayingback()) {
-//			subtick=new VirtualSubticks(tick, pitch, yaw);
-//		}
-//	}
-	
-	public static void fillSubtickWithPlayback() {
-		if(InputPlayback.isPlayingback()) {
-			subtick=InputPlayback.getCurrentSubtick();
+		} else if (currentMouse.get(keyname).isKeyDown()) {
+			return true;
+		} else {
+			return false;
 		}
 	}
-	
-//	public static int getSubtickTick() {
-//		return subtick.getTick();
-//	}
-	
-	public static float getSubtickPitch() {
-		return subtick.getPitch();
+
+	public boolean willKeyBeDown(int keycode) {
+		if (keycode >= 0)
+			return nextKeyboard.get(keycode).isKeyDown();
+
+		else
+			return nextMouse.get(keycode).isKeyDown();
 	}
-	
-	public static float getSubtickYaw() {
-		return subtick.getYaw();
-	}
-	
-	public static VirtualSubticks getSubtick() {
-		return subtick;
-	}
-	
-	/*================================Code similar to keybidings================================*/
-	/**
-	 * Picks up keycodes, stores their state and adds keycodes not listed
-	 * @param keyCode
-	 * @param pressed
-	 * @return changedKeycode
-	 */
-	public static int runThroughKeyboard(int keyCode, boolean pressed) {
-		if(VirtualKeybindings.isKeyCodeAlwaysBlocked(keyCode)) {
-			return keyCode;
+
+	public boolean willKeyBeDown(String keyname) {
+		if (nextKeyboard.get(keyname).isKeyDown()) {
+			return true;
+		} else if (nextMouse.get(keyname).isKeyDown()) {
+			return true;
+		} else {
+			return false;
 		}
-		keyboard.get(addKeyCodeIfNecessary(keyCode)).setPressed(pressed);
-		return keyCode;
 	}
-	
-	/**
-	 * Checks if the given keycode is pressed on the Virtual keyboard/mouse
-	 * @param keyCode
-	 * @return boolean
-	 */
-	public static boolean isKeyDown(int keyCode) {
-		if(keyboard.get(keyCode)!=null) {
-			return keyboard.get(keyCode).isKeyDown();
-		}else return false;
-	}
-	
-	/**
-	 * Picks up chars from the keyboard and stores their state. Used in guiscreens
-	 * @param character
-	 * @param pressed
-	 * @return boolean
-	 */
-	public static char runCharThroughKeyboard(char character, boolean pressed) {
-		charList.add(new VirtualChar(character, pressed));
-		return character;
-	}
-	
-	public static void resetCharList() {
-		charList.clear();
-	}
-	
-	/**
-	 * Checks if the given character is pressed on the Virtual keyboard/mouse
-	 * @param character
-	 * @return boolean
-	 */
-	public static boolean isKeyDown(char character) {
-		return VirtualChar.keyChars.get(character).isPressed();
-	}
-	
-	/**
-	 * Checks if the keycode is in the list and adds it if necessary
-	 * @param keyCode
-	 * @return
-	 */
-	public static int addKeyCodeIfNecessary(int keyCode) {
-		if(keyboard.get(keyCode)==null) {
-			updateMissingKeyCode(keyCode);
-			return keyboard.get(keyCode).getKeycode();
-		}else return keyboard.get(keyCode).getKeycode();
-	}
-	
-	/**
-	 * Updates the given misssing keycode. The name will be the keycode to string
-	 * @param keyCode
-	 */
-	private static void updateMissingKeyCode(int keyCode) {
-		keyboard.add(keyCode);
-	}
-	
-	/**
-	 * Looks through the list of names and returns it's keycode returns -1 if it can't find anything
-	 * @param name Name of the key
-	 * @return int keycode, else -1
-	 */
-	public static int getKeyCodeFromKeyName(String name) {
-		if(keyboard.get(name) != null) {
-			return keyboard.get(name).getKeycode();
-		}else return -1;
-	}
-	
-	/**
-	 * Looks through the list of keycodes and returns it's name.
-	 * @param keycode
-	 * @return Name of the keycode
-	 */
-	public static String getNameFromKeyCode(int keycode) {
-		return keyboard.get(keycode).getName();
-	}
-	
-	/**
-	 * Resets every key in the list to be not pressed
-	 */
-	public static void unpressEverything() {
-		
-		KeyBinding.unPressAllKeys();
-	}
-	
-	
-	/**
-	 * Debug method to return a list of keys currently being pressed. Could be used for a keystroke display
-	 * @return List of keynames currently being pressed
-	 */
-	public static List<String> getCurrentKeyboardPresses() {
-		return keyboard.getCurrentPresses();
-	}
-	
-	/**
-	 * Debug method to return a list of characters currently being pressed. Could be used for a keystroke display
-	 * @return List of characters
-	 */
-	public static List<Character> getCurrentCharList() {
-		charsListOut.clear();
-		if(charList.isEmpty()) {
-			return charsListOut;
-		}
-		charList.forEach((virtual)->{
-			if(virtual.isPressed()) {
-				charsListOut.add(virtual.getName());
+
+	public List<String> getCurrentKeyboardPresses() {
+		List<String> out = new ArrayList<String>();
+
+		currentKeyboard.getKeyList().forEach((keycodes, virtualkeys) -> {
+			if (virtualkeys.isKeyDown()) {
+				out.add(virtualkeys.getName());
 			}
 		});
-		return charsListOut;
+
+		return out;
 	}
-	
-	/**
-	 * Debug method to return a list of mouse keys currently being pressed. Could be used for a keystroke display
-	 * @return List of keynames currently being pressed
-	 */
-	public static List<String> getCurrentMousePresses() {
-		return mouse.getCurrentPresses();
+
+	public List<String> getNextKeyboardPresses() {
+
+		List<String> out = new ArrayList<String>();
+		if (container.isPlayingback() && container.get(container.index()) != null) {
+			container.get(container.index()).getKeyboard().getKeyList().forEach((keycodes, virtualkeys) -> {
+				if (virtualkeys.isKeyDown()) {
+					out.add(virtualkeys.getName());
+				}
+			});
+		} else {
+			nextKeyboard.getKeyList().forEach((keycodes, virtualkeys) -> {
+				if (virtualkeys.isKeyDown()) {
+					out.add(virtualkeys.getName());
+				}
+			});
+		}
+		return out;
 	}
-	
-	/*================================Code for tickrate 0================================*/
-	
-	/*Different things need to happen during tickrate 0. As mentioned in https://github.com/ScribbleLP/TASmod/issues/44,
-	 *the lwjgl buffer keeps running full*/
-	
-	
-	private static void printKeyList() {
-		keyboardEventList.forEach(action->{
-			System.out.println(action.getKeyCode()+" "+action.isState());
+
+	// =======================================================================================
+
+	private VirtualMouse currentMouse = new VirtualMouse();
+
+	public VirtualMouse nextMouse = new VirtualMouse();
+
+	private List<VirtualMouseEvent> currentMouseEvents = new ArrayList<VirtualMouseEvent>();
+	private Iterator<VirtualMouseEvent> currentMouseEventIterator = currentMouseEvents.iterator();
+
+	private VirtualMouseEvent currentMouseEvent = null;
+
+	public VirtualMouse getCurrentMouse() {
+		return currentMouse;
+	}
+
+	public VirtualMouse getNextMouse() {
+		return nextMouse;
+	}
+
+	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
+
+		boolean flag = true;
+		if (filter) {
+			flag = nextMouse.isSomethingDown() || scrollwheel != 0 || keycode != -1;
+		}
+		VirtualKey key = nextMouse.get(keycode - 100);
+
+		key.setPressed(keystate);
+
+		nextMouse.setScrollWheel(scrollwheel);
+
+		nextMouse.setCursor(PointerNormalizer.getNormalizedX(cursorX), PointerNormalizer.getNormalizedY(cursorY));
+
+		if (flag == true)
+			nextMouse.addPathNode();
+	}
+
+	public List<VirtualMouseEvent> getCurrentMouseEvents() {
+		return currentMouse.getDifference(nextMouse);
+	}
+
+	public void updateCurrentMouseEvents() {
+		currentMouseEvents = getCurrentMouseEvents();
+		currentMouseEventIterator = currentMouseEvents.iterator();
+
+		// Prints the mouse events given to the keybindings... very useful
+//		currentMouseEvents.forEach(action->{
+//			System.out.println(action.toString());
+//		});
+
+		resetNextMouseLists();
+
+		currentMouse = nextMouse.clone();
+	}
+
+	public void resetNextMouseLists() {
+		nextMouse.resetPath();
+	}
+
+	public boolean nextMouseEvent() {
+		boolean hasnext = currentMouseEventIterator.hasNext();
+		if (hasnext) {
+			currentMouseEvent = currentMouseEventIterator.next();
+		}
+		return hasnext;
+	}
+
+	public int getEventMouseKey() {
+		return currentMouseEvent.getKeyCode();
+	}
+
+	public boolean getEventMouseState() {
+		return currentMouseEvent.isState();
+	}
+
+	public int getEventMouseScrollWheel() {
+		return currentMouseEvent.getScrollwheel();
+	}
+
+	public int getEventCursorX() {
+		return PointerNormalizer.getCoordsX(currentMouseEvent.getMouseX());
+	}
+
+	public int getEventCursorY() {
+		return PointerNormalizer.getCoordsY(currentMouseEvent.getMouseY());
+	}
+
+	public void clearNextMouse() {
+		nextMouse.clear();
+	}
+
+	public List<String> getCurrentMousePresses() {
+		List<String> out = new ArrayList<String>();
+
+		currentMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
+			if (virtualkeys.isKeyDown()) {
+				out.add(virtualkeys.getName());
+			}
 		});
+
+		return out;
+	}
+
+	public List<String> getNextMousePresses() {
+		List<String> out = new ArrayList<String>();
+
+		if (container.isPlayingback() && container.get(container.index()) != null) {
+			container.get(container.index()).getMouse().getKeyList().forEach((keycodes, virtualkeys) -> {
+				if (virtualkeys.isKeyDown()) {
+					out.add(virtualkeys.getName());
+				}
+			});
+		} else {
+			nextMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
+				if (virtualkeys.isKeyDown()) {
+					out.add(virtualkeys.getName());
+				}
+			});
+		}
+
+		return out;
+	}
+
+	public void unpressEverything() {
+		clearNextKeyboard();
+		clearNextMouse();
+	}
+
+	// =======================================================================================
+
+	VirtualSubticks currentSubtick = new VirtualSubticks(0, 0);
+
+	public void updateSubtick(float pitch, float yaw) {
+		currentSubtick = container.addSubticksToContainer(new VirtualSubticks(pitch, yaw));
+	}
+
+	public float getSubtickPitch() {
+		return currentSubtick.getPitch();
+	}
+
+	public float getSubtickYaw() {
+		return currentSubtick.getYaw();
+	}
+
+	public InputContainer getContainer() {
+		return container;
+	}
+
+	public void updateContainer() {
+		nextKeyboard = container.addKeyboardToContainer(nextKeyboard);
+		nextMouse = container.addMouseToContainer(nextMouse);
+	}
+
+	public void setContainer(InputContainer container) {
+		this.container = container;
+	}
+
+	public void loadSavestate(InputContainer container) {
+		if (this.container.isPlayingback()) {
+			preloadInput(this.container, container.size() - 1);
+			this.container.setIndex(container.size());
+
+		} else if (this.container.isRecording()) {
+			String start = container.getStartLocation();
+			preloadInput(container, container.size() - 1);
+
+			nextKeyboard = new VirtualKeyboard();
+			nextMouse = new VirtualMouse();
+
+			container.setIndex(container.size());
+			container.setRecording(true);
+			container.setStartLocation(start);
+			this.container = container;
+		}
+	}
+
+	private void preloadInput(InputContainer container, int index) {
+		TickInputContainer tickcontainer = container.get(index).clone();
+
+		nextKeyboard = tickcontainer.getKeyboard().clone();
+		nextMouse = tickcontainer.getMouse().clone();
+
+		((AccessorRunStuff) Minecraft.getMinecraft()).runTickKeyboardAccessor();
+		((AccessorRunStuff) Minecraft.getMinecraft()).runTickMouseAccessor();
+
 	}
 }
