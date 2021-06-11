@@ -12,7 +12,7 @@ import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.savestates.server.SavestateEvents;
 import de.scribble.lp.tasmod.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
-import de.scribble.lp.tasmod.virtual.VirtualInput2;
+import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -48,7 +48,7 @@ public class ClientProxy extends CommonProxy {
 
 	public static KeyBinding infoGuiKey = new KeyBinding("Open InfoGui Editor", Keyboard.KEY_F6, "TASmod");
 
-	public static VirtualInput2 virtual = new VirtualInput2();
+	public static VirtualInput virtual = new VirtualInput();
 
 	public static ContainerSerialiser serialiser = new ContainerSerialiser();
 

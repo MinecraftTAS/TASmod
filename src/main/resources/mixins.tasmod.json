@@ -7,7 +7,7 @@
     "mixins": [
     
         //General
-        "MixinMinecraftServer2",
+        "MixinMinecraftServer",
         "MixinEntityPlayer",
         
         //Savestates
@@ -41,9 +41,9 @@
     ],
     "client": [
         //General
-        "MixinMinecraft2",
-        "MixinEntityRenderer2",
-        "MixinGuiScreen2",
+        "MixinMinecraft",
+        "MixinEntityRenderer",
+        "MixinGuiScreen",
         
         //Savestates
 		"savestates.MixinChunkProviderClient",
