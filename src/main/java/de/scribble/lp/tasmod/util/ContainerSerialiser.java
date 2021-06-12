@@ -256,21 +256,25 @@ public class ContainerSerialiser {
 
 		for (String pathNode : pathNodes) {
 			String[] split = pathNode.split(",");
-			String key = split[0];
+			
+			int length=split.length;
 			int scrollWheel = 0;
 			int cursorX = 0;
 			int cursorY = 0;
 			try {
-				scrollWheel = Integer.parseInt(split[1]);
-				cursorX = Integer.parseInt(split[2]);
-				cursorY = Integer.parseInt(split[3]);
+				scrollWheel = Integer.parseInt(split[length-3]);
+				cursorX = Integer.parseInt(split[length-2]);
+				cursorY = Integer.parseInt(split[length-1]);
 			} catch (NumberFormatException e) {
 				throw new IOException("'" + pathNode + "' couldn't be read in line " + linenumber+": Something is not a number");
 			} catch (ArrayIndexOutOfBoundsException e) {
 				throw new IOException("'" + pathNode + "' couldn't be read in line " + linenumber+": Something is missing or is too much");
 			}
 			PathNode node = mouse.new PathNode();
-			node.get(key).setPressed(true);
+			for (int i=0; i<length-3; i++) {
+				String key= split[i];
+				node.get(key).setPressed(true);
+			}
 			node.scrollwheel = scrollWheel;
 			node.cursorX = cursorX;
 			node.cursorY = cursorY;
