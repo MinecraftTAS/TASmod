@@ -14,6 +14,7 @@ import de.pfannekuchen.killtherng.utils.ItemRandom;
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
 import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.savestates.server.SavestateTrackerFile;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
@@ -28,6 +29,8 @@ public class SettingsGui extends GuiScreen {
 	public String dragging;
 	public static HashMap<Settings, Integer> widths = new HashMap<>();
 	
+	private static boolean isOpen;
+	
 	static {
 		widths.put(Settings.XYZ, 0);
 		widths.put(Settings.XYZPRECISE, 0);
@@ -41,10 +44,13 @@ public class SettingsGui extends GuiScreen {
 		widths.put(Settings.PREDICTEDXYZ, 0);
 		widths.put(Settings.MOUSEPOS, 0);
 		widths.put(Settings.VELOCITY, 0);
+		widths.put(Settings.DESYNC, 0);
+		widths.put(Settings.DESYNC_DELTA_MOTION, 0);
+		widths.put(Settings.DESYNC_DELTA_POS, 0);
 	}
 	
 	public static enum Settings {
-		XYZ, XYZPRECISE, CXZ, WORLDSEED, RNGSEEDS, FACING, TICKS, TICKRATE, SAVESTATECOUNT, PREDICTEDXYZ, MOUSEPOS, TRAJECTORIES, VELOCITY;
+		XYZ, XYZPRECISE, CXZ, WORLDSEED, RNGSEEDS, FACING, TICKS, TICKRATE, SAVESTATECOUNT, PREDICTEDXYZ, MOUSEPOS, TRAJECTORIES, VELOCITY, DESYNC, DESYNC_DELTA_MOTION, DESYNC_DELTA_POS;
 	}
 	
 	public static Properties p;
@@ -52,8 +58,15 @@ public class SettingsGui extends GuiScreen {
 	public String identify(int mouseX, int mouseY) {
 		final AtomicReference<String> returnable = new AtomicReference<String>(null);
 		widths.forEach((a, b) -> {
-			int x = Integer.parseInt(p.getProperty(a.name() + "_x"));
-			int y = Integer.parseInt(p.getProperty(a.name() + "_y"));
+			int x=0;
+			int y=0;
+			try {
+				x = Integer.parseInt(p.getProperty(a.name() + "_x"));
+				y = Integer.parseInt(p.getProperty(a.name() + "_y"));
+			}catch (NumberFormatException e) {
+				p.setProperty(a.name() + "_x", "0");
+				p.setProperty(a.name() + "_y", "0");
+			}
 			int w = x + widths.get(a);
 			int h = y + 25;
 			
@@ -94,6 +107,7 @@ public class SettingsGui extends GuiScreen {
 	
 	@Override
 	public void initGui() {
+		isOpen=true;
 		int y = height;
 		int index = 0;
 		for (Settings s : Settings.values()) {
@@ -101,6 +115,11 @@ public class SettingsGui extends GuiScreen {
 			index++;
 		}
 		super.initGui();
+	}
+	
+	@Override
+	public void onGuiClosed() {
+		isOpen=false;
 	}
 	
 	@Override
@@ -238,6 +257,33 @@ public class SettingsGui extends GuiScreen {
 			int x = Integer.parseInt(p.getProperty("VELOCITY_x"));
 			int y = Integer.parseInt(p.getProperty("VELOCITY_y"));
 			widths.replace(Settings.VELOCITY, drawRectWithText("Velocity: " + Minecraft.getMinecraft().player.motionX + " " + Minecraft.getMinecraft().player.motionY + " " + Minecraft.getMinecraft().player.motionZ, x, y, Boolean.parseBoolean(p.getProperty("VELOCITY_hideRect"))));
+		}
+		
+		boolean showDESYNC = Boolean.parseBoolean(p.getProperty("DESYNC_visible"));
+		if(showDESYNC) {
+			int x = Integer.parseInt(p.getProperty("DESYNC_x"));
+			int y = Integer.parseInt(p.getProperty("DESYNC_y"));
+			widths.replace(Settings.DESYNC, drawRectWithText(ClientProxy.virtual.getContainer().dMonitor.getMonitoring(ClientProxy.virtual.getContainer(), Minecraft.getMinecraft().player), x, y, Boolean.parseBoolean(p.getProperty("DESYNC_hideRect"))));
+		}
+		
+		boolean showDESYNCDELTAMOTION = Boolean.parseBoolean(p.getProperty("DESYNC_DELTA_MOTION_visible"));
+		if(showDESYNCDELTAMOTION) {
+			int x = Integer.parseInt(p.getProperty("DESYNC_DELTA_MOTION_x"));
+			int y = Integer.parseInt(p.getProperty("DESYNC_DELTA_MOTION_y"));
+			
+			DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().dMonitor;
+			String toDraw=isOpen ? "MotionX MotionY MotionZ" : dMonitor.getMx()+" "+ dMonitor.getMy()+" "+dMonitor.getMz();
+			widths.replace(Settings.DESYNC_DELTA_MOTION, drawRectWithText(toDraw, x, y, Boolean.parseBoolean(p.getProperty("DESYNC_DELTA_MOTION_hideRect"))));
+		}
+		
+		boolean showDESYNCDELTAPOS = Boolean.parseBoolean(p.getProperty("DESYNC_DELTA_POS_visible"));
+		if(showDESYNCDELTAPOS) {
+			int x = Integer.parseInt(p.getProperty("DESYNC_DELTA_POS_x"));
+			int y = Integer.parseInt(p.getProperty("DESYNC_DELTA_POS_y"));
+			
+			DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().dMonitor;
+			String toDraw=isOpen ? "X Y Z" : dMonitor.getX()+" "+ dMonitor.getY()+" "+dMonitor.getZ();
+			widths.replace(Settings.DESYNC_DELTA_POS, drawRectWithText(toDraw, x, y, Boolean.parseBoolean(p.getProperty("DESYNC_DELTA_POS_hideRect"))));
 		}
 	}
 	
