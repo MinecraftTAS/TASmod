@@ -100,7 +100,7 @@ public abstract class MixinMinecraft {
 
 	@Inject(method = "runTickKeyboard", at = @At(value = "HEAD"))
 	public void injectRunTickKeyboard(CallbackInfo ci) {
-		ClientProxy.virtual.updateCurrentKeyboardEvents();
+		ClientProxy.virtual.updateCurrentKeyboard();
 	}
 
 	// =====================================================================================================================================

@@ -23,7 +23,7 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-			lagServer = true;
+//			lagServer = true;
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) { // Sorry..
 			Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {

@@ -3,6 +3,8 @@ package de.scribble.lp.tasmod.savestates.server;
 import java.io.File;
 import java.io.IOException;
 
+import javax.xml.ws.ServiceMode;
+
 import org.apache.commons.io.FileUtils;
 
 import de.scribble.lp.tasmod.CommonProxy;
@@ -24,6 +26,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Creates and loads savestates on both client and server without closing the world <br>
@@ -35,7 +39,7 @@ import net.minecraftforge.common.DimensionManager;
  */
 public class SavestateHandler {
 	private static MinecraftServer server=ModLoader.getServerInstance();
-	public static final File savestateDirectory=new File(server.getDataDirectory()+File.separator+"saves"+File.separator+"savestates"+File.separator);
+	private static File savestateDirectory;
 	
 	public static boolean isSaving=false;
 	
@@ -80,7 +84,7 @@ public class SavestateHandler {
 		
 		//Get the current and target directory for copying
 		String worldname=server.getFolderName();
-		File currentfolder=new File(server.getDataDirectory(),"saves"+File.separator+worldname);
+		File currentfolder=new File(savestateDirectory,".."+File.separator+worldname);
 		File targetfolder=getNextSaveFolderLocation(worldname);
 		
 		//Send the name of the world to all players. This will make a savestate of the recording on the client with that name
@@ -191,7 +195,7 @@ public class SavestateHandler {
 		
 		//Get the current and target directory for copying
 		String worldname=server.getFolderName();
-		File currentfolder=new File(server.getDataDirectory(),"saves"+File.separator+worldname);
+		File currentfolder=new File(savestateDirectory,".."+File.separator+worldname);
 		File targetfolder=getLatestSavestateLocation(worldname);
 		
 		//Load savestate on the client
@@ -310,6 +314,11 @@ public class SavestateHandler {
 	 * Creates the savestate directory in case the user deletes it between savestates
 	 */
 	private static void createSavestateDirectory() {
+		if(!server.isDedicatedServer()) {
+			savestateDirectory=new File(server.getDataDirectory()+File.separator+"saves"+File.separator+"savestates"+File.separator);
+		}else {
+			savestateDirectory=new File(server.getDataDirectory()+File.separator+"savestates"+File.separator);
+		}
 		if(!savestateDirectory.exists()) {
 			savestateDirectory.mkdir();
 		}
@@ -324,6 +333,7 @@ public class SavestateHandler {
 		SavestatePlayerLoading.reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public static void playerLoadSavestateEventClient() {
 		SavestatesChunkControl.addPlayerToChunk(Minecraft.getMinecraft().player);
 	}

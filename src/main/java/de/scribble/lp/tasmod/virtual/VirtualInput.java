@@ -7,6 +7,7 @@ import java.util.List;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.mixin.AccessorRunStuff;
+import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
 import net.minecraft.client.Minecraft;
 
@@ -16,9 +17,9 @@ import net.minecraft.client.Minecraft;
  * This mimics peripherals used to control minecraft which are: The keyboard, the mouse and the angle of the player, which is called "Subticks" in this case
  * <i>(this came from a time when the camera angle was actually updated on a subtick level)</i>.<br>
  * <br>
- * For each peripheral there are 2 states. The "current" state, which is the state of what the game actually currently recognises and the "next" state which either the buttons pressed on the keyboard, or the buttons pressed in the next playback tick.<br>
+ * For each peripheral there are 2 states. The "current" state <i>(e.g. {@linkplain #currentKeyboard})</i>, which is the state of what the game actually currently recognizes and the "next" state <i>(e.g. {@linkplain #nextKeyboard})</i> which either the buttons pressed on the keyboard, or the buttons pressed in the next playback tick.<br>
  * <br>
- * Outside of this class, there is a third state, which is the vanilla Minecraft keybindings, which, in the best case, should be a copy of the "current" state. <br>
+ * Outside of this class, there is a third state, which is the Vanilla Minecraft keybindings, which, in the best case, should be a copy of the "current" state. <br>
  * <h2>Events</h2>
  * To update the vanilla keybindings you need something called key events. An event for a keyboard might look like this <br>
  * <br>
@@ -33,9 +34,24 @@ import net.minecraft.client.Minecraft;
  * <br>
  * From that, the vanilla keybindings know which key is currently pressed down. As a bonus, the character 'w' is used when typing in a textfield.<br>
  * <h2>Emulating events</h2>
- * With the key events from LWJGL, so from the physical keyboard, we can update the nextKeyboard in the {@link #updateNextKeyboard(int, boolean, char)} method.<br>
- * From that we can compare the nextKeyboard with the current keyboard to get the key events back.
- * TODO finish this
+ * With the key events from LWJGL, so from the "physical keyboard", we can update the nextKeyboard in the {@link #updateNextKeyboard(int, boolean, char)} method.<br>
+ * This method is called every frame and also works in tickrate 0.<br>
+ * <br>
+ * And on every tick, we call {@link #updateCurrentKeyboard()}, which updates the currentKeyboard with a copy of nextKeyboard. <br>
+ * However, we still need to update the Vanilla Minecraft keybinding by using key events.<br>
+ * To solve this problem we can use {@link VirtualKeyboard#getDifference(VirtualKeyboard)}, which compares 2 keyboards and extracts the key events from that.<br>
+ * <br>
+ * For instance if we have a keyboard, where nothing is pressed, then a keyboard where only "W" is pressed, we can assume that the key event responsible for that change 17,true,? is. <br>
+ * But as indicated by the ? we actually don't know the character that is typed there. And for that we need to store the characters seperately in the keyboard ({@link VirtualKeyboard#getCharList()}).<br>
+ * <br>
+ * The advantage of this system is:
+ * <ul>
+ * <li>Better support for savestates</li>
+ * <li>Better support for tickrate 0</li>
+ * <li>Less cluttering in the resulting files</li>
+ * <li>Recording support for the full keyboard/eventual modding support</li>
+ * </ul>
+ * 
  * @author ScribbleLP
  *
  */
@@ -85,7 +101,7 @@ public class VirtualInput {
 		return currentKeyboard.getDifference(nextKeyboard);
 	}
 
-	public void updateCurrentKeyboardEvents() {
+	public void updateCurrentKeyboard() {
 		currentKeyboardEvents = getCurrentKeyboardEvents();
 		currentKeyboardEventIterator = currentKeyboardEvents.iterator();
 

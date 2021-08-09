@@ -21,7 +21,7 @@ public class MixinGuiScreen implements GuiScreenDuck {
 
 	@Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isCreated()Z", shift = Shift.AFTER, remap = false))
 	public void injectAfterKeyboardCreated(CallbackInfo ci) {
-		ClientProxy.virtual.updateCurrentKeyboardEvents();
+		ClientProxy.virtual.updateCurrentKeyboard();
 	}
 
 	// =====================================================================================================================================

@@ -7,7 +7,6 @@ import de.scribble.lp.tasmod.mixin.savestates.MixinChunkProviderClient;
 import de.scribble.lp.tasmod.mixin.savestates.MixinChunkProviderServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.MathHelper;
@@ -167,7 +166,7 @@ public class SavestatesChunkControl {
 	 * Side: Client
 	 */
 	@SideOnly(Side.CLIENT)
-	public static void keepPlayerInLoadedEntityList(EntityPlayer player) {
+	public static void keepPlayerInLoadedEntityList(net.minecraft.entity.player.EntityPlayer player) {
 		Minecraft.getMinecraft().world.unloadedEntityList.remove(player);
 	}
 	
@@ -186,7 +185,7 @@ public class SavestatesChunkControl {
 	 * Side: Client
 	 */
 	@SideOnly(Side.CLIENT)
-	public static void addPlayerToChunk(EntityPlayer player) {
+	public static void addPlayerToChunk(net.minecraft.entity.player.EntityPlayer player) {
 		int i = MathHelper.floor(player.posX / 16.0D);
         int j = MathHelper.floor(player.posZ / 16.0D);
         Chunk chunk=Minecraft.getMinecraft().world.getChunkFromChunkCoords(i, j);

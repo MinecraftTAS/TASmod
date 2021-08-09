@@ -42,9 +42,9 @@ public class CommandPlay extends CommandBase {
 		if (!(sender instanceof EntityPlayer)) {
 			return;
 		}
-		if (ClientProxy.virtual.getContainer().isPlayingback()) {
-			return;
-		}
+//		if (ClientProxy.virtual.getContainer().isPlayingback()) {
+//			return;
+//		}
 		if (args.length < 1) {
 			CommonProxy.NETWORK.sendToServer(new PlaybackPacket(!ClientProxy.virtual.getContainer().isPlayingback()));
 		} else if (args.length == 1) {
