@@ -15,11 +15,13 @@ import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.client.settings.KeyBinding;
 
 /**
- * Transforms certain Minecraft keybindings to keybindings checked by LWJGL's
- * isKeyDown method. <br>
- * Keybinds with LWJGL work during guiscreens and don't get recognised by the
- * InputPlayback, meaning you can't accidentally savestate while playing back a
- * file
+ * Applies special rules to vanilla keybindings. <br>
+ * <br>
+ * Using {@link #isKeyDown(KeyBinding)}, the registered keybindings will work inside of gui screens <br>
+ * <br>
+ * {@link #isKeyDownExceptTextfield(KeyBinding)} does the same, but excludes textfields, certain guiscreens, and the keybinding options<br>
+ * <br>
+ * Keybindings registered with {@link #registerBlockedKeyBinding(KeyBinding)} will not be recorded during a recording or pressed in a playback
  * 
  * @author ScribbleLP
  *
@@ -38,7 +40,29 @@ public class VirtualKeybindings {
 	}
 
 	/**
-	 * Checks whether the key is down, but doesn't execute in chat
+	 * Checks whether the keycode is pressed, regardless of any gui screens
+	 * @param keybind
+	 * @return
+	 */
+	public static boolean isKeyDown(KeyBinding keybind) {
+		boolean down = Keyboard.isKeyDown(keybind.getKeyCode());
+		if (down) {
+			if (cooldownHashMap.containsKey(keybind)) {
+				if (standardCooldown <= cooldowntimer - (long) cooldownHashMap.get(keybind)) {
+					cooldownHashMap.put(keybind, cooldowntimer);
+					return true;
+				}
+				return false;
+			} else {
+				cooldownHashMap.put(keybind, cooldowntimer);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks whether the key is down, but stops when certain conditions apply
 	 * 
 	 * @param keybind
 	 * @return
@@ -63,23 +87,10 @@ public class VirtualKeybindings {
 		return false;
 	}
 
-	public static boolean isKeyDown(KeyBinding keybind) {
-		boolean down = Keyboard.isKeyDown(keybind.getKeyCode());
-		if (down) {
-			if (cooldownHashMap.containsKey(keybind)) {
-				if (standardCooldown <= cooldowntimer - (long) cooldownHashMap.get(keybind)) {
-					cooldownHashMap.put(keybind, cooldowntimer);
-					return true;
-				}
-				return false;
-			} else {
-				cooldownHashMap.put(keybind, cooldowntimer);
-				return true;
-			}
-		}
-		return false;
-	}
-
+	/**
+	 * Registers keybindings that should not be recorded or played back in a TAS
+	 * @param keybind
+	 */
 	public static void registerBlockedKeyBinding(KeyBinding keybind) {
 		blockedKeys.add(keybind);
 	}
@@ -89,6 +100,11 @@ public class VirtualKeybindings {
 		blockedDuringRecordingKeys.add(keybind);
 	}
 
+	/**
+	 * Checks whether the keycode should not be recorded or played back in a TAS
+	 * @param keycode to block
+	 * @return Whether it should be blocked
+	 */
 	public static boolean isKeyCodeAlwaysBlocked(int keycode) {
 		for (KeyBinding keybind : blockedKeys) {
 			if (keycode == keybind.getKeyCode())

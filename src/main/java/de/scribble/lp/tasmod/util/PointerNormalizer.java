@@ -68,23 +68,35 @@ public class PointerNormalizer {
 	 * work this way and you can't even use the pointer properly... But now I have
 	 * made it so I will let it stay here until I find a use, to spare me another 10
 	 * hours.
-	 * 
-	 * 
-	 * private double getNormalizedXOld(double pointerX) { Minecraft
-	 * mc=Minecraft.getMinecraft(); ScaledResolution scaled=new
-	 * ScaledResolution(mc); return (double) pointerX/(double)
-	 * mc.displayWidth/(4D/(double)scaled.getScaleFactor()); } public static double
-	 * getNormalizedYOld(int pointerY) { Minecraft mc=Minecraft.getMinecraft();
-	 * ScaledResolution scaled=new ScaledResolution(mc); double out=(double)
-	 * pointerY/(double) mc.displayHeight/(4D/(double)scaled.getScaleFactor());
-	 * return out; } public static int getCoordsXOld(double normalizedX) { Minecraft
-	 * mc=Minecraft.getMinecraft(); ScaledResolution scaled=new
-	 * ScaledResolution(mc); double guiScaled=normalizedX*(double)
-	 * mc.displayWidth*(4D/(double)scaled.getScaleFactor()); int out=(int)
-	 * Math.round(guiScaled); return out; } public static int getCoordsYOld(double
-	 * normalizedY) { Minecraft mc=Minecraft.getMinecraft(); ScaledResolution
-	 * scaled=new ScaledResolution(mc); double guiScaled=normalizedY*(double)
-	 * mc.displayHeight*(4D/(double)scaled.getScaleFactor()); int out=(int)
-	 * Math.round(guiScaled); return out; }
 	 */
+
+//	private double getNormalizedXOld(double pointerX) {
+//		Minecraft mc = Minecraft.getMinecraft();
+//		ScaledResolution scaled = new ScaledResolution(mc);
+//		return (double) pointerX / (double) mc.displayWidth / (4D / (double) scaled.getScaleFactor());
+//	}
+//
+//	public static double getNormalizedYOld(int pointerY) {
+//		Minecraft mc = Minecraft.getMinecraft();
+//		ScaledResolution scaled = new ScaledResolution(mc);
+//		double out = (double) pointerY / (double) mc.displayHeight / (4D / (double) scaled.getScaleFactor());
+//		return out;
+//	}
+//
+//	public static int getCoordsXOld(double normalizedX) {
+//		Minecraft mc = Minecraft.getMinecraft();
+//		ScaledResolution scaled = new ScaledResolution(mc);
+//		double guiScaled = normalizedX * (double) mc.displayWidth * (4D / (double) scaled.getScaleFactor());
+//		int out = (int) Math.round(guiScaled);
+//		return out;
+//	}
+//
+//	public static int getCoordsYOld(double normalizedY) {
+//		Minecraft mc = Minecraft.getMinecraft();
+//		ScaledResolution scaled = new ScaledResolution(mc);
+//		double guiScaled = normalizedY * (double) mc.displayHeight * (4D / (double) scaled.getScaleFactor());
+//		int out = (int) Math.round(guiScaled);
+//		return out;
+//	}
+
 }

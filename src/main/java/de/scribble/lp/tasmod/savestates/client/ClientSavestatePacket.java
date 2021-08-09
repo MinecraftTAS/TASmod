@@ -12,7 +12,7 @@ public class ClientSavestatePacket implements IMessage{
 	public ClientSavestatePacket() {
 	}
 	/**
-	 * Makes a savestate of the recording
+	 * Makes a savestate of the recording on the <u>Client</u> 
 	 * @param mode If true: Make a savestate, else load the savestate
 	 * @param name Name of the savestated file
 	 */

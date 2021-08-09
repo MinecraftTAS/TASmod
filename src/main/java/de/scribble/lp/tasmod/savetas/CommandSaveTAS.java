@@ -47,9 +47,9 @@ public class CommandSaveTAS extends CommandBase {
 					String spacer = " ";
 					for (int i = 0; i < args.length; i++) {
 						if (i == args.length - 1) {
-							spacer="";
+							spacer = "";
 						}
-						name=name.concat(args[i]+spacer);
+						name = name.concat(args[i] + spacer);
 					}
 					CommonProxy.NETWORK.sendToAll(new SaveTASPacket(name));
 				}

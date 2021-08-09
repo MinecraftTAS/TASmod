@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.virtual.container;
+package de.scribble.lp.tasmod.inputcontainer;
 
 import java.io.Serializable;
 

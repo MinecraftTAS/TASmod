@@ -12,22 +12,48 @@ import com.dselent.bigarraylist.BigArrayList;
 
 import de.pfannekuchen.killtherng.utils.EntityRandom;
 import de.pfannekuchen.killtherng.utils.ItemRandom;
+import de.scribble.lp.tasmod.inputcontainer.InputContainer;
+import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
+import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.savetas.FileThread;
 import de.scribble.lp.tasmod.virtual.VirtualKey;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
 import de.scribble.lp.tasmod.virtual.VirtualMouse.PathNode;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
-import de.scribble.lp.tasmod.virtual.container.InputContainer;
-import de.scribble.lp.tasmod.virtual.container.TickInputContainer;
 import net.minecraft.client.Minecraft;
 
+/**
+ * Saves a given {@linkplain InputContainer} to a file. Is also able to read an input container from a file. <br>
+ * <br>
+ * I plan to be backwards compatible so all the save functions have a V1 in their name by the time of writing this<br>
+ * <br>
+ * It also serializes the {@linkplain DesyncMonitoring} from the input container<br>
+ * <br>
+ * Side: Client
+ * 
+ * @author ScribbleLP
+ *
+ */
 public class ContainerSerialiser {
 	
+	/**
+	 * Saves all inputs of the input container
+	 * @param file Where to save the container
+	 * @param container The container to save
+	 * @throws IOException When the input container is empty
+	 */
 	public void saveToFileV1(File file, InputContainer container) throws IOException {
 		saveToFileV1Until(file, container, -1);
 	}
 	
+	/**
+	 * Saves inputs up to a certain index of the input container
+	 * @param file Where to save the container
+	 * @param container The container to save
+	 * @param index index until the inputs get saved
+	 * @throws IOException When the input container is empty
+	 */
 	public void saveToFileV1Until(File file, InputContainer container, int index) throws IOException{
 		
 		if (container.size() == 0) {

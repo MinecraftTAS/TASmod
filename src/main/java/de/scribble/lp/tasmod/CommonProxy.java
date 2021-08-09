@@ -11,6 +11,7 @@ import de.scribble.lp.tasmod.clearinputs.ClearInputsPacketHandler;
 import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.folder.FolderPacket;
 import de.scribble.lp.tasmod.folder.FolderPacketHandler;
+import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.loadtas.LoadTASPacket;
 import de.scribble.lp.tasmod.loadtas.LoadTASPacketHandler;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
@@ -89,6 +90,7 @@ public class CommonProxy {
 		
 		// Misc
 		NETWORK.registerMessage(FolderPacketHandler.class, FolderPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(InputContainer.TeleportPlayerPacketHandler.class, InputContainer.TeleportPlayerPacket.class, i++, Side.SERVER);
 		
 		// KilltheRNG
 		NETWORK.registerMessage(UpdateSeedPacketHandler.class, UpdateSeedPacket.class, i++, Side.SERVER);

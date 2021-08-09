@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.virtual.container.InputContainer;
+import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.text.TextFormatting;
 
+/**
+ * Stores the players position during recording and compares it with the position during playback
+ * @author ScribbleLP
+ *
+ */
 public class DesyncMonitoring {
 	private List<String> pos = new ArrayList<String>();
 	

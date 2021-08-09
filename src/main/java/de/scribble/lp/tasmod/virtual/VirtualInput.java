@@ -4,17 +4,46 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.scribble.lp.tasmod.inputcontainer.InputContainer;
+import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.mixin.AccessorRunStuff;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
-import de.scribble.lp.tasmod.virtual.container.InputContainer;
-import de.scribble.lp.tasmod.virtual.container.TickInputContainer;
 import net.minecraft.client.Minecraft;
 
+/**
+ * One of the core classes of this mod <br>
+ * <br>
+ * This mimics peripherals used to control minecraft which are: The keyboard, the mouse and the angle of the player, which is called "Subticks" in this case
+ * <i>(this came from a time when the camera angle was actually updated on a subtick level)</i>.<br>
+ * <br>
+ * For each peripheral there are 2 states. The "current" state, which is the state of what the game actually currently recognises and the "next" state which either the buttons pressed on the keyboard, or the buttons pressed in the next playback tick.<br>
+ * <br>
+ * Outside of this class, there is a third state, which is the vanilla Minecraft keybindings, which, in the best case, should be a copy of the "current" state. <br>
+ * <h2>Events</h2>
+ * To update the vanilla keybindings you need something called key events. An event for a keyboard might look like this <br>
+ * <br>
+ * <b>17,true,'w'</b><br>
+ * <br>
+ * Something like this is sent by the LWJGL methods to the vanilla methods to update the keybindings. <br>
+ * In this case it is the key with the keycode 17 (The 'W' key), in the state true which means it is pressed down. And the 'w' is the character that is associated with that key <br>
+ * <br>
+ * You can find a complete list of LWJGL keycodes in {@link VirtualKeyboard}.<br>
+ * <br>
+ * If W is released, the key event for this would look something like this: <b>17, false, NULL</b>
+ * <br>
+ * From that, the vanilla keybindings know which key is currently pressed down. As a bonus, the character 'w' is used when typing in a textfield.<br>
+ * <h2>Emulating events</h2>
+ * With the key events from LWJGL, so from the physical keyboard, we can update the nextKeyboard in the {@link #updateNextKeyboard(int, boolean, char)} method.<br>
+ * From that we can compare the nextKeyboard with the current keyboard to get the key events back.
+ * TODO finish this
+ * @author ScribbleLP
+ *
+ */
 public class VirtualInput {
 
 	private InputContainer container = new InputContainer();
 
-	// ============================================================
+	// ===========================Keyboard=================================
 
 	private VirtualKeyboard currentKeyboard = new VirtualKeyboard();
 
@@ -160,7 +189,7 @@ public class VirtualInput {
 		return out;
 	}
 
-	// =======================================================================================
+	// =======================================Mouse============================================
 
 	private VirtualMouse currentMouse = new VirtualMouse();
 
@@ -288,7 +317,7 @@ public class VirtualInput {
 		clearNextMouse();
 	}
 
-	// =======================================================================================
+	// ======================================Subticks===========================================
 
 	VirtualSubticks currentSubtick = new VirtualSubticks(0, 0);
 

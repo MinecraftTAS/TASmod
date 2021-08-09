@@ -130,6 +130,16 @@ public class SavestatesChunkControl {
 		}
 	}
 	/**
+	 * The session lock is minecrafts failsafe system when it comes to saving. It prevents writing to the world folder from 2 different locations <br>
+	 * <br>
+	 * That works by storing system time to a session.lock file, when the server started. The integrated server also saves the time when it started in a variable. <br>
+	 * <br>
+	 * Those two times are then compared every time minecraft tries to save and fails if the times are different.<br>
+	 * <br>
+	 * Since we never close the integrated server, but copy an "old" session.lock file with the savestate, the session.lock will always mismatch.<br>
+	 * Thus we need to update the session lock once the loadstating is completed<br>
+	 * <br>
+	 * TLDR:<br>
 	 * Updates the session lock to allow for vanilla saving again<br>
 	 * <br>
 	 * Side: Server
@@ -145,6 +155,13 @@ public class SavestatesChunkControl {
 		}
 	}
 	/**
+	 * A bug occurs when unloading the client world. The client world has a "unloadedEntityList" which, as the name implies, stores all unloaded entities <br>
+	 * <br>
+	 * Strange things happen, when the client player is unloaded, which is what happens when we use {@linkplain #unloadAllClientChunks()}.<br>
+	 * <br>
+	 * This method ensures that the player is loaded by removing the player from the unloadedEntityList. <br>
+	 * <br>
+	 * TLDR:<br>
 	 * Makes sure that the player is not removed from the loaded entity list<br>
 	 * <br>
 	 * Side: Client
@@ -155,6 +172,15 @@ public class SavestatesChunkControl {
 	}
 	
 	/**
+	 * Similar to {@linkplain #keepPlayerInLoadedEntityList(EntityPlayer)}, the chunks themselves have a list with loaded entities <br>
+	 * <br>
+	 * Even after adding the player to the world, the chunks may not load the player correctly. <br>
+	 * <br>
+	 * Without this, no model is shown in third person and the player is able to place blocks inside of him.<br>
+	 * This state is fixed, once the player moves into a different chunk, since the new chunk adds the player to it's list. <br>
+	 * <br>
+	 * 
+	 * TLDR:<br>
 	 * Adds the player to the chunk so he can't place any blocks inside himself <br>
 	 * <br>
 	 * Side: Client

@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
-import de.scribble.lp.tasmod.virtual.container.InputContainer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -56,11 +56,11 @@ public class ClientSavestateHandler {
 	}
 
 	/**
-	 * Makes replaces the current recording with the recording from the savestate.
+	 * Replaces the current recording with the recording from the savestate.
 	 * Gets triggered when a savestate is loaded on the server<br>
 	 * Side: Client
 	 * 
-	 * @param nameOfSavestate
+	 * @param nameOfSavestate coming from the server
 	 * @throws IOException
 	 */
 	public static void loadstate(String nameOfSavestate) throws IOException {

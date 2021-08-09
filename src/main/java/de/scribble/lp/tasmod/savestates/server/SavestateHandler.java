@@ -111,8 +111,8 @@ public class SavestateHandler {
 	/**
 	 * Searches through the savestate folder to look for the next possible savestate foldername <br>
 	 * Savestate equivalent to {@link SavestateHandler#getLatestSavestateLocation(String)}
-	 * @param worldname
-	 * @return targetsavefolder
+	 * @param worldname The worldname of the current world
+	 * @return targetsavefolder The file where the savestate should be copied to
 	 * @throws SavestateException if the found savestates count is greater or equal than 300
 	 */
 	private static File getNextSaveFolderLocation(String worldname) throws SavestateException {
@@ -164,7 +164,7 @@ public class SavestateHandler {
 	/**
 	 * Loads the latest savestate it can find in .minecraft/saves/savestates/worldname-Savestate
 	 * 
-	 * @Side Server
+	 * Side: Server
 	 * @throws LoadstateException
 	 * @throws IOException
 	 */
@@ -315,6 +315,9 @@ public class SavestateHandler {
 		}
 	}
 	
+	/**
+	 * Event, that gets executed after a loadstate operation was carried out, get's called on the server side
+	 */
 	public static void playerLoadSavestateEventServer() {
 		EntityPlayerMP player=server.getPlayerList().getPlayers().get(0);
 		NBTTagCompound nbttagcompound = server.getPlayerList().getPlayerNBT(player);
