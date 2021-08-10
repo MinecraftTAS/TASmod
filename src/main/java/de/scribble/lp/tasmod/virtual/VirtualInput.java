@@ -57,12 +57,23 @@ import net.minecraft.client.Minecraft;
  */
 public class VirtualInput {
 
+	/**
+	 * The container where all inputs get stored during recording or stored and ready to be played back
+	 */
 	private InputContainer container = new InputContainer();
 
 	// ===========================Keyboard=================================
 
+	/**
+	 * The state of the keyboard recognized by the game. Updated on a tick basis <br>
+	 * See also: {@link VirtualInput}
+	 */
 	private VirtualKeyboard currentKeyboard = new VirtualKeyboard();
 
+	/**
+	 * The state of the keyboard which will replace {@linkplain VirtualInput#currentKeyboard} in the next tick. Updated every frame<br>
+	 * See also: {@link VirtualInput}
+	 */
 	private VirtualKeyboard nextKeyboard = new VirtualKeyboard();
 
 	private List<VirtualKeyboardEvent> currentKeyboardEvents = new ArrayList<VirtualKeyboardEvent>();
@@ -209,7 +220,7 @@ public class VirtualInput {
 
 	private VirtualMouse currentMouse = new VirtualMouse();
 
-	public VirtualMouse nextMouse = new VirtualMouse();
+	private VirtualMouse nextMouse = new VirtualMouse();
 
 	private List<VirtualMouseEvent> currentMouseEvents = new ArrayList<VirtualMouseEvent>();
 	private Iterator<VirtualMouseEvent> currentMouseEventIterator = currentMouseEvents.iterator();
@@ -349,19 +360,31 @@ public class VirtualInput {
 		return currentSubtick.getYaw();
 	}
 
+	// =====================================Container===========================================
+	
 	public InputContainer getContainer() {
 		return container;
 	}
 
+	/**
+	 * Updates the input container and the {@link #nextKeyboard} as well as {@link #nextMouse}<br>
+	 * Gets executed each game tick
+	 */
 	public void updateContainer() {
 		nextKeyboard = container.addKeyboardToContainer(nextKeyboard);
 		nextMouse = container.addMouseToContainer(nextMouse);
 	}
 
+	/**
+	 * Replaces the {@link #container}, used in 
+	 * @param container to replace the current one
+	 */
 	public void setContainer(InputContainer container) {
 		this.container = container;
 	}
 
+	// =====================================Savestates===========================================
+	
 	public void loadSavestate(InputContainer container) {
 		if (this.container.isPlayingback()) {
 			preloadInput(this.container, container.size() - 1);

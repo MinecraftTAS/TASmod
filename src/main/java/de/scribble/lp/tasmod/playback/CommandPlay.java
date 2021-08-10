@@ -24,7 +24,7 @@ public class CommandPlay extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "/play <true|false>";
+		return "/play [true|false]";
 	}
 
 	@Override
@@ -42,11 +42,13 @@ public class CommandPlay extends CommandBase {
 		if (!(sender instanceof EntityPlayer)) {
 			return;
 		}
-//		if (ClientProxy.virtual.getContainer().isPlayingback()) {
-//			return;
-//		}
+
 		if (args.length < 1) {
-			CommonProxy.NETWORK.sendToServer(new PlaybackPacket(!ClientProxy.virtual.getContainer().isPlayingback()));
+			if(!server.isDedicatedServer()) {
+				CommonProxy.NETWORK.sendToServer(new PlaybackPacket(!ClientProxy.virtual.getContainer().isPlayingback()));
+			} else {
+				sender.sendMessage(new TextComponentString(TextFormatting.RED+"For multiplayer sessions use /play true|false to start/stop a playback"));
+			}
 		} else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("true")) {
 				CommonProxy.NETWORK.sendToAll(new PlaybackPacket(true));

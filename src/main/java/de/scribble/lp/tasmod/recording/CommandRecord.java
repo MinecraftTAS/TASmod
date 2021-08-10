@@ -43,7 +43,11 @@ public class CommandRecord extends CommandBase {
 			return;
 		}
 		if (args.length < 1) {
-			CommonProxy.NETWORK.sendToServer(new RecordingPacket(!ClientProxy.virtual.getContainer().isRecording()));
+			if (!server.isDedicatedServer()) {
+				CommonProxy.NETWORK.sendToServer(new RecordingPacket(!ClientProxy.virtual.getContainer().isRecording()));
+			} else {
+				sender.sendMessage(new TextComponentString(TextFormatting.RED + "For multiplayer sessions use /play true|false to start/stop a recording"));
+			}
 		} else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("true")) {
 				CommonProxy.NETWORK.sendToAll(new RecordingPacket(true));
