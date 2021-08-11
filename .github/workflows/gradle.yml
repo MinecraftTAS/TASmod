@@ -1,0 +1,27 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 8 for x64
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+        architecture: x64
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build TASmod with Gradle
+      run: ./gradlew shadowJar --no-daemon
+    - run: find . -type f ! -name "*forge.jar" -delete
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Package
+        path: build/libs

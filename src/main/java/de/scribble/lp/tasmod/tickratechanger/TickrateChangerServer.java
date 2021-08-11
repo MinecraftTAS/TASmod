@@ -26,7 +26,9 @@ public class TickrateChangerServer {
         if(tickrate>0) {
         	MILISECONDS_PER_TICK = (long)(1000L / tickrate);
         }else if(tickrate==0) {
-        	TICKRATE_SAVED=TICKS_PER_SECOND;
+        	if(TICKS_PER_SECOND!=0) {
+        		TICKRATE_SAVED=TICKS_PER_SECOND;
+        	}
         	MILISECONDS_PER_TICK = Long.MAX_VALUE;
         }
         TICKS_PER_SECOND = tickrate;

@@ -1,22 +1,36 @@
 package de.scribble.lp.tasmod.virtual;
 
-public class VirtualSubticks {
-	private int tick;
+import java.io.Serializable;
+
+public class VirtualSubticks implements Serializable{
 	private float pitch;
 	private float yaw;
-	
-	public VirtualSubticks(int tick, float pitch, float yaw) {
-		this.tick=tick;
-		this.pitch=pitch;
-		this.yaw=yaw;
+
+	public VirtualSubticks() {
+		pitch = 0;
+		yaw = 0;
 	}
-	public int getTick() {
-		return tick;
+
+	public VirtualSubticks(float pitch, float yaw) {
+		this.pitch = pitch;
+		this.yaw = yaw;
 	}
+
 	public float getPitch() {
 		return pitch;
 	}
+
 	public float getYaw() {
 		return yaw;
+	}
+
+	@Override
+	public VirtualSubticks clone() {
+		return new VirtualSubticks(pitch, yaw);
+	}
+	
+	@Override
+	public String toString() {
+		return "Camera:"+pitch+";"+yaw;
 	}
 }

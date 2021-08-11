@@ -3,9 +3,35 @@ package de.scribble.lp.tasmod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.pfannekuchen.killtherng.KillTheRNG;
+import de.pfannekuchen.killtherng.networking.UpdateSeedPacket;
+import de.pfannekuchen.killtherng.networking.UpdateSeedPacketHandler;
+import de.scribble.lp.tasmod.clearinputs.ClearInputsPacket;
+import de.scribble.lp.tasmod.clearinputs.ClearInputsPacketHandler;
 import de.scribble.lp.tasmod.events.TASmodEvents;
+import de.scribble.lp.tasmod.folder.FolderPacket;
+import de.scribble.lp.tasmod.folder.FolderPacketHandler;
+import de.scribble.lp.tasmod.inputcontainer.InputContainer;
+import de.scribble.lp.tasmod.loadtas.LoadTASPacket;
+import de.scribble.lp.tasmod.loadtas.LoadTASPacketHandler;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
+import de.scribble.lp.tasmod.recording.RecordingPacket;
+import de.scribble.lp.tasmod.recording.RecordingPacketHandler;
+import de.scribble.lp.tasmod.savestates.client.ClientSavestatePacket;
+import de.scribble.lp.tasmod.savestates.client.ClientSavestatePacketHandler;
+import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
+import de.scribble.lp.tasmod.savestates.server.LoadstatePacketHandler;
+import de.scribble.lp.tasmod.savestates.server.SavestatePacket;
+import de.scribble.lp.tasmod.savestates.server.SavestatePacketHandler;
+import de.scribble.lp.tasmod.savestates.server.motion.MotionPacket;
+import de.scribble.lp.tasmod.savestates.server.motion.MotionPacketHandler;
+import de.scribble.lp.tasmod.savestates.server.motion.RequestMotionPacket;
+import de.scribble.lp.tasmod.savestates.server.motion.RequestMotionPacketHandler;
+import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket;
+import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacketHandler;
+import de.scribble.lp.tasmod.savetas.SaveTASPacket;
+import de.scribble.lp.tasmod.savetas.SaveTASPacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacketHandler;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
@@ -20,13 +46,55 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class CommonProxy {
 	public static SimpleNetworkWrapper NETWORK;
-	public static Logger logger= LogManager.getLogger("TASmod");
+	public static Logger logger = LogManager.getLogger("TASmod");
+
 	public void preInit(FMLPreInitializationEvent ev) {
-		NETWORK= NetworkRegistry.INSTANCE.newSimpleChannel("tasmod");
-		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, 0, Side.SERVER);
-		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, 1, Side.CLIENT);
-		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, 2, Side.CLIENT);
-		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, 3, Side.CLIENT);
+		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("tasmod");
+		int i = -1;
+		// Tickrate
+		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, i++, Side.CLIENT);
+
+		// Ticksync
+		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, i++, Side.CLIENT);
+
+		// Trigger a recording/playback on the client
+		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(RecordingPacketHandler.class, RecordingPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(RecordingPacketHandler.class, RecordingPacket.class, i++, Side.SERVER);
+
+		// Trigger savestates/loadstates on the client
+		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.CLIENT);
+
+		// Sync player motion between client and server
+		NETWORK.registerMessage(RequestMotionPacketHandler.class, RequestMotionPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(MotionPacketHandler.class, MotionPacket.class, i++, Side.SERVER);
+		
+		// Create or load a savestate of the recording or playback on the client
+		NETWORK.registerMessage(ClientSavestatePacketHandler.class, ClientSavestatePacket.class, i++, Side.CLIENT);
+		
+		// When loadstating, send the data of the client from server to client
+		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, i++, Side.CLIENT);
+		
+		// Trigger saving the inputs to file on the client
+		NETWORK.registerMessage(SaveTASPacketHandler.class, SaveTASPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(SaveTASPacketHandler.class, SaveTASPacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.SERVER);
+		
+		// Misc
+		NETWORK.registerMessage(FolderPacketHandler.class, FolderPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(InputContainer.TeleportPlayerPacketHandler.class, InputContainer.TeleportPlayerPacket.class, i++, Side.SERVER);
+		
+		// KilltheRNG
+		NETWORK.registerMessage(UpdateSeedPacketHandler.class, UpdateSeedPacket.class, i++, Side.SERVER);
+		KillTheRNG.init();
 	}
 
 	public void init(FMLInitializationEvent ev) {

@@ -5,21 +5,74 @@
     "refmap": "mixins.tasmod.refmap.json",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
-        "MixinMinecraftServer"
+    
+        //General
+        "MixinMinecraftServer",
+        "MixinEntityPlayer",
+        
+        //Savestates
+        "savestates.MixinChunkProviderServer",
+        "savestates.MixinEntityPlayerMP",
+        
+        //Fixing forge stuff
+        "MixinDragonFightManager",
+        
+        //KillTheRNG
+        "killtherng.MixinUUIDFix",
+        "killtherng.redirect.RedirectBlockCrops",
+    	"killtherng.redirect.RedirectBlockDispenser",
+    	"killtherng.redirect.RedirectBlockLeaves",
+    	"killtherng.redirect.RedirectBlockNetherWart",
+    	"killtherng.redirect.RedirectBlockOre",
+    	"killtherng.redirect.RedirectCommandSpreadPlayers",
+    	"killtherng.redirect.RedirectCommandWeather",
+    	"killtherng.redirect.RedirectContainerEnchantment",
+    	"killtherng.redirect.RedirectEntityRandom",
+    	"killtherng.redirect.RedirectEntityMinecartContainer",
+    	"killtherng.redirect.RedirectEntityLivingRandom",
+    	"killtherng.redirect.RedirectTeleportToTeam",
+    	"killtherng.redirect.RedirectTileEntityLockableLoot",
+    	"killtherng.redirect.RedirectDragonFightManager",
+    	"killtherng.redirect.RedirectMapGenStronghold",
+    	"killtherng.redirect.RedirectMapGenStructure",
+    	"killtherng.redirect.RedirectExplosion",
+    	"killtherng.redirect.RedirectWorld",
+    	"killtherng.redirect.RedirectDragonSpawnManager"
     ],
     "client": [
+        //General
         "MixinMinecraft",
         "MixinEntityRenderer",
-		"MixinGameSettings",
-		"MixinGuiContainer",
-		"MixinGuiScreen",
-		"MixinGuiClickableScrolledSelectionListProxy",
-		"MixinGuiSlot",
-		"MixinGuiContainerCreative",
-		"MixinGuiChat",
-		"MixinGuiScreenAdvancements",
-		"MixinGuiScreen",
-		"MixinKeyBinding",
-		"MixinGuiMainMenu"
+        "MixinGuiScreen",
+        "MixinInGameHud",
+        
+        //Savestates
+		"savestates.MixinChunkProviderClient",
+		"AccessorRunStuff",
+		
+		//Interpolation
+		"MixinFrustum",
+		
+		//Keybinding
+		"MixinTextfield",
+		
+		//Join and leave game event on the client
+		"MixinNetHandlerPlayClient",
+		"MixinWorldClient",
+		
+		//KillTheRNG
+		"killtherng.MixinMainMenu",
+		
+		//Playbackhooks
+		"playbackhooks.MixinGameSettings",
+		"playbackhooks.MixinGuiChat",
+		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",
+		"playbackhooks.MixinGuiContainer",
+		"playbackhooks.MixinGuiContainerCreative",
+		"playbackhooks.MixinGuiMainMenu",
+		"playbackhooks.MixinGuiScreenAdvancements",
+		"playbackhooks.MixinGuiSlot",
+		"playbackhooks.MixinGuiStats",
+		"playbackhooks.MixinKeyBinding"
 	]
 }
