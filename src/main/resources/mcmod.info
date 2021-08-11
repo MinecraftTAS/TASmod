@@ -5,17 +5,11 @@
   "description": "Saves tickperfect inputs to a file and is able to play it back",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://www.curseforge.com/minecraft/mc-mods/tasmod",
   "updateUrl": "",
-  "authorList": ["tr7zw, famous1622, ScribbleLP, Pfannekuchen"],
-  "credits": "
-  Thanks to tr7zw for the initial idea,
-  famous for setting up and helping,
-  Tickrate Code inspired by Guichaguri
-  Tickrate 0 Code inspired by Cubitect
-  RNG Math by Admiral_Stapler
-  Special thanks to Darkmoon",
-  "logoFile": "",
+  "authorList": ["\u00A7btr7zw, famous1622, ScribbleLP, Pfannekuchen\u00A7r"],
+  "credits": "\n\nThanks to \u00A76tr7zw\u00A7r for the initial idea,\n\u00A76famous\u00A7r for setting up and helping,\nTickrate Code inspired by \u00A76Guichaguri\u00A7r\nTickrate 0 Code inspired by \u00A76Cubitect\u00A7r\nRNG Math by \u00A76Admiral_Stapler\u00A7r\nSpecial thanks to \u00A76Darkmoon\u00A7r\n",
+  "logoFile": "assets/tasmod/textures/potion.png",
   "screenshots": [],
   "dependencies": []
 }

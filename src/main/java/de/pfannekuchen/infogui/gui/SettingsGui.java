@@ -237,7 +237,7 @@ public class SettingsGui extends GuiScreen {
 		if (showMOUSEPOS) {
 			int x = Integer.parseInt(p.getProperty("MOUSEPOS_x"));
 			int y = Integer.parseInt(p.getProperty("MOUSEPOS_y"));
-			widths.replace(Settings.MOUSEPOS, drawRectWithText("Mouse Cursor: " + ClientProxy.virtual.nextMouse.getPath().get(0).cursorX + " " + ClientProxy.virtual.nextMouse.getPath().get(0).cursorY, x, y, Boolean.parseBoolean(p.getProperty("MOUSEPOS_hideRect"))));
+			widths.replace(Settings.MOUSEPOS, drawRectWithText("Mouse Cursor: " + ClientProxy.virtual.getNextMouse().getPath().get(0).cursorX + " " + ClientProxy.virtual.getNextMouse().getPath().get(0).cursorY, x, y, Boolean.parseBoolean(p.getProperty("MOUSEPOS_hideRect"))));
 		}
 		
 		boolean showTRAJECTORIES = Boolean.parseBoolean(p.getProperty("TRAJECTORIES_visible"));
