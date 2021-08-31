@@ -13,9 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import de.pfannekuchen.killtherng.networking.UpdateSeedPacket;
 import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.duck.GuiScreenDuck;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
@@ -201,23 +199,6 @@ public abstract class MixinMinecraft {
 		return ClientProxy.virtual.getEventKeyboardState();
 	}
 
-	// =====================================================================================================================================
-
-	/**
-     * Request a Seed Change for every Key Input
-     * @author Pancake
-     * @param ci Mixin
-     */
-	@Inject(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V"))
-	public void injectRunTickKeyboard2(CallbackInfo ci) {
-		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
-	}
-	
-	@Inject(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
-	public void injectRunTickMouse2(CallbackInfo ci) {
-		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
-	}
-	
 	// =====================================================================================================================================
 	
 	@Inject(method = "runTick", at = @At(value = "RETURN"))

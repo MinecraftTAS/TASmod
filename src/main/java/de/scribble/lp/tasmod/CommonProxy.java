@@ -3,9 +3,6 @@ package de.scribble.lp.tasmod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.pfannekuchen.killtherng.KillTheRNG;
-import de.pfannekuchen.killtherng.networking.UpdateSeedPacket;
-import de.pfannekuchen.killtherng.networking.UpdateSeedPacketHandler;
 import de.scribble.lp.tasmod.clearinputs.ClearInputsPacket;
 import de.scribble.lp.tasmod.clearinputs.ClearInputsPacketHandler;
 import de.scribble.lp.tasmod.events.TASmodEvents;
@@ -92,9 +89,6 @@ public class CommonProxy {
 		NETWORK.registerMessage(FolderPacketHandler.class, FolderPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(InputContainer.TeleportPlayerPacketHandler.class, InputContainer.TeleportPlayerPacket.class, i++, Side.SERVER);
 		
-		// KilltheRNG
-		NETWORK.registerMessage(UpdateSeedPacketHandler.class, UpdateSeedPacket.class, i++, Side.SERVER);
-		KillTheRNG.init();
 	}
 
 	public void init(FMLInitializationEvent ev) {

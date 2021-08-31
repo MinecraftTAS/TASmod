@@ -10,8 +10,6 @@ import org.apache.commons.io.FileUtils;
 
 import com.dselent.bigarraylist.BigArrayList;
 
-import de.pfannekuchen.killtherng.utils.EntityRandom;
-import de.pfannekuchen.killtherng.utils.ItemRandom;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
@@ -81,8 +79,6 @@ public class ContainerSerialiser {
 				 + "#Rerecords:"+container.getRerecords() + "\n"
 				 + "#																											#\n"
 				 + "#----------------------------------------------- Settings --------------------------------------------------#\n"
-				 + "#Entity Seed:" + EntityRandom.currentSeed.get() + "\n"
-				 + "#Item Seed:" + ItemRandom.currentSeed.get() + "\n"
 				 + "#StartPosition:"+container.getStartLocation()+"\n"
 				 + "#############################################################################################################\n");
 		

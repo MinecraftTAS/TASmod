@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
-import de.pfannekuchen.killtherng.utils.EntityRandom;
-import de.pfannekuchen.killtherng.utils.ItemRandom;
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
 import de.scribble.lp.tasmod.ClientProxy;
@@ -192,8 +190,8 @@ public class SettingsGui extends GuiScreen {
 		if (showRNGSEEDS) {
 			int x = Integer.parseInt(p.getProperty("RNGSEEDS_x"));
 			int y = Integer.parseInt(p.getProperty("RNGSEEDS_y"));
-			int i = widths.replace(Settings.RNGSEEDS, drawRectWithText("Entity Random Seed: " + EntityRandom.currentSeed, x, y, Boolean.parseBoolean(p.getProperty("RNGSEEDS_hideRect"))));
-			drawRectWithTextFixedWidth("Item Random Seed: " + ItemRandom.currentSeed, x, y + 14, Boolean.parseBoolean(p.getProperty("RNGSEEDS_hideRect")), i);
+//			int i = widths.replace(Settings.RNGSEEDS, drawRectWithText("Entity Random Seed: " + EntityRandom.currentSeed, x, y, Boolean.parseBoolean(p.getProperty("RNGSEEDS_hideRect"))));
+//			drawRectWithTextFixedWidth("Item Random Seed: " + ItemRandom.currentSeed, x, y + 14, Boolean.parseBoolean(p.getProperty("RNGSEEDS_hideRect")), i);
 		}
 		
 		boolean showFACING = Boolean.parseBoolean(p.getProperty("FACING_visible"));
