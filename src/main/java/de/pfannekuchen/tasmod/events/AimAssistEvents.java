@@ -1,6 +1,5 @@
 package de.pfannekuchen.tasmod.events;
 
-import de.pfannekuchen.infogui.gui.SettingsGui;
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -22,7 +21,7 @@ public class AimAssistEvents {
             return;
         }
 		if (mc.world == null) return;
-		SettingsGui.drawOverlay();
+		ClientProxy.hud.drawHud();
 	}
 	
 	@SubscribeEvent
