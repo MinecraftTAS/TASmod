@@ -47,6 +47,7 @@ public class MixinEntityRenderer implements SubtickDuck{
         //No Gui
         if (this.mc.currentScreen == null) {
             mc.mouseHelper.mouseXYChange();
+            mc.getTutorial().handleMouse(mc.mouseHelper);
             dX += mc.mouseHelper.deltaX;
             dY += mc.mouseHelper.deltaY;
         } else {

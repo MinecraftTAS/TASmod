@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.GuiIngameForge;
 
@@ -23,11 +24,12 @@ public abstract class MixinInGameHud {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(potion);
 		int m = (scaledresolution.getScaledWidth() / 2)-6;
         int n = scaledresolution.getScaledHeight() - 31 - 19;
-        GL11.glEnable(GL11.GL_BLEND);
 		int skale=20;
-		GL11.glColor4f(1, 1, 1, 0.3F);
+		GlStateManager.enableBlend();
+		GlStateManager.enableAlpha();
+		GlStateManager.color(1, 1, 1, 0.3F);
 		Gui.drawModalRectWithCustomSizedTexture(m-3, n, 0F, 0F, skale, skale, skale, skale);
-        GL11.glDisable(GL11.GL_BLEND);
-        
+		GlStateManager.disableBlend();
+		GlStateManager.disableAlpha();
 	}
 }
