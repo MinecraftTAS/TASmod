@@ -154,7 +154,7 @@ public class InfoHud extends GuiScreen {
 	 */
 	private void saveConfig() {
 		try {
-			File tasmodDir = new File(Minecraft.getMinecraft().mcDataDir, "tasmodog");
+			File tasmodDir = new File(Minecraft.getMinecraft().mcDataDir, "tasmod");
 			tasmodDir.mkdir();
 			File configFile = new File(tasmodDir, "infogui.cfg");
 			if (!configFile.exists()) configFile.createNewFile();
@@ -177,7 +177,7 @@ public class InfoHud extends GuiScreen {
 		/* Check whether already rendered before */
 		try {
 			configuration = new Properties();
-			File tasmodDir = new File(Minecraft.getMinecraft().mcDataDir, "tasmodog");
+			File tasmodDir = new File(Minecraft.getMinecraft().mcDataDir, "tasmod");
 			tasmodDir.mkdir();
 			File configFile = new File(tasmodDir, "infogui2.cfg");
 			if (!configFile.exists()) configFile.createNewFile();
