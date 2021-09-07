@@ -14,9 +14,12 @@ import org.lwjgl.opengl.GL11;
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
 import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.events.TASmodEvents;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
+import de.scribble.lp.tasmod.virtual.VirtualInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.math.Vec3d;
@@ -36,6 +39,7 @@ public class InfoHud extends GuiScreen {
 		public boolean renderRect;
 		public String renderText;
 		private Callable<String> text;
+		
 		
 		public InfoLabel(String displayName, int x, int y, boolean visible, boolean renderRect, Callable<String> text) {
 			this.displayName = displayName;
@@ -60,6 +64,9 @@ public class InfoHud extends GuiScreen {
 	private int currentlyDraggedIndex = -1;
 	private int xOffset; // drag offsets
 	private int yOffset;
+	
+	private int gridSizeX=14;
+	private int gridSizeY=14;
 	
 	public Properties configuration;
 	public static List<InfoLabel> lists = new ArrayList<>();
@@ -141,12 +148,30 @@ public class InfoHud extends GuiScreen {
 	protected void mouseClickMove(int mouseX, int mouseY, int k, long millis) {
 		if (currentlyDraggedIndex != -1) {
 			String dragging = lists.get(currentlyDraggedIndex).displayName;
-			lists.get(currentlyDraggedIndex).x = mouseX - xOffset;
-			lists.get(currentlyDraggedIndex).y = mouseY - yOffset;
+			
+			int mousePosX=mouseX - xOffset;
+			int mousePosY=mouseY - yOffset;
+			
+			if(ClientProxy.virtual.isKeyDown(42)) {
+				mousePosX=snapToGridX(mousePosX);
+				mousePosY=snapToGridY(mousePosY);
+			}
+			
+			lists.get(currentlyDraggedIndex).x = mousePosX;
+			lists.get(currentlyDraggedIndex).y = mousePosY;
+			
 			configuration.setProperty(dragging + "_x", lists.get(currentlyDraggedIndex).x + "");
 			configuration.setProperty(dragging + "_y", lists.get(currentlyDraggedIndex).y + "");
 		}
 		super.mouseClickMove(mouseX, mouseY, k, millis);
+	}
+	
+	private int snapToGridX(int x) {
+		return Math.round(x / gridSizeX) * gridSizeX;
+	}
+	
+	private int snapToGridY(int y) {
+		return Math.round(y / gridSizeY) * gridSizeY;
 	}
 	
 	/**
@@ -320,6 +345,12 @@ public class InfoHud extends GuiScreen {
 	 * Render the Info Hud only
 	 */
 	public void drawHud() {
+		int xpos=40;
+		int ypos=190;
+		Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Leftclick to move", width-ypos, xpos- 30, 0x60FF00);
+		Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Middleclick to enable", width-ypos, xpos-20, 0x60FF00);
+		Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Rightclick to add black background", width-ypos, xpos-10, 0x60FF00);
+		Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Hold Shift to snap to grid", width-ypos, xpos, 0x60FF00);
 		for (InfoLabel label : lists) {
 			if (label.visible) {
 				drawRectWithText(label.renderText, label.x, label.y, label.renderRect);
@@ -328,7 +359,7 @@ public class InfoHud extends GuiScreen {
 					GL11.glPushMatrix();
 		         	GL11.glEnable(GL11.GL_BLEND);
 		         	GL11.glBlendFunc(770, 771);
-		         	Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(label.renderText, label.x + 2, label.y + 3, 0x40FFFFFF);
+		         	Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(label.renderText, label.x + 2, label.y + 3, 0x60FFFFFF);
 		    		GL11.glDisable(GL11.GL_BLEND);
 		         	GL11.glPopMatrix();
 				}
