@@ -37,7 +37,7 @@ public class ClientSavestateHandler {
 			return;
 		}
 
-		createSavestateDirectory();
+		ClientProxy.createSavestatesDir();
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".tas");
 
@@ -46,12 +46,6 @@ public class ClientSavestateHandler {
 			ClientProxy.serialiser.saveToFileV1(targetfile, container);
 		} else if(container.isPlayingback()){
 			ClientProxy.serialiser.saveToFileV1Until(targetfile, container, container.index());
-		}
-	}
-
-	private static void createSavestateDirectory() {
-		if (!savestateDirectory.exists()) {
-			savestateDirectory.mkdir();
 		}
 	}
 
@@ -70,7 +64,7 @@ public class ClientSavestateHandler {
 			return;
 		}
 
-		createSavestateDirectory();
+		ClientProxy.createSavestatesDir();
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".tas");
 

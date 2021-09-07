@@ -171,8 +171,8 @@ public class ClientProxy extends CommonProxy {
 		VirtualKeybindings.registerBlockedKeyBinding(stopkey);
 		VirtualKeybindings.registerBlockedKeyBinding(testingKey);
 
-		new File(tasdirectory).mkdir();
-		new File(savestatedirectory).mkdir();
+		createTASDir();
+		createSavestatesDir();
 
 		super.init(ev);
 	}
@@ -183,5 +183,19 @@ public class ClientProxy extends CommonProxy {
 
 	public static TutorialHandler getPlaybackTutorial() {
 		return playbackTutorial;
+	}
+	
+	public static void createTASDir() {
+		File tasDir=new File(tasdirectory);
+		if(!tasDir.exists()) {
+			tasDir.mkdir();
+		}
+	}
+	
+	public static void createSavestatesDir() {
+		File savestateDir=new File(savestatedirectory);
+		if(!savestateDir.exists()) {
+			savestateDir.mkdir();
+		}
 	}
 }

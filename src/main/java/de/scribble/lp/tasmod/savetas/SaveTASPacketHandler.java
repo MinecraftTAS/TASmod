@@ -18,6 +18,7 @@ public class SaveTASPacketHandler implements IMessageHandler<SaveTASPacket, IMes
 	public IMessage onMessage(SaveTASPacket message, MessageContext ctx) {
 		if (ctx.side.isClient()) {
 			Minecraft.getMinecraft().addScheduledTask(()->{
+				ClientProxy.createTASDir();
 				try {
 					ClientProxy.serialiser.saveToFileV1(new File(ClientProxy.tasdirectory + "/"+message.getName()+".tas"), ClientProxy.virtual.getContainer());
 				} catch (IOException e) {

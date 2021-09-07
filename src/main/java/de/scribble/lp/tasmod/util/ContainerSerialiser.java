@@ -53,7 +53,6 @@ public class ContainerSerialiser {
 	 * @throws IOException When the input container is empty
 	 */
 	public void saveToFileV1Until(File file, InputContainer container, int index) throws IOException{
-		
 		if (container.size() == 0) {
 			throw new IOException("There are no inputs to save to a file");
 		}

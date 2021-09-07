@@ -45,6 +45,8 @@ public class ModLoader {
 	public static final String MCVERSION = "${mcversion}";
 
 	private static MinecraftServer serverInstance;
+	
+	public static boolean isKTRNGLoaded;
 
 	public static final Logger logger = LogManager.getFormatterLogger("TASMod");
 
@@ -65,8 +67,12 @@ public class ModLoader {
 	@EventHandler
 	public void init(FMLInitializationEvent ev) {
 		logger.info("Initializing TASmod");
-		if (Loader.isModLoaded("killtherng")) {
-			KillTheRNG.LOGGER.info("Testing connection to KillTheRNG");
+		logger.info("Testing connection with KillTheRNG");
+		isKTRNGLoaded=Loader.isModLoaded("killtherng");
+		if (isKTRNGLoaded) {
+			KillTheRNG.LOGGER.info("Connection established with TASmod");
+		}else {
+			logger.info("KillTheRNG doesn't appear to be loaded");
 		}
 		proxy.init(ev);
 	}
