@@ -3,6 +3,10 @@ package de.scribble.lp.tasmod.virtual;
 import java.io.Serializable;
 
 public class VirtualSubticks implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2038332459318568985L;
 	private float pitch;
 	private float yaw;
 

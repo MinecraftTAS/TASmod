@@ -14,6 +14,11 @@ import com.google.common.collect.Maps;
 
 public class VirtualKeyboard implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4694772261313303998L;
+
 	private Map<Integer, VirtualKey> keyList;
 
 	private List<Character> charList;

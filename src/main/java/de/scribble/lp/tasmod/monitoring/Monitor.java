@@ -14,7 +14,7 @@ public class Monitor {
 			return;
 		}
 
-		Class monitoredClass = monitoredObject.getClass();
+		Class<?> monitoredClass = monitoredObject.getClass();
 
 		Field[] fields = monitoredClass.getDeclaredFields();
 

@@ -18,7 +18,7 @@ public abstract class MixinChunkProviderServer implements ChunkProviderDuck{
 
 	@Override
 	public void unloadAllChunks() {
-    	ObjectIterator objectiterator = this.id2ChunkMap.values().iterator();
+    	ObjectIterator<?> objectiterator = this.id2ChunkMap.values().iterator();
 
         while (objectiterator.hasNext())
         {

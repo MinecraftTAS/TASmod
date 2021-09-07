@@ -3,20 +3,14 @@ package de.scribble.lp.tasmod.mixin;
 import java.util.Queue;
 import java.util.concurrent.FutureTask;
 
-import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.ModLoader;
-import de.scribble.lp.tasmod.savestates.server.SavestateEvents;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
@@ -97,7 +91,7 @@ public abstract class MixinMinecraftServer {
 			synchronized (this.futureTaskQueue) {
 				while (!this.futureTaskQueue.isEmpty()) {
 					try {
-						((FutureTask) this.futureTaskQueue.poll()).run();
+						((FutureTask<?>) this.futureTaskQueue.poll()).run();
 					} catch (Throwable var9) {
 						var9.printStackTrace();
 					}

@@ -3,7 +3,6 @@ package de.scribble.lp.tasmod.monitoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;

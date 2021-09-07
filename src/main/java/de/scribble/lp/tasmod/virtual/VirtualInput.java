@@ -7,7 +7,6 @@ import java.util.List;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.mixin.AccessorRunStuff;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
 import net.minecraft.client.Minecraft;
 

@@ -3,8 +3,6 @@ package de.scribble.lp.tasmod.savestates.server;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.ws.ServiceMode;
-
 import org.apache.commons.io.FileUtils;
 
 import de.scribble.lp.tasmod.CommonProxy;

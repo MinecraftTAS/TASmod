@@ -6,8 +6,6 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.common.collect.ImmutableList;
-
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.tasmod.clearinputs.CommandClearInputs;
 import de.scribble.lp.tasmod.folder.CommandFolder;

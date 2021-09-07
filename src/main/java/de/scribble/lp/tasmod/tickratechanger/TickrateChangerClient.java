@@ -5,7 +5,6 @@ import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiControls;
-import net.minecraft.client.gui.GuiKeyBindingList;
 
 public class TickrateChangerClient {
 	public static float TICKS_PER_SECOND=20f;

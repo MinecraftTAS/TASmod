@@ -8,8 +8,6 @@ import com.dselent.bigarraylist.BigArrayList;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
@@ -60,7 +58,7 @@ public class InputContainer {
 	/**
 	 * The place where all inputs get stored
 	 */
-	private BigArrayList<TickInputContainer> inputs = new BigArrayList(directory + File.separator + "temp");
+	private BigArrayList<TickInputContainer> inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 	
 	public DesyncMonitoring dMonitor= new DesyncMonitoring();
 
