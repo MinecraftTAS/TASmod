@@ -1,7 +1,12 @@
 package de.scribble.lp.tasmod.savestates.server;
 
+import java.awt.EventQueue;
+
+import javax.swing.WindowConstants;
+
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.monitoring.BufferView;
 import de.scribble.lp.tasmod.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
@@ -22,7 +27,18 @@ public class SavestateEvents {
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
-//			lagServer = true;
+			EventQueue.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						BufferView frame = new BufferView();
+						frame.setVisible(true);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) { // Sorry..
 			Minecraft.getMinecraft().displayGuiScreen(ClientProxy.hud);
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {

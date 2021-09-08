@@ -413,4 +413,39 @@ public class VirtualInput {
 		((AccessorRunStuff) Minecraft.getMinecraft()).runTickMouseAccessor();
 
 	}
+	
+	// =====================================Debug===========================================
+	
+	public class InputEvent{
+		public int tick;
+		public List<VirtualKeyboardEvent> keyboardevent;
+		public List<VirtualMouseEvent> mouseEvent;
+		public VirtualSubticks subticks;
+		
+		public InputEvent(int tick, List<VirtualKeyboardEvent> keyboardevent, List<VirtualMouseEvent> mouseEvent, VirtualSubticks subticks) {
+			this.tick=tick;
+			this.keyboardevent = keyboardevent;
+			this.mouseEvent = mouseEvent;
+			this.subticks = subticks;
+		}
+	}
+	
+	public List<InputEvent> getAllInputEvents() {
+		List<InputEvent> main=new ArrayList<>();
+		for (int i = 0; i < container.size(); i++) {
+			TickInputContainer tick=container.get(i);
+			TickInputContainer nextTick=container.get(i+1);
+			if(nextTick==null) {
+				nextTick=new TickInputContainer(i+1);
+			}
+			VirtualKeyboard kb=tick.getKeyboard();
+			List<VirtualKeyboardEvent> kbe=kb.getDifference(nextTick.getKeyboard());
+			
+			VirtualMouse m=tick.getMouse();
+			List<VirtualMouseEvent> me=m.getDifference(nextTick.getMouse());
+			
+			main.add(new InputEvent(tick.getTick(), kbe, me, tick.getSubticks()));
+		}
+		return main;
+	}
 }
