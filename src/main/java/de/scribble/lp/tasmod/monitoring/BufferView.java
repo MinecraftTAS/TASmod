@@ -33,6 +33,8 @@ import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Font;
@@ -66,7 +68,11 @@ public class BufferView extends JFrame {
 	 * Create the frame.
 	 */
 	public BufferView() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(BufferView.class.getResource("/assets/tasmod/textures/potion.png")));
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}catch (Exception e) {
+		}
+		setIconImage(Toolkit.getDefaultToolkit().getImage(BufferView.class.getResource("/assets/tasmod/textures/potion2.png")));
 		setBackground(Color.WHITE);
 		setTitle("Buffer Viewer");
 		setFont(new Font("Arial", Font.PLAIN, 12));

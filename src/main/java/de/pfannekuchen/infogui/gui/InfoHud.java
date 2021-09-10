@@ -181,7 +181,7 @@ public class InfoHud extends GuiScreen {
 		try {
 			File tasmodDir = new File(Minecraft.getMinecraft().mcDataDir, "tasmod");
 			tasmodDir.mkdir();
-			File configFile = new File(tasmodDir, "infogui.cfg");
+			File configFile = new File(tasmodDir, "infogui2.cfg");
 			if (!configFile.exists()) configFile.createNewFile();
 			configuration.store(new FileOutputStream(configFile, false), "DO NOT EDIT MANUALLY");
 		} catch (IOException e) {
