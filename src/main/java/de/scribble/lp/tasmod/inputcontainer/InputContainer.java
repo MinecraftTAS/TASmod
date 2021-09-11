@@ -38,9 +38,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  */
 public class InputContainer {
 	
-	private boolean playback = false;
-
-	private boolean recording = false;
+	private TASstate state=TASstate.NONE;
 
 	/**
 	 * The current index of the inputs
@@ -78,11 +76,19 @@ public class InputContainer {
 	// Main methods for starting/stopping the recording, come with their own error messages
 	
 	public boolean isPlayingback() {
-		return playback;
+		return state==TASstate.PLAYBACK;
 	}
 
 	public boolean isRecording() {
-		return recording;
+		return state==TASstate.RECORDING;
+	}
+	
+	public boolean isNothingPlaying() {
+		return state==TASstate.NONE;
+	}
+	
+	public String setRecording(boolean enabled) {
+		return setRecording(enabled, true);
 	}
 	
 	/**
@@ -90,43 +96,59 @@ public class InputContainer {
 	 * @param enabled If true: starts a recording, else stops a running recording
 	 * @return Chat message depending on the state
 	 */
-	public String setRecording(boolean enabled) {
-		if (playback)
-			return TextFormatting.RED + "A playback is already running";
-		recording = enabled;
-		if (recording) {
-			if (Minecraft.getMinecraft().player != null) {
-				startLocation = getStartLocation(Minecraft.getMinecraft().player);
-			}
-			return TextFormatting.GREEN + "Starting the recording";
-		} else {
-			return TextFormatting.GREEN + "Stopping the recording";
+	public String setRecording(boolean enabled, boolean verbose) {
+		if (state==TASstate.PLAYBACK) {
+			return verbose ? TextFormatting.RED + "A playback is already running" : "";
 		}
+		if(enabled) {
+			state=TASstate.RECORDING;
+		}else {
+			state=TASstate.NONE;
+		}
+		
+		if (state==TASstate.RECORDING) {
+			if (Minecraft.getMinecraft().player != null) {
+				startLocation = getStartLocation(Minecraft.getMinecraft().player); //TODO #99 Make this a secondary command
+			}
+			return verbose ? TextFormatting.GREEN + "Starting the recording" : "";
+		} else if(state==TASstate.NONE){
+			return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
+		}
+		return "";
 	}
 
+	public String setPlayback(boolean enabled) {
+		return setPlayback(enabled, true);
+	}
+	
 	/**
 	 * Starts/Stops a playback
+	 * 
 	 * @param enabled If true: start a playback, else aborts a running playback
 	 * @return Chat message depending on the state
 	 */
-	public String setPlayback(boolean enabled) {
-		if (recording)
-			return TextFormatting.RED + "A recording is already running";
-		playback = enabled;
-		if (playback) {
+	public String setPlayback(boolean enabled, boolean verbose) {
+		if (state==TASstate.RECORDING)
+			return verbose ? TextFormatting.RED + "A recording is already running" : "";
+		if(enabled) {
+			state=TASstate.PLAYBACK;
+		} else {
+			state=TASstate.NONE;
+		}
+		if (state==TASstate.PLAYBACK) {
 			if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
 				try {
-				tpPlayer(startLocation);
+					tpPlayer(startLocation);
 				} catch (NumberFormatException e) {
-					playback=false;
+					state=TASstate.NONE;
 					e.printStackTrace();
-					return TextFormatting.RED + "An error occured while reading the start location of the TAS. The file might be broken";
+					return verbose ? TextFormatting.RED+ "An error occured while reading the start location of the TAS. The file might be broken" : "";
 				}
 			}
 			index = 0;
-			return TextFormatting.GREEN + "Starting playback";
+			return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 		} else {
-			return TextFormatting.GREEN + "Aborting playback";
+			return verbose ? TextFormatting.GREEN + "Aborting playback" : "";
 		}
 	}
 
@@ -140,9 +162,9 @@ public class InputContainer {
 	 * @return Keyboard to retrieve
 	 */
 	public VirtualKeyboard addKeyboardToContainer(VirtualKeyboard keyboard) {
-		if (recording) {
+		if (state==TASstate.RECORDING) {
 			this.keyboard = keyboard.clone();
-		} else if (playback) {
+		} else if (state==TASstate.PLAYBACK) {
 			keyboard = this.keyboard.clone();
 		}
 		return keyboard;
@@ -154,9 +176,9 @@ public class InputContainer {
 	 * @return Mouse to retrieve
 	 */
 	public VirtualMouse addMouseToContainer(VirtualMouse mouse) {
-		if (recording) {
+		if (state==TASstate.RECORDING) {
 			this.mouse = mouse.clone();
-		} else if (playback) {
+		} else if (state==TASstate.PLAYBACK) {
 			mouse = this.mouse.clone();
 		}
 		return mouse;
@@ -168,9 +190,9 @@ public class InputContainer {
 	 * @return Subticks to retrieve
 	 */
 	public VirtualSubticks addSubticksToContainer(VirtualSubticks subticks) {
-		if (recording) {
+		if (state==TASstate.RECORDING) {
 			this.subticks = subticks.clone();
-		} else if (playback) {
+		} else if (state==TASstate.PLAYBACK) {
 			subticks = this.subticks.clone();
 		}
 		return subticks;
@@ -186,11 +208,11 @@ public class InputContainer {
 	 * Then in {@linkplain VirtualInput}, {@linkplain #keyboard}, {@linkplain #mouse} and {@linkplain #subticks} are retrieved and emulated as the next inputs
 	 */
 	public void nextTick() {
-		if (recording) {
+		if (state==TASstate.RECORDING) {
 			index++;
 			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
 			dMonitor.capturePosition();		//Capturing the current position of the player
-		} else if (playback) {
+		} else if (state==TASstate.PLAYBACK) {
 			if(!Display.isActive()) {		//Stops the playback when you tab out of minecraft, for once as a failsafe, secondly as potential exploit protection
 				setPlayback(false);
 			}
@@ -232,7 +254,7 @@ public class InputContainer {
 
 	public void setIndex(int index) {
 		this.index = index;
-		if (playback) {
+		if (state==TASstate.PLAYBACK) {
 			TickInputContainer tickcontainer = inputs.get(index);
 			this.keyboard = tickcontainer.getKeyboard();
 			this.mouse = tickcontainer.getMouse();
