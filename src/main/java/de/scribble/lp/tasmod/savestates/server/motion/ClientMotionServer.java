@@ -5,7 +5,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.TASmod;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ClientMotionServer {
@@ -21,7 +21,7 @@ public class ClientMotionServer {
 		CommonProxy.NETWORK.sendToAll(new RequestMotionPacket());
 
 		int i = 0;
-		while (motion.size() != ModLoader.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
+		while (motion.size() != TASmod.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
 			i++;
 			try {
 				Thread.sleep(10);

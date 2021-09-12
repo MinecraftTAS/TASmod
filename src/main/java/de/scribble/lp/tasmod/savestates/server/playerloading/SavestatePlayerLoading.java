@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.TASmod;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,7 +27,7 @@ public class SavestatePlayerLoading {
 	 */
 	public static void loadAndSendMotionToPlayer() {
 		
-		MinecraftServer server=ModLoader.getServerInstance();
+		MinecraftServer server=TASmod.getServerInstance();
 		List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
 		PlayerList list=server.getPlayerList();
 		
@@ -103,7 +103,7 @@ public class SavestatePlayerLoading {
 
                 if (!playerIn.isRiding())
                 {
-                    ModLoader.logger.warn("Couldn't reattach entity to player");
+                    TASmod.logger.warn("Couldn't reattach entity to player");
                     worldserver.removeEntityDangerously(entity1);
 
                     for (Entity entity2 : entity1.getRecursivePassengers())

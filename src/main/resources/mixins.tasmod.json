@@ -14,6 +14,9 @@
         "savestates.MixinChunkProviderServer",
         "savestates.MixinEntityPlayerMP",
         
+        //Events
+        "events.MixinPlayerList",
+        
         //Fixing forge stuff
         "MixinDragonFightManager"
         
@@ -36,8 +39,8 @@
 		"MixinTextfield",
 		
 		//Join and leave game event on the client
-		"MixinNetHandlerPlayClient",
-		"MixinWorldClient",
+		"events.MixinNetHandlerPlayClient",
+		"events.MixinWorldClient",
 		
 		//Playbackhooks
 		"playbackhooks.MixinGameSettings",

@@ -62,7 +62,7 @@ public class DesyncMonitoring {
 			return TextFormatting.GRAY + "Empty";
 		}
 		
-		if(!inputContainer.isPlayingback()&&!inputContainer.isRecording()) {
+		if(inputContainer.isNothingPlaying()) {
 			return lastDesync;
 		}
 		String[] split = position.split(" ");

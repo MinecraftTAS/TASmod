@@ -13,8 +13,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.ModLoader;
-import de.scribble.lp.tasmod.events.TASmodEvents;
+import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;

@@ -3,20 +3,22 @@ package de.scribble.lp.tasmod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.scribble.lp.tasmod.clearinputs.ClearInputsPacket;
-import de.scribble.lp.tasmod.clearinputs.ClearInputsPacketHandler;
-import de.scribble.lp.tasmod.events.TASmodEvents;
-import de.scribble.lp.tasmod.folder.FolderPacket;
-import de.scribble.lp.tasmod.folder.FolderPacketHandler;
+import de.scribble.lp.tasmod.commands.clearinputs.ClearInputsPacket;
+import de.scribble.lp.tasmod.commands.clearinputs.ClearInputsPacketHandler;
+import de.scribble.lp.tasmod.commands.folder.FolderPacket;
+import de.scribble.lp.tasmod.commands.folder.FolderPacketHandler;
+import de.scribble.lp.tasmod.commands.loadtas.LoadTASPacket;
+import de.scribble.lp.tasmod.commands.loadtas.LoadTASPacketHandler;
+import de.scribble.lp.tasmod.commands.playback.PlaybackPacket;
+import de.scribble.lp.tasmod.commands.playback.PlaybackPacketHandler;
+import de.scribble.lp.tasmod.commands.recording.RecordingPacket;
+import de.scribble.lp.tasmod.commands.recording.RecordingPacketHandler;
+import de.scribble.lp.tasmod.commands.savetas.SaveTASPacket;
+import de.scribble.lp.tasmod.commands.savetas.SaveTASPacketHandler;
+import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
-import de.scribble.lp.tasmod.loadtas.LoadTASPacket;
-import de.scribble.lp.tasmod.loadtas.LoadTASPacketHandler;
-import de.scribble.lp.tasmod.playback.PlaybackPacket;
-import de.scribble.lp.tasmod.playback.PlaybackPacketHandler;
-import de.scribble.lp.tasmod.recording.RecordingPacket;
-import de.scribble.lp.tasmod.recording.RecordingPacketHandler;
-import de.scribble.lp.tasmod.savestates.client.ClientSavestatePacket;
-import de.scribble.lp.tasmod.savestates.client.ClientSavestatePacketHandler;
+import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
+import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacketHandler;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacketHandler;
 import de.scribble.lp.tasmod.savestates.server.SavestatePacket;
@@ -27,8 +29,6 @@ import de.scribble.lp.tasmod.savestates.server.motion.RequestMotionPacket;
 import de.scribble.lp.tasmod.savestates.server.motion.RequestMotionPacketHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacketHandler;
-import de.scribble.lp.tasmod.savetas.SaveTASPacket;
-import de.scribble.lp.tasmod.savetas.SaveTASPacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.TickratePacketHandler;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
@@ -72,7 +72,7 @@ public class CommonProxy {
 		NETWORK.registerMessage(MotionPacketHandler.class, MotionPacket.class, i++, Side.SERVER);
 		
 		// Create or load a savestate of the recording or playback on the client
-		NETWORK.registerMessage(ClientSavestatePacketHandler.class, ClientSavestatePacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(InputSavestatesPacketHandler.class, InputSavestatesPacket.class, i++, Side.CLIENT);
 		
 		// When loadstating, send the data of the client from server to client
 		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, i++, Side.CLIENT);
@@ -92,7 +92,6 @@ public class CommonProxy {
 	}
 
 	public void init(FMLInitializationEvent ev) {
-		MinecraftForge.EVENT_BUS.register(new TASmodEvents());
 	}
 
 	public void postInit(FMLPostInitializationEvent ev) {

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
@@ -100,7 +100,7 @@ public abstract class MixinMinecraftServer {
 			try {
 				Thread.sleep(1L);
 			} catch (InterruptedException e) {
-				ModLoader.logger.error("Thread Sleep Interrupted!");
+				TASmod.logger.error("Thread Sleep Interrupted!");
 				e.printStackTrace();
 			}
 		}

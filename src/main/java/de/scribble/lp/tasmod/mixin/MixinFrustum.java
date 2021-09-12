@@ -7,6 +7,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.renderer.culling.Frustum;
 
+/**
+ * 
+ * @author Pancake
+ *
+ */
 @Mixin(Frustum.class)
 public class MixinFrustum {
 
