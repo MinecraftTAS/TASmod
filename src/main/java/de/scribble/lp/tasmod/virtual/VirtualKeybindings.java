@@ -28,7 +28,7 @@ import net.minecraft.client.settings.KeyBinding;
  */
 public class VirtualKeybindings {
 	private static Minecraft mc = Minecraft.getMinecraft();
-	private static final long standardCooldown = 20;
+	private static long cooldown = 20;
 	private static HashMap<KeyBinding, Long> cooldownHashMap = Maps.<KeyBinding, Long>newHashMap();
 	private static List<KeyBinding> blockedKeys = new ArrayList<>();
 	private static List<KeyBinding> blockedDuringRecordingKeys = new ArrayList<>();
@@ -48,13 +48,15 @@ public class VirtualKeybindings {
 		boolean down = Keyboard.isKeyDown(keybind.getKeyCode());
 		if (down) {
 			if (cooldownHashMap.containsKey(keybind)) {
-				if (standardCooldown <= cooldowntimer - (long) cooldownHashMap.get(keybind)) {
+				if (cooldown <= cooldowntimer - (long) cooldownHashMap.get(keybind)) {
 					cooldownHashMap.put(keybind, cooldowntimer);
+					cooldown=Minecraft.getDebugFPS()/3;
 					return true;
 				}
 				return false;
 			} else {
 				cooldownHashMap.put(keybind, cooldowntimer);
+				cooldown=Minecraft.getDebugFPS()/3;
 				return true;
 			}
 		}
@@ -64,7 +66,7 @@ public class VirtualKeybindings {
 	/**
 	 * Checks whether the key is down, but stops when certain conditions apply
 	 * 
-	 * @param keybind
+	 * @param keybind 
 	 * @return
 	 */
 	public static boolean isKeyDownExceptTextfield(KeyBinding keybind) {
@@ -74,7 +76,7 @@ public class VirtualKeybindings {
 		boolean down = Keyboard.isKeyDown(keybind.getKeyCode());
 		if (down) {
 			if (cooldownHashMap.containsKey(keybind)) {
-				if (standardCooldown <= cooldowntimer - (long) cooldownHashMap.get(keybind)) {
+				if (cooldown <= cooldowntimer - (long) cooldownHashMap.get(keybind)) {
 					cooldownHashMap.put(keybind, cooldowntimer);
 					return true;
 				}
@@ -121,5 +123,9 @@ public class VirtualKeybindings {
 			}
 		}
 		return false;
+	}
+	
+	public static void setCooldown(long cooldown) {
+		VirtualKeybindings.cooldown = cooldown;
 	}
 }

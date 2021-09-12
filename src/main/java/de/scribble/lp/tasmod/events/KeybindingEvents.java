@@ -1,23 +1,21 @@
-package de.scribble.lp.tasmod.savestates.server;
+package de.scribble.lp.tasmod.events;
 
 import java.awt.EventQueue;
-
-import javax.swing.WindowConstants;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.commands.playback.PlaybackPacket;
 import de.scribble.lp.tasmod.monitoring.BufferView;
+import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
+import de.scribble.lp.tasmod.savestates.server.SavestatePacket;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-public class SavestateEvents {
-	public static boolean lagServer;
+public class KeybindingEvents {
 
-	@SubscribeEvent
-	public void onRender(TickEvent.RenderTickEvent ev) {
+	public static void fireKeybindingsEvent() {
+		//TODO Move each of these in seperate classes
+		VirtualKeybindings.increaseCooldowntimer();
 		if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.savestateSaveKey)) {
 
 			CommonProxy.NETWORK.sendToServer(new SavestatePacket());
@@ -40,7 +38,7 @@ public class SavestateEvents {
 					}
 				}
 			});
-		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) { // Sorry..
+		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) {
 			Minecraft.getMinecraft().displayGuiScreen(ClientProxy.hud);
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
 			CommonProxy.NETWORK.sendToServer(new PlaybackPacket(false));

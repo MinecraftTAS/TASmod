@@ -8,7 +8,6 @@ import de.pfannekuchen.infogui.gui.InfoHud;
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.commands.tutorial.TutorialHandler;
-import de.scribble.lp.tasmod.savestates.server.SavestateEvents;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -73,8 +72,6 @@ public class ClientProxy extends CommonProxy {
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
 		MinecraftForge.EVENT_BUS.register(new CameraInterpolationEvents());
-
-		MinecraftForge.EVENT_BUS.register(new SavestateEvents());
 
 		ClientRegistry.registerKeyBinding(tickratezeroKey);
 		ClientRegistry.registerKeyBinding(tickAdvance);

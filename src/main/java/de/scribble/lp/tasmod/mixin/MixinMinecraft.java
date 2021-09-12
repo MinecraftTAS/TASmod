@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.duck.GuiScreenDuck;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
+import de.scribble.lp.tasmod.events.KeybindingEvents;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -38,7 +39,8 @@ public abstract class MixinMinecraft {
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void injectRunGameLoop(CallbackInfo ci) {
 		// TASmod
-		VirtualKeybindings.increaseCooldowntimer();
+		KeybindingEvents.fireKeybindingsEvent();
+		
 		TickrateChangerClient.bypass();
 		while (Keyboard.next()) {
 			ClientProxy.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
