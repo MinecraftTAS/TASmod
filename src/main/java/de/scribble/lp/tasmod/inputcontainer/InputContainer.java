@@ -39,6 +39,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  */
 public class InputContainer {
 	
+	/**
+	 * The current state of the container.
+	 */
 	private TASstate state=TASstate.NONE;
 
 	/**
@@ -74,7 +77,80 @@ public class InputContainer {
 	private String startLocation = "";
 
 	// =====================================================================================================
-	// Main methods for starting/stopping the recording, come with their own error messages
+	
+	/**
+	 * Starts or stops a recording/playback
+	 * @param stateIn stateIn The desired state of the container
+	 * @return 
+	 */
+	public String setTASState(TASstate stateIn) {
+		return setTASState(stateIn, true);
+	}
+	
+	/**
+	 * Starts or stops a recording/playback
+	 * @param stateIn The desired state of the container
+	 * @param verbose Whether the output should be printed in the chat
+	 * @return The message printed in the chat
+	 */
+	public String setTASState(TASstate stateIn, boolean verbose) {
+		if (state==stateIn) {
+			switch (stateIn) {
+			case PLAYBACK:
+				return verbose ? TextFormatting.RED + "A playback is already running" : "";
+			case RECORDING:
+				return verbose ? TextFormatting.RED + "A recording is already running" : "";
+			case NONE:
+				return verbose ? TextFormatting.RED + "Nothing is running" : "";
+			}
+			
+		}else if(state==TASstate.NONE) {
+			switch (stateIn) {
+			case PLAYBACK:
+				if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
+					try {
+						tpPlayer(startLocation);	//TODO #99 Make this a secondary command
+					} catch (NumberFormatException e) {
+						state=TASstate.NONE;
+						e.printStackTrace();
+						return verbose ? TextFormatting.RED+ "An error occured while reading the start location of the TAS. The file might be broken" : "";
+					}
+				}
+				index = 0;
+				state=TASstate.PLAYBACK;
+				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
+			case RECORDING:
+				if (Minecraft.getMinecraft().player != null) {
+					startLocation = getStartLocation(Minecraft.getMinecraft().player);
+				}
+				state=TASstate.RECORDING;
+				return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
+			case NONE:
+				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: None)";
+			}
+		}else if(state==TASstate.RECORDING) {
+			switch (stateIn) {
+			case PLAYBACK:
+				return verbose ? TextFormatting.RED + "A recording is currently running. Please stop the recording first before starting a playback" : "";
+			case RECORDING:
+				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Recording)";
+			case NONE:
+				state=TASstate.NONE;
+				return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
+			}
+		}else if(state==TASstate.PLAYBACK) {
+			switch (stateIn) {
+			case PLAYBACK:
+				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Playback)";
+			case RECORDING:
+				return verbose ? TextFormatting.RED + "A playback is currently running. Please stop the playback first before starting a recording" : "";
+			case NONE:
+				state=TASstate.NONE;
+				return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";
+			}
+		}
+		return "Something went wrong ._.";
+	}
 	
 	public boolean isPlayingback() {
 		return state==TASstate.PLAYBACK;
@@ -88,6 +164,7 @@ public class InputContainer {
 		return state==TASstate.NONE;
 	}
 	
+	@Deprecated
 	public String setRecording(boolean enabled) {
 		return setRecording(enabled, true);
 	}
@@ -97,6 +174,7 @@ public class InputContainer {
 	 * @param enabled If true: starts a recording, else stops a running recording
 	 * @return Chat message depending on the state
 	 */
+	@Deprecated
 	public String setRecording(boolean enabled, boolean verbose) {
 		if (state==TASstate.PLAYBACK) {
 			return verbose ? TextFormatting.RED + "A playback is already running" : "";
@@ -117,7 +195,7 @@ public class InputContainer {
 		}
 		return "";
 	}
-
+	@Deprecated
 	public String setPlayback(boolean enabled) {
 		return setPlayback(enabled, true);
 	}
@@ -128,6 +206,7 @@ public class InputContainer {
 	 * @param enabled If true: start a playback, else aborts a running playback
 	 * @return Chat message depending on the state
 	 */
+	@Deprecated
 	public String setPlayback(boolean enabled, boolean verbose) {
 		if (state==TASstate.RECORDING)
 			return verbose ? TextFormatting.RED + "A recording is already running" : "";

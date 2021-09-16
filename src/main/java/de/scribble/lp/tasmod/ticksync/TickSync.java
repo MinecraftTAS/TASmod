@@ -4,7 +4,6 @@ import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.gui.GuiMultiplayerTimeOut;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayerMP;
 
 /**
  * Makes tickrate only dependent on the server, e.g. when the server lags, the client lags too

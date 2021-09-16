@@ -8,6 +8,7 @@ import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.mixin.AccessorRunStuff;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
+import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -397,7 +398,7 @@ public class VirtualInput {
 			nextMouse = new VirtualMouse();
 
 			container.setIndex(container.size());
-			container.setRecording(true);
+			container.setTASState(TASstate.RECORDING);
 			container.setStartLocation(start);
 			this.container = container;
 		}

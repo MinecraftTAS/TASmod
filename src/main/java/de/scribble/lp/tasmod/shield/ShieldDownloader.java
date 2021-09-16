@@ -26,7 +26,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ShieldDownloader {
 	private static final ResourceLocation bottleshield = new ResourceLocation("tasmod:textures/shields/bottleshield.png");
