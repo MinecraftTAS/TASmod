@@ -1,6 +1,8 @@
 package de.scribble.lp.tasmod.events;
 
 
+import com.mojang.authlib.GameProfile;
+
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
@@ -49,5 +51,16 @@ public class PlayerJoinLeaveEvents {
 	public static void firePlayerLeaveClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
 		TASmod.logger.info("Firing logout events for {} on the CLIENT", player.getName());
 		ClientProxy.virtual.unpressEverything();
+	}
+
+	/**
+	 * Executes when other players join the server
+	 * @param profile
+	 */
+	@SideOnly(Side.CLIENT)
+	public static void fireOtherPlayerJoinedClientSide(GameProfile profile) {
+		TASmod.logger.info("Firing other login events for {} on the CLIENT", profile.getName());
+		ClientProxy.shieldDownloader.onPlayerJoin(profile);
+		
 	}
 }

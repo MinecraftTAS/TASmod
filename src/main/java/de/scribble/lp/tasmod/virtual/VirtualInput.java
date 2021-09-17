@@ -342,6 +342,7 @@ public class VirtualInput {
 	public void unpressEverything() {
 		clearNextKeyboard();
 		clearNextMouse();
+		container.unpressContainer();
 	}
 
 	// ======================================Subticks===========================================

@@ -6,6 +6,7 @@ import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
 
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
@@ -104,7 +105,8 @@ public class InputContainer {
 				return verbose ? TextFormatting.RED + "Nothing is running" : "";
 			}
 			
-		}else if(state==TASstate.NONE) {
+		}else if(state==TASstate.NONE) { //If the container is currently doing nothing
+			ClientProxy.virtual.unpressEverything();
 			switch (stateIn) {
 			case PLAYBACK:
 				if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
@@ -128,7 +130,7 @@ public class InputContainer {
 			case NONE:
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: None)";
 			}
-		}else if(state==TASstate.RECORDING) {
+		}else if(state==TASstate.RECORDING) {	//If the container is currently recording
 			switch (stateIn) {
 			case PLAYBACK:
 				return verbose ? TextFormatting.RED + "A recording is currently running. Please stop the recording first before starting a playback" : "";
@@ -138,7 +140,7 @@ public class InputContainer {
 				state=TASstate.NONE;
 				return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
 			}
-		}else if(state==TASstate.PLAYBACK) {
+		}else if(state==TASstate.PLAYBACK) { //If the container is currently playing back
 			switch (stateIn) {
 			case PLAYBACK:
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Playback)";
@@ -534,4 +536,12 @@ public class InputContainer {
 	}
 	
 	//==============================================================
+	
+	/**
+	 * Clears {@link #keyboard} and {@link #mouse}
+	 */
+	public void unpressContainer() {
+		keyboard.clear();
+		mouse.clear();
+	}
 }

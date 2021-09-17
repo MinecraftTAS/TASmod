@@ -8,6 +8,7 @@ import de.pfannekuchen.infogui.gui.InfoHud;
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.commands.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.shield.ShieldDownloader;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -55,6 +56,8 @@ public class ClientProxy extends CommonProxy {
 
 	public static InfoHud hud;
 	
+	public static ShieldDownloader shieldDownloader;
+	
 	public void preInit(FMLPreInitializationEvent ev) {
 		isDevEnvironment = (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 		playbackTutorial = new TutorialHandler((short) 1);
@@ -67,6 +70,7 @@ public class ClientProxy extends CommonProxy {
 
 	public void init(FMLInitializationEvent ev) {
 		hud = new InfoHud();
+		shieldDownloader = new ShieldDownloader();
 
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);

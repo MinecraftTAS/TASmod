@@ -52,6 +52,10 @@
 		"playbackhooks.MixinGuiScreenAdvancements",
 		"playbackhooks.MixinGuiSlot",
 		"playbackhooks.MixinGuiStats",
-		"playbackhooks.MixinKeyBinding"
+		"playbackhooks.MixinKeyBinding",
+		
+		//Shields
+		"shields.MixinRenderItem",
+		"shields.MixinTileEntityItemStackRenderer"
 	]
 }
