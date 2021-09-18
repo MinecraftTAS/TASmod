@@ -8,6 +8,7 @@ import de.pfannekuchen.infogui.gui.InfoHud;
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.commands.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
 import de.scribble.lp.tasmod.shield.ShieldDownloader;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
@@ -76,6 +77,9 @@ public class ClientProxy extends CommonProxy {
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
 		MinecraftForge.EVENT_BUS.register(new CameraInterpolationEvents());
+		
+		//It pains me to do this ._.
+		MinecraftForge.EVENT_BUS.register(new PlayerJoinLeaveEvents());
 
 		ClientRegistry.registerKeyBinding(tickratezeroKey);
 		ClientRegistry.registerKeyBinding(tickAdvance);

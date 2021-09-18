@@ -9,8 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.network.play.server.SPacketPlayerListItem;
-import net.minecraft.network.play.server.SPacketPlayerListItem.Action;
 
 @Mixin(NetHandlerPlayClient.class)
 public class MixinNetHandlerPlayClient {
@@ -22,12 +20,14 @@ public class MixinNetHandlerPlayClient {
 		PlayerJoinLeaveEvents.firePlayerJoinedClientSide(gameController.player);
 	}
 
-	@Inject(method = "handlePlayerListItem", at = @At(value = "HEAD"))
-	public void otherClientJoinServerEvent(SPacketPlayerListItem packet, CallbackInfo ci) {
-		for (int i = 0; i < packet.getEntries().size(); i++) {
-			if (packet.getAction() == Action.ADD_PLAYER) {
-				PlayerJoinLeaveEvents.fireOtherPlayerJoinedClientSide(packet.getEntries().get(i).getProfile());
-			}
-		}
-	}
+	//Github Workflows can't process this for some reason...
+	
+//	@Inject(method = "handlePlayerListItem", at = @At(value = "HEAD"))
+//	public void otherClientJoinServerEvent(SPacketPlayerListItem packet, CallbackInfo ci) {
+//		for (int i = 0; i < packet.getEntries().size(); i++) {
+//			if (packet.getAction() == Action.ADD_PLAYER) {
+//				PlayerJoinLeaveEvents.fireOtherPlayerJoinedClientSide(packet.getEntries().get(i).getProfile());
+//			}
+//		}
+//	}
 }

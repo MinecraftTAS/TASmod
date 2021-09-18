@@ -8,6 +8,8 @@ import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -54,13 +56,24 @@ public class PlayerJoinLeaveEvents {
 	}
 
 	/**
-	 * Executes when other players join the server
+	 * When a player joins the world... Github workflows break without this, else I would use {@link #fireOtherPlayerJoinedClientSide(GameProfile)}
+	 * @param event
+	 */
+	@SubscribeEvent
+	public void fireOtherPlayerJoinedClientSide(EntityJoinWorldEvent event) {
+		if ((event.getWorld().isRemote) && ((event.getEntity() instanceof net.minecraft.entity.player.EntityPlayer))){
+			GameProfile profile = ((net.minecraft.entity.player.EntityPlayer)event.getEntity()).getGameProfile();
+			TASmod.logger.info("Firing other login events for {} on the CLIENT", profile.getName());
+			ClientProxy.shieldDownloader.onPlayerJoin(profile);
+		}
+	}
+	
+	/**
+	 * When any player joins the world on the client
 	 * @param profile
 	 */
-	@SideOnly(Side.CLIENT)
 	public static void fireOtherPlayerJoinedClientSide(GameProfile profile) {
 		TASmod.logger.info("Firing other login events for {} on the CLIENT", profile.getName());
 		ClientProxy.shieldDownloader.onPlayerJoin(profile);
-		
 	}
 }
