@@ -4,7 +4,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
@@ -23,11 +22,12 @@ public class MixinNetHandlerPlayClient {
 		PlayerJoinLeaveEvents.firePlayerJoinedClientSide(gameController.player);
 	}
 
-	@ModifyVariable(method = "handlePlayerListItem", at = @At(value = "STORE"), index = 3, ordinal = 0)
-	public net.minecraft.network.play.server.SPacketPlayerListItem.AddPlayerData otherClientJoinServerEvent(net.minecraft.network.play.server.SPacketPlayerListItem.AddPlayerData sentData, SPacketPlayerListItem packet) {
-		if (packet.getAction() == Action.ADD_PLAYER) {
-			PlayerJoinLeaveEvents.fireOtherPlayerJoinedClientSide(sentData.getProfile());
+	@Inject(method = "handlePlayerListItem", at = @At(value = "HEAD"))
+	public void otherClientJoinServerEvent(SPacketPlayerListItem packet, CallbackInfo ci) {
+		for (int i = 0; i < packet.getEntries().size(); i++) {
+			if (packet.getAction() == Action.ADD_PLAYER) {
+				PlayerJoinLeaveEvents.fireOtherPlayerJoinedClientSide(packet.getEntries().get(i).getProfile());
+			}
 		}
-		return sentData;
 	}
 }
