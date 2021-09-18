@@ -37,17 +37,6 @@ public class ShieldDownloader {
 
 	public static EntityLivingBase renderedEntity;
 
-	@Deprecated
-	public ResourceLocation getResourceLocationOld(EntityLivingBase entitylivingbaseIn) {
-		String playerUUID = entitylivingbaseIn.getUniqueID().toString();
-		String name = getShieldName(playerUUID);
-		if (!name.contentEquals("bottleshield")) {
-			return new ResourceLocation(cacheLocation + name);
-		} else {
-			return bottleshield;
-		}
-	}
-
 	public ResourceLocation getResourceLocation(EntityLivingBase entitylivingbaseIn) {
 		String uuid = entitylivingbaseIn.getUniqueID().toString();
 		ResourceLocation cachedLocation = new ResourceLocation(cacheLocation + uuid);
@@ -109,6 +98,17 @@ public class ShieldDownloader {
 
 	// =====================TASTools=====================
 
+	@Deprecated
+	public ResourceLocation getResourceLocationOld(EntityLivingBase entitylivingbaseIn) {
+		String playerUUID = entitylivingbaseIn.getUniqueID().toString();
+		String name = getShieldName(playerUUID);
+		if (!name.contentEquals("bottleshield")) {
+			return new ResourceLocation(cacheLocation + name);
+		} else {
+			return bottleshield;
+		}
+	}
+	
 	@Deprecated
 	public void downloadFromTASTools(String uuid, String location) {
 		String name = getShieldName(uuid);

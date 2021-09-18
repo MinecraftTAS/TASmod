@@ -15,6 +15,6 @@ import net.minecraft.item.ItemStack;
 public class MixinRenderItem {
     @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;Z)V", at = @At("HEAD"))
     public void getAbstractClientPlayer(ItemStack stack, EntityLivingBase entitylivingbaseIn, ItemCameraTransforms.TransformType transform, boolean leftHanded, CallbackInfo ci) {
-        ShieldDownloader.renderedEntity = entitylivingbaseIn;
+    	ShieldDownloader.renderedEntity = entitylivingbaseIn;
     }
 }

@@ -24,7 +24,7 @@ public class MixinNetHandlerPlayClient {
 	}
 
 	@ModifyVariable(method = "handlePlayerListItem", at = @At(value = "STORE"), index = 3, ordinal = 0)
-	public SPacketPlayerListItem.AddPlayerData otherClientJoinServerEvent(SPacketPlayerListItem.AddPlayerData sentData, SPacketPlayerListItem packet) {
+	public net.minecraft.network.play.server.SPacketPlayerListItem.AddPlayerData otherClientJoinServerEvent(net.minecraft.network.play.server.SPacketPlayerListItem.AddPlayerData sentData, SPacketPlayerListItem packet) {
 		if (packet.getAction() == Action.ADD_PLAYER) {
 			PlayerJoinLeaveEvents.fireOtherPlayerJoinedClientSide(sentData.getProfile());
 		}

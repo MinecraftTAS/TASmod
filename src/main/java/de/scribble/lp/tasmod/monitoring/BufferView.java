@@ -25,6 +25,7 @@ import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 
 public class BufferView extends JFrame {
 
+	private static final long serialVersionUID = -1823965270972132025L;
 	private JPanel contentPane;
 	private JTable table;
 	private static DefaultTableModel model;
@@ -69,7 +70,7 @@ public class BufferView extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
-		Vector title=new Vector<String>();
+		Vector<String> title=new Vector<String>();
 		title.add("Ticks");
 		title.add("KeyboardEvents");
 		title.add("MouseEvents");
@@ -97,7 +98,7 @@ public class BufferView extends JFrame {
 	public static void update(VirtualInput input) {
 		model.getDataVector().clear();
 		input.getAllInputEvents().forEach(inputsevents->{
-			Vector row=new Vector<>(4);
+			Vector<Object> row=new Vector<Object>(4);
 			row.add(inputsevents.tick);
 			
 			String kbs="";
