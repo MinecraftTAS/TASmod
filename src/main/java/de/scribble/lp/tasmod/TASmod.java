@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.killtherng.KillTheRNG;
+import de.scribble.lp.tasmod.commands.changestates.ContainerStateServer;
 import de.scribble.lp.tasmod.commands.clearinputs.CommandClearInputs;
 import de.scribble.lp.tasmod.commands.folder.CommandFolder;
 import de.scribble.lp.tasmod.commands.loadtas.CommandLoadTAS;
@@ -50,6 +51,8 @@ public class TASmod {
 	public static boolean isKTRNGLoaded;
 
 	public static final Logger logger = LogManager.getLogger("TASMod");
+	
+	public static ContainerStateServer containerStateServer;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent ev) throws Exception {
@@ -86,6 +89,7 @@ public class TASmod {
 	@EventHandler
 	public void serverStart(FMLServerStartingEvent ev) {
 		serverInstance = ev.getServer();
+		containerStateServer=new ContainerStateServer();
 		// Command handling
 		ev.registerServerCommand(new CommandTickrate());
 		ev.registerServerCommand(new CommandRecord());

@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
+import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -45,11 +47,14 @@ public class CommandPlay extends CommandBase {
 
 		if (args.length < 1) {
 			if(!server.isDedicatedServer()) {
-				CommonProxy.NETWORK.sendToServer(new PlaybackPacket(!ClientProxy.virtual.getContainer().isPlayingback()));
+				TASstate state=TASmod.containerStateServer.getState();
+				state=state==TASstate.PLAYBACK ? TASstate.NONE : TASstate.PLAYBACK;
+				TASmod.containerStateServer.setState(state);
+				CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
 			} else {
 				sender.sendMessage(new TextComponentString(TextFormatting.RED+"For multiplayer sessions use /play true|false to start/stop a playback"));
 			}
-		} else if (args.length == 1) {
+		} /*else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("true")) {
 				CommonProxy.NETWORK.sendToAll(new PlaybackPacket(true));
 			} else if (args[0].equalsIgnoreCase("false")) {
@@ -57,7 +62,7 @@ public class CommandPlay extends CommandBase {
 			} else {
 				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Couldn't process the argument " + args[0] + ". Must be either true or false"));
 			}
-		} else if (args.length > 1) {
+		}*/ else if (args.length > 1) {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments. " + getUsage(sender)));
 		}
 

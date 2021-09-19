@@ -1,9 +1,8 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
-import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
 import de.scribble.lp.tasmod.util.TASstate;
-import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiControls;
 
@@ -50,7 +49,7 @@ public class TickrateChangerClient {
     	if(Minecraft.getMinecraft().currentScreen instanceof GuiControls) {
     		if(TICKS_PER_SECOND==0&&WASZERO==false) {
     			changeClientTickrate(20);
-    			ClientProxy.virtual.getContainer().setTASState(TASstate.NONE);
+    			CommonProxy.NETWORK.sendToServer(new SyncStatePacket(TASstate.NONE));
     			WASZERO=true;
     		}
     		return;

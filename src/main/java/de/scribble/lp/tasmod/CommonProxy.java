@@ -3,16 +3,16 @@ package de.scribble.lp.tasmod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.scribble.lp.tasmod.commands.changestates.RequestStatePacket;
+import de.scribble.lp.tasmod.commands.changestates.RequestStatePacketHandler;
+import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
+import de.scribble.lp.tasmod.commands.changestates.SyncStatePacketHandler;
 import de.scribble.lp.tasmod.commands.clearinputs.ClearInputsPacket;
 import de.scribble.lp.tasmod.commands.clearinputs.ClearInputsPacketHandler;
 import de.scribble.lp.tasmod.commands.folder.FolderPacket;
 import de.scribble.lp.tasmod.commands.folder.FolderPacketHandler;
 import de.scribble.lp.tasmod.commands.loadtas.LoadTASPacket;
 import de.scribble.lp.tasmod.commands.loadtas.LoadTASPacketHandler;
-import de.scribble.lp.tasmod.commands.playback.PlaybackPacket;
-import de.scribble.lp.tasmod.commands.playback.PlaybackPacketHandler;
-import de.scribble.lp.tasmod.commands.recording.RecordingPacket;
-import de.scribble.lp.tasmod.commands.recording.RecordingPacketHandler;
 import de.scribble.lp.tasmod.commands.savetas.SaveTASPacket;
 import de.scribble.lp.tasmod.commands.savetas.SaveTASPacketHandler;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
@@ -53,11 +53,11 @@ public class CommonProxy {
 		// Ticksync
 		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, i++, Side.CLIENT);
 
-		// Trigger a recording/playback on the client
-		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, i++, Side.CLIENT);
-		NETWORK.registerMessage(PlaybackPacketHandler.class, PlaybackPacket.class, i++, Side.SERVER);
-		NETWORK.registerMessage(RecordingPacketHandler.class, RecordingPacket.class, i++, Side.CLIENT);
-		NETWORK.registerMessage(RecordingPacketHandler.class, RecordingPacket.class, i++, Side.SERVER);
+		// Sync State
+		NETWORK.registerMessage(RequestStatePacketHandler.class, RequestStatePacket.class, i++, Side.CLIENT);
+
+		NETWORK.registerMessage(SyncStatePacketHandler.class, SyncStatePacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(SyncStatePacketHandler.class, SyncStatePacket.class, i++, Side.SERVER);
 
 		// Trigger savestates/loadstates on the client
 		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.SERVER);
@@ -68,13 +68,13 @@ public class CommonProxy {
 		// Sync player motion between client and server
 		NETWORK.registerMessage(RequestMotionPacketHandler.class, RequestMotionPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(MotionPacketHandler.class, MotionPacket.class, i++, Side.SERVER);
-		
+
 		// Create or load a savestate of the recording or playback on the client
 		NETWORK.registerMessage(InputSavestatesPacketHandler.class, InputSavestatesPacket.class, i++, Side.CLIENT);
-		
+
 		// When loadstating, send the data of the client from server to client
 		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, i++, Side.CLIENT);
-		
+
 		// Trigger saving the inputs to file on the client
 		NETWORK.registerMessage(SaveTASPacketHandler.class, SaveTASPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(SaveTASPacketHandler.class, SaveTASPacket.class, i++, Side.SERVER);
@@ -82,11 +82,11 @@ public class CommonProxy {
 		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.SERVER);
-		
+
 		// Misc
 		NETWORK.registerMessage(FolderPacketHandler.class, FolderPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(InputContainer.TeleportPlayerPacketHandler.class, InputContainer.TeleportPlayerPacket.class, i++, Side.SERVER);
-		
+
 	}
 
 	public void init(FMLInitializationEvent ev) {

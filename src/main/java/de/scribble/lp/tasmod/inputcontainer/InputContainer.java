@@ -166,6 +166,10 @@ public class InputContainer {
 		return state==TASstate.NONE;
 	}
 	
+	public TASstate getState() {
+		return state;
+	}
+	
 	@Deprecated
 	public String setRecording(boolean enabled) {
 		return setRecording(enabled, true);

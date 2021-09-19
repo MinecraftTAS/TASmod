@@ -2,11 +2,12 @@ package de.scribble.lp.tasmod.events;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.commands.playback.PlaybackPacket;
+import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
 import de.scribble.lp.tasmod.monitoring.BufferView;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
 import de.scribble.lp.tasmod.savestates.server.SavestatePacket;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
+import de.scribble.lp.tasmod.util.TASstate;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 
@@ -38,7 +39,7 @@ public class KeybindingEvents {
 			
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
 			
-			CommonProxy.NETWORK.sendToServer(new PlaybackPacket(false));
+			CommonProxy.NETWORK.sendToServer(new SyncStatePacket(TASstate.NONE));
 			
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickratezeroKey)) {
 			

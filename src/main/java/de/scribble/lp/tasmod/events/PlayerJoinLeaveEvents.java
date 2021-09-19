@@ -23,6 +23,7 @@ public class PlayerJoinLeaveEvents {
 	public static void firePlayerJoinedServerSide(EntityPlayerMP player) {
 		TASmod.logger.info("Firing login events for {} on the SERVER", player.getName());
 		TickSyncServer.joinServer(player);
+		TASmod.containerStateServer.joinServer(player);
 	}
 	
 	/**
