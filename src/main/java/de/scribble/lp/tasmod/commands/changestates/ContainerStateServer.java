@@ -32,7 +32,7 @@ public class ContainerStateServer {
 
 	public void joinServer(EntityPlayerMP player) {
 		if (!shouldChange) {
-			shouldChange = true;
+			shouldChange=true;
 			CommonProxy.NETWORK.sendTo(new RequestStatePacket(), player);
 		} else {
 			CommonProxy.NETWORK.sendTo(new SyncStatePacket(state, false), player);

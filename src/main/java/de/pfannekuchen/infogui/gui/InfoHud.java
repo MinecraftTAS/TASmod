@@ -11,12 +11,17 @@ import java.util.concurrent.Callable;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
+
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
+import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
+import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.math.Vec3d;
@@ -211,7 +216,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Tickrate";
-				return String.format("Tickrate: %.2f", TickrateChangerClient.TICKS_PER_SECOND);
+				return String.format("Tickrate: %.1f", TickrateChangerClient.TICKS_PER_SECOND);
 			}));
 			
 			title = "position";
@@ -246,11 +251,22 @@ public class InfoHud extends GuiScreen {
 				return "World Seed: " + Minecraft.getMinecraft().world.worldInfo.getSeed();
 			}));
 			
+			y += 14;
+			
+			if(TASmod.isKTRNGLoaded) {
+				title = "ktrng_randomseed";
+				if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+				lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+					if (Minecraft.getMinecraft().currentScreen == this) return "KTRNG";
+					return "RandomSeed: " + KillTheRNG.randomness.Global.getSeed();
+				}));
+			}
+			
 			title = "facing";
 			y += 14;
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-				if (Minecraft.getMinecraft().currentScreen == this) return "Chunk Position";
+				if (Minecraft.getMinecraft().currentScreen == this) return "Facing";
 				return String.format("%.2f %.2f", Minecraft.getMinecraft().player.rotationYaw, Minecraft.getMinecraft().player.rotationPitch);
 			}));
 			
@@ -276,6 +292,29 @@ public class InfoHud extends GuiScreen {
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Predicted Position";
 				return String.format("%f %f %f", PlayerPositionCalculator.xNew, PlayerPositionCalculator.yNew, PlayerPositionCalculator.zNew);
+			}));
+			
+			title = "state";
+			y += 14;
+			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+				if (Minecraft.getMinecraft().currentScreen == this) {
+					return "State";
+				}else {
+				TASstate state=ClientProxy.virtual.getContainer().getState();
+				ChatFormatting format=ChatFormatting.WHITE;
+				String out="";
+				if(state==TASstate.PLAYBACK) {
+					out="Playback";
+					format=ChatFormatting.GREEN;
+				}else if(state==TASstate.RECORDING){
+					out="Recording";
+					format=ChatFormatting.RED;
+				}else if(state==TASstate.NONE) {
+					out="";
+				}
+				return String.format("%s%s", format, out);
+				}
 			}));
 			
 			title = "cursor";
@@ -312,26 +351,27 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync";
-				return "Desync: " + ClientProxy.virtual.getContainer().dMonitor.getMonitoring(ClientProxy.virtual.getContainer(), Minecraft.getMinecraft().player);
+				return ClientProxy.virtual.getContainer().dMonitor.getMonitoring(ClientProxy.virtual.getContainer(), Minecraft.getMinecraft().player);
 			}));
 			
-			title = "desyncstatus1";
+			title = "desyncstatusMotion";
 			y += 14;
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Motion";
 				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().dMonitor;
-				return "Motion Desync: " + dMonitor.getMx()+" "+ dMonitor.getMy()+" "+dMonitor.getMz();
+				return dMonitor.getMx()+" "+ dMonitor.getMy()+" "+dMonitor.getMz();
 			}));
 			
-			title = "desyncstatus2";
+			title = "desyncstatusPos";
 			y += 14;
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Position";
 				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().dMonitor;
-				return "Position Desync: " + dMonitor.getX()+" "+ dMonitor.getY()+" "+dMonitor.getZ();
+				return dMonitor.getX()+" "+ dMonitor.getY()+" "+dMonitor.getZ();
 			}));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
