@@ -78,11 +78,13 @@ public class VirtualKeybindings {
 			if (cooldownHashMap.containsKey(keybind)) {
 				if (cooldown <= cooldowntimer - (long) cooldownHashMap.get(keybind)) {
 					cooldownHashMap.put(keybind, cooldowntimer);
+					cooldown=Minecraft.getDebugFPS()/3;
 					return true;
 				}
 				return false;
 			} else {
 				cooldownHashMap.put(keybind, cooldowntimer);
+				cooldown=Minecraft.getDebugFPS()/3;
 				return true;
 			}
 		}

@@ -84,9 +84,12 @@ public abstract class MixinMinecraftServer {
 				msToTick = 1L;
 		}
 		for (long o = 0; o < msToTick; o++) {
+			if(TickrateChangerServer.TICKS_PER_SECOND==0) {
+				currentTime=System.currentTimeMillis();
+			}
 			if (TickrateChangerServer.INTERRUPT) {
-				msToTick = 1L;
 				currentTime = System.currentTimeMillis();
+				msToTick = 1L;
 				TickrateChangerServer.INTERRUPT = false;
 			}
 			synchronized (this.futureTaskQueue) {

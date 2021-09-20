@@ -23,10 +23,14 @@ public class ClientMotionServer {
 		int i = 0;
 		while (motion.size() != TASmod.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
 			i++;
+			System.out.println(motion.size());
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			}
+			if(i % 30 == 0) {
+				CommonProxy.NETWORK.sendToAll(new RequestMotionPacket());
 			}
 			if (i == 3000) {
 				CommonProxy.logger.warn("Client motion timed out!");

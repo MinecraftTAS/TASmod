@@ -44,6 +44,7 @@ public class PlayerJoinLeaveEvents {
 	public static void firePlayerJoinedClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
 		TASmod.logger.info("Firing login events for {} on the CLIENT", player.getName());
 		ClientProxy.virtual.unpressEverything();
+		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
 	}
 	
 	/**
