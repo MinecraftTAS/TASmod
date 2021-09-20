@@ -1,6 +1,7 @@
 package de.scribble.lp.tasmod.commands.savetas;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +81,12 @@ public class CommandSaveTAS extends CommandBase {
 	public List<String> getFilenames() {
 		List<String> tab = new ArrayList<String>();
 		File folder = new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + "tasfiles");
-		File[] listOfFiles = folder.listFiles();
+		File[] listOfFiles = folder.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.getName().endsWith(".tas");
+			}
+		});
 		for (int i = 0; i < listOfFiles.length; i++) {
 			tab.add(listOfFiles[i].getName().replaceAll("\\.tas", ""));
 		}

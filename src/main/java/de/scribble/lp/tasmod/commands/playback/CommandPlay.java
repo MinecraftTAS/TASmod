@@ -46,23 +46,22 @@ public class CommandPlay extends CommandBase {
 		}
 
 		if (args.length < 1) {
-			if(!server.isDedicatedServer()) {
-				TASstate state=TASmod.containerStateServer.getState();
-				state=state==TASstate.PLAYBACK ? TASstate.NONE : TASstate.PLAYBACK;
-				TASmod.containerStateServer.setState(state);
-				CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
-			} else {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED+"For multiplayer sessions use /play true|false to start/stop a playback"));
-			}
-		} /*else if (args.length == 1) {
-			if (args[0].equalsIgnoreCase("true")) {
-				CommonProxy.NETWORK.sendToAll(new PlaybackPacket(true));
-			} else if (args[0].equalsIgnoreCase("false")) {
-				CommonProxy.NETWORK.sendToAll(new PlaybackPacket(false));
-			} else {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Couldn't process the argument " + args[0] + ". Must be either true or false"));
-			}
-		}*/ else if (args.length > 1) {
+//			if(!server.isDedicatedServer()) {
+			TASstate state = TASmod.containerStateServer.getState();
+			state = state == TASstate.PLAYBACK ? TASstate.NONE : TASstate.PLAYBACK;
+			TASmod.containerStateServer.setState(state);
+			CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
+//			} else {
+//				sender.sendMessage(new TextComponentString(TextFormatting.RED+"For multiplayer sessions use /play true|false to start/stop a playback"));
+//			}
+		} /*
+			 * else if (args.length == 1) { if (args[0].equalsIgnoreCase("true")) {
+			 * CommonProxy.NETWORK.sendToAll(new PlaybackPacket(true)); } else if
+			 * (args[0].equalsIgnoreCase("false")) { CommonProxy.NETWORK.sendToAll(new
+			 * PlaybackPacket(false)); } else { sender.sendMessage(new
+			 * TextComponentString(TextFormatting.RED + "Couldn't process the argument " +
+			 * args[0] + ". Must be either true or false")); } }
+			 */ else if (args.length > 1) {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments. " + getUsage(sender)));
 		}
 
@@ -70,9 +69,9 @@ public class CommandPlay extends CommandBase {
 
 	@Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-		if (args.length == 1) {
-			return getListOfStringsMatchingLastWord(args, ImmutableList.of("true", "false"));
-		}
+//		if (args.length == 1) {
+//			return getListOfStringsMatchingLastWord(args, ImmutableList.of("true", "false"));
+//		}
 		return super.getTabCompletions(server, sender, args, targetPos);
 	}
 }

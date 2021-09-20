@@ -41,6 +41,9 @@ public abstract class MixinMinecraft {
 		KeybindingEvents.fireKeybindingsEvent();
 		
 		TickrateChangerClient.bypass();
+		if(((Minecraft) (Object) this).player!=null) {
+			ClientProxy.hud.tick();
+		}
 		while (Keyboard.next()) {
 			ClientProxy.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
@@ -88,9 +91,6 @@ public abstract class MixinMinecraft {
 	@Inject(method = "runTick", at = @At(value = "HEAD"))
 	public void injectRunTick(CallbackInfo ci) throws IOException {
 		TickSync.incrementClienttickcounter();
-		if(((Minecraft) (Object) this).player!=null) {
-			ClientProxy.hud.tick();
-		}
 		if (SavestatePlayerLoading.wasLoading) {
 			SavestatePlayerLoading.wasLoading = false;
 			SavestateHandler.playerLoadSavestateEventClient();

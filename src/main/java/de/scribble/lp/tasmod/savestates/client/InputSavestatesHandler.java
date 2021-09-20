@@ -37,7 +37,7 @@ public class InputSavestatesHandler {
 			return;
 		}
 
-		ClientProxy.createSavestatesDir();
+		savestateDirectory.mkdir();
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".tas");
 
@@ -64,7 +64,7 @@ public class InputSavestatesHandler {
 			return;
 		}
 
-		ClientProxy.createSavestatesDir();
+		savestateDirectory.mkdir();
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".tas");
 

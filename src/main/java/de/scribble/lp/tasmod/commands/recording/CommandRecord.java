@@ -45,14 +45,14 @@ public class CommandRecord extends CommandBase {
 			return;
 		}
 		if (args.length < 1) {
-			if (!server.isDedicatedServer()) {
+//			if (!server.isDedicatedServer()) {
 				TASstate state=TASmod.containerStateServer.getState();
 				state=state==TASstate.RECORDING ? TASstate.NONE : TASstate.RECORDING;
 				TASmod.containerStateServer.setState(state);
 				CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
-			} else {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "For multiplayer sessions use /play true|false to start/stop a recording"));
-			}
+//			} else {
+//				sender.sendMessage(new TextComponentString(TextFormatting.RED + "For multiplayer sessions use /play true|false to start/stop a recording"));
+//			}
 		} /*else if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("true")) {
 				CommonProxy.NETWORK.sendToAll(new RecordingPacket(true));
@@ -69,9 +69,9 @@ public class CommandRecord extends CommandBase {
 
 	@Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-		if (args.length == 1) {
-			return getListOfStringsMatchingLastWord(args, ImmutableList.of("true", "false"));
-		}
+//		if (args.length == 1) {
+//			return getListOfStringsMatchingLastWord(args, ImmutableList.of("true", "false"));
+//		}
 		return super.getTabCompletions(server, sender, args, targetPos);
 	}
 }
