@@ -372,6 +372,14 @@ public class InfoHud extends GuiScreen {
 				return dMonitor.getX()+" "+ dMonitor.getY()+" "+dMonitor.getZ();
 			}));
 			
+			title = "Lagging";
+			y += 14;
+			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+				if (Minecraft.getMinecraft().currentScreen == this) return "Ticksync Lag";
+				return "Lagging: "+(TickSync.isLagging?ChatFormatting.RED+"YES":"No");
+			}));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -397,7 +405,7 @@ public class InfoHud extends GuiScreen {
 		         	GL11.glPopMatrix();
 				}
 			}
-			if(Minecraft.getMinecraft().currentScreen != null) {
+			if(Minecraft.getMinecraft().currentScreen instanceof InfoHud) {
 				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Leftclick to move", width-ypos, xpos- 30, 0x60FF00);
 				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Middleclick to enable", width-ypos, xpos-20, 0x60FF00);
 				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Rightclick to add black background", width-ypos, xpos-10, 0x60FF00);
