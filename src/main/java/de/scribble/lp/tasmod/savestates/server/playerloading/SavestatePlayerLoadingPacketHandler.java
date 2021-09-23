@@ -3,6 +3,7 @@ package de.scribble.lp.tasmod.savestates.server.playerloading;
 import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -54,7 +55,12 @@ public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<Save
 		float jumpVector = motion.getFloat("JumpFactor");
 		player.setSprinting(sprinting);
 		player.jumpMovementFactor = jumpVector;
-
+		
+		//TAS#86 Savestates don't change the gamemode clientside
+		int gamemode=compound.getInteger("playerGameType");
+		GameType type=GameType.getByID(gamemode);
+		Minecraft.getMinecraft().playerController.setGameType(type);
+		
 		SavestatesChunkControl.keepPlayerInLoadedEntityList(player);
 		SavestatePlayerLoading.wasLoading = true;
 	}

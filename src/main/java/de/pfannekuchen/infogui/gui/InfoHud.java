@@ -389,11 +389,6 @@ public class InfoHud extends GuiScreen {
 				drawRectWithText(label.renderText, label.x, label.y, label.renderRect);
 			} else if (Minecraft.getMinecraft().currentScreen != null) {
 				if (Minecraft.getMinecraft().currentScreen.getClass().getSimpleName().contains("InfoHud")) {
-					Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Leftclick to move", width-ypos, xpos- 30, 0x60FF00);
-					Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Middleclick to enable", width-ypos, xpos-20, 0x60FF00);
-					Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Rightclick to add black background", width-ypos, xpos-10, 0x60FF00);
-					Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Hold Shift to snap to grid", width-ypos, xpos, 0x60FF00);
-					
 					GL11.glPushMatrix();
 		         	GL11.glEnable(GL11.GL_BLEND);
 		         	GL11.glBlendFunc(770, 771);
@@ -401,6 +396,12 @@ public class InfoHud extends GuiScreen {
 		    		GL11.glDisable(GL11.GL_BLEND);
 		         	GL11.glPopMatrix();
 				}
+			}
+			if(Minecraft.getMinecraft().currentScreen != null) {
+				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Leftclick to move", width-ypos, xpos- 30, 0x60FF00);
+				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Middleclick to enable", width-ypos, xpos-20, 0x60FF00);
+				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Rightclick to add black background", width-ypos, xpos-10, 0x60FF00);
+				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Hold Shift to snap to grid", width-ypos, xpos, 0x60FF00);
 			}
 		}
 	}
