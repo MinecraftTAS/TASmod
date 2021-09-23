@@ -3,7 +3,9 @@ package de.scribble.lp.tasmod.commands.savetas;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,7 @@ public class FileThread extends Thread {
 	private List<String> output = new ArrayList<String>();
 	
 	public FileThread(File fileLocation, boolean append) throws FileNotFoundException {
-		stream = new PrintWriter(new FileOutputStream(fileLocation, append));
+		stream = new PrintWriter(new OutputStreamWriter(new FileOutputStream(fileLocation, append), StandardCharsets.UTF_8));
 	}
 	
 	public void addLine(String line) {

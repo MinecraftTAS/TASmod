@@ -302,21 +302,21 @@ public class VirtualKeyboard implements Serializable {
 		case '\u2907':
 			return new VirtualKeyboardEvent(15, false, Character.MIN_VALUE);
 		case '\u21E4':
-			return new VirtualKeyboardEvent(199, true, character);
+			return new VirtualKeyboardEvent(199, true, Character.MIN_VALUE);
 		case '\u2191':
-			return new VirtualKeyboardEvent(200, true, character);
+			return new VirtualKeyboardEvent(200, true, Character.MIN_VALUE);
 		case '\u21E7':
-			return new VirtualKeyboardEvent(201, true, character);
+			return new VirtualKeyboardEvent(201, true, Character.MIN_VALUE);
 		case '\u2190':
-			return new VirtualKeyboardEvent(203, true, character);
+			return new VirtualKeyboardEvent(203, true, Character.MIN_VALUE);
 		case '\u2192':
-			return new VirtualKeyboardEvent(205, true, character);
+			return new VirtualKeyboardEvent(205, true, Character.MIN_VALUE);
 		case '\u21E5':
-			return new VirtualKeyboardEvent(207, true, character);
+			return new VirtualKeyboardEvent(207, true, Character.MIN_VALUE);
 		case '\u2193':
-			return new VirtualKeyboardEvent(208, true, character);
+			return new VirtualKeyboardEvent(208, true, Character.MIN_VALUE);
 		case '\u21E9':
-			return new VirtualKeyboardEvent(209, true, character);
+			return new VirtualKeyboardEvent(209, true, Character.MIN_VALUE);
 		default:
 			return new VirtualKeyboardEvent(0, true, character);
 		}
