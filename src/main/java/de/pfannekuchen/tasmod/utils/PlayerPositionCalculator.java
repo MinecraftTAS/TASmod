@@ -29,9 +29,9 @@ public class PlayerPositionCalculator {
 		bb = source.getEntityBoundingBox();
 		float f6 = 0.91F;
 
-		float forward = ClientProxy.virtual.willKeyBeDown(mc.gameSettings.keyBindForward.getKeyCode()) ? .98f : ClientProxy.virtual.willKeyBeDown(mc.gameSettings.keyBindBack.getKeyCode()) ? -.98f : 0f;
+		float forward = ClientProxy.virtual.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()) ? .98f : ClientProxy.virtual.isKeyDown(mc.gameSettings.keyBindBack.getKeyCode()) ? -.98f : 0f;
 		float up = source.moveVertical;
-		float strafe = ClientProxy.virtual.willKeyBeDown(mc.gameSettings.keyBindLeft.getKeyCode()) ? .98f : ClientProxy.virtual.willKeyBeDown(mc.gameSettings.keyBindRight.getKeyCode()) ? -.98f : 0f;
+		float strafe = ClientProxy.virtual.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()) ? .98f : ClientProxy.virtual.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode()) ? -.98f : 0f;
 		
 		double motionX = source.motionX;
 		double motionY = source.motionY;

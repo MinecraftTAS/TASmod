@@ -35,8 +35,6 @@ public class ClientProxy extends CommonProxy {
 
 	public static KeyBinding tickAdvance = new KeyBinding("Advance Tick", Keyboard.KEY_F9, "TASmod");
 
-	public static KeyBinding showNextLocation = new KeyBinding("Show Next Location", Keyboard.KEY_O, "TASmod");
-
 	public static KeyBinding stopkey = new KeyBinding("Recording/Playback Stop", Keyboard.KEY_F10, "TASmod");
 
 	public static KeyBinding savestateSaveKey = new KeyBinding("Create Savestate", Keyboard.KEY_J, "TASmod");
@@ -84,7 +82,6 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(tickratezeroKey);
 		ClientRegistry.registerKeyBinding(tickAdvance);
 		ClientRegistry.registerKeyBinding(stopkey);
-		ClientRegistry.registerKeyBinding(showNextLocation);
 		ClientRegistry.registerKeyBinding(savestateSaveKey);
 		ClientRegistry.registerKeyBinding(savestateLoadKey);
 		ClientRegistry.registerKeyBinding(testingKey);
