@@ -29,7 +29,7 @@ public class KeybindingEvents {
 
 			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
 
-		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.testingKey)) {
+		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.bufferViewKey)) {
 			
 			BufferView.startBufferView();
 			

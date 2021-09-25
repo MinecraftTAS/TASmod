@@ -20,7 +20,9 @@ public class RequestMotionPacketHandler implements IMessageHandler<RequestMotion
 		return null;
 	}
 	
+	
 	@SideOnly(Side.CLIENT)
+	//For some reason the packet still tries to execute this on the server even tho ctx.side = CLIENT
 	private void workaround() {
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		if (player != null) {

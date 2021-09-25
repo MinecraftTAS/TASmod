@@ -44,6 +44,8 @@ public class ClientProxy extends CommonProxy {
 	public static KeyBinding testingKey = new KeyBinding("Various Testing", Keyboard.KEY_F12, "TASmod");
 
 	public static KeyBinding infoGuiKey = new KeyBinding("Open InfoGui Editor", Keyboard.KEY_F6, "TASmod");
+	
+	public static KeyBinding bufferViewKey = new KeyBinding("Buffer View", Keyboard.KEY_NUMPAD0, "TASmod");
 
 	public static VirtualInput virtual = new VirtualInput();
 
@@ -86,6 +88,7 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(savestateLoadKey);
 		ClientRegistry.registerKeyBinding(testingKey);
 		ClientRegistry.registerKeyBinding(infoGuiKey);
+		ClientRegistry.registerKeyBinding(bufferViewKey);
 
 		VirtualKeybindings.registerBlockedKeyBinding(infoGuiKey);
 		VirtualKeybindings.registerBlockedKeyBinding(tickratezeroKey);

@@ -20,19 +20,19 @@ public class ClientMotionServer {
 		motion.clear();
 		CommonProxy.NETWORK.sendToAll(new RequestMotionPacket());
 
-		int i = 0;
+		int i = 1;
 		while (motion.size() != TASmod.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
 			i++;
-			System.out.println(motion.size());
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if(i % 30 == 0) {
+			if(i % 30 == 1) {
+				CommonProxy.logger.info("Resending motion packet");
 				CommonProxy.NETWORK.sendToAll(new RequestMotionPacket());
 			}
-			if (i == 3000) {
+			if (i == 1000) {
 				CommonProxy.logger.warn("Client motion timed out!");
 				break;
 			}
