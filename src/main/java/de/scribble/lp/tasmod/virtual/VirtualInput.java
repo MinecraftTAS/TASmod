@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.mixin.AccessorRunStuff;
@@ -14,35 +15,57 @@ import net.minecraft.client.Minecraft;
 /**
  * One of the core classes of this mod <br>
  * <br>
- * This mimics peripherals used to control minecraft which are: The keyboard, the mouse and the angle of the player, which is called "Subticks" in this case
- * <i>(this came from a time when the camera angle was actually updated on a subtick level)</i>.<br>
+ * This mimics peripherals used to control minecraft which are: The keyboard,
+ * the mouse and the angle of the player, which is called "Subticks" in this
+ * case <i>(this came from a time when the camera angle was actually updated on
+ * a subtick level)</i>.<br>
  * <br>
- * For each peripheral there are 2 states. The "current" state <i>(e.g. {@linkplain #currentKeyboard})</i>, which is the state of what the game actually currently recognizes and the "next" state <i>(e.g. {@linkplain #nextKeyboard})</i> which either the buttons pressed on the keyboard, or the buttons pressed in the next playback tick.<br>
+ * For each peripheral there are 2 states. The "current" state <i>(e.g.
+ * {@linkplain #currentKeyboard})</i>, which is the state of what the game
+ * actually currently recognizes and the "next" state <i>(e.g.
+ * {@linkplain #nextKeyboard})</i> which either the buttons pressed on the
+ * keyboard, or the buttons pressed in the next playback tick.<br>
  * <br>
- * Outside of this class, there is a third state, which is the Vanilla Minecraft keybindings, which, in the best case, should be a copy of the "current" state. <br>
- * <h2>Events</h2>
- * To update the vanilla keybindings you need something called key events. An event for a keyboard might look like this <br>
+ * Outside of this class, there is a third state, which is the Vanilla Minecraft
+ * keybindings, which, in the best case, should be a copy of the "current"
+ * state. <br>
+ * <h2>Events</h2> To update the vanilla keybindings you need something called
+ * key events. An event for a keyboard might look like this <br>
  * <br>
  * <b>17,true,'w'</b><br>
  * <br>
- * Something like this is sent by the LWJGL methods to the vanilla methods to update the keybindings. <br>
- * In this case it is the key with the keycode 17 (The 'W' key), in the state true which means it is pressed down. And the 'w' is the character that is associated with that key <br>
+ * Something like this is sent by the LWJGL methods to the vanilla methods to
+ * update the keybindings. <br>
+ * In this case it is the key with the keycode 17 (The 'W' key), in the state
+ * true which means it is pressed down. And the 'w' is the character that is
+ * associated with that key <br>
  * <br>
- * You can find a complete list of LWJGL keycodes in {@link VirtualKeyboard}.<br>
+ * You can find a complete list of LWJGL keycodes in
+ * {@link VirtualKeyboard}.<br>
  * <br>
- * If W is released, the key event for this would look something like this: <b>17, false, NULL</b>
- * <br>
- * From that, the vanilla keybindings know which key is currently pressed down. As a bonus, the character 'w' is used when typing in a textfield.<br>
- * <h2>Emulating events</h2>
- * With the key events from LWJGL, so from the "physical keyboard", we can update the nextKeyboard in the {@link #updateNextKeyboard(int, boolean, char)} method.<br>
+ * If W is released, the key event for this would look something like this:
+ * <b>17, false, NULL</b> <br>
+ * From that, the vanilla keybindings know which key is currently pressed down.
+ * As a bonus, the character 'w' is used when typing in a textfield.<br>
+ * <h2>Emulating events</h2> With the key events from LWJGL, so from the
+ * "physical keyboard", we can update the nextKeyboard in the
+ * {@link #updateNextKeyboard(int, boolean, char)} method.<br>
  * This method is called every frame and also works in tickrate 0.<br>
  * <br>
- * And on every tick, we call {@link #updateCurrentKeyboard()}, which updates the currentKeyboard with a copy of nextKeyboard. <br>
- * However, we still need to update the Vanilla Minecraft keybinding by using key events.<br>
- * To solve this problem we can use {@link VirtualKeyboard#getDifference(VirtualKeyboard)}, which compares 2 keyboards and extracts the key events from that.<br>
+ * And on every tick, we call {@link #updateCurrentKeyboard()}, which updates
+ * the currentKeyboard with a copy of nextKeyboard. <br>
+ * However, we still need to update the Vanilla Minecraft keybinding by using
+ * key events.<br>
+ * To solve this problem we can use
+ * {@link VirtualKeyboard#getDifference(VirtualKeyboard)}, which compares 2
+ * keyboards and extracts the key events from that.<br>
  * <br>
- * For instance if we have a keyboard, where nothing is pressed, then a keyboard where only "W" is pressed, we can assume that the key event responsible for that change 17,true,? is. <br>
- * But as indicated by the ? we actually don't know the character that is typed there. And for that we need to store the characters seperately in the keyboard ({@link VirtualKeyboard#getCharList()}).<br>
+ * For instance if we have a keyboard, where nothing is pressed, then a keyboard
+ * where only "W" is pressed, we can assume that the key event responsible for
+ * that change 17,true,? is. <br>
+ * But as indicated by the ? we actually don't know the character that is typed
+ * there. And for that we need to store the characters seperately in the
+ * keyboard ({@link VirtualKeyboard#getCharList()}).<br>
  * <br>
  * The advantage of this system is:
  * <ul>
@@ -58,20 +81,24 @@ import net.minecraft.client.Minecraft;
 public class VirtualInput {
 
 	/**
-	 * The container where all inputs get stored during recording or stored and ready to be played back
+	 * The container where all inputs get stored during recording or stored and
+	 * ready to be played back
 	 */
 	private InputContainer container = new InputContainer();
 
 	// ===========================Keyboard=================================
 
 	/**
-	 * The state of the keyboard recognized by the game. Updated on a tick basis <br>
+	 * The state of the keyboard recognized by the game. Updated on a tick basis
+	 * <br>
 	 * See also: {@link VirtualInput}
 	 */
 	private VirtualKeyboard currentKeyboard = new VirtualKeyboard();
 
 	/**
-	 * The state of the keyboard which will replace {@linkplain VirtualInput#currentKeyboard} in the next tick. Updated every frame<br>
+	 * The state of the keyboard which will replace
+	 * {@linkplain VirtualInput#currentKeyboard} in the next tick. Updated every
+	 * frame<br>
 	 * See also: {@link VirtualInput}
 	 */
 	private VirtualKeyboard nextKeyboard = new VirtualKeyboard();
@@ -362,13 +389,14 @@ public class VirtualInput {
 	}
 
 	// =====================================Container===========================================
-	
+
 	public InputContainer getContainer() {
 		return container;
 	}
 
 	/**
-	 * Updates the input container and the {@link #nextKeyboard} as well as {@link #nextMouse}<br>
+	 * Updates the input container and the {@link #nextKeyboard} as well as
+	 * {@link #nextMouse}<br>
 	 * Gets executed each game tick
 	 */
 	public void updateContainer() {
@@ -377,7 +405,8 @@ public class VirtualInput {
 	}
 
 	/**
-	 * Replaces the {@link #container}, used in 
+	 * Replaces the {@link #container}, used in
+	 * 
 	 * @param container to replace the current one
 	 */
 	public void setContainer(InputContainer container) {
@@ -385,68 +414,105 @@ public class VirtualInput {
 	}
 
 	// =====================================Savestates===========================================
-	
-	public void loadSavestate(InputContainer container) {
+
+	/**
+	 * Loads and preloads the inputs from the new InputContainer to
+	 * {@link #container}
+	 * 
+	 * @param savestatecontainer The container that should be loaded.
+	 */
+	public void loadSavestate(InputContainer savestatecontainer) {
+
 		if (this.container.isPlayingback()) {
-			preloadInput(this.container, container.size() - 1);
-			this.container.setIndex(container.size());
+			preloadInput(this.container, savestatecontainer.size() - 1); 	// Preloading from the current container and from the second to last index of
+																			// the savestatecontainer. Since this is executed during playback,
+																			// we will only load the position of the savestate container and not replace the
+																			// container itself
+
+			this.container.setIndex(savestatecontainer.size()); 			// Set the "playback" index of the current container to the latest index of the
+																			// savestatecontainer. Meaning this index will be played next
 
 		} else if (this.container.isRecording()) {
-			String start = container.getStartLocation();
-			preloadInput(container, container.size() - 1);
+			String start = savestatecontainer.getStartLocation();				// TODO Another start location thing to keep in mind
+			preloadInput(savestatecontainer, savestatecontainer.size() - 1);	// Preload the input of the savestate
 
-			nextKeyboard = new VirtualKeyboard();
+			nextKeyboard = new VirtualKeyboard(); 	// Unpress the nextKeyboard and mouse to get rid of the preloaded inputs in the
+													// next keyboard. Note that these inputs are still loaded in the current
+													// keyboard
 			nextMouse = new VirtualMouse();
 
-			container.setIndex(container.size());
-			container.setTASState(TASstate.RECORDING);
-			container.setStartLocation(start);
-			this.container = container;
+			savestatecontainer.setIndex(savestatecontainer.size());
+			savestatecontainer.setTASState(TASstate.RECORDING);
+			savestatecontainer.setStartLocation(start);		//TODO Another one
+			this.container = savestatecontainer;			//Replace the current container with the savestated container
 		}
 	}
 
+	/**
+	 * Preloads the specified index from, the container to {@link #nextMouse} and {@link #nextKeyboard}
+	 * @param container The container from which the inputs should be pre loaded
+	 * @param index The index of the container from which the inputs should be loaded
+	 */
 	private void preloadInput(InputContainer container, int index) {
-		TickInputContainer tickcontainer = container.get(index).clone();
+		TickInputContainer tickcontainer = container.get(index);
 
-		nextKeyboard = tickcontainer.getKeyboard().clone();
-		nextMouse = tickcontainer.getMouse().clone();
+		if (tickcontainer != null) {
+			tickcontainer = tickcontainer.clone();
+			nextKeyboard = tickcontainer.getKeyboard().clone();
+			nextMouse = tickcontainer.getMouse().clone();
 
-		((AccessorRunStuff) Minecraft.getMinecraft()).runTickKeyboardAccessor();
-		((AccessorRunStuff) Minecraft.getMinecraft()).runTickMouseAccessor();
-
+			((AccessorRunStuff) Minecraft.getMinecraft()).runTickKeyboardAccessor();	// Letting mouse and keyboard tick once to load inputs into the "currentKeyboard"
+			((AccessorRunStuff) Minecraft.getMinecraft()).runTickMouseAccessor();
+		} else {
+			TASmod.logger.warn("Can't preload inputs, specified inputs are null!");
+		}
 	}
-	
+
 	// =====================================Debug===========================================
-	
-	public class InputEvent{
+
+	public class InputEvent {
 		public int tick;
 		public List<VirtualKeyboardEvent> keyboardevent;
 		public List<VirtualMouseEvent> mouseEvent;
 		public VirtualSubticks subticks;
-		
+
 		public InputEvent(int tick, List<VirtualKeyboardEvent> keyboardevent, List<VirtualMouseEvent> mouseEvent, VirtualSubticks subticks) {
-			this.tick=tick;
+			this.tick = tick;
 			this.keyboardevent = keyboardevent;
 			this.mouseEvent = mouseEvent;
 			this.subticks = subticks;
 		}
 	}
-	
+
+	/**
+	 * Gets all InputEvents from the current container.<br>
+	 * <br>
+	 * Container and input events differ in that input events are the events that get accepted by Minecraft in the runTickKeyboard.<br>
+	 * The container however stores the current inputs and can calculate the corresponding input events from that, but it does it only when you are playing back or recording.<br>
+	 * <br>
+	 * This however runs through the {@link VirtualInput#container} and generates the input events on for debug purposes.
+	 * @return
+	 */
 	public List<InputEvent> getAllInputEvents() {
-		List<InputEvent> main=new ArrayList<>();
+		
+		List<InputEvent> main = new ArrayList<>();
+		
 		for (int i = 0; i < container.size(); i++) {
-			TickInputContainer tick=container.get(i);
-			TickInputContainer nextTick=container.get(i+1);
-			if(nextTick==null) {
-				nextTick=new TickInputContainer(i+1);
+			
+			TickInputContainer tick = container.get(i);
+			TickInputContainer nextTick = container.get(i + 1);
+			
+			if (nextTick == null) {
+				nextTick = new TickInputContainer(i + 1);	//Fills the last tick in the container with an empty TickInputContainer
 			}
-			VirtualKeyboard kb=tick.getKeyboard();
-			List<VirtualKeyboardEvent> kbe=kb.getDifference(nextTick.getKeyboard());
 			
-			VirtualMouse m=tick.getMouse();
-			List<VirtualMouseEvent> me=m.getDifference(nextTick.getMouse());
-			
-			main.add(new InputEvent(tick.getTick(), kbe, me, tick.getSubticks()));
+			VirtualKeyboard keyboard = tick.getKeyboard();
+			List<VirtualKeyboardEvent> keyboardEventsList = keyboard.getDifference(nextTick.getKeyboard());
+
+			VirtualMouse mouse = tick.getMouse();
+			List<VirtualMouseEvent> mouseEventsList = mouse.getDifference(nextTick.getMouse());
+
+			main.add(new InputEvent(tick.getTick(), keyboardEventsList, mouseEventsList, tick.getSubticks()));
 		}
 		return main;
 	}
