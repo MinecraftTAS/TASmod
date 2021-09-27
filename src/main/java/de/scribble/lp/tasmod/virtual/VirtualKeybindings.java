@@ -8,6 +8,7 @@ import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Maps;
 
+import de.scribble.lp.tasmod.ClientProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiControls;
@@ -31,7 +32,6 @@ public class VirtualKeybindings {
 	private static long cooldown = 20;
 	private static HashMap<KeyBinding, Long> cooldownHashMap = Maps.<KeyBinding, Long>newHashMap();
 	private static List<KeyBinding> blockedKeys = new ArrayList<>();
-	private static List<KeyBinding> blockedDuringRecordingKeys = new ArrayList<>();
 	private static long cooldowntimer = 0;
 	public static boolean focused = false;
 
@@ -45,7 +45,10 @@ public class VirtualKeybindings {
 	 * @return
 	 */
 	public static boolean isKeyDown(KeyBinding keybind) {
-		boolean down = Keyboard.isKeyDown(keybind.getKeyCode());
+		
+		int keycode=keybind.getKeyCode();
+		boolean down = isKeyCodeAlwaysBlocked(keycode) ?  Keyboard.isKeyDown(keycode) : ClientProxy.virtual.willKeyBeDown(keycode);
+		
 		if (down) {
 			if (cooldownHashMap.containsKey(keybind)) {
 				if (cooldown <= cooldowntimer - (long) cooldownHashMap.get(keybind)) {
@@ -73,22 +76,7 @@ public class VirtualKeybindings {
 		if (mc.currentScreen instanceof GuiChat || mc.currentScreen instanceof GuiEditSign || (focused && mc.currentScreen != null) || mc.currentScreen instanceof GuiControls) {
 			return false;
 		}
-		boolean down = Keyboard.isKeyDown(keybind.getKeyCode());
-		if (down) {
-			if (cooldownHashMap.containsKey(keybind)) {
-				if (cooldown <= cooldowntimer - (long) cooldownHashMap.get(keybind)) {
-					cooldownHashMap.put(keybind, cooldowntimer);
-					cooldown=Minecraft.getDebugFPS()/3;
-					return true;
-				}
-				return false;
-			} else {
-				cooldownHashMap.put(keybind, cooldowntimer);
-				cooldown=Minecraft.getDebugFPS()/3;
-				return true;
-			}
-		}
-		return false;
+		return isKeyDown(keybind);
 	}
 
 	/**
@@ -99,11 +87,6 @@ public class VirtualKeybindings {
 		blockedKeys.add(keybind);
 	}
 	
-	@Deprecated
-	public static void registerBlockedDuringRecordingKeyBinding(KeyBinding keybind) {
-		blockedDuringRecordingKeys.add(keybind);
-	}
-
 	/**
 	 * Checks whether the keycode should not be recorded or played back in a TAS
 	 * @param keycode to block
@@ -116,18 +99,5 @@ public class VirtualKeybindings {
 		}
 		return false;
 	}
-	@Deprecated
-	public static boolean isKeyCodeBlockedDuringRecording(int keycode) {
-		for (KeyBinding keybind : blockedDuringRecordingKeys) {
-			if (keycode == keybind.getKeyCode()) {
-				blockedDuringRecordingKeys.remove(keybind);
-				return true;
-			}
-		}
-		return false;
-	}
 	
-	public static void setCooldown(long cooldown) {
-		VirtualKeybindings.cooldown = cooldown;
-	}
 }

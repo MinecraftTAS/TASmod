@@ -3,6 +3,7 @@ package de.scribble.lp.tasmod.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,14 +113,14 @@ public class ContainerSerialiser {
 
 	public InputContainer fromEntireFileV1(File file) throws IOException {
 
-		List<String> lines = FileUtils.readLines(file, Charset.defaultCharset());
+		List<String> lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
 		
 		File monitorFile=new File(file, "../"+file.getName().replace(".tas", "")+".mon");
 		
 		List<String> monitorLines=null;
 		
 		if(monitorFile.exists()) {
-			monitorLines = FileUtils.readLines(monitorFile, Charset.defaultCharset());
+			monitorLines = FileUtils.readLines(monitorFile, StandardCharsets.UTF_8);
 		}
 
 		InputContainer container = new InputContainer();

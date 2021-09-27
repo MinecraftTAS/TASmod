@@ -90,11 +90,15 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(infoGuiKey);
 		ClientRegistry.registerKeyBinding(bufferViewKey);
 
-		VirtualKeybindings.registerBlockedKeyBinding(infoGuiKey);
+		
 		VirtualKeybindings.registerBlockedKeyBinding(tickratezeroKey);
 		VirtualKeybindings.registerBlockedKeyBinding(tickAdvance);
 		VirtualKeybindings.registerBlockedKeyBinding(stopkey);
+		VirtualKeybindings.registerBlockedKeyBinding(savestateSaveKey);
+		VirtualKeybindings.registerBlockedKeyBinding(savestateLoadKey);
 		VirtualKeybindings.registerBlockedKeyBinding(testingKey);
+		VirtualKeybindings.registerBlockedKeyBinding(infoGuiKey);
+		VirtualKeybindings.registerBlockedKeyBinding(bufferViewKey);
 
 		createTASDir();
 		createSavestatesDir();
