@@ -120,11 +120,6 @@ public class VirtualInput {
 
 //		System.out.println(keycode+" "+keystate+" "+character);
 
-		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
-			return;
-		}
-		VirtualKey key = nextKeyboard.get(keycode);
-		key.setPressed(keystate);
 		if (keystate) {
 			character = nextKeyboard.encodeUnicode(keycode, character);
 		} else {
@@ -133,6 +128,11 @@ public class VirtualInput {
 			}
 		}
 		nextKeyboard.addChar(character);
+		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
+			return;
+		}
+		VirtualKey key = nextKeyboard.get(keycode);
+		key.setPressed(keystate);
 	}
 
 	public List<VirtualKeyboardEvent> getCurrentKeyboardEvents() {
@@ -264,6 +264,9 @@ public class VirtualInput {
 
 	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
 
+		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
+			return;
+		}
 		boolean flag = true;
 		if (filter) {
 			flag = nextMouse.isSomethingDown() || scrollwheel != 0 || keycode != -1;
