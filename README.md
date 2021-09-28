@@ -5,17 +5,15 @@ This mod is currently only for Forge 1.12.2 and will update/downgrade once 1.12.
 
 ## Credits  
 Author of the original mod: tr7zw  
-Author: ScribbleLP  
+Main Author: Scribble  
   
-Contributions by: Famous1622, Pancake (MCPfannkuchenYT)  
+Contributions by: famous1622, Pancake  
   
 Tickratechanger: [Guichaguri](https://github.com/Guichaguri/TickrateChanger)  
 Tickrate 0 idea: [Cubitect](https://github.com/Cubitect/Cubitick)  
-Savestate idea: [bspkrs, MightyPork](https://github.com/bspkrs-mods/WorldStateCheckpoints), although implementation is totally different now  
+Savestate idea: [bspkrs, MightyPork](https://github.com/bspkrs-mods/WorldStateCheckpoints), although implementation is totally different now
   
-RNG Math: [Admiral_Stapler](https://www.youtube.com/channel/UCB4XuRBJZBOpnoJSWekMohw)  
-  
-Special thanks: Darkmoon
+Special thanks: Darkmoon, The Minecraft TAS Community  
 ## Commands  
 `/record` Starts to record your input, hit the same command again to stop recording  
 `/play` Starts to  play back a the stored inputs  
