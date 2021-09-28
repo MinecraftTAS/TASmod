@@ -6,11 +6,12 @@ import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
 
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
+import de.scribble.lp.tasmod.util.TASstate;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
@@ -26,23 +27,27 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * A container where the inputs are stored.<br>
  * <br>
- * Filling this container is accomplished by setting the state to "recording" via {@linkplain #setRecording(boolean)},<br>
+ * Filling this container is accomplished by setting the state to "recording"
+ * via {@linkplain #setRecording(boolean)},<br>
  * or by loading inputs from file.<br>
  * <br>
- * These inputs can be played back at any time by setting {@linkplain #setPlayback(boolean)} to true. <br>
+ * These inputs can be played back at any time by setting
+ * {@linkplain #setPlayback(boolean)} to true. <br>
  * <br>
- * Information about the author etc. get stored in the input container too and will be printed out in chat when the player loads into a world
- * <br>
- * Inputs are saved and loaded to/from file via the {@linkplain ContainerSerialiser}
+ * Information about the author etc. get stored in the input container too and
+ * will be printed out in chat when the player loads into a world <br>
+ * Inputs are saved and loaded to/from file via the
+ * {@linkplain ContainerSerialiser}
  * 
  * @author ScribbleLP
  *
  */
 public class InputContainer {
-	
-	private boolean playback = false;
 
-	private boolean recording = false;
+	/**
+	 * The current state of the container.
+	 */
+	private TASstate state = TASstate.NONE;
 
 	/**
 	 * The current index of the inputs
@@ -60,9 +65,9 @@ public class InputContainer {
 	/**
 	 * The place where all inputs get stored
 	 */
-	private BigArrayList<TickInputContainer> inputs = new BigArrayList(directory + File.separator + "temp");
-	
-	public DesyncMonitoring dMonitor= new DesyncMonitoring();
+	private BigArrayList<TickInputContainer> inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
+
+	public DesyncMonitoring dMonitor = new DesyncMonitoring();
 
 	// =====================================================================================================
 
@@ -77,102 +82,219 @@ public class InputContainer {
 	private String startLocation = "";
 
 	// =====================================================================================================
-	// Main methods for starting/stopping the recording, come with their own error messages
-	
+
+	/**
+	 * Starts or stops a recording/playback
+	 * 
+	 * @param stateIn stateIn The desired state of the container
+	 * @return
+	 */
+	public String setTASState(TASstate stateIn) {
+		return setTASState(stateIn, true);
+	}
+
+	/**
+	 * Starts or stops a recording/playback
+	 * 
+	 * @param stateIn The desired state of the container
+	 * @param verbose Whether the output should be printed in the chat
+	 * @return The message printed in the chat
+	 */
+	public String setTASState(TASstate stateIn, boolean verbose) {
+		if (state == stateIn) {
+			switch (stateIn) {
+			case PLAYBACK:
+				return verbose ? TextFormatting.RED + "A playback is already running" : "";
+			case RECORDING:
+				return verbose ? TextFormatting.RED + "A recording is already running" : "";
+			case NONE:
+				return verbose ? TextFormatting.RED + "Nothing is running" : "";
+			}
+
+		} else if (state == TASstate.NONE) { // If the container is currently doing nothing
+			switch (stateIn) {
+			case PLAYBACK:
+				if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
+					try {
+						tpPlayer(startLocation); // TODO #99 Make this a secondary command
+					} catch (NumberFormatException e) {
+						state = TASstate.NONE;
+						e.printStackTrace();
+						return verbose ? TextFormatting.RED + "An error occured while reading the start location of the TAS. The file might be broken" : "";
+					}
+				}
+				index = 0;
+				state = TASstate.PLAYBACK;
+				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
+			case RECORDING:
+				if (Minecraft.getMinecraft().player != null) {
+					startLocation = getStartLocation(Minecraft.getMinecraft().player);
+				}
+				state = TASstate.RECORDING;
+				return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
+			case NONE:
+				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: None)";
+			}
+		} else if (state == TASstate.RECORDING) { // If the container is currently recording
+			switch (stateIn) {
+			case PLAYBACK:
+				return verbose ? TextFormatting.RED + "A recording is currently running. Please stop the recording first before starting a playback" : "";
+			case RECORDING:
+				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Recording)";
+			case NONE:
+				ClientProxy.virtual.unpressEverything();
+				state = TASstate.NONE;
+				return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
+			}
+		} else if (state == TASstate.PLAYBACK) { // If the container is currently playing back
+			switch (stateIn) {
+			case PLAYBACK:
+				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Playback)";
+			case RECORDING:
+				return verbose ? TextFormatting.RED + "A playback is currently running. Please stop the playback first before starting a recording" : "";
+			case NONE:
+				ClientProxy.virtual.unpressEverything();
+				state = TASstate.NONE;
+				return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";
+			}
+		}
+		return "Something went wrong ._.";
+	}
+
 	public boolean isPlayingback() {
-		return playback;
+		return state == TASstate.PLAYBACK;
 	}
 
 	public boolean isRecording() {
-		return recording;
+		return state == TASstate.RECORDING;
 	}
-	
+
+	public boolean isNothingPlaying() {
+		return state == TASstate.NONE;
+	}
+
+	public TASstate getState() {
+		return state;
+	}
+
+	@Deprecated
+	public String setRecording(boolean enabled) {
+		return setRecording(enabled, true);
+	}
+
 	/**
 	 * Starts/Stops a recording
+	 * 
 	 * @param enabled If true: starts a recording, else stops a running recording
 	 * @return Chat message depending on the state
 	 */
-	public String setRecording(boolean enabled) {
-		if (playback)
-			return TextFormatting.RED + "A playback is already running";
-		recording = enabled;
-		if (recording) {
-			if (Minecraft.getMinecraft().player != null) {
-				startLocation = getStartLocation(Minecraft.getMinecraft().player);
-			}
-			return TextFormatting.GREEN + "Starting the recording";
-		} else {
-			return TextFormatting.GREEN + "Stopping the recording";
+	@Deprecated
+	public String setRecording(boolean enabled, boolean verbose) {
+		if (state == TASstate.PLAYBACK) {
+			return verbose ? TextFormatting.RED + "A playback is already running" : "";
 		}
+		if (enabled) {
+			state = TASstate.RECORDING;
+		} else {
+			state = TASstate.NONE;
+		}
+
+		if (state == TASstate.RECORDING) {
+			if (Minecraft.getMinecraft().player != null) {
+				startLocation = getStartLocation(Minecraft.getMinecraft().player); // TODO #99 Make this a secondary command
+			}
+			return verbose ? TextFormatting.GREEN + "Starting the recording" : "";
+		} else if (state == TASstate.NONE) {
+			return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
+		}
+		return "";
+	}
+
+	@Deprecated
+	public String setPlayback(boolean enabled) {
+		return setPlayback(enabled, true);
 	}
 
 	/**
 	 * Starts/Stops a playback
+	 * 
 	 * @param enabled If true: start a playback, else aborts a running playback
 	 * @return Chat message depending on the state
 	 */
-	public String setPlayback(boolean enabled) {
-		if (recording)
-			return TextFormatting.RED + "A recording is already running";
-		playback = enabled;
-		if (playback) {
+	@Deprecated
+	public String setPlayback(boolean enabled, boolean verbose) {
+		if (state == TASstate.RECORDING)
+			return verbose ? TextFormatting.RED + "A recording is already running" : "";
+		if (enabled) {
+			state = TASstate.PLAYBACK;
+		} else {
+			state = TASstate.NONE;
+		}
+		if (state == TASstate.PLAYBACK) {
 			if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
 				try {
-				tpPlayer(startLocation);
+					tpPlayer(startLocation);
 				} catch (NumberFormatException e) {
-					playback=false;
+					state = TASstate.NONE;
 					e.printStackTrace();
-					return TextFormatting.RED + "An error occured while reading the start location of the TAS. The file might be broken";
+					return verbose ? TextFormatting.RED + "An error occured while reading the start location of the TAS. The file might be broken" : "";
 				}
 			}
 			index = 0;
-			return TextFormatting.GREEN + "Starting playback";
+			return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 		} else {
-			return TextFormatting.GREEN + "Aborting playback";
+			return verbose ? TextFormatting.GREEN + "Aborting playback" : "";
 		}
 	}
 
 	// =====================================================================================================
 	// Methods to update the temporary variables of the container.
-	// These act as an input and output, depending if a recording or a playback is running
-	
+	// These act as an input and output, depending if a recording or a playback is
+	// running
+
 	/**
-	 * Adds or retrives a keyboard to the input container, depends on whether a recording or a playback is running
+	 * Adds or retrives a keyboard to the input container, depends on whether a
+	 * recording or a playback is running
+	 * 
 	 * @param keyboard Keyboard to add
 	 * @return Keyboard to retrieve
 	 */
 	public VirtualKeyboard addKeyboardToContainer(VirtualKeyboard keyboard) {
-		if (recording) {
+		if (state == TASstate.RECORDING) {
 			this.keyboard = keyboard.clone();
-		} else if (playback) {
+		} else if (state == TASstate.PLAYBACK) {
 			keyboard = this.keyboard.clone();
 		}
 		return keyboard;
 	}
 
 	/**
-	 * Adds or retrives a mouse to the input container, depends on whether a recording or a playback is running
+	 * Adds or retrives a mouse to the input container, depends on whether a
+	 * recording or a playback is running
+	 * 
 	 * @param mouse Mouse to add
 	 * @return Mouse to retrieve
 	 */
 	public VirtualMouse addMouseToContainer(VirtualMouse mouse) {
-		if (recording) {
+		if (state == TASstate.RECORDING) {
 			this.mouse = mouse.clone();
-		} else if (playback) {
+		} else if (state == TASstate.PLAYBACK) {
 			mouse = this.mouse.clone();
 		}
 		return mouse;
 	}
 
 	/**
-	 * Adds or retrives the angle of the camera to the input container, depends on whether a recording or a playback is running
+	 * Adds or retrives the angle of the camera to the input container, depends on
+	 * whether a recording or a playback is running
+	 * 
 	 * @param subticks Subticks to add
 	 * @return Subticks to retrieve
 	 */
 	public VirtualSubticks addSubticksToContainer(VirtualSubticks subticks) {
-		if (recording) {
+		if (state == TASstate.RECORDING) {
 			this.subticks = subticks.clone();
-		} else if (playback) {
+		} else if (state == TASstate.PLAYBACK) {
 			subticks = this.subticks.clone();
 		}
 		return subticks;
@@ -181,41 +303,48 @@ public class InputContainer {
 	/**
 	 * Updates the input container.<br>
 	 * <br>
-	 * During a recording this adds the {@linkplain #keyboard}, {@linkplain #mouse} and {@linkplain #subticks} to {@linkplain #inputs} and increases the {@linkplain #index}.<br>
+	 * During a recording this adds the {@linkplain #keyboard}, {@linkplain #mouse}
+	 * and {@linkplain #subticks} to {@linkplain #inputs} and increases the
+	 * {@linkplain #index}.<br>
 	 * <br>
-	 * During playback the opposite is happening, getting the inputs from {@linkplain #inputs} and temporarily storing them in {@linkplain #keyboard}, {@linkplain #mouse} and {@linkplain #subticks}.<br>
+	 * During playback the opposite is happening, getting the inputs from
+	 * {@linkplain #inputs} and temporarily storing them in {@linkplain #keyboard},
+	 * {@linkplain #mouse} and {@linkplain #subticks}.<br>
 	 * <br>
-	 * Then in {@linkplain VirtualInput}, {@linkplain #keyboard}, {@linkplain #mouse} and {@linkplain #subticks} are retrieved and emulated as the next inputs
+	 * Then in {@linkplain VirtualInput}, {@linkplain #keyboard},
+	 * {@linkplain #mouse} and {@linkplain #subticks} are retrieved and emulated as
+	 * the next inputs
 	 */
 	public void nextTick() {
-		if (recording) {
+		if (state == TASstate.RECORDING) {
 			index++;
 			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
-			dMonitor.capturePosition();		//Capturing the current position of the player
-		} else if (playback) {
-			if(!Display.isActive()) {		//Stops the playback when you tab out of minecraft, for once as a failsafe, secondly as potential exploit protection
-				setPlayback(false);
+			dMonitor.capturePosition(); // Capturing the current position of the player
+		} else if (state == TASstate.PLAYBACK) {
+			if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe,
+										// secondly as potential exploit protection
+				setTASState(TASstate.NONE);
 			}
 			index++;
-			if (index == inputs.size()) {	//When the last input is supposed to occur
+			if (index == inputs.size()) { // When the last input is supposed to occur
 				this.keyboard = new VirtualKeyboard();
 				this.mouse = new VirtualMouse();
 			} else if (index > inputs.size()) {
-				setPlayback(false);
+				CommonProxy.NETWORK.sendToServer(new SyncStatePacket(TASstate.NONE));
 //				TickrateChangerServer.changeServerTickrate(0);	//Tickrate 0 once the playback is done
 //				TickrateChangerServer.changeClientTickrate(0);
 				index--;
 			} else {
 				TickInputContainer tickcontainer = inputs.get(index);
-				this.keyboard = tickcontainer.getKeyboard();
-				this.mouse = tickcontainer.getMouse();
-				this.subticks = tickcontainer.getSubticks();
+				this.keyboard = tickcontainer.getKeyboard().clone();
+				this.mouse = tickcontainer.getMouse().clone();
+				this.subticks = tickcontainer.getSubticks().clone();
 			}
 		}
 	}
 	// =====================================================================================================
 	// Methods to manipulate inputs
-	
+
 	public int size() {
 		return (int) inputs.size();
 	}
@@ -234,7 +363,7 @@ public class InputContainer {
 
 	public void setIndex(int index) {
 		this.index = index;
-		if (playback) {
+		if (state == TASstate.PLAYBACK) {
 			TickInputContainer tickcontainer = inputs.get(index);
 			this.keyboard = tickcontainer.getKeyboard();
 			this.mouse = tickcontainer.getMouse();
@@ -257,7 +386,7 @@ public class InputContainer {
 		index = 0;
 		dMonitor.getPos().clear();
 	}
-	
+
 	/**
 	 * Used for serializing the input container
 	 */
@@ -275,7 +404,7 @@ public class InputContainer {
 
 	// =====================================================================================================
 	// Methods to set and retrieve author, title etc
-	
+
 	public String getAuthors() {
 		return authors;
 	}
@@ -320,7 +449,7 @@ public class InputContainer {
 
 	// =====================================================================================================
 	// Methods and classes related to the start location of a TAS
-	
+
 	/**
 	 * @return The start location of the TAS
 	 */
@@ -330,6 +459,7 @@ public class InputContainer {
 
 	/**
 	 * Updates the start location of the input container
+	 * 
 	 * @param startLocation The start location of the TAS
 	 */
 	public void setStartLocation(String startLocation) {
@@ -338,6 +468,7 @@ public class InputContainer {
 
 	/**
 	 * Generates a start location from the players position and angle
+	 * 
 	 * @param player The player of the TAS
 	 * @return The start location from the player
 	 */
@@ -350,32 +481,32 @@ public class InputContainer {
 
 	/**
 	 * Teleports the player to the start location
-	 * @param startLocation The start location where the player should be teleported to
+	 * 
+	 * @param startLocation The start location where the player should be teleported
+	 *                      to
 	 * @throws NumberFormatException If the location can't be parsed
 	 */
-	private void tpPlayer(String startLocation) throws NumberFormatException{
+	private void tpPlayer(String startLocation) throws NumberFormatException {
 		String[] section = startLocation.split(",");
-		double x=Double.parseDouble(section[0]);
-		double y=Double.parseDouble(section[1]);
-		double z=Double.parseDouble(section[2]);
-		
-		float angleYaw=Float.parseFloat(section[3]);
-		float anglePitch=Float.parseFloat(section[4]);
-		
-		EntityPlayerSP player=Minecraft.getMinecraft().player;
+		double x = Double.parseDouble(section[0]);
+		double y = Double.parseDouble(section[1]);
+		double z = Double.parseDouble(section[2]);
+
+		float angleYaw = Float.parseFloat(section[3]);
+		float anglePitch = Float.parseFloat(section[4]);
 
 		CommonProxy.NETWORK.sendToServer(new TeleportPlayerPacket(x, y, z, angleYaw, anglePitch));
 	}
-	
+
 	public static class TeleportPlayerPacket implements IMessage {
-		
+
 		double x;
 		double y;
 		double z;
-		
+
 		float angleYaw;
 		float anglePitch;
-		
+
 		public TeleportPlayerPacket(double x, double y, double z, float angleYaw, float anglePitch) {
 			this.x = x;
 			this.y = y;
@@ -383,11 +514,10 @@ public class InputContainer {
 			this.angleYaw = angleYaw;
 			this.anglePitch = anglePitch;
 		}
-		
+
 		public TeleportPlayerPacket() {
 		}
-		
-		
+
 		@Override
 		public void fromBytes(ByteBuf buf) {
 			this.x = buf.readDouble();
@@ -402,36 +532,44 @@ public class InputContainer {
 			buf.writeDouble(x);
 			buf.writeDouble(y);
 			buf.writeDouble(z);
-			
+
 			buf.writeFloat(angleYaw);
 			buf.writeFloat(anglePitch);
 		}
-		
+
 	}
-	
+
 	/**
 	 * Permissionless player teleporting packet
 	 * 
 	 * @author ScribbleLP
 	 *
 	 */
-	public static class TeleportPlayerPacketHandler implements IMessageHandler<TeleportPlayerPacket, IMessage>{
+	public static class TeleportPlayerPacketHandler implements IMessageHandler<TeleportPlayerPacket, IMessage> {
 
 		@Override
 		public IMessage onMessage(TeleportPlayerPacket message, MessageContext ctx) {
-			if(ctx.side.isServer()) {
-				net.minecraft.entity.player.EntityPlayerMP player=ctx.getServerHandler().player;
-				ctx.getServerHandler().player.getServerWorld().addScheduledTask(()->{
-					player.rotationPitch=message.anglePitch;
-					player.rotationYaw=message.angleYaw;
-					
+			if (ctx.side.isServer()) {
+				net.minecraft.entity.player.EntityPlayerMP player = ctx.getServerHandler().player;
+				ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
+					player.rotationPitch = message.anglePitch;
+					player.rotationYaw = message.angleYaw;
+
 					player.setPositionAndUpdate(message.x, message.y, message.z);
 				});
 			}
 			return null;
 		}
-		
+
 	}
-	
-	//==============================================================
+
+	// ==============================================================
+
+	/**
+	 * Clears {@link #keyboard} and {@link #mouse}
+	 */
+	public void unpressContainer() {
+		keyboard.clear();
+		mouse.clear();
+	}
 }

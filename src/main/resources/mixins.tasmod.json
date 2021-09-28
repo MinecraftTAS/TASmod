@@ -14,30 +14,12 @@
         "savestates.MixinChunkProviderServer",
         "savestates.MixinEntityPlayerMP",
         
-        //Fixing forge stuff
-        "MixinDragonFightManager",
+        //Events
+        "events.MixinPlayerList",
         
-        //KillTheRNG
-        "killtherng.MixinUUIDFix",
-        "killtherng.redirect.RedirectBlockCrops",
-    	"killtherng.redirect.RedirectBlockDispenser",
-    	"killtherng.redirect.RedirectBlockLeaves",
-    	"killtherng.redirect.RedirectBlockNetherWart",
-    	"killtherng.redirect.RedirectBlockOre",
-    	"killtherng.redirect.RedirectCommandSpreadPlayers",
-    	"killtherng.redirect.RedirectCommandWeather",
-    	"killtherng.redirect.RedirectContainerEnchantment",
-    	"killtherng.redirect.RedirectEntityRandom",
-    	"killtherng.redirect.RedirectEntityMinecartContainer",
-    	"killtherng.redirect.RedirectEntityLivingRandom",
-    	"killtherng.redirect.RedirectTeleportToTeam",
-    	"killtherng.redirect.RedirectTileEntityLockableLoot",
-    	"killtherng.redirect.RedirectDragonFightManager",
-    	"killtherng.redirect.RedirectMapGenStronghold",
-    	"killtherng.redirect.RedirectMapGenStructure",
-    	"killtherng.redirect.RedirectExplosion",
-    	"killtherng.redirect.RedirectWorld",
-    	"killtherng.redirect.RedirectDragonSpawnManager"
+        //Fixing forge stuff
+        "MixinDragonFightManager"
+        
     ],
     "client": [
         //General
@@ -57,11 +39,8 @@
 		"MixinTextfield",
 		
 		//Join and leave game event on the client
-		"MixinNetHandlerPlayClient",
-		"MixinWorldClient",
-		
-		//KillTheRNG
-		"killtherng.MixinMainMenu",
+		"events.MixinNetHandlerPlayClient",
+		"events.MixinWorldClient",
 		
 		//Playbackhooks
 		"playbackhooks.MixinGameSettings",
@@ -73,6 +52,10 @@
 		"playbackhooks.MixinGuiScreenAdvancements",
 		"playbackhooks.MixinGuiSlot",
 		"playbackhooks.MixinGuiStats",
-		"playbackhooks.MixinKeyBinding"
+		"playbackhooks.MixinKeyBinding",
+		
+		//Shields
+		"shields.MixinRenderItem",
+		"shields.MixinTileEntityItemStackRenderer"
 	]
 }

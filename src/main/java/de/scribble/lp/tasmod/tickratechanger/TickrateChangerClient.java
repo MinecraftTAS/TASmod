@@ -1,11 +1,10 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
-import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
+import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
+import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiControls;
-import net.minecraft.client.gui.GuiKeyBindingList;
 
 public class TickrateChangerClient {
 	public static float TICKS_PER_SECOND=20f;
@@ -50,8 +49,7 @@ public class TickrateChangerClient {
     	if(Minecraft.getMinecraft().currentScreen instanceof GuiControls) {
     		if(TICKS_PER_SECOND==0&&WASZERO==false) {
     			changeClientTickrate(20);
-    			ClientProxy.virtual.getContainer().setPlayback(false);
-    			ClientProxy.virtual.getContainer().setRecording(false);
+    			CommonProxy.NETWORK.sendToServer(new SyncStatePacket(TASstate.NONE));
     			WASZERO=true;
     		}
     		return;
@@ -59,11 +57,6 @@ public class TickrateChangerClient {
     	if(WASZERO==true) {
 			changeClientTickrate(0);
 			WASZERO=false;
-		}
-		if (VirtualKeybindings.isKeyDown(ClientProxy.tickratezeroKey)) {
-			pauseUnpauseGame();
-		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickAdvance)) {
-			advanceTick();
 		}
     }
 

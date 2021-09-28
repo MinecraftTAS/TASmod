@@ -16,12 +16,16 @@ jobs:
         java-version: '8'
         distribution: 'adopt'
         architecture: x64
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+    - name: Prepare folders
+      run: mkdir -p gradle/wrapper
+    - name: Download gradle properties
+      run: wget -P gradle/wrapper https://mgnet.work/.web_ram/gradle-wrapper.properties
+    - name: Obtain gradle
+      run: wget -P gradle/wrapper https://mgnet.work/.web_ram/gradle-wrapper.jar
     - name: Build TASmod with Gradle
-      run: ./gradlew shadowJar --no-daemon
+      run: java -cp gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain shadowJar --no-daemon
     - run: find . -type f ! -name "*forge.jar" -delete
     - uses: actions/upload-artifact@v2
       with:
-        name: Package
+        name: TASmod-Dev-Build
         path: build/libs

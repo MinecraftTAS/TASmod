@@ -3,6 +3,7 @@ package de.scribble.lp.tasmod.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,18 +11,15 @@ import org.apache.commons.io.FileUtils;
 
 import com.dselent.bigarraylist.BigArrayList;
 
-import de.pfannekuchen.killtherng.utils.EntityRandom;
-import de.pfannekuchen.killtherng.utils.ItemRandom;
+import de.scribble.lp.tasmod.commands.savetas.FileThread;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
-import de.scribble.lp.tasmod.savetas.FileThread;
 import de.scribble.lp.tasmod.virtual.VirtualKey;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
 import de.scribble.lp.tasmod.virtual.VirtualMouse.PathNode;
 import de.scribble.lp.tasmod.virtual.VirtualSubticks;
-import net.minecraft.client.Minecraft;
 
 /**
  * Saves a given {@linkplain InputContainer} to a file. Is also able to read an input container from a file. <br>
@@ -55,7 +53,6 @@ public class ContainerSerialiser {
 	 * @throws IOException When the input container is empty
 	 */
 	public void saveToFileV1Until(File file, InputContainer container, int index) throws IOException{
-		
 		if (container.size() == 0) {
 			throw new IOException("There are no inputs to save to a file");
 		}
@@ -81,8 +78,6 @@ public class ContainerSerialiser {
 				 + "#Rerecords:"+container.getRerecords() + "\n"
 				 + "#																											#\n"
 				 + "#----------------------------------------------- Settings --------------------------------------------------#\n"
-				 + "#Entity Seed:" + EntityRandom.currentSeed.get() + "\n"
-				 + "#Item Seed:" + ItemRandom.currentSeed.get() + "\n"
 				 + "#StartPosition:"+container.getStartLocation()+"\n"
 				 + "#############################################################################################################\n");
 		
@@ -118,14 +113,14 @@ public class ContainerSerialiser {
 
 	public InputContainer fromEntireFileV1(File file) throws IOException {
 
-		List<String> lines = FileUtils.readLines(file, Charset.defaultCharset());
+		List<String> lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
 		
 		File monitorFile=new File(file, "../"+file.getName().replace(".tas", "")+".mon");
 		
 		List<String> monitorLines=null;
 		
 		if(monitorFile.exists()) {
-			monitorLines = FileUtils.readLines(monitorFile, Charset.defaultCharset());
+			monitorLines = FileUtils.readLines(monitorFile, StandardCharsets.UTF_8);
 		}
 
 		InputContainer container = new InputContainer();
@@ -145,6 +140,7 @@ public class ContainerSerialiser {
 		int linenumber = 0;
 		for (String line : lines) {
 			linenumber++;
+			//Read out the data
 			if (line.startsWith("#")) {
 				if (line.startsWith("#Author:")) {
 					author = line.split(":")[1];
@@ -263,7 +259,7 @@ public class ContainerSerialiser {
 				} else {
 					vkey = mouse.get(button);
 				}
-				if (mouse.get(button) == null) {
+				if (vkey == null) {
 					throw new IOException(button + " is not a recognised mouse key in line " + linenumber);
 				}
 				mouse.get(button).setPressed(true);
@@ -326,16 +322,16 @@ public class ContainerSerialiser {
 		return new VirtualSubticks(x, y);
 	}
 
-	private String getStartLocation() {
-		Minecraft mc = Minecraft.getMinecraft();
-		String pos = mc.player.getPositionVector().toString();
-		pos = pos.replace("(", "");
-		pos = pos.replace(")", "");
-		pos = pos.replace(" ", "");
-		String pitch = Float.toString(mc.player.rotationPitch);
-		String yaw = Float.toString(mc.player.rotationYaw);
-		return pos + "," + yaw + "," + pitch;
-	}
+//	private String getStartLocation() {
+//		Minecraft mc = Minecraft.getMinecraft();
+//		String pos = mc.player.getPositionVector().toString();
+//		pos = pos.replace("(", "");
+//		pos = pos.replace(")", "");
+//		pos = pos.replace(" ", "");
+//		String pitch = Float.toString(mc.player.rotationPitch);
+//		String yaw = Float.toString(mc.player.rotationYaw);
+//		return pos + "," + yaw + "," + pitch;
+//	}
 	
 	private boolean isNumeric(String in){
 		try {

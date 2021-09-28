@@ -11,6 +11,11 @@ import com.google.common.collect.Maps;
 
 public class VirtualMouse implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5389661329436686190L;
+
 	private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
 
 	private int scrollwheel = 0;
@@ -198,6 +203,11 @@ public class VirtualMouse implements Serializable {
 	}
 
 	public class PathNode implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2221602955260299028L;
+
 		private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
 
 		public int scrollwheel = 0;

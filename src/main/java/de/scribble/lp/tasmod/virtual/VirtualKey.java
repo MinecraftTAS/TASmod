@@ -10,6 +10,10 @@ import java.io.Serializable;
  */
 public class VirtualKey implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2186369910433056224L;
 	private String name;
 	private int keycode;
 	private boolean isKeyDown=false;

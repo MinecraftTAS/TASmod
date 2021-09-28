@@ -1,16 +1,15 @@
 package de.scribble.lp.tasmod;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
 
 import org.lwjgl.input.Keyboard;
 
-import de.pfannekuchen.infogui.gui.SettingsGui;
+import de.pfannekuchen.infogui.gui.InfoHud;
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
-import de.scribble.lp.tasmod.savestates.server.SavestateEvents;
-import de.scribble.lp.tasmod.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.commands.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
+import de.scribble.lp.tasmod.shield.ShieldDownloader;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -36,8 +35,6 @@ public class ClientProxy extends CommonProxy {
 
 	public static KeyBinding tickAdvance = new KeyBinding("Advance Tick", Keyboard.KEY_F9, "TASmod");
 
-	public static KeyBinding showNextLocation = new KeyBinding("Show Next Location", Keyboard.KEY_O, "TASmod");
-
 	public static KeyBinding stopkey = new KeyBinding("Recording/Playback Stop", Keyboard.KEY_F10, "TASmod");
 
 	public static KeyBinding savestateSaveKey = new KeyBinding("Create Savestate", Keyboard.KEY_J, "TASmod");
@@ -47,6 +44,8 @@ public class ClientProxy extends CommonProxy {
 	public static KeyBinding testingKey = new KeyBinding("Various Testing", Keyboard.KEY_F12, "TASmod");
 
 	public static KeyBinding infoGuiKey = new KeyBinding("Open InfoGui Editor", Keyboard.KEY_F6, "TASmod");
+	
+	public static KeyBinding bufferViewKey = new KeyBinding("Buffer View", Keyboard.KEY_NUMPAD0, "TASmod");
 
 	public static VirtualInput virtual = new VirtualInput();
 
@@ -56,6 +55,10 @@ public class ClientProxy extends CommonProxy {
 
 	public static final String savestatedirectory = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "savestates";
 
+	public static InfoHud hud;
+	
+	public static ShieldDownloader shieldDownloader;
+	
 	public void preInit(FMLPreInitializationEvent ev) {
 		isDevEnvironment = (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 		playbackTutorial = new TutorialHandler((short) 1);
@@ -67,112 +70,38 @@ public class ClientProxy extends CommonProxy {
 	}
 
 	public void init(FMLInitializationEvent ev) {
-		try {
-			SettingsGui.load(); // This goes first.. muhahahahaha
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						SettingsGui.save();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}));
-		} catch (IOException e) {
-			SettingsGui.p = new Properties();
-			SettingsGui.p.setProperty("XYZ_visible", "true");
-			SettingsGui.p.setProperty("XYZPRECISE_visible", "false");
-			SettingsGui.p.setProperty("CXZ_visible", "false");
-			SettingsGui.p.setProperty("WORLDSEED_visible", "false");
-			SettingsGui.p.setProperty("RNGSEEDS_visible", "false");
-			SettingsGui.p.setProperty("FACING_visible", "false");
-			SettingsGui.p.setProperty("TICKS_visible", "false");
-			SettingsGui.p.setProperty("TICKRATE_visible", "false");
-			SettingsGui.p.setProperty("SAVESTATECOUNT_visible", "false");
-			SettingsGui.p.setProperty("PREDICTEDXYZ_visible", "false");
-			SettingsGui.p.setProperty("MOUSEPOS_visible", "false");
-			SettingsGui.p.setProperty("TRAJECTORIES_visible", "false");
-			SettingsGui.p.setProperty("VELOCITY_visible", "false");
-			SettingsGui.p.setProperty("DESYNC_visible", "false");
-
-			SettingsGui.p.setProperty("XYZ_x", "0");
-			SettingsGui.p.setProperty("XYZPRECISE_x", "0");
-			SettingsGui.p.setProperty("CXZ_x", "0");
-			SettingsGui.p.setProperty("WORLDSEED_x", "0");
-			SettingsGui.p.setProperty("RNGSEEDS_x", "0");
-			SettingsGui.p.setProperty("FACING_x", "0");
-			SettingsGui.p.setProperty("TICKS_x", "0");
-			SettingsGui.p.setProperty("TICKRATE_x", "0");
-			SettingsGui.p.setProperty("SAVESTATECOUNT_x", "0");
-			SettingsGui.p.setProperty("PREDICTEDXYZ_x", "0");
-			SettingsGui.p.setProperty("MOUSEPOS_x", "0");
-			SettingsGui.p.setProperty("TRAJECTORIES_x", "0");
-			SettingsGui.p.setProperty("VELOCITY_x", "0");
-			SettingsGui.p.setProperty("DESYNC_x", "0");
-
-			SettingsGui.p.setProperty("XYZ_y", "0");
-			SettingsGui.p.setProperty("XYZPRECISE_y", "0");
-			SettingsGui.p.setProperty("CXZ_y", "0");
-			SettingsGui.p.setProperty("WORLDSEED_y", "0");
-			SettingsGui.p.setProperty("RNGSEEDS_y", "0");
-			SettingsGui.p.setProperty("FACING_y", "0");
-			SettingsGui.p.setProperty("TICKS_y", "0");
-			SettingsGui.p.setProperty("TICKRATE_y", "0");
-			SettingsGui.p.setProperty("SAVESTATECOUNT_y", "0");
-			SettingsGui.p.setProperty("PREDICTEDXYZ_y", "0");
-			SettingsGui.p.setProperty("MOUSEPOS_y", "0");
-			SettingsGui.p.setProperty("TRAJECTORIES_y", "0");
-			SettingsGui.p.setProperty("VELOCITY_y", "0");
-			SettingsGui.p.setProperty("DESYNC_y", "0");
-			
-			SettingsGui.p.setProperty("XYZ_hideRect", "false");
-			SettingsGui.p.setProperty("XYZPRECISE_hideRect", "false");
-			SettingsGui.p.setProperty("CXZ_hideRect", "false");
-			SettingsGui.p.setProperty("WORLDSEED_hideRect", "false");
-			SettingsGui.p.setProperty("RNGSEEDS_hideRect", "false");
-			SettingsGui.p.setProperty("FACING_hideRect", "false");
-			SettingsGui.p.setProperty("TICKS_hideRect", "false");
-			SettingsGui.p.setProperty("TICKRATE_hideRect", "false");
-			SettingsGui.p.setProperty("SAVESTATECOUNT_hideRect", "false");
-			SettingsGui.p.setProperty("PREDICTEDXYZ_hideRect", "false");
-			SettingsGui.p.setProperty("MOUSEPOS_hideRect", "false");
-			SettingsGui.p.setProperty("TRAJECTORIES_hideRect", "false");
-			SettingsGui.p.setProperty("VELOCITY_hideRect", "false");
-			SettingsGui.p.setProperty("DESYNC_hideRect", "false");
-
-			try {
-				SettingsGui.save();
-			} catch (IOException e420) {
-				e420.printStackTrace();
-			}
-		}
+		hud = new InfoHud();
+		shieldDownloader = new ShieldDownloader();
 
 		MinecraftForge.EVENT_BUS.register(new InfoGui());
 		MinecraftForge.EVENT_BUS.register(playbackTutorial);
 		MinecraftForge.EVENT_BUS.register(new AimAssistEvents());
 		MinecraftForge.EVENT_BUS.register(new CameraInterpolationEvents());
-
-		MinecraftForge.EVENT_BUS.register(new SavestateEvents());
+		
+		//It pains me to do this ._.
+		MinecraftForge.EVENT_BUS.register(new PlayerJoinLeaveEvents());
 
 		ClientRegistry.registerKeyBinding(tickratezeroKey);
 		ClientRegistry.registerKeyBinding(tickAdvance);
 		ClientRegistry.registerKeyBinding(stopkey);
-		ClientRegistry.registerKeyBinding(showNextLocation);
 		ClientRegistry.registerKeyBinding(savestateSaveKey);
 		ClientRegistry.registerKeyBinding(savestateLoadKey);
 		ClientRegistry.registerKeyBinding(testingKey);
 		ClientRegistry.registerKeyBinding(infoGuiKey);
+		ClientRegistry.registerKeyBinding(bufferViewKey);
 
-		VirtualKeybindings.registerBlockedKeyBinding(infoGuiKey);
+		
 		VirtualKeybindings.registerBlockedKeyBinding(tickratezeroKey);
 		VirtualKeybindings.registerBlockedKeyBinding(tickAdvance);
 		VirtualKeybindings.registerBlockedKeyBinding(stopkey);
+		VirtualKeybindings.registerBlockedKeyBinding(savestateSaveKey);
+		VirtualKeybindings.registerBlockedKeyBinding(savestateLoadKey);
 		VirtualKeybindings.registerBlockedKeyBinding(testingKey);
+		VirtualKeybindings.registerBlockedKeyBinding(infoGuiKey);
+		VirtualKeybindings.registerBlockedKeyBinding(bufferViewKey);
 
-		new File(tasdirectory).mkdir();
-		new File(savestatedirectory).mkdir();
+		createTASDir();
+		createSavestatesDir();
 
 		super.init(ev);
 	}
@@ -183,5 +112,19 @@ public class ClientProxy extends CommonProxy {
 
 	public static TutorialHandler getPlaybackTutorial() {
 		return playbackTutorial;
+	}
+	
+	public static void createTASDir() {
+		File tasDir=new File(tasdirectory);
+		if(!tasDir.exists()) {
+			tasDir.mkdir();
+		}
+	}
+	
+	public static void createSavestatesDir() {
+		File savestateDir=new File(savestatedirectory);
+		if(!savestateDir.exists()) {
+			savestateDir.mkdir();
+		}
 	}
 }

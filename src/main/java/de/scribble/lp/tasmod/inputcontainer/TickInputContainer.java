@@ -8,6 +8,8 @@ import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 
 public class TickInputContainer implements Serializable {
 
+	private static final long serialVersionUID = -3420565284438152474L;
+
 	private int tick;
 
 	private VirtualKeyboard keyboard;

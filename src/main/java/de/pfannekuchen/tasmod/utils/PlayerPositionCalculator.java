@@ -2,6 +2,8 @@ package de.pfannekuchen.tasmod.utils;
 
 import java.util.List;
 
+import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
+import de.scribble.lp.tasmod.ClientProxy;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -27,9 +29,9 @@ public class PlayerPositionCalculator {
 		bb = source.getEntityBoundingBox();
 		float f6 = 0.91F;
 
-		float strafe = mc.gameSettings.keyBindForward.isKeyDown() ? .98f : mc.gameSettings.keyBindBack.isKeyDown() ? -.98f : 0f;
+		float forward = ClientProxy.virtual.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode()) ? .98f : ClientProxy.virtual.isKeyDown(mc.gameSettings.keyBindBack.getKeyCode()) ? -.98f : 0f;
 		float up = source.moveVertical;
-		float forward = mc.gameSettings.keyBindLeft.isKeyDown() ? .98f : mc.gameSettings.keyBindRight.isKeyDown() ? -.98f : 0f;
+		float strafe = ClientProxy.virtual.isKeyDown(mc.gameSettings.keyBindLeft.getKeyCode()) ? .98f : ClientProxy.virtual.isKeyDown(mc.gameSettings.keyBindRight.getKeyCode()) ? -.98f : 0f;
 		
 		double motionX = source.motionX;
 		double motionY = source.motionY;
@@ -53,8 +55,8 @@ public class PlayerPositionCalculator {
 			strafe = strafe * f;
 			up = up * f;
 			forward = forward * f;
-			float f1 = MathHelper.sin(source.rotationYaw * 0.017453292F);
-			float f2 = MathHelper.cos(source.rotationYaw * 0.017453292F);
+			float f1 = MathHelper.sin((CameraInterpolationEvents.rotationYaw + 180f) * 0.017453292F);
+			float f2 = MathHelper.cos((CameraInterpolationEvents.rotationYaw + 180f) * 0.017453292F);
 			motionX += (double) (strafe * f2 - forward * f1);
 			motionY += (double) up;
 			motionZ += (double) (forward * f2 + strafe * f1);
@@ -314,9 +316,6 @@ public class PlayerPositionCalculator {
         }
         
 
-        float rotationYaw = source.prevRotationYawHead;
-        float rotationPitch = source.rotationPitch;
-        
         float partialTicks = Minecraft.getMinecraft().timer.renderPartialTicks;
         if (partialTicks == 1.0F)
         {
@@ -334,12 +333,12 @@ public class PlayerPositionCalculator {
         
         if (partialTicks == 1.0F)
         {
-            vec3d1 = source.getVectorForRotation(rotationPitch, rotationYaw);
+            vec3d1 = source.getVectorForRotation(CameraInterpolationEvents.rotationPitch, source.rotationYawHead);
         }
         else
         {
-            float f2 = source.rotationPitch;
-            float f1 = source.rotationYaw;
+            float f2 = CameraInterpolationEvents.rotationPitch;
+            float f1 = CameraInterpolationEvents.rotationYaw + 180f;
             vec3d1 = source.getVectorForRotation(f2, f1);
         }
         

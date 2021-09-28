@@ -4,7 +4,6 @@ import org.lwjgl.opengl.Display;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 
-import ca.weblite.objc.Client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.Gui;

@@ -1,6 +1,7 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
 import de.scribble.lp.tasmod.CommonProxy;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
 public class TickrateChangerServer {
@@ -51,4 +52,15 @@ public class TickrateChangerServer {
     		CommonProxy.NETWORK.sendToAll(new TickratePacket(true, 0F, false));
     	}
     }
+    
+    /**
+     * Fired when a player left the server
+     * @param player
+     */
+	public static void leaveServer(EntityPlayerMP player) {
+		//TODO Test this in multiplayer
+		if (TickrateChangerServer.TICKS_PER_SECOND == 0) {
+			TickrateChangerServer.changeServerTickrate(20F);
+		}
+	}
 }

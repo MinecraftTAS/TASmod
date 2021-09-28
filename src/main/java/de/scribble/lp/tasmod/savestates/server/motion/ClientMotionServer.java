@@ -5,7 +5,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.ModLoader;
+import de.scribble.lp.tasmod.TASmod;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ClientMotionServer {
@@ -20,15 +20,19 @@ public class ClientMotionServer {
 		motion.clear();
 		CommonProxy.NETWORK.sendToAll(new RequestMotionPacket());
 
-		int i = 0;
-		while (motion.size() != ModLoader.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
+		int i = 1;
+		while (motion.size() != TASmod.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
 			i++;
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if (i == 3000) {
+			if(i % 30 == 1) {
+				CommonProxy.logger.info("Resending motion packet");
+				CommonProxy.NETWORK.sendToAll(new RequestMotionPacket());
+			}
+			if (i == 1000) {
 				CommonProxy.logger.warn("Client motion timed out!");
 				break;
 			}

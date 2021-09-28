@@ -3,14 +3,12 @@ package de.scribble.lp.tasmod.savestates.server;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.ws.ServiceMode;
-
 import org.apache.commons.io.FileUtils;
 
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.ModLoader;
-import de.scribble.lp.tasmod.savestates.client.ClientSavestateHandler;
-import de.scribble.lp.tasmod.savestates.client.ClientSavestatePacket;
+import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.savestates.client.InputSavestatesHandler;
+import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
 import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
@@ -38,7 +36,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  *
  */
 public class SavestateHandler {
-	private static MinecraftServer server=ModLoader.getServerInstance();
+	private static MinecraftServer server=TASmod.getServerInstance();
 	private static File savestateDirectory;
 	
 	public static boolean isSaving=false;
@@ -72,7 +70,7 @@ public class SavestateHandler {
 		TickrateChangerServer.changeClientTickrate(0);
 		
 		//Update the server variable
-		server=ModLoader.getServerInstance();
+		server=TASmod.getServerInstance();
 		
 		//Get the motion from the client
 		ClientMotionServer.requestMotionFromClient();
@@ -88,7 +86,7 @@ public class SavestateHandler {
 		File targetfolder=getNextSaveFolderLocation(worldname);
 		
 		//Send the name of the world to all players. This will make a savestate of the recording on the client with that name
-		CommonProxy.NETWORK.sendToAll(new ClientSavestatePacket(true, nameWhenSaving(worldname)));
+		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, nameWhenSaving(worldname)));
 		
 		//Wait for the chunkloader to save the game
 		for(WorldServer world:server.worlds) {
@@ -140,7 +138,7 @@ public class SavestateHandler {
 	}
 	
 	/**
-	 * Get's the correct string of the savestate, used in {@linkplain ClientSavestateHandler#savestate(String)}
+	 * Get's the correct string of the savestate, used in {@linkplain InputSavestatesHandler#savestate(String)}
 	 * 
 	 * @param worldname the name of the world currently on the server
 	 * @return The correct name of the next savestate
@@ -191,7 +189,7 @@ public class SavestateHandler {
 		
 		
 		//Update the server instance
-		server=ModLoader.getServerInstance();
+		server=TASmod.getServerInstance();
 		
 		//Get the current and target directory for copying
 		String worldname=server.getFolderName();
@@ -199,7 +197,7 @@ public class SavestateHandler {
 		File targetfolder=getLatestSavestateLocation(worldname);
 		
 		//Load savestate on the client
-		CommonProxy.NETWORK.sendToAll(new ClientSavestatePacket(false, nameWhenLoading(worldname)));
+		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, nameWhenLoading(worldname)));
 		
 		//Disabeling level saving for all worlds in case the auto save kicks in during world unload
 		for(WorldServer world: server.worlds) {
@@ -282,7 +280,7 @@ public class SavestateHandler {
 	}
 	
 	/**
-	 * Get's the correct string of the loadstate, used in {@linkplain ClientSavestateHandler#loadstate(String)}
+	 * Get's the correct string of the loadstate, used in {@linkplain InputSavestatesHandler#loadstate(String)}
 	 * 
 	 * @param worldname the name of the world currently on the server
 	 * @return The correct name of the next loadstate

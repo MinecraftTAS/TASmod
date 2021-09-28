@@ -13,16 +13,14 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import de.pfannekuchen.killtherng.networking.UpdateSeedPacket;
 import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.duck.GuiScreenDuck;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
+import de.scribble.lp.tasmod.events.KeybindingEvents;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
-import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -40,8 +38,12 @@ public abstract class MixinMinecraft {
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void injectRunGameLoop(CallbackInfo ci) {
 		// TASmod
-		VirtualKeybindings.increaseCooldowntimer();
+		KeybindingEvents.fireKeybindingsEvent();
+		
 		TickrateChangerClient.bypass();
+		if(((Minecraft) (Object) this).player!=null) {
+			ClientProxy.hud.tick();
+		}
 		while (Keyboard.next()) {
 			ClientProxy.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
@@ -89,7 +91,6 @@ public abstract class MixinMinecraft {
 	@Inject(method = "runTick", at = @At(value = "HEAD"))
 	public void injectRunTick(CallbackInfo ci) throws IOException {
 		TickSync.incrementClienttickcounter();
-
 		if (SavestatePlayerLoading.wasLoading) {
 			SavestatePlayerLoading.wasLoading = false;
 			SavestateHandler.playerLoadSavestateEventClient();
@@ -201,23 +202,6 @@ public abstract class MixinMinecraft {
 		return ClientProxy.virtual.getEventKeyboardState();
 	}
 
-	// =====================================================================================================================================
-
-	/**
-     * Request a Seed Change for every Key Input
-     * @author Pancake
-     * @param ci Mixin
-     */
-	@Inject(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V"))
-	public void injectRunTickKeyboard2(CallbackInfo ci) {
-		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
-	}
-	
-	@Inject(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
-	public void injectRunTickMouse2(CallbackInfo ci) {
-		CommonProxy.NETWORK.sendToServer(new UpdateSeedPacket());
-	}
-	
 	// =====================================================================================================================================
 	
 	@Inject(method = "runTick", at = @At(value = "RETURN"))
