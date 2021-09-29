@@ -39,10 +39,7 @@ public class SavestateHandler {
 	private static MinecraftServer server=TASmod.getServerInstance();
 	private static File savestateDirectory;
 	
-	public static boolean isSaving=false;
-	
-	public static boolean isLoading=false;
-	public static boolean wasLoading=false;
+	public static SavestateState state=SavestateState.NONE;
 	
 	/**
 	 * Creates a copy of the currently played world and saves it in .minecraft/saves/savestates/worldname <br>
@@ -53,14 +50,14 @@ public class SavestateHandler {
 	 * @throws IOException
 	 */
 	public static void saveState() throws SavestateException, IOException {
-		if(isSaving) {
+		if(state==SavestateState.SAVING) {
 			throw new SavestateException("A savestating operation is already being carried out");
 		}
-		if(isLoading) {
+		if(state==SavestateState.LOADING) {
 			throw new SavestateException("A loadstate operation is being carried out");
 		}
 		//Lock savestating and loadstating
-		isSaving=true;
+		state=SavestateState.SAVING;
 		
 		//Create a directory just in case
 		createSavestateDirectory();
@@ -107,7 +104,7 @@ public class SavestateHandler {
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 		
 		//Unlock savestating
-		isSaving=false;
+		state=SavestateState.NONE;
 	}
 	
 	/**
@@ -121,10 +118,8 @@ public class SavestateHandler {
 		int i = 1;
 		int limit=300;
 		File targetsavefolder=null;
-		isSaving=true;
 		while (i <= limit) {
 			if (i >= limit) {
-				isSaving = false;
 				throw new SavestateException("Savestatecount is greater or equal than "+limit);
 			}
 			targetsavefolder = new File(savestateDirectory,worldname + "-Savestate" + Integer.toString(i)+File.separator);
@@ -171,14 +166,14 @@ public class SavestateHandler {
 	 * @throws IOException
 	 */
 	public static void loadState() throws LoadstateException, IOException {
-		if(isSaving) {
+		if(state==SavestateState.SAVING) {
 			throw new LoadstateException("A savestating operation is already being carried out");
 		}
-		if(isLoading) {
+		if(state==SavestateState.LOADING) {
 			throw new LoadstateException("A loadstate operation is being carried out");
 		}
 		//Lock savestating and loadstating
-		isLoading=true;
+		state=SavestateState.LOADING;
 		
 		//Create a directory just in case
 		createSavestateDirectory();
@@ -246,8 +241,7 @@ public class SavestateHandler {
         }
 		
 		//Unlock loadstating
-		isLoading=false;
-		wasLoading=true;
+		state=SavestateState.WASLOADING;
 	}
 	
 	/**

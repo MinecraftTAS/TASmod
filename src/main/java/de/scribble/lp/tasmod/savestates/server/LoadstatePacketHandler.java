@@ -30,7 +30,7 @@ public class LoadstatePacketHandler implements IMessageHandler<LoadstatePacket, 
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to load a savestate: "+e.getCause().toString()));
 					e.printStackTrace();
 				} finally {
-					SavestateHandler.isLoading=false;
+					SavestateHandler.state=SavestateState.NONE;
 				}
 			});
 		}else {
