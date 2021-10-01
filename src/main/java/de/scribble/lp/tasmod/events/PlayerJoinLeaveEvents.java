@@ -24,6 +24,7 @@ public class PlayerJoinLeaveEvents {
 		TASmod.logger.info("Firing login events for {} on the SERVER", player.getName());
 		TickSyncServer.joinServer(player);
 		TASmod.containerStateServer.joinServer(player);
+		TickrateChangerServer.joinServer(player);
 	}
 	
 	/**
@@ -32,8 +33,7 @@ public class PlayerJoinLeaveEvents {
 	 * @param player The player that left the server
 	 */
 	public static void firePlayerLeaveServerSide(EntityPlayerMP player) {
-		TASmod.logger.info("Firing logout events for {} on the SERVER", player.getName());
-		TickrateChangerServer.leaveServer(player);
+//		TASmod.logger.info("Firing logout events for {} on the SERVER", player.getName());
 	}
 
 	/**

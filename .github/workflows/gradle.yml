@@ -19,9 +19,9 @@ jobs:
     - name: Prepare folders
       run: mkdir -p gradle/wrapper
     - name: Download gradle properties
-      run: wget -P gradle/wrapper https://mgnet.work/.web_ram/gradle-wrapper.properties
+      run: wget -P gradle/wrapper https://data.mgnet.work/tasmod/gradle-wrapper.properties
     - name: Obtain gradle
-      run: wget -P gradle/wrapper https://mgnet.work/.web_ram/gradle-wrapper.jar
+      run: wget -P gradle/wrapper https://data.mgnet.work/tasmod/gradle-wrapper.jar
     - name: Build TASmod with Gradle
       run: java -cp gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain shadowJar --no-daemon
     - run: find . -type f ! -name "*forge.jar" -delete

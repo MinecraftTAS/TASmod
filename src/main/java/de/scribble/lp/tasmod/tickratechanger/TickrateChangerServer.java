@@ -1,8 +1,8 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.TASmod;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 
 public class TickrateChangerServer {
 	public static float TICKS_PER_SECOND=20F;
@@ -13,11 +13,6 @@ public class TickrateChangerServer {
 	public static int cooldownKeyPause;
 	public static int cooldownKeyAdvance;
 	
-	private static MinecraftServer serverInstance;
-	
-	public TickrateChangerServer(MinecraftServer server) {
-		serverInstance=server;
-	}
 	public static void changeClientTickrate(float tickrate) {
 		CommonProxy.NETWORK.sendToAll(new TickratePacket(false, tickrate, false));
 	}
@@ -54,13 +49,13 @@ public class TickrateChangerServer {
     }
     
     /**
-     * Fired when a player left the server
+     * Fired when a player joined the server
      * @param player
      */
-	public static void leaveServer(EntityPlayerMP player) {
-		//TODO Test this in multiplayer
-		if (TickrateChangerServer.TICKS_PER_SECOND == 0) {
-			TickrateChangerServer.changeServerTickrate(20F);
+	public static void joinServer(EntityPlayerMP player) {
+		if(TASmod.getServerInstance().isDedicatedServer()) {
+			TASmod.logger.info("Sending the current tickrate ({}) to {}", TICKS_PER_SECOND, player.getName());
+			CommonProxy.NETWORK.sendTo(new TickratePacket(false, TICKS_PER_SECOND, false), player);
 		}
 	}
 }

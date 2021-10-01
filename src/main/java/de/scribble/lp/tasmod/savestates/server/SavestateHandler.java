@@ -1,6 +1,7 @@
 package de.scribble.lp.tasmod.savestates.server;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
@@ -39,28 +40,26 @@ public class SavestateHandler {
 	private static MinecraftServer server=TASmod.getServerInstance();
 	private static File savestateDirectory;
 	
-	public static boolean isSaving=false;
-	
-	public static boolean isLoading=false;
-	public static boolean wasLoading=false;
+	public static SavestateState state=SavestateState.NONE;
 	
 	/**
 	 * Creates a copy of the currently played world and saves it in .minecraft/saves/savestates/worldname <br>
 	 * Called in {@link SavestatePacketHandler}<br>
 	 * <br>
 	 * Side: Server
+	 * @param savestateIndex The index where the mod will save the savestate -1 if it should load the latest
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
-	public static void saveState() throws SavestateException, IOException {
-		if(isSaving) {
+	public static void saveState(int savestateIndex) throws SavestateException, IOException {
+		if(state==SavestateState.SAVING) {
 			throw new SavestateException("A savestating operation is already being carried out");
 		}
-		if(isLoading) {
+		if(state==SavestateState.LOADING) {
 			throw new SavestateException("A loadstate operation is being carried out");
 		}
 		//Lock savestating and loadstating
-		isSaving=true;
+		state=SavestateState.SAVING;
 		
 		//Create a directory just in case
 		createSavestateDirectory();
@@ -107,7 +106,21 @@ public class SavestateHandler {
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 		
 		//Unlock savestating
-		isSaving=false;
+		state=SavestateState.NONE;
+	}
+	
+	private static String nextSaveName(String worldname, int index) {
+		File[] listofFiles=savestateDirectory.listFiles(new FileFilter() {
+
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.getName().startsWith(worldname);
+			}
+			
+		});
+		if(index<0) {
+		}
+		return "";
 	}
 	
 	/**
@@ -117,14 +130,13 @@ public class SavestateHandler {
 	 * @return targetsavefolder The file where the savestate should be copied to
 	 * @throws SavestateException if the found savestates count is greater or equal than 300
 	 */
+	@Deprecated
 	private static File getNextSaveFolderLocation(String worldname) throws SavestateException {
 		int i = 1;
 		int limit=300;
 		File targetsavefolder=null;
-		isSaving=true;
 		while (i <= limit) {
 			if (i >= limit) {
-				isSaving = false;
 				throw new SavestateException("Savestatecount is greater or equal than "+limit);
 			}
 			targetsavefolder = new File(savestateDirectory,worldname + "-Savestate" + Integer.toString(i)+File.separator);
@@ -143,6 +155,7 @@ public class SavestateHandler {
 	 * @param worldname the name of the world currently on the server
 	 * @return The correct name of the next savestate
 	 */
+	@Deprecated
 	private static String nameWhenSaving(String worldname) {
 		int i = 1;
 		int limit=300;
@@ -171,14 +184,14 @@ public class SavestateHandler {
 	 * @throws IOException
 	 */
 	public static void loadState() throws LoadstateException, IOException {
-		if(isSaving) {
+		if(state==SavestateState.SAVING) {
 			throw new LoadstateException("A savestating operation is already being carried out");
 		}
-		if(isLoading) {
+		if(state==SavestateState.LOADING) {
 			throw new LoadstateException("A loadstate operation is being carried out");
 		}
 		//Lock savestating and loadstating
-		isLoading=true;
+		state=SavestateState.LOADING;
 		
 		//Create a directory just in case
 		createSavestateDirectory();
@@ -246,8 +259,7 @@ public class SavestateHandler {
         }
 		
 		//Unlock loadstating
-		isLoading=false;
-		wasLoading=true;
+		state=SavestateState.WASLOADING;
 	}
 	
 	/**

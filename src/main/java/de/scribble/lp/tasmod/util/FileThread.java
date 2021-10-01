@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.commands.savetas;
+package de.scribble.lp.tasmod.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
