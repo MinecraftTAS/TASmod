@@ -47,7 +47,7 @@ minecraft {
 }
 repositories {
     mavenCentral()
-    maven { url = "https://mgnet.work/repo" }
+    maven { url = "https://maven.mgnet.work" }
     maven {
         name = 'sponge'
         url = 'https://repo.spongepowered.org/maven'
