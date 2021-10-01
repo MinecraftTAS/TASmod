@@ -30,7 +30,7 @@ public class SavestatePacketHandler implements IMessageHandler<SavestatePacket, 
 					return;
 				}
 				try {
-					SavestateHandler.saveState();
+					SavestateHandler.saveState(-1);
 				} catch (SavestateException e) {
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getMessage()));
 					

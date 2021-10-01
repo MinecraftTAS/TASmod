@@ -1,6 +1,7 @@
 package de.scribble.lp.tasmod.savestates.server;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
@@ -46,10 +47,11 @@ public class SavestateHandler {
 	 * Called in {@link SavestatePacketHandler}<br>
 	 * <br>
 	 * Side: Server
+	 * @param savestateIndex The index where the mod will save the savestate -1 if it should load the latest
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
-	public static void saveState() throws SavestateException, IOException {
+	public static void saveState(int savestateIndex) throws SavestateException, IOException {
 		if(state==SavestateState.SAVING) {
 			throw new SavestateException("A savestating operation is already being carried out");
 		}
@@ -107,6 +109,20 @@ public class SavestateHandler {
 		state=SavestateState.NONE;
 	}
 	
+	private static String nextSaveName(String worldname, int index) {
+		File[] listofFiles=savestateDirectory.listFiles(new FileFilter() {
+
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.getName().startsWith(worldname);
+			}
+			
+		});
+		if(index<0) {
+		}
+		return "";
+	}
+	
 	/**
 	 * Searches through the savestate folder to look for the next possible savestate foldername <br>
 	 * Savestate equivalent to {@link SavestateHandler#getLatestSavestateLocation(String)}
@@ -114,6 +130,7 @@ public class SavestateHandler {
 	 * @return targetsavefolder The file where the savestate should be copied to
 	 * @throws SavestateException if the found savestates count is greater or equal than 300
 	 */
+	@Deprecated
 	private static File getNextSaveFolderLocation(String worldname) throws SavestateException {
 		int i = 1;
 		int limit=300;
@@ -138,6 +155,7 @@ public class SavestateHandler {
 	 * @param worldname the name of the world currently on the server
 	 * @return The correct name of the next savestate
 	 */
+	@Deprecated
 	private static String nameWhenSaving(String worldname) {
 		int i = 1;
 		int limit=300;

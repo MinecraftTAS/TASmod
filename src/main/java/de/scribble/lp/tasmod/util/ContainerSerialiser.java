@@ -11,7 +11,6 @@ import org.apache.commons.io.FileUtils;
 
 import com.dselent.bigarraylist.BigArrayList;
 
-import de.scribble.lp.tasmod.commands.savetas.FileThread;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
