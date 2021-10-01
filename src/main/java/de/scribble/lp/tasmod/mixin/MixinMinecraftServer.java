@@ -17,7 +17,10 @@ import de.scribble.lp.tasmod.savestates.server.SavestateState;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
 import de.scribble.lp.tasmod.ticksync.TickSyncServer;
+import net.minecraft.network.NetworkSystem;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer {
@@ -74,6 +77,11 @@ public abstract class MixinMinecraftServer {
 
 	@Shadow
 	private Queue<FutureTask<?>> futureTaskQueue;
+	
+	@Shadow
+	private NetworkSystem networkSystem;
+	
+	private int faketick=0;
 
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Thread;sleep(J)V"))
 	public void redirectThreadSleep(long msToTick) {
@@ -87,6 +95,12 @@ public abstract class MixinMinecraftServer {
 		for (long o = 0; o < msToTick; o++) {
 			if(TickrateChangerServer.TICKS_PER_SECOND==0) {
 				currentTime=System.currentTimeMillis();
+				faketick++;
+				if(faketick>=20) {
+					faketick=0;
+					networkSystem.networkTick();
+					runPendingCommands();
+				}
 			}
 			if (TickrateChangerServer.INTERRUPT) {
 				currentTime = System.currentTimeMillis();
@@ -102,12 +116,21 @@ public abstract class MixinMinecraftServer {
 					}
 				}
 			}
+			
 			try {
 				Thread.sleep(1L);
 			} catch (InterruptedException e) {
 				TASmod.logger.error("Thread Sleep Interrupted!");
 				e.printStackTrace();
 			}
+		}
+	}
+
+	@SideOnly(Side.SERVER)
+	private void runPendingCommands() {
+		if((MinecraftServer)(Object)this instanceof net.minecraft.server.dedicated.DedicatedServer) {
+			net.minecraft.server.dedicated.DedicatedServer server=(net.minecraft.server.dedicated.DedicatedServer)(MinecraftServer)(Object)this;
+			server.executePendingCommands();
 		}
 	}
 

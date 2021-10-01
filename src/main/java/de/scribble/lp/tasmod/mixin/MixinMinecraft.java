@@ -35,6 +35,8 @@ public abstract class MixinMinecraft {
 	@Shadow
 	private GuiScreen currentScreen;
 	
+//	private int faketick=0;
+	
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void injectRunGameLoop(CallbackInfo ci) {
 		// TASmod
@@ -44,6 +46,15 @@ public abstract class MixinMinecraft {
 		if(((Minecraft) (Object) this).player!=null) {
 			ClientProxy.hud.tick();
 		}
+		
+		//Fake tickrate loop when you are in tickrate 0
+//    	if(TickrateChangerClient.TICKS_PER_SECOND==0) {
+//    		faketick++;
+//    		if(faketick>=Minecraft.getDebugFPS()/3) {	//Not yet used but maybe in the future
+//    			faketick=0;
+//    		}
+//    	}
+    	
 		while (Keyboard.next()) {
 			ClientProxy.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}

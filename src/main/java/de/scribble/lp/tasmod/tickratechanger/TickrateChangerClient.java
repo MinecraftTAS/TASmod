@@ -35,6 +35,7 @@ public class TickrateChangerClient {
 			pauseUnpauseClient();
 		}
     }
+	
     public static void advanceTick() {
     	if(Minecraft.getMinecraft().world!=null) {
     		advanceServerTick();
@@ -42,10 +43,12 @@ public class TickrateChangerClient {
     		advanceClientTick();
     	}
     }
+    
     /**
      * Bypasses the tick system
      */
     public static void bypass() {
+    	//Stopping any playback or recording if you are in tickrate 0 and the GuiControls
     	if(Minecraft.getMinecraft().currentScreen instanceof GuiControls) {
     		if(TICKS_PER_SECOND==0&&WASZERO==false) {
     			changeClientTickrate(20);
@@ -58,6 +61,7 @@ public class TickrateChangerClient {
 			changeClientTickrate(0);
 			WASZERO=false;
 		}
+    	
     }
 
 	public static void advanceClientTick() {
