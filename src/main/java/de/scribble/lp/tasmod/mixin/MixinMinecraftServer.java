@@ -37,7 +37,7 @@ public abstract class MixinMinecraftServer {
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick()V", ordinal = 1))
 	public void redirectTick(MinecraftServer server) {
 		this.tick();
-		if (SavestateHandler.state==SavestateState.WASLOADING) {
+		if (SavestateHandler.state == SavestateState.WASLOADING) {
 			SavestateHandler.state = SavestateState.NONE;
 			SavestateHandler.playerLoadSavestateEventServer();
 		}
@@ -77,11 +77,11 @@ public abstract class MixinMinecraftServer {
 
 	@Shadow
 	private Queue<FutureTask<?>> futureTaskQueue;
-	
+
 	@Shadow
 	private NetworkSystem networkSystem;
-	
-	private int faketick=0;
+
+	private int faketick = 0;
 
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Thread;sleep(J)V"))
 	public void redirectThreadSleep(long msToTick) {
@@ -93,13 +93,15 @@ public abstract class MixinMinecraftServer {
 				msToTick = 1L;
 		}
 		for (long o = 0; o < msToTick; o++) {
-			if(TickrateChangerServer.TICKS_PER_SECOND==0) {
-				currentTime=System.currentTimeMillis();
+			if (TickrateChangerServer.TICKS_PER_SECOND == 0) {
+				currentTime = System.currentTimeMillis();
 				faketick++;
-				if(faketick>=20) {
-					faketick=0;
+				if (faketick >= 20) {
+					faketick = 0;
 					networkSystem.networkTick();
-					runPendingCommands();
+					if (((MinecraftServer) (Object) this).isDedicatedServer()) {
+						runPendingCommands();
+					}
 				}
 			}
 			if (TickrateChangerServer.INTERRUPT) {
@@ -116,7 +118,7 @@ public abstract class MixinMinecraftServer {
 					}
 				}
 			}
-			
+
 			try {
 				Thread.sleep(1L);
 			} catch (InterruptedException e) {
@@ -128,14 +130,14 @@ public abstract class MixinMinecraftServer {
 
 	@SideOnly(Side.SERVER)
 	private void runPendingCommands() {
-		if((MinecraftServer)(Object)this instanceof net.minecraft.server.dedicated.DedicatedServer) {
-			net.minecraft.server.dedicated.DedicatedServer server=(net.minecraft.server.dedicated.DedicatedServer)(MinecraftServer)(Object)this;
+		if ((MinecraftServer) (Object) this instanceof net.minecraft.server.dedicated.DedicatedServer) {
+			net.minecraft.server.dedicated.DedicatedServer server = (net.minecraft.server.dedicated.DedicatedServer) (MinecraftServer) (Object) this;
 			server.executePendingCommands();
 		}
 	}
 
 	// =====================================================================================================================================
-	
+
 //	@Inject(method = "tick", at = @At("HEAD"))
 //	public void lagServer(CallbackInfo ci) {
 //		if(SavestateEvents.lagServer) {
@@ -147,7 +149,7 @@ public abstract class MixinMinecraftServer {
 //			}
 //		}
 //	}
-	
+
 //	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
 //	public long limitLag(long j) {
 //		if(j>(500L*(20/TickrateChangerServer.TICKS_PER_SECOND))){
@@ -155,5 +157,5 @@ public abstract class MixinMinecraftServer {
 //		}
 //		return j;
 //	}
-	
+
 }
