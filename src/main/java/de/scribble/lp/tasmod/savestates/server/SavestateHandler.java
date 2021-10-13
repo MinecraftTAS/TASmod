@@ -3,6 +3,12 @@ package de.scribble.lp.tasmod.savestates.server;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 
@@ -16,10 +22,12 @@ import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
 import de.scribble.lp.tasmod.savestates.server.motion.ClientMotionServer;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
+import de.scribble.lp.tasmod.util.FileThread;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
@@ -37,10 +45,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  *
  */
 public class SavestateHandler {
-	private static MinecraftServer server=TASmod.getServerInstance();
-	private static File savestateDirectory;
+	private MinecraftServer server;
+	private File savestateDirectory;
 	
 	public static SavestateState state=SavestateState.NONE;
+	
+	public SavestateHandler(MinecraftServer server) {
+		this.server=server;
+		createSavestateDirectory();
+		refreshSavestateMap();
+		loadCurrentIndex();
+	}
 	
 	/**
 	 * Creates a copy of the currently played world and saves it in .minecraft/saves/savestates/worldname <br>
@@ -51,7 +66,7 @@ public class SavestateHandler {
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
-	public static void saveState(int savestateIndex) throws SavestateException, IOException {
+	public void saveState(int savestateIndex) throws SavestateException, IOException {
 		if(state==SavestateState.SAVING) {
 			throw new SavestateException("A savestating operation is already being carried out");
 		}
@@ -63,6 +78,9 @@ public class SavestateHandler {
 		
 		//Create a directory just in case
 		createSavestateDirectory();
+		
+		increaseCurrentIndex();
+		saveCurrentIndex();
 		
 		//Enable tickrate 0
 		TickrateChangerServer.changeServerTickrate(0);
@@ -109,20 +127,6 @@ public class SavestateHandler {
 		state=SavestateState.NONE;
 	}
 	
-	private static String nextSaveName(String worldname, int index) {
-		File[] listofFiles=savestateDirectory.listFiles(new FileFilter() {
-
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.getName().startsWith(worldname);
-			}
-			
-		});
-		if(index<0) {
-		}
-		return "";
-	}
-	
 	/**
 	 * Searches through the savestate folder to look for the next possible savestate foldername <br>
 	 * Savestate equivalent to {@link SavestateHandler#getLatestSavestateLocation(String)}
@@ -131,7 +135,7 @@ public class SavestateHandler {
 	 * @throws SavestateException if the found savestates count is greater or equal than 300
 	 */
 	@Deprecated
-	private static File getNextSaveFolderLocation(String worldname) throws SavestateException {
+	private File getNextSaveFolderLocation(String worldname) throws SavestateException {
 		int i = 1;
 		int limit=300;
 		File targetsavefolder=null;
@@ -156,7 +160,7 @@ public class SavestateHandler {
 	 * @return The correct name of the next savestate
 	 */
 	@Deprecated
-	private static String nameWhenSaving(String worldname) {
+	private String nameWhenSaving(String worldname) {
 		int i = 1;
 		int limit=300;
 		File targetsavefolder=null;
@@ -183,7 +187,7 @@ public class SavestateHandler {
 	 * @throws LoadstateException
 	 * @throws IOException
 	 */
-	public static void loadState() throws LoadstateException, IOException {
+	public void loadState() throws LoadstateException, IOException {
 		if(state==SavestateState.SAVING) {
 			throw new LoadstateException("A savestating operation is already being carried out");
 		}
@@ -269,7 +273,7 @@ public class SavestateHandler {
 	 * @return targetsavefolder
 	 * @throws LoadstateException if there is no savestate or more than 300 savestates
 	 */
-	private static File getLatestSavestateLocation(String worldname) throws LoadstateException {
+	private File getLatestSavestateLocation(String worldname) throws LoadstateException {
 		int i=1;
 		int limit=300;
 		
@@ -297,13 +301,13 @@ public class SavestateHandler {
 	 * @param worldname the name of the world currently on the server
 	 * @return The correct name of the next loadstate
 	 */
-	private static String nameWhenLoading(String worldname) throws LoadstateException {
+	private String nameWhenLoading(String worldname) throws LoadstateException {
 		int i=1;
 		int limit=300;
 		String name="";
 		File targetsavefolder=null;
 		while(i<=300) {
-			targetsavefolder = new File(savestateDirectory,worldname+"-Savestate"+Integer.toString(i));
+			targetsavefolder = new File(savestateDirectory, worldname+"-Savestate"+Integer.toString(i));
 			if (!targetsavefolder.exists()) {
 				if(i-1==0) {
 					throw new LoadstateException("Couldn't find any savestates");
@@ -323,7 +327,7 @@ public class SavestateHandler {
 	/**
 	 * Creates the savestate directory in case the user deletes it between savestates
 	 */
-	private static void createSavestateDirectory() {
+	private void createSavestateDirectory() {
 		if(!server.isDedicatedServer()) {
 			savestateDirectory=new File(server.getDataDirectory()+File.separator+"saves"+File.separator+"savestates"+File.separator);
 		}else {
@@ -334,12 +338,100 @@ public class SavestateHandler {
 		}
 	}
 	
+	private Map<Integer, File> savestateMap=new HashMap<Integer, File>();
+	
+	private int nextFreeIndex=0;
+	
+	private int currentIndex;
+	
+	public void refreshSavestateMap() {
+		savestateMap.clear();
+		File[] files=savestateDirectory.listFiles(new FileFilter() {
+			
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.getName().startsWith(server.getFolderName()+"-Savestate");
+			}
+		});
+		int index=0;
+		for(File file:files) {
+			try {
+				index=Integer.parseInt(file.getName().substring(file.getName().length()-1));
+			} catch (NumberFormatException e) {
+				TASmod.logger.warn(String.format("Could not process the savestate %s", e.getMessage()));
+			}
+			savestateMap.put(index, file);
+		}
+		nextFreeIndex=index+1;
+	}
+	
+	public void saveCurrentIndex() {
+		File tasmodDir=new File(savestateDirectory, "../"+server.getFolderName()+"/tasmod/");
+		if(!tasmodDir.exists()) {
+			tasmodDir.mkdir();
+		}
+		File savestateDat=new File(tasmodDir, "savestate.data");
+		List<String> lines=new ArrayList<String>();
+		lines.add("currentIndex="+currentIndex);
+		try {
+			FileUtils.writeLines(savestateDat, lines);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadCurrentIndex() {
+		int index = -1;
+		List<String> lines = new ArrayList<String>();
+		File tasmodDir = new File(savestateDirectory, "../" + server.getFolderName() + "/tasmod/");
+		if (!tasmodDir.exists()) {
+			tasmodDir.mkdir();
+		}
+		File savestateDat = new File(tasmodDir, "savestate.data");
+		try {
+			lines = FileUtils.readLines(savestateDat, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			TASmod.logger.warn("No savestate.data file found in current world folder, ignoring it");
+		}
+		if (!lines.isEmpty()) {
+			for (String line : lines) {
+				if (line.startsWith("currentIndex=")) {
+					try {
+						index = Integer.parseInt(line.split("=")[1]);
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		setCurrentIndex(index);;
+	}
+
+	private void setCurrentIndex(int index) {
+		if(index<0) {
+			currentIndex=nextFreeIndex-1;
+		}else {
+			currentIndex=index;
+		}
+		TASmod.logger.info("Setting the savestate index to {}", currentIndex);
+	}
+	
+	public void increaseCurrentIndex() {
+		setCurrentIndex(currentIndex+1);
+	}
+	
+	private String getSavestateNameWithIndex(int index) {
+		return server.getFolderName()+File.separator+"Savestate"+index;
+	}
+	
 	/**
 	 * Event, that gets executed after a loadstate operation was carried out, get's called on the server side
 	 */
 	public static void playerLoadSavestateEventServer() {
-		EntityPlayerMP player=server.getPlayerList().getPlayers().get(0);
-		NBTTagCompound nbttagcompound = server.getPlayerList().getPlayerNBT(player);
+		PlayerList playerList=TASmod.getServerInstance().getPlayerList();
+		EntityPlayerMP player=playerList.getPlayers().get(0);
+		NBTTagCompound nbttagcompound = playerList.getPlayerNBT(player);
+		//TODO Make this multiplayer compatible ffs
 		SavestatePlayerLoading.reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
 	}
 	
@@ -347,4 +439,5 @@ public class SavestateHandler {
 	public static void playerLoadSavestateEventClient() {
 		SavestatesChunkControl.addPlayerToChunk(Minecraft.getMinecraft().player);
 	}
+	
 }

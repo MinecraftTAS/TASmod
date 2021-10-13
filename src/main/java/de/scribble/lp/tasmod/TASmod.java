@@ -15,6 +15,7 @@ import de.scribble.lp.tasmod.commands.playback.CommandPlay;
 import de.scribble.lp.tasmod.commands.recording.CommandRecord;
 import de.scribble.lp.tasmod.commands.savetas.CommandSaveTAS;
 import de.scribble.lp.tasmod.commands.tutorial.CommandPlaybacktutorial;
+import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.SavestateTrackerFile;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.util.ModIncompatibleException;
@@ -53,6 +54,8 @@ public class TASmod {
 	public static final Logger logger = LogManager.getLogger("TASMod");
 	
 	public static ContainerStateServer containerStateServer;
+	
+	public static SavestateHandler savestateHandler;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent ev) throws Exception {
@@ -107,6 +110,8 @@ public class TASmod {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		savestateHandler=new SavestateHandler(ev.getServer());
 	}
 
 	public static TASmod getInstance() {

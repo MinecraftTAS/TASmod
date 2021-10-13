@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.savestates.server;
 
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,7 @@ public class LoadstatePacketHandler implements IMessageHandler<LoadstatePacket, 
 					return;
 				}
 				try {
-					SavestateHandler.loadState();
+					TASmod.savestateHandler.loadState();
 				} catch (LoadstateException e) {
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to load a savestate: "+e.getMessage()));
 					
