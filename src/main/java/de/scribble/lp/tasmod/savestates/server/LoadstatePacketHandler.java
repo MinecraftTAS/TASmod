@@ -26,12 +26,11 @@ public class LoadstatePacketHandler implements IMessageHandler<LoadstatePacket, 
 					TASmod.savestateHandler.loadState();
 				} catch (LoadstateException e) {
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to load a savestate: "+e.getMessage()));
-					
 				} catch (Exception e) {
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to load a savestate: "+e.getCause().toString()));
 					e.printStackTrace();
 				} finally {
-					SavestateHandler.state=SavestateState.NONE;
+					TASmod.savestateHandler.state=SavestateState.NONE;
 				}
 			});
 		}else {

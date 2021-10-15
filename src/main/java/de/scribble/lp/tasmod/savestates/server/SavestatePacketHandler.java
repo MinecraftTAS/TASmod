@@ -39,7 +39,7 @@ public class SavestatePacketHandler implements IMessageHandler<SavestatePacket, 
 					e.printStackTrace();
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getCause().toString()));
 				} finally {
-					SavestateHandler.state=SavestateState.NONE;
+					TASmod.savestateHandler.state=SavestateState.NONE;
 				}
 			});
 		}else {

@@ -18,6 +18,7 @@ import de.scribble.lp.tasmod.savestates.client.InputSavestatesHandler;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
 import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
+import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateDeleteException;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
 import de.scribble.lp.tasmod.savestates.server.motion.ClientMotionServer;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
@@ -50,7 +51,7 @@ public class SavestateHandler {
 	private MinecraftServer server;
 	private File savestateDirectory;
 
-	public static SavestateState state = SavestateState.NONE;
+	public SavestateState state = SavestateState.NONE;
 
 	public SavestateHandler(MinecraftServer server) {
 		this.server = server;
@@ -66,8 +67,9 @@ public class SavestateHandler {
 	 * <br>
 	 * Side: Server
 	 * 
-	 * @param savestateIndex The index where the mod will save the savestate. -1 if
-	 *                       it should load the latest
+	 * @param savestateIndex The index where the mod will save the savestate.
+	 *                       index<=0 if it should load the next from the
+	 *                       currentindex
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
@@ -98,7 +100,7 @@ public class SavestateHandler {
 		server.getPlayerList().saveAllPlayerData();
 		server.saveAllWorlds(true);
 
-		if (savestateIndex < 0) {
+		if (savestateIndex <= 0) {
 			setCurrentIndex(currentIndex + 1);
 		} else {
 			setCurrentIndex(savestateIndex);
@@ -134,6 +136,9 @@ public class SavestateHandler {
 		tracker.saveFile();
 
 		saveCurrentIndexToFile();
+
+		// Send a notification that the savestate has been loaded
+		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + currentIndex + " saved"));
 
 		// Close the GuiSavestateScreen on the client
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
@@ -234,6 +239,9 @@ public class SavestateHandler {
 		if (savestateIndex < 0) {
 			setCurrentIndex(currentIndex);
 		} else {
+			if (!get(savestateIndex).exists()) {
+				throw new LoadstateException("The savestate to load doesn't exist");
+			}
 			setCurrentIndex(savestateIndex);
 		}
 
@@ -241,10 +249,6 @@ public class SavestateHandler {
 		String worldname = server.getFolderName();
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = get(currentIndex);
-
-		if (!targetfolder.exists()) {
-			throw new LoadstateException("The savestate to load doesn't exist");
-		}
 
 		// Load savestate on the client
 		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateNameWithIndex(currentIndex)));
@@ -287,7 +291,7 @@ public class SavestateHandler {
 		saveCurrentIndexToFile();
 
 		// Send a notification that the savestate has been loaded
-		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate loaded"));
+		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + currentIndex + " loaded"));
 
 		WorldServer[] worlds = DimensionManager.getWorlds();
 
@@ -415,14 +419,14 @@ public class SavestateHandler {
 		}
 		Collections.sort(indexList);
 		if (indexList.isEmpty()) {
-			indexList.add(1);
+			indexList.add(0);
 		}
 		nextFreeIndex = indexList.get(indexList.size() - 1);
 	}
 
-	public void deleteIndex(int index) {
-		if (index < 0) {
-			return;
+	public void deleteIndex(int index) throws SavestateDeleteException {
+		if (index <= 0) {
+			throw new SavestateDeleteException("Cannot delete the indexes below or exactly 0: " + index);
 		}
 		File toDelete = get(index);
 		if (toDelete.exists()) {
@@ -433,11 +437,20 @@ public class SavestateHandler {
 			}
 		}
 		refresh();
+		if(!indexList.contains(currentIndex)) {
+			setCurrentIndex(nextFreeIndex);
+		}
+		// Send a notification that the savestate has been deleted
+		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + index + " deleted"));
 	}
 
-	public List<Integer> getIndexes() {
+	public String getIndexesAsString() {
 		refresh();
-		return indexList;
+		String out = "";
+		for (int i : indexList) {
+			out = out.concat(" " + i + ",");
+		}
+		return out;
 	}
 
 	private File get(int index) {
@@ -484,7 +497,6 @@ public class SavestateHandler {
 			}
 		}
 		setCurrentIndex(index);
-		;
 	}
 
 	private void setCurrentIndex(int index) {
@@ -498,6 +510,10 @@ public class SavestateHandler {
 
 	private String getSavestateNameWithIndex(int index) {
 		return server.getFolderName() + "-Savestate" + index;
+	}
+
+	public int getCurrentIndex() {
+		return currentIndex;
 	}
 
 	/**
@@ -523,5 +539,14 @@ public class SavestateHandler {
 
 	public void saveState() throws SavestateException, IOException {
 		saveState(-1);
+	}
+
+	public void deleteIndex(int from, int to) throws SavestateDeleteException {
+		if (from >= to) {
+			throw new SavestateDeleteException("The 'from-index' is smaller or equal to the 'to-index'");
+		}
+		for (int i = from; i < to; i++) {
+			deleteIndex(i);
+		}
 	}
 }

@@ -37,8 +37,8 @@ public abstract class MixinMinecraftServer {
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick()V", ordinal = 1))
 	public void redirectTick(MinecraftServer server) {
 		this.tick();
-		if (SavestateHandler.state == SavestateState.WASLOADING) {
-			SavestateHandler.state = SavestateState.NONE;
+		if (TASmod.savestateHandler.state == SavestateState.WASLOADING) {
+			TASmod.savestateHandler.state = SavestateState.NONE;
 			SavestateHandler.playerLoadSavestateEventServer();
 		}
 

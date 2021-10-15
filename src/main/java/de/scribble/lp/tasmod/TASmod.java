@@ -15,6 +15,7 @@ import de.scribble.lp.tasmod.commands.playback.CommandPlay;
 import de.scribble.lp.tasmod.commands.recording.CommandRecord;
 import de.scribble.lp.tasmod.commands.savetas.CommandSaveTAS;
 import de.scribble.lp.tasmod.commands.tutorial.CommandPlaybacktutorial;
+import de.scribble.lp.tasmod.savestates.server.SavestateCommand;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.SavestateTrackerFile;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
@@ -102,6 +103,7 @@ public class TASmod {
 		ev.registerServerCommand(new CommandPlaybacktutorial());
 		ev.registerServerCommand(new CommandFolder());
 		ev.registerServerCommand(new CommandClearInputs());
+		ev.registerServerCommand(new SavestateCommand());
 
 		// Save Loadstate Count
 		File savestateDirectory = new File(serverInstance.getDataDirectory() + File.separator + "saves" + File.separator + "savestates" + File.separator);
