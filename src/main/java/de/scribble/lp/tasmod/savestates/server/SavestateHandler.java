@@ -148,66 +148,6 @@ public class SavestateHandler {
 	}
 
 	/**
-	 * Searches through the savestate folder to look for the next possible savestate
-	 * foldername <br>
-	 * Savestate equivalent to
-	 * {@link SavestateHandler#getLatestSavestateLocation(String)}
-	 * 
-	 * @param worldname The worldname of the current world
-	 * @return targetsavefolder The file where the savestate should be copied to
-	 * @throws SavestateException if the found savestates count is greater or equal
-	 *                            than 300
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private File getNextSaveFolderLocation(String worldname) throws SavestateException {
-		int i = 1;
-		int limit = 300;
-		File targetsavefolder = null;
-		while (i <= limit) {
-			if (i >= limit) {
-				throw new SavestateException("Savestatecount is greater or equal than " + limit);
-			}
-			targetsavefolder = new File(savestateDirectory, worldname + "-Savestate" + Integer.toString(i) + File.separator);
-
-			if (!targetsavefolder.exists()) {
-				break;
-			}
-			i++;
-		}
-		return targetsavefolder;
-	}
-
-	/**
-	 * Get's the correct string of the savestate, used in
-	 * {@linkplain InputSavestatesHandler#savestate(String)}
-	 * 
-	 * @param worldname the name of the world currently on the server
-	 * @return The correct name of the next savestate
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private String nameWhenSaving(String worldname) {
-		int i = 1;
-		int limit = 300;
-		File targetsavefolder = null;
-		String name = "";
-		while (i <= limit) {
-			if (i >= limit) {
-				break;
-			}
-			name = worldname + "-Savestate" + Integer.toString(i);
-			targetsavefolder = new File(savestateDirectory, name + File.separator);
-
-			if (!targetsavefolder.exists()) {
-				break;
-			}
-			i++;
-		}
-		return name;
-	}
-
-	/**
 	 * Loads the latest savestate it can find in
 	 * .minecraft/saves/savestates/worldname-Savestate
 	 * 
@@ -236,12 +176,9 @@ public class SavestateHandler {
 		// Update the server instance
 		server = TASmod.getServerInstance();
 
-		if (savestateIndex < 0) {
-			setCurrentIndex(currentIndex);
+		if (!get(savestateIndex).exists()) {
+			throw new LoadstateException("The savestate to load doesn't exist");
 		} else {
-			if (!get(savestateIndex).exists()) {
-				throw new LoadstateException("The savestate to load doesn't exist");
-			}
 			setCurrentIndex(savestateIndex);
 		}
 
@@ -304,72 +241,6 @@ public class SavestateHandler {
 	}
 
 	/**
-	 * Searches through the savestate folder to look for the latest savestate<br>
-	 * Loadstate equivalent to
-	 * {@link SavestateHandler#getNextSaveFolderLocation(String)}
-	 * 
-	 * @param worldname
-	 * @return targetsavefolder
-	 * @throws LoadstateException if there is no savestate or more than 300
-	 *                            savestates
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private File getLatestSavestateLocation(String worldname) throws LoadstateException {
-		int i = 1;
-		int limit = 300;
-
-		File targetsavefolder = null;
-		while (i <= 300) {
-			targetsavefolder = new File(savestateDirectory, worldname + "-Savestate" + Integer.toString(i));
-			if (!targetsavefolder.exists()) {
-				if (i - 1 == 0) {
-					throw new LoadstateException("Couldn't find any savestates");
-				}
-				if (i > 300) {
-					throw new LoadstateException("Savestatecount is greater or equal than " + limit);
-				}
-				targetsavefolder = new File(savestateDirectory, worldname + "-Savestate" + Integer.toString(i - 1));
-				break;
-			}
-			i++;
-		}
-		return targetsavefolder;
-	}
-
-	/**
-	 * Get's the correct string of the loadstate, used in
-	 * {@linkplain InputSavestatesHandler#loadstate(String)}
-	 * 
-	 * @param worldname the name of the world currently on the server
-	 * @return The correct name of the next loadstate
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private String nameWhenLoading(String worldname) throws LoadstateException {
-		int i = 1;
-		int limit = 300;
-		String name = "";
-		File targetsavefolder = null;
-		while (i <= 300) {
-			targetsavefolder = new File(savestateDirectory, worldname + "-Savestate" + Integer.toString(i));
-			if (!targetsavefolder.exists()) {
-				if (i - 1 == 0) {
-					throw new LoadstateException("Couldn't find any savestates");
-				}
-				if (i > 300) {
-					throw new LoadstateException("Savestatecount is greater or equal than " + limit);
-				}
-
-				name = worldname + "-Savestate" + Integer.toString(i - 1);
-				break;
-			}
-			i++;
-		}
-		return name;
-	}
-
-	/**
 	 * Creates the savestate directory in case the user deletes it between
 	 * savestates
 	 */
@@ -386,7 +257,7 @@ public class SavestateHandler {
 
 	private final List<Integer> indexList = new ArrayList<>();
 
-	private int nextFreeIndex = 0;
+	private int latestIndex = 0;
 
 	private int currentIndex;
 
@@ -421,7 +292,8 @@ public class SavestateHandler {
 		if (indexList.isEmpty()) {
 			indexList.add(0);
 		}
-		nextFreeIndex = indexList.get(indexList.size() - 1);
+		latestIndex = indexList.get(indexList.size() - 1);
+		System.out.println("LatestIndex: " + latestIndex);
 	}
 
 	public void deleteIndex(int index) throws SavestateDeleteException {
@@ -435,10 +307,13 @@ public class SavestateHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else {
+			server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.YELLOW + "Savestate " + index + " doesn't exist so it can't be deleted"));
+			return;
 		}
 		refresh();
-		if(!indexList.contains(currentIndex)) {
-			setCurrentIndex(nextFreeIndex);
+		if (!indexList.contains(currentIndex)) {
+			setCurrentIndex(latestIndex);
 		}
 		// Send a notification that the savestate has been deleted
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + index + " deleted"));
@@ -501,7 +376,7 @@ public class SavestateHandler {
 
 	private void setCurrentIndex(int index) {
 		if (index < 0) {
-			currentIndex = nextFreeIndex - 1;
+			currentIndex = latestIndex - 1;
 		} else {
 			currentIndex = index;
 		}
