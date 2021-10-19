@@ -264,7 +264,7 @@ public class VirtualInput {
 
 	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
 
-		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
+		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode-100)) {
 			return;
 		}
 		boolean flag = true;

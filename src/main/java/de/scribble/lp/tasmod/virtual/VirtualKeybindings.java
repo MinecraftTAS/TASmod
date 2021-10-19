@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import com.google.common.collect.Maps;
 
@@ -47,7 +48,14 @@ public class VirtualKeybindings {
 	public static boolean isKeyDown(KeyBinding keybind) {
 		
 		int keycode=keybind.getKeyCode();
-		boolean down = isKeyCodeAlwaysBlocked(keycode) ?  Keyboard.isKeyDown(keycode) : ClientProxy.virtual.willKeyBeDown(keycode);
+		
+		boolean down=false;
+		
+		if(isKeyCodeAlwaysBlocked(keycode)) {
+			down=keycode>=0 ? Keyboard.isKeyDown(keycode) : Mouse.isButtonDown(keycode+100);
+		}else {
+			down=ClientProxy.virtual.willKeyBeDown(keycode);
+		}
 		
 		if (down) {
 			if (cooldownHashMap.containsKey(keybind)) {
