@@ -103,13 +103,13 @@ public class SavestateCommand extends CommandBase {
 			} else if ("delete".equals(args[0])) {
 				if (args.length == 2) {
 					try {
-						TASmod.savestateHandler.deleteIndex(processIndex(args[1]));
+						TASmod.savestateHandler.deleteSavestate(processIndex(args[1]));
 					} catch (SavestateDeleteException e) {
 						throw new CommandException(e.getMessage(), new Object[] {});
 					}
 				} else if (args.length == 3) {
 					try {
-						TASmod.savestateHandler.deleteIndex(processIndex(args[1]), processIndex(args[2]));
+						TASmod.savestateHandler.deleteSavestate(processIndex(args[1]), processIndex(args[2]));
 					} catch (SavestateDeleteException e) {
 						throw new CommandException(e.getMessage(), new Object[] {});
 					}

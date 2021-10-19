@@ -14,7 +14,6 @@ import org.apache.commons.io.FileUtils;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.savestates.client.InputSavestatesHandler;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
 import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
@@ -48,11 +47,22 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  *
  */
 public class SavestateHandler {
+
 	private MinecraftServer server;
 	private File savestateDirectory;
 
 	public SavestateState state = SavestateState.NONE;
 
+	private final List<Integer> indexList = new ArrayList<>();
+
+	private int latestIndex = 0;
+	private int currentIndex;
+
+	/**
+	 * Creates a savestate handler on the specified server
+	 * 
+	 * @param The server that should store the savestates
+	 */
 	public SavestateHandler(MinecraftServer server) {
 		this.server = server;
 		createSavestateDirectory();
@@ -61,15 +71,28 @@ public class SavestateHandler {
 	}
 
 	/**
-	 * Creates a copy of the currently played world and saves it in
-	 * .minecraft/saves/savestates/worldname <br>
-	 * Called in {@link SavestatePacketHandler}<br>
+	 * Creates a copy of the world that is currently being played and saves it in
+	 * .minecraft/saves/savestates/worldname-Savestate[{@linkplain #currentIndex}+1]
+	 * <br>
+	 * <br>
+	 * Side: Server
+	 * 
+	 * @throws SavestateException
+	 * @throws IOException
+	 */
+	public void saveState() throws SavestateException, IOException {
+		saveState(-1);
+	}
+
+	/**
+	 * Creates a copy of the world that is currently being played and saves it in
+	 * .minecraft/saves/savestates/worldname-Savestate[savestateIndex] <br>
 	 * <br>
 	 * Side: Server
 	 * 
 	 * @param savestateIndex The index where the mod will save the savestate.
-	 *                       index<=0 if it should load the next from the
-	 *                       currentindex
+	 *                       index<=0 if it should save it in the next index from
+	 *                       the currentindex
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
@@ -100,8 +123,12 @@ public class SavestateHandler {
 		server.getPlayerList().saveAllPlayerData();
 		server.saveAllWorlds(true);
 
+		// Refreshing the index list
+		refresh();
+
+		// Setting the current index depending on the savestateIndex.
 		if (savestateIndex <= 0) {
-			setCurrentIndex(currentIndex + 1);
+			setCurrentIndex(currentIndex + 1); // If the savestateIndex <= 0, create a savestate at currentIndex+1
 		} else {
 			setCurrentIndex(savestateIndex);
 		}
@@ -109,7 +136,7 @@ public class SavestateHandler {
 		// Get the current and target directory for copying
 		String worldname = server.getFolderName();
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
-		File targetfolder = get(currentIndex);
+		File targetfolder = getSavestateFile(currentIndex);
 
 		if (targetfolder.exists()) {
 			TASmod.logger.warn("WARNING! Overwriting the savestate with the index {}", currentIndex);
@@ -118,7 +145,7 @@ public class SavestateHandler {
 
 		// Send the name of the world to all players. This will make a savestate of the
 		// recording on the client with that name
-		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, getSavestateNameWithIndex(currentIndex)));
+		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, getSavestateName(currentIndex)));
 
 		// Wait for the chunkloader to save the game
 		for (WorldServer world : server.worlds) {
@@ -145,6 +172,19 @@ public class SavestateHandler {
 
 		// Unlock savestating
 		state = SavestateState.NONE;
+	}
+
+	/**
+	 * Loads the latest savestate at {@linkplain #currentIndex}
+	 * .minecraft/saves/savestates/worldname-Savestate[{@linkplain #currentIndex}]
+	 * 
+	 * Side: Server
+	 * 
+	 * @throws LoadstateException
+	 * @throws IOException
+	 */
+	public void loadState() throws LoadstateException, IOException {
+		loadState(-1);
 	}
 
 	/**
@@ -176,19 +216,23 @@ public class SavestateHandler {
 		// Update the server instance
 		server = TASmod.getServerInstance();
 
-		if (!get(savestateIndex).exists()) {
-			throw new LoadstateException("The savestate to load doesn't exist");
+		refresh();
+
+		int indexToLoad = savestateIndex < 0 ? currentIndex : savestateIndex;
+
+		if (!getSavestateFile(indexToLoad).exists()) {
+			throw new LoadstateException("Savestate " + indexToLoad + " doesn't exist");
 		} else {
-			setCurrentIndex(savestateIndex);
+			setCurrentIndex(indexToLoad);
 		}
 
 		// Get the current and target directory for copying
 		String worldname = server.getFolderName();
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
-		File targetfolder = get(currentIndex);
+		File targetfolder = getSavestateFile(currentIndex);
 
 		// Load savestate on the client
-		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateNameWithIndex(currentIndex)));
+		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateName(currentIndex)));
 
 		// Disabeling level saving for all worlds in case the auto save kicks in during
 		// world unload
@@ -255,12 +299,6 @@ public class SavestateHandler {
 		}
 	}
 
-	private final List<Integer> indexList = new ArrayList<>();
-
-	private int latestIndex = 0;
-
-	private int currentIndex;
-
 	private void refresh() {
 		indexList.clear();
 		File[] files = savestateDirectory.listFiles(new FileFilter() {
@@ -289,27 +327,52 @@ public class SavestateHandler {
 			indexList.add(index);
 		}
 		Collections.sort(indexList);
-		if (indexList.isEmpty()) {
-			indexList.add(0);
+		if (!indexList.isEmpty()) {
+			latestIndex = indexList.get(indexList.size() - 1);
+		} else {
+			latestIndex = 0;
 		}
-		latestIndex = indexList.get(indexList.size() - 1);
-		System.out.println("LatestIndex: " + latestIndex);
 	}
 
-	public void deleteIndex(int index) throws SavestateDeleteException {
-		if (index <= 0) {
-			throw new SavestateDeleteException("Cannot delete the indexes below or exactly 0: " + index);
+	/**
+	 * @param index The index of the savestate file that we want to get
+	 * @return The file of the savestate from the specified index
+	 */
+	private File getSavestateFile(int index) {
+		return new File(savestateDirectory, getSavestateName(index));
+	}
+
+	/**
+	 * @param index The index of the savestate file that we want to get
+	 * @return The savestate name without any paths
+	 */
+	private String getSavestateName(int index) {
+		return server.getFolderName() + "-Savestate" + index;
+	}
+
+	/**
+	 * Deletes the specified savestate
+	 * 
+	 * @param index The index of the savestate that should be deleted
+	 * @throws SavestateDeleteException
+	 */
+	public void deleteSavestate(int index) throws SavestateDeleteException {
+		if (state != SavestateState.NONE) {
+			throw new SavestateDeleteException("A savestate operation is currently being carried out");
 		}
-		File toDelete = get(index);
+		if (index <= 0) {
+			throw new SavestateDeleteException("Cannot delete the indexes below or exactly zero");
+		}
+		File toDelete = getSavestateFile(index);
 		if (toDelete.exists()) {
 			try {
 				FileUtils.deleteDirectory(toDelete);
 			} catch (IOException e) {
 				e.printStackTrace();
+				throw new SavestateDeleteException("Something went wrong while trying to delete the savestate " + index);
 			}
 		} else {
-			server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.YELLOW + "Savestate " + index + " doesn't exist so it can't be deleted"));
-			return;
+			throw new SavestateDeleteException(TextFormatting.YELLOW + "Savestate " + index + " doesn't exist, so it can't be deleted");
 		}
 		refresh();
 		if (!indexList.contains(currentIndex)) {
@@ -317,6 +380,30 @@ public class SavestateHandler {
 		}
 		// Send a notification that the savestate has been deleted
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + index + " deleted"));
+	}
+
+	/**
+	 * Deletes savestates in a range from "from" to "to"
+	 * 
+	 * @param from
+	 * @param to   (exclusive)
+	 * @throws SavestateDeleteException
+	 */
+	public void deleteSavestate(int from, int to) throws SavestateDeleteException {
+		if (state != SavestateState.NONE) {
+			throw new SavestateDeleteException("A savestate operation is currently being carried out");
+		}
+		if (from >= to) {
+			throw new SavestateDeleteException("The 'from-index' is smaller or equal to the 'to-index'");
+		}
+		for (int i = from; i < to; i++) {
+			try {
+				deleteSavestate(i);
+			} catch (SavestateDeleteException e) {
+				server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
+				continue;
+			}
+		}
 	}
 
 	public String getIndexesAsString() {
@@ -328,10 +415,10 @@ public class SavestateHandler {
 		return out;
 	}
 
-	private File get(int index) {
-		return new File(savestateDirectory, getSavestateNameWithIndex(index));
-	}
-
+	/**
+	 * Saves the current index to the current world-folder (not the savestate
+	 * folder)
+	 */
 	private void saveCurrentIndexToFile() {
 		File tasmodDir = new File(savestateDirectory, "../" + server.getFolderName() + "/tasmod/");
 		if (!tasmodDir.exists()) {
@@ -347,6 +434,10 @@ public class SavestateHandler {
 		}
 	}
 
+	/**
+	 * Loads the current index to the current world-folder (not the savestate
+	 * folder)
+	 */
 	public void loadCurrentIndexFromFile() {
 		int index = -1;
 		List<String> lines = new ArrayList<String>();
@@ -376,15 +467,11 @@ public class SavestateHandler {
 
 	private void setCurrentIndex(int index) {
 		if (index < 0) {
-			currentIndex = latestIndex - 1;
+			currentIndex = latestIndex;
 		} else {
 			currentIndex = index;
 		}
 		TASmod.logger.info("Setting the savestate index to {}", currentIndex);
-	}
-
-	private String getSavestateNameWithIndex(int index) {
-		return server.getFolderName() + "-Savestate" + index;
 	}
 
 	public int getCurrentIndex() {
@@ -406,22 +493,5 @@ public class SavestateHandler {
 	@SideOnly(Side.CLIENT)
 	public static void playerLoadSavestateEventClient() {
 		SavestatesChunkControl.addPlayerToChunk(Minecraft.getMinecraft().player);
-	}
-
-	public void loadState() throws LoadstateException, IOException {
-		loadState(-1);
-	}
-
-	public void saveState() throws SavestateException, IOException {
-		saveState(-1);
-	}
-
-	public void deleteIndex(int from, int to) throws SavestateDeleteException {
-		if (from >= to) {
-			throw new SavestateDeleteException("The 'from-index' is smaller or equal to the 'to-index'");
-		}
-		for (int i = from; i < to; i++) {
-			deleteIndex(i);
-		}
 	}
 }
