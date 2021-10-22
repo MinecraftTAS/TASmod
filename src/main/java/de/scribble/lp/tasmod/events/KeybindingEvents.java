@@ -19,7 +19,6 @@ import net.minecraft.client.Minecraft;
 public class KeybindingEvents {
 
 	public static void fireKeybindingsEvent() {
-		VirtualKeybindings.increaseCooldowntimer();
 		
 		if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.savestateSaveKey)) {
 
