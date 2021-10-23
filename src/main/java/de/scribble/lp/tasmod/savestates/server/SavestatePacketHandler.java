@@ -31,7 +31,7 @@ public class SavestatePacketHandler implements IMessageHandler<SavestatePacket, 
 					return;
 				}
 				try {
-					TASmod.savestateHandler.saveState();
+					TASmod.savestateHandler.saveState(message.index);
 				} catch (SavestateException e) {
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getMessage()));
 					
@@ -43,7 +43,7 @@ public class SavestatePacketHandler implements IMessageHandler<SavestatePacket, 
 				}
 			});
 		}else {
-			net.minecraft.client.Minecraft mc=net.minecraft.client.Minecraft.getMinecraft();
+			net.minecraft.client.Minecraft mc=net.minecraft.client.Minecraft.getMinecraft();	//Forge will think this is executed on the server for some reason...
 			workaround(mc);
 		}
 		return null;

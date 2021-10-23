@@ -127,7 +127,7 @@ public class SavestateHandler {
 		refresh();
 
 		// Setting the current index depending on the savestateIndex.
-		if (savestateIndex <= 0) {
+		if (savestateIndex < 0) {
 			setCurrentIndex(currentIndex + 1); // If the savestateIndex <= 0, create a savestate at currentIndex+1
 		} else {
 			setCurrentIndex(savestateIndex);
@@ -357,11 +357,14 @@ public class SavestateHandler {
 	 * @throws SavestateDeleteException
 	 */
 	public void deleteSavestate(int index) throws SavestateDeleteException {
-		if (state != SavestateState.NONE) {
-			throw new SavestateDeleteException("A savestate operation is currently being carried out");
+		if (state == SavestateState.SAVING) {
+			throw new SavestateDeleteException("A savestating operation is already being carried out");
 		}
-		if (index <= 0) {
-			throw new SavestateDeleteException("Cannot delete the indexes below or exactly zero");
+		if (state == SavestateState.LOADING) {
+			throw new SavestateDeleteException("A loadstate operation is being carried out");
+		}
+		if (index < 0) {
+			throw new SavestateDeleteException("Cannot delete the negative indexes");
 		}
 		File toDelete = getSavestateFile(index);
 		if (toDelete.exists()) {
@@ -390,13 +393,19 @@ public class SavestateHandler {
 	 * @throws SavestateDeleteException
 	 */
 	public void deleteSavestate(int from, int to) throws SavestateDeleteException {
-		if (state != SavestateState.NONE) {
-			throw new SavestateDeleteException("A savestate operation is currently being carried out");
+		if (state == SavestateState.SAVING) {
+			throw new SavestateDeleteException("A savestating operation is already being carried out");
+		}
+		if (state == SavestateState.LOADING) {
+			throw new SavestateDeleteException("A loadstate operation is being carried out");
 		}
 		if (from >= to) {
-			throw new SavestateDeleteException("The 'from-index' is smaller or equal to the 'to-index'");
+			throw new SavestateDeleteException("Can't delete amounts that are negative or 0");
 		}
 		for (int i = from; i < to; i++) {
+			if (i == 0) {
+				continue;
+			}
 			try {
 				deleteSavestate(i);
 			} catch (SavestateDeleteException e) {
@@ -410,7 +419,7 @@ public class SavestateHandler {
 		refresh();
 		String out = "";
 		for (int i : indexList) {
-			out = out.concat(" " + i + ",");
+			out = out.concat(" " + i + (i==indexList.size()-1?"":","));
 		}
 		return out;
 	}
