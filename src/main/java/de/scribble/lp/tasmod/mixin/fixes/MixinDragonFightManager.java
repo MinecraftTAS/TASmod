@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.mixin;
+package de.scribble.lp.tasmod.mixin.fixes;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
