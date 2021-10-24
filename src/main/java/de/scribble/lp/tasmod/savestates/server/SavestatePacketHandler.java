@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.savestates.server;
 
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;
@@ -30,7 +31,7 @@ public class SavestatePacketHandler implements IMessageHandler<SavestatePacket, 
 					return;
 				}
 				try {
-					SavestateHandler.saveState(-1);
+					TASmod.savestateHandler.saveState(message.index);
 				} catch (SavestateException e) {
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getMessage()));
 					
@@ -38,11 +39,11 @@ public class SavestatePacketHandler implements IMessageHandler<SavestatePacket, 
 					e.printStackTrace();
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getCause().toString()));
 				} finally {
-					SavestateHandler.state=SavestateState.NONE;
+					TASmod.savestateHandler.state=SavestateState.NONE;
 				}
 			});
 		}else {
-			net.minecraft.client.Minecraft mc=net.minecraft.client.Minecraft.getMinecraft();
+			net.minecraft.client.Minecraft mc=net.minecraft.client.Minecraft.getMinecraft();	//Forge will think this is executed on the server for some reason...
 			workaround(mc);
 		}
 		return null;

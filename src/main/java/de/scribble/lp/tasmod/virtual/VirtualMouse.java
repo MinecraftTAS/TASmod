@@ -54,19 +54,19 @@ public class VirtualMouse implements Serializable {
 		keyList.put(-100, new VirtualKey("LC", -100));
 		keyList.put(-99, new VirtualKey("RC", -99));
 		keyList.put(-98, new VirtualKey("MC", -98));
-		keyList.put(-97, new VirtualKey("MBUTTON3", -97));
-		keyList.put(-96, new VirtualKey("MBUTTON4", -96));
-		keyList.put(-95, new VirtualKey("MBUTTON5", -95));
-		keyList.put(-94, new VirtualKey("MBUTTON6", -94));
-		keyList.put(-93, new VirtualKey("MBUTTON7", -93));
-		keyList.put(-92, new VirtualKey("MBUTTON8", -92));
-		keyList.put(-91, new VirtualKey("MBUTTON9", -91));
-		keyList.put(-90, new VirtualKey("MBUTTON10", -90));
-		keyList.put(-89, new VirtualKey("MBUTTON11", -89));
-		keyList.put(-88, new VirtualKey("MBUTTON12", -88));
-		keyList.put(-87, new VirtualKey("MBUTTON13", -87));
-		keyList.put(-86, new VirtualKey("MBUTTON14", -86));
-		keyList.put(-85, new VirtualKey("MBUTTON15", -85));
+		keyList.put(-97, new VirtualKey("MBUTTON4", -97));
+		keyList.put(-96, new VirtualKey("MBUTTON5", -96));
+		keyList.put(-95, new VirtualKey("MBUTTON6", -95));
+		keyList.put(-94, new VirtualKey("MBUTTON7", -94));
+		keyList.put(-93, new VirtualKey("MBUTTON8", -93));
+		keyList.put(-92, new VirtualKey("MBUTTON9", -92));
+		keyList.put(-91, new VirtualKey("MBUTTON10", -91));
+		keyList.put(-90, new VirtualKey("MBUTTON11", -90));
+		keyList.put(-89, new VirtualKey("MBUTTON12", -89));
+		keyList.put(-88, new VirtualKey("MBUTTON13", -88));
+		keyList.put(-87, new VirtualKey("MBUTTON14", -87));
+		keyList.put(-86, new VirtualKey("MBUTTON15", -86));
+		keyList.put(-85, new VirtualKey("MBUTTON16", -85));
 
 		this.scrollwheel = 0;
 

@@ -17,8 +17,9 @@
         //Events
         "events.MixinPlayerList",
         
-        //Fixing forge stuff
-        "MixinDragonFightManager"
+        //Fixing forge and vanilla stuff
+        "fixes.MixinDragonFightManager",
+        "fixes.MixinMinecraftFullscreen"
         
     ],
     "client": [

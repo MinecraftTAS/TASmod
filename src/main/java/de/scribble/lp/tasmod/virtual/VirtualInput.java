@@ -179,7 +179,6 @@ public class VirtualInput {
 	public boolean isKeyDown(int keycode) {
 		if (keycode >= 0)
 			return currentKeyboard.get(keycode).isKeyDown();
-
 		else
 			return currentMouse.get(keycode).isKeyDown();
 	}
@@ -197,7 +196,6 @@ public class VirtualInput {
 	public boolean willKeyBeDown(int keycode) {
 		if (keycode >= 0)
 			return nextKeyboard.get(keycode).isKeyDown();
-
 		else
 			return nextMouse.get(keycode).isKeyDown();
 	}
@@ -264,15 +262,18 @@ public class VirtualInput {
 
 	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
 
-		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
-			return;
-		}
 		boolean flag = true;
 		if (filter) {
 			flag = nextMouse.isSomethingDown() || scrollwheel != 0 || keycode != -1;
 		}
+		
 		VirtualKey key = nextMouse.get(keycode - 100);
 
+		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode - 100)) {
+			key.setPressed(false);
+			return;
+		}
+		
 		key.setPressed(keystate);
 
 		nextMouse.setScrollWheel(scrollwheel);
@@ -427,34 +428,37 @@ public class VirtualInput {
 	public void loadSavestate(InputContainer savestatecontainer) {
 
 		if (this.container.isPlayingback()) {
-			preloadInput(this.container, savestatecontainer.size() - 1); 	// Preloading from the current container and from the second to last index of
+			preloadInput(this.container, savestatecontainer.size() - 1); // Preloading from the current container and from the second to last index of
 																			// the savestatecontainer. Since this is executed during playback,
 																			// we will only load the position of the savestate container and not replace the
 																			// container itself
 
-			this.container.setIndex(savestatecontainer.size()); 			// Set the "playback" index of the current container to the latest index of the
-																			// savestatecontainer. Meaning this index will be played next
+			this.container.setIndex(savestatecontainer.size()); // Set the "playback" index of the current container to the latest index of the
+																// savestatecontainer. Meaning this index will be played next
 
 		} else if (this.container.isRecording()) {
-			String start = savestatecontainer.getStartLocation();				// TODO Another start location thing to keep in mind
-			preloadInput(savestatecontainer, savestatecontainer.size() - 1);	// Preload the input of the savestate
+			String start = savestatecontainer.getStartLocation(); // TODO Another start location thing to keep in mind
+			preloadInput(savestatecontainer, savestatecontainer.size() - 1); // Preload the input of the savestate
 
-			nextKeyboard = new VirtualKeyboard(); 	// Unpress the nextKeyboard and mouse to get rid of the preloaded inputs in the
+			nextKeyboard = new VirtualKeyboard(); // Unpress the nextKeyboard and mouse to get rid of the preloaded inputs in the
 													// next keyboard. Note that these inputs are still loaded in the current
 													// keyboard
 			nextMouse = new VirtualMouse();
 
 			savestatecontainer.setIndex(savestatecontainer.size());
 			savestatecontainer.setTASState(TASstate.RECORDING);
-			savestatecontainer.setStartLocation(start);		//TODO Another one
-			this.container = savestatecontainer;			//Replace the current container with the savestated container
+			savestatecontainer.setStartLocation(start); // TODO Another one
+			this.container = savestatecontainer; // Replace the current container with the savestated container
 		}
 	}
 
 	/**
-	 * Preloads the specified index from, the container to {@link #nextMouse} and {@link #nextKeyboard}
+	 * Preloads the specified index from, the container to {@link #nextMouse} and
+	 * {@link #nextKeyboard}
+	 * 
 	 * @param container The container from which the inputs should be pre loaded
-	 * @param index The index of the container from which the inputs should be loaded
+	 * @param index     The index of the container from which the inputs should be
+	 *                  loaded
 	 */
 	private void preloadInput(InputContainer container, int index) {
 		TickInputContainer tickcontainer = container.get(index);
@@ -464,7 +468,8 @@ public class VirtualInput {
 			nextKeyboard = tickcontainer.getKeyboard().clone();
 			nextMouse = tickcontainer.getMouse().clone();
 
-			((AccessorRunStuff) Minecraft.getMinecraft()).runTickKeyboardAccessor();	// Letting mouse and keyboard tick once to load inputs into the "currentKeyboard"
+			((AccessorRunStuff) Minecraft.getMinecraft()).runTickKeyboardAccessor(); // Letting mouse and keyboard tick once to load inputs into the
+																						// "currentKeyboard"
 			((AccessorRunStuff) Minecraft.getMinecraft()).runTickMouseAccessor();
 		} else {
 			TASmod.logger.warn("Can't preload inputs, specified inputs are null!");
@@ -490,25 +495,30 @@ public class VirtualInput {
 	/**
 	 * Gets all InputEvents from the current container.<br>
 	 * <br>
-	 * Container and input events differ in that input events are the events that get accepted by Minecraft in the runTickKeyboard.<br>
-	 * The container however stores the current inputs and can calculate the corresponding input events from that, but it does it only when you are playing back or recording.<br>
+	 * Container and input events differ in that input events are the events that
+	 * get accepted by Minecraft in the runTickKeyboard.<br>
+	 * The container however stores the current inputs and can calculate the
+	 * corresponding input events from that, but it does it only when you are
+	 * playing back or recording.<br>
 	 * <br>
-	 * This however runs through the {@link VirtualInput#container} and generates the input events on for debug purposes.
+	 * This however runs through the {@link VirtualInput#container} and generates
+	 * the input events on for debug purposes.
+	 * 
 	 * @return
 	 */
 	public List<InputEvent> getAllInputEvents() {
-		
+
 		List<InputEvent> main = new ArrayList<>();
-		
+
 		for (int i = 0; i < container.size(); i++) {
-			
+
 			TickInputContainer tick = container.get(i);
 			TickInputContainer nextTick = container.get(i + 1);
-			
+
 			if (nextTick == null) {
-				nextTick = new TickInputContainer(i + 1);	//Fills the last tick in the container with an empty TickInputContainer
+				nextTick = new TickInputContainer(i + 1); // Fills the last tick in the container with an empty TickInputContainer
 			}
-			
+
 			VirtualKeyboard keyboard = tick.getKeyboard();
 			List<VirtualKeyboardEvent> keyboardEventsList = keyboard.getDifference(nextTick.getKeyboard());
 

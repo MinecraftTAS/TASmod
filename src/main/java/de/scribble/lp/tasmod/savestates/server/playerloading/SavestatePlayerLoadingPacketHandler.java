@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.savestates.server.playerloading;
 
+import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
@@ -60,6 +61,10 @@ public class SavestatePlayerLoadingPacketHandler implements IMessageHandler<Save
 		int gamemode=compound.getInteger("playerGameType");
 		GameType type=GameType.getByID(gamemode);
 		Minecraft.getMinecraft().playerController.setGameType(type);
+		
+		//TAS#?? Player rotation does not change when loading a savestate
+		CameraInterpolationEvents.rotationPitch=player.rotationPitch;
+		CameraInterpolationEvents.rotationYaw=player.rotationYaw+180f;
 		
 		SavestatesChunkControl.keepPlayerInLoadedEntityList(player);
 		SavestatePlayerLoading.wasLoading = true;
