@@ -68,7 +68,7 @@ public class InputContainer {
 	private BigArrayList<TickInputContainer> inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 
 	public DesyncMonitoring dMonitor = new DesyncMonitoring();
-
+	
 	// =====================================================================================================
 
 	private String authors = "Insert author here";
@@ -123,6 +123,7 @@ public class InputContainer {
 						return verbose ? TextFormatting.RED + "An error occured while reading the start location of the TAS. The file might be broken" : "";
 					}
 				}
+				Minecraft.getMinecraft().gameSettings.chatLinks = false; // #119
 				index = 0;
 				state = TASstate.PLAYBACK;
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
@@ -175,76 +176,6 @@ public class InputContainer {
 
 	public TASstate getState() {
 		return state;
-	}
-
-	@Deprecated
-	public String setRecording(boolean enabled) {
-		return setRecording(enabled, true);
-	}
-
-	/**
-	 * Starts/Stops a recording
-	 * 
-	 * @param enabled If true: starts a recording, else stops a running recording
-	 * @return Chat message depending on the state
-	 */
-	@Deprecated
-	public String setRecording(boolean enabled, boolean verbose) {
-		if (state == TASstate.PLAYBACK) {
-			return verbose ? TextFormatting.RED + "A playback is already running" : "";
-		}
-		if (enabled) {
-			state = TASstate.RECORDING;
-		} else {
-			state = TASstate.NONE;
-		}
-
-		if (state == TASstate.RECORDING) {
-			if (Minecraft.getMinecraft().player != null) {
-				startLocation = getStartLocation(Minecraft.getMinecraft().player); // TODO #99 Make this a secondary command
-			}
-			return verbose ? TextFormatting.GREEN + "Starting the recording" : "";
-		} else if (state == TASstate.NONE) {
-			return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
-		}
-		return "";
-	}
-
-	@Deprecated
-	public String setPlayback(boolean enabled) {
-		return setPlayback(enabled, true);
-	}
-
-	/**
-	 * Starts/Stops a playback
-	 * 
-	 * @param enabled If true: start a playback, else aborts a running playback
-	 * @return Chat message depending on the state
-	 */
-	@Deprecated
-	public String setPlayback(boolean enabled, boolean verbose) {
-		if (state == TASstate.RECORDING)
-			return verbose ? TextFormatting.RED + "A recording is already running" : "";
-		if (enabled) {
-			state = TASstate.PLAYBACK;
-		} else {
-			state = TASstate.NONE;
-		}
-		if (state == TASstate.PLAYBACK) {
-			if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
-				try {
-					tpPlayer(startLocation);
-				} catch (NumberFormatException e) {
-					state = TASstate.NONE;
-					e.printStackTrace();
-					return verbose ? TextFormatting.RED + "An error occured while reading the start location of the TAS. The file might be broken" : "";
-				}
-			}
-			index = 0;
-			return verbose ? TextFormatting.GREEN + "Starting playback" : "";
-		} else {
-			return verbose ? TextFormatting.GREEN + "Aborting playback" : "";
-		}
 	}
 
 	// =====================================================================================================
