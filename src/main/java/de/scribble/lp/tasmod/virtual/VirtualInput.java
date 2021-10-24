@@ -262,15 +262,18 @@ public class VirtualInput {
 
 	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
 
-		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode - 100)) {
-			return;
-		}
 		boolean flag = true;
 		if (filter) {
 			flag = nextMouse.isSomethingDown() || scrollwheel != 0 || keycode != -1;
 		}
+		
 		VirtualKey key = nextMouse.get(keycode - 100);
 
+		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode - 100)) {
+			key.setPressed(false);
+			return;
+		}
+		
 		key.setPressed(keystate);
 
 		nextMouse.setScrollWheel(scrollwheel);

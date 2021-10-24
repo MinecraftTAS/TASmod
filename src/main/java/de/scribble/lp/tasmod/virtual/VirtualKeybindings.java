@@ -33,7 +33,7 @@ import net.minecraft.client.settings.KeyBinding;
  */
 public class VirtualKeybindings {
 	private static Minecraft mc = Minecraft.getMinecraft();
-	private static long cooldown = 50*10;
+	private static long cooldown = 50*5;
 	private static HashMap<KeyBinding, Long> cooldownHashMap = Maps.<KeyBinding, Long>newHashMap();
 	private static List<KeyBinding> blockedKeys = new ArrayList<>();
 	public static boolean focused = false;
@@ -51,6 +51,10 @@ public class VirtualKeybindings {
 
 		boolean down = false;
 
+		if(mc.currentScreen instanceof GuiControls) {
+			return false;
+		}
+		
 		if (isKeyCodeAlwaysBlocked(keycode)) {
 			down = keycode >= 0 ? Keyboard.isKeyDown(keycode) : Mouse.isButtonDown(keycode + 100);
 		} else {
@@ -79,7 +83,7 @@ public class VirtualKeybindings {
 	 * @return
 	 */
 	public static boolean isKeyDownExceptTextfield(KeyBinding keybind) {
-		if (mc.currentScreen instanceof GuiChat || mc.currentScreen instanceof GuiEditSign || (focused && mc.currentScreen != null) || mc.currentScreen instanceof GuiControls) {
+		if (mc.currentScreen instanceof GuiChat || mc.currentScreen instanceof GuiEditSign || (focused && mc.currentScreen != null)) {
 			return false;
 		}
 		return isKeyDown(keybind);
