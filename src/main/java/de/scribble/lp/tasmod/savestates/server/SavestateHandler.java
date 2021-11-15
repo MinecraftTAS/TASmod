@@ -81,7 +81,7 @@ public class SavestateHandler {
 	 * @throws IOException
 	 */
 	public void saveState() throws SavestateException, IOException {
-		saveState(-1);
+		saveState(-1, true);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class SavestateHandler {
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
-	public void saveState(int savestateIndex) throws SavestateException, IOException {
+	public void saveState(int savestateIndex, boolean tickrate0) throws SavestateException, IOException {
 		if (state == SavestateState.SAVING) {
 			throw new SavestateException("A savestating operation is already being carried out");
 		}
@@ -170,6 +170,11 @@ public class SavestateHandler {
 		// Close the GuiSavestateScreen on the client
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 
+		if(!tickrate0) {
+			TickrateChangerServer.changeServerTickrate(20);
+			TickrateChangerServer.changeClientTickrate(20);
+		}
+		
 		// Unlock savestating
 		state = SavestateState.NONE;
 	}
@@ -184,7 +189,7 @@ public class SavestateHandler {
 	 * @throws IOException
 	 */
 	public void loadState() throws LoadstateException, IOException {
-		loadState(-1);
+		loadState(-1, true);
 	}
 
 	/**
@@ -196,7 +201,7 @@ public class SavestateHandler {
 	 * @throws LoadstateException
 	 * @throws IOException
 	 */
-	public void loadState(int savestateIndex) throws LoadstateException, IOException {
+	public void loadState(int savestateIndex, boolean tickrate0) throws LoadstateException, IOException {
 		if (state == SavestateState.SAVING) {
 			throw new LoadstateException("A savestating operation is already being carried out");
 		}
@@ -279,7 +284,13 @@ public class SavestateHandler {
 		for (WorldServer world : worlds) {
 			world.tick();
 		}
-
+		
+		if(!tickrate0) {
+			System.out.println("TEst");
+			TickrateChangerServer.changeServerTickrate(20);
+			TickrateChangerServer.changeClientTickrate(20);
+		}
+		
 		// Unlock loadstating
 		state = SavestateState.WASLOADING;
 	}

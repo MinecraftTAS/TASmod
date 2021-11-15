@@ -11,6 +11,10 @@ import de.scribble.lp.tasmod.commands.clearinputs.ClearInputsPacket;
 import de.scribble.lp.tasmod.commands.clearinputs.ClearInputsPacketHandler;
 import de.scribble.lp.tasmod.commands.folder.FolderPacket;
 import de.scribble.lp.tasmod.commands.folder.FolderPacketHandler;
+import de.scribble.lp.tasmod.commands.fullplay.FullPlayPacket;
+import de.scribble.lp.tasmod.commands.fullplay.FullPlayPacketHandler;
+import de.scribble.lp.tasmod.commands.fullrecord.FullRecordPacket;
+import de.scribble.lp.tasmod.commands.fullrecord.FullRecordPacketHandler;
 import de.scribble.lp.tasmod.commands.loadtas.LoadTASPacket;
 import de.scribble.lp.tasmod.commands.loadtas.LoadTASPacketHandler;
 import de.scribble.lp.tasmod.commands.savetas.SaveTASPacket;
@@ -86,6 +90,11 @@ public class CommonProxy {
 		// Misc
 		NETWORK.registerMessage(FolderPacketHandler.class, FolderPacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(InputContainer.TeleportPlayerPacketHandler.class, InputContainer.TeleportPlayerPacket.class, i++, Side.SERVER);
+		
+		// Fullrecord
+		NETWORK.registerMessage(FullRecordPacketHandler.class, FullRecordPacket.class, i++, Side.CLIENT);
+		
+		NETWORK.registerMessage(FullPlayPacketHandler.class, FullPlayPacket.class, i++, Side.CLIENT);
 
 	}
 

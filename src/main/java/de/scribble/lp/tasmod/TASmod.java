@@ -10,6 +10,8 @@ import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.tasmod.commands.changestates.ContainerStateServer;
 import de.scribble.lp.tasmod.commands.clearinputs.CommandClearInputs;
 import de.scribble.lp.tasmod.commands.folder.CommandFolder;
+import de.scribble.lp.tasmod.commands.fullplay.CommandFullPlay;
+import de.scribble.lp.tasmod.commands.fullrecord.CommandFullRecord;
 import de.scribble.lp.tasmod.commands.loadtas.CommandLoadTAS;
 import de.scribble.lp.tasmod.commands.playback.CommandPlay;
 import de.scribble.lp.tasmod.commands.recording.CommandRecord;
@@ -104,6 +106,8 @@ public class TASmod {
 		ev.registerServerCommand(new CommandFolder());
 		ev.registerServerCommand(new CommandClearInputs());
 		ev.registerServerCommand(new SavestateCommand());
+		ev.registerServerCommand(new CommandFullRecord());
+		ev.registerServerCommand(new CommandFullPlay());
 
 		// Save Loadstate Count
 		File savestateDirectory = new File(serverInstance.getDataDirectory() + File.separator + "saves" + File.separator + "savestates" + File.separator);

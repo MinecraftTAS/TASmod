@@ -23,7 +23,7 @@ public class LoadstatePacketHandler implements IMessageHandler<LoadstatePacket, 
 					return;
 				}
 				try {
-					TASmod.savestateHandler.loadState(message.index);
+					TASmod.savestateHandler.loadState(message.index, true);
 				} catch (LoadstateException e) {
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to load a savestate: "+e.getMessage()));
 				} catch (Exception e) {

@@ -171,7 +171,7 @@ public class SavestateCommand extends CommandBase {
 			if (indexToSave <= 0) { // Disallow to save on Savestate 0
 				indexToSave = -1;
 			}
-			TASmod.savestateHandler.saveState(indexToSave);
+			TASmod.savestateHandler.saveState(indexToSave, true);
 		} catch (SavestateException e) {
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} catch (IOException e) {
@@ -197,7 +197,7 @@ public class SavestateCommand extends CommandBase {
 
 	private void loadLatest(String[] args) throws CommandException {
 		try {
-			TASmod.savestateHandler.loadState(processIndex(args[1]));
+			TASmod.savestateHandler.loadState(processIndex(args[1]), true);
 		} catch (LoadstateException e) {
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} catch (IOException e) {
