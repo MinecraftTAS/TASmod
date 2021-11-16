@@ -42,6 +42,7 @@
 		//Join and leave game event on the client
 		"events.MixinNetHandlerPlayClient",
 		"events.MixinWorldClient",
+		"events.MixinGuiMainMenu",
 		
 		//Playbackhooks
 		"playbackhooks.MixinGameSettings",

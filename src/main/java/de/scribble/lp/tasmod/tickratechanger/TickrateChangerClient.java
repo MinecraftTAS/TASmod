@@ -1,8 +1,8 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
 import de.scribble.lp.tasmod.util.TASstate;
+import de.scribble.lp.tasmod.util.changestates.SyncStatePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiControls;
 

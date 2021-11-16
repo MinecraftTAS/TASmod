@@ -143,9 +143,17 @@ public class SavestateHandler {
 			FileUtils.deleteDirectory(targetfolder);
 		}
 
-		// Send the name of the world to all players. This will make a savestate of the
-		// recording on the client with that name
-		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, getSavestateName(currentIndex)));
+		/*
+		 * Prevents creating an InputSavestate when saving at index 0 (Index 0 is the
+		 * savestate when starting a recording)
+		 */
+		if (savestateIndex != 0) {
+			/*
+			 * Send the name of the world to all players. This will make a savestate of the
+			 * recording on the client with that name
+			 */
+			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, getSavestateName(currentIndex)));
+		}
 
 		// Wait for the chunkloader to save the game
 		for (WorldServer world : server.worlds) {
@@ -170,11 +178,11 @@ public class SavestateHandler {
 		// Close the GuiSavestateScreen on the client
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 
-		if(!tickrate0) {
+		if (!tickrate0) {
 			TickrateChangerServer.changeServerTickrate(20);
 			TickrateChangerServer.changeClientTickrate(20);
 		}
-		
+
 		// Unlock savestating
 		state = SavestateState.NONE;
 	}
@@ -236,8 +244,15 @@ public class SavestateHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(currentIndex);
 
-		// Load savestate on the client
-		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateName(currentIndex)));
+		/*
+		 * Prevents loading an InputSavestate when loading index 0 (Index 0 is the
+		 * savestate when starting a recording. Not doing this will load an empty
+		 * InputSavestate)
+		 */
+		if (savestateIndex != 0) {
+			// Load savestate on the client
+			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateName(currentIndex)));
+		}
 
 		// Disabeling level saving for all worlds in case the auto save kicks in during
 		// world unload
@@ -284,13 +299,12 @@ public class SavestateHandler {
 		for (WorldServer world : worlds) {
 			world.tick();
 		}
-		
-		if(!tickrate0) {
-			System.out.println("TEst");
+
+		if (!tickrate0) {
 			TickrateChangerServer.changeServerTickrate(20);
 			TickrateChangerServer.changeClientTickrate(20);
 		}
-		
+
 		// Unlock loadstating
 		state = SavestateState.WASLOADING;
 	}
@@ -430,7 +444,7 @@ public class SavestateHandler {
 		refresh();
 		String out = "";
 		for (int i : indexList) {
-			out = out.concat(" " + i + (i==indexList.size()-1?"":","));
+			out = out.concat(" " + i + (i == indexList.size() - 1 ? "" : ","));
 		}
 		return out;
 	}

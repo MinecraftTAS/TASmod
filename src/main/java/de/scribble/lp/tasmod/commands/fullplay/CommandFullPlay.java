@@ -2,10 +2,10 @@ package de.scribble.lp.tasmod.commands.fullplay;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
 import de.scribble.lp.tasmod.savestates.server.SavestateState;
 import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.util.TASstate;
+import de.scribble.lp.tasmod.util.changestates.SyncStatePacket;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -39,9 +39,6 @@ public class CommandFullPlay extends CommandBase{
 		} finally {
 			TASmod.savestateHandler.state=SavestateState.NONE;
 		}
-		
-		TASmod.containerStateServer.setState(TASstate.PLAYBACK);
-		CommonProxy.NETWORK.sendToAll(new SyncStatePacket(TASstate.PLAYBACK));
 		
 		CommonProxy.NETWORK.sendToAll(new FullPlayPacket());
 	}

@@ -7,7 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.killtherng.KillTheRNG;
-import de.scribble.lp.tasmod.commands.changestates.ContainerStateServer;
 import de.scribble.lp.tasmod.commands.clearinputs.CommandClearInputs;
 import de.scribble.lp.tasmod.commands.folder.CommandFolder;
 import de.scribble.lp.tasmod.commands.fullplay.CommandFullPlay;
@@ -22,6 +21,7 @@ import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.SavestateTrackerFile;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.util.ModIncompatibleException;
+import de.scribble.lp.tasmod.util.changestates.ContainerStateServer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;

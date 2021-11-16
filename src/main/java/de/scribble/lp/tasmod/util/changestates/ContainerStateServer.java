@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.commands.changestates;
+package de.scribble.lp.tasmod.util.changestates;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
@@ -69,6 +69,16 @@ public class ContainerStateServer {
 				this.state = stateIn;
 			}
 		}
+	}
+	
+	public TASstate toggleRecording() {
+		setState(state==TASstate.RECORDING ? TASstate.NONE : TASstate.RECORDING);
+		return state;
+	}
+	
+	public TASstate togglePlayback() {
+		setState(state == TASstate.PLAYBACK ? TASstate.NONE : TASstate.PLAYBACK);
+		return state;
 	}
 
 	public TASstate getState() {

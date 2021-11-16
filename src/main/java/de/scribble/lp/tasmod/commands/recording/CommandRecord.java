@@ -6,8 +6,8 @@ import com.google.common.collect.ImmutableList;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
 import de.scribble.lp.tasmod.util.TASstate;
+import de.scribble.lp.tasmod.util.changestates.SyncStatePacket;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -46,9 +46,7 @@ public class CommandRecord extends CommandBase {
 		}
 		if (args.length < 1) {
 //			if (!server.isDedicatedServer()) {
-				TASstate state=TASmod.containerStateServer.getState();
-				state=state==TASstate.RECORDING ? TASstate.NONE : TASstate.RECORDING;
-				TASmod.containerStateServer.setState(state);
+				TASstate state=TASmod.containerStateServer.toggleRecording();
 				CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
 //			} else {
 //				sender.sendMessage(new TextComponentString(TextFormatting.RED + "For multiplayer sessions use /play true|false to start/stop a recording"));

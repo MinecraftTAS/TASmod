@@ -31,6 +31,8 @@ public class DesyncMonitoring {
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		if (player != null) {
 			pos.add(player.posX + " " + player.posY + " " + player.posZ + " " + player.motionX + " " + player.motionY + " " + player.motionZ);
+		}else {
+			pos.add(0 + " " + 0 + " " + 0 + " " + 0 + " " + 0 + " " + 0);
 		}
 	}
 
@@ -207,5 +209,6 @@ public class DesyncMonitoring {
 		z="";
 		Mx="";
 		My="";
-		Mz="";}
+		Mz="";
+	}
 }
