@@ -38,11 +38,8 @@ public class KeybindingEvents {
 			Minecraft.getMinecraft().displayGuiScreen(ClientProxy.hud);
 			
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.stopkey)) {
-			if(Minecraft.getMinecraft().player!=null) {
-				CommonProxy.NETWORK.sendToServer(new SyncStatePacket(TASstate.NONE));
-			}else {
-				ClientProxy.virtual.getContainer().setTASState(TASstate.NONE);
-			}
+			
+			TASstate.setOrSend(TASstate.NONE);
 			
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickratezeroKey)) {
 			

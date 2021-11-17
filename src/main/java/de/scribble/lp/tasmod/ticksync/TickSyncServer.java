@@ -34,9 +34,5 @@ public class TickSyncServer {
 	public static void joinServer(EntityPlayerMP player) {
 		TickSyncServer.resetTickCounter();
 		CommonProxy.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(), true, TickSyncServer.isEnabled()));
-
-		if (TickrateChangerClient.TICKS_PER_SECOND == 0) {
-			TickrateChangerServer.changeServerTickrate(0F);
-		}
 	}
 }

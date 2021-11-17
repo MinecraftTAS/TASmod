@@ -261,7 +261,7 @@ public class InputContainer {
 				this.keyboard = new VirtualKeyboard();
 				this.mouse = new VirtualMouse();
 			} else if (index > inputs.size()) {
-				CommonProxy.NETWORK.sendToServer(new SyncStatePacket(TASstate.NONE));
+				TASstate.setOrSend(TASstate.NONE);
 //				TickrateChangerServer.changeServerTickrate(0);	//Tickrate 0 once the playback is done
 //				TickrateChangerServer.changeClientTickrate(0);
 				index--;

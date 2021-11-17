@@ -18,7 +18,7 @@ public class TickratePacketHandler implements IMessageHandler<TickratePacket, IM
 						TickrateChangerServer.advanceTick();
 					}
 				}else if(message.isPause()) {
-					TickrateChangerServer.pauseUnpauseGame();
+					TickrateChangerServer.togglePause();
 				}
 			}
 		}else if(ctx.side==Side.CLIENT) {

@@ -29,9 +29,9 @@ public class TickrateChangerServer {
         }
         TICKS_PER_SECOND = tickrate;
 	}
-	public static void pauseUnpauseGame() {
+	
+	public static void togglePause() {
     	if(TICKS_PER_SECOND>0) {
-    		TICKRATE_SAVED=TICKS_PER_SECOND;
 			changeServerTickrate(0F);
 			changeClientTickrate(0F);
     	}
@@ -40,6 +40,22 @@ public class TickrateChangerServer {
     		changeClientTickrate(TICKRATE_SAVED);
     	}
     }
+	
+	/**
+	 * Enables tickrate 0
+	 * @param pause True if the game should be paused, false if unpause
+	 */
+	public static void pauseGame(boolean pause) {
+		if(pause) {
+			changeServerTickrate(0F);
+			changeClientTickrate(0F);
+    	}
+    	else {
+    		changeServerTickrate(TICKRATE_SAVED);
+    		changeClientTickrate(TICKRATE_SAVED);
+    	}
+	}
+	
     public static void advanceTick() {
     	if(TICKS_PER_SECOND==0) {
     		ADVANCE_TICK=true;

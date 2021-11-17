@@ -91,8 +91,9 @@ public class SavestateHandler {
 	 * Side: Server
 	 * 
 	 * @param savestateIndex The index where the mod will save the savestate.
-	 *                       index<=0 if it should save it in the next index from
+	 *                       index<0 if it should save it in the next index from
 	 *                       the currentindex
+	 * @param tickrate0 When true: Set's the game to tickrate 0 after creating a savestate
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
@@ -110,8 +111,7 @@ public class SavestateHandler {
 		createSavestateDirectory();
 
 		// Enable tickrate 0
-		TickrateChangerServer.changeServerTickrate(0);
-		TickrateChangerServer.changeClientTickrate(0);
+		TickrateChangerServer.pauseGame(true);
 
 		// Update the server variable
 		server = TASmod.getServerInstance();
@@ -179,8 +179,7 @@ public class SavestateHandler {
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 
 		if (!tickrate0) {
-			TickrateChangerServer.changeServerTickrate(20);
-			TickrateChangerServer.changeClientTickrate(20);
+			TickrateChangerServer.pauseGame(false);
 		}
 
 		// Unlock savestating
@@ -206,6 +205,9 @@ public class SavestateHandler {
 	 * 
 	 * Side: Server
 	 * 
+	 * @param savestateIndex The index where the mod will load the savestate.
+	 *                       index<0 if it should load the currentindex
+	 * @param tickrate0 When true: Set's the game to tickrate 0 after creating a savestate
 	 * @throws LoadstateException
 	 * @throws IOException
 	 */
@@ -223,8 +225,7 @@ public class SavestateHandler {
 		createSavestateDirectory();
 
 		// Enable tickrate 0
-		TickrateChangerServer.changeServerTickrate(0);
-		TickrateChangerServer.changeClientTickrate(0);
+		TickrateChangerServer.pauseGame(true);
 
 		// Update the server instance
 		server = TASmod.getServerInstance();
@@ -301,8 +302,7 @@ public class SavestateHandler {
 		}
 
 		if (!tickrate0) {
-			TickrateChangerServer.changeServerTickrate(20);
-			TickrateChangerServer.changeClientTickrate(20);
+			TickrateChangerServer.pauseGame(false);
 		}
 
 		// Unlock loadstating
