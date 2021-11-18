@@ -5,14 +5,10 @@ import java.util.List;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 
-import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateDeleteException;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
-import de.scribble.lp.tasmod.virtual.VirtualInput;
-import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

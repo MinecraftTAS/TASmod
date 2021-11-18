@@ -2,8 +2,6 @@ package de.scribble.lp.tasmod.ticksync;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class TickSyncServer {

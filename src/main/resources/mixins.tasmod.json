@@ -43,6 +43,7 @@
 		"events.MixinNetHandlerPlayClient",
 		"events.MixinWorldClient",
 		"events.MixinGuiMainMenu",
+		"events.MixinGuiIngameMenu",
 		
 		//Playbackhooks
 		"playbackhooks.MixinGameSettings",
@@ -50,7 +51,6 @@
 		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",
 		"playbackhooks.MixinGuiContainer",
 		"playbackhooks.MixinGuiContainerCreative",
-		"playbackhooks.MixinGuiMainMenu",
 		"playbackhooks.MixinGuiScreenAdvancements",
 		"playbackhooks.MixinGuiSlot",
 		"playbackhooks.MixinGuiStats",

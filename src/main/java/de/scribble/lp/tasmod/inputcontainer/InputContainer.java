@@ -11,7 +11,6 @@ import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.util.TASstate;
-import de.scribble.lp.tasmod.util.changestates.SyncStatePacket;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;

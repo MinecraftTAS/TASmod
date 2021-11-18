@@ -12,9 +12,9 @@ public enum TASstate {
 	
 	public static void setOrSend(TASstate state) {
 		if(Minecraft.getMinecraft().player!=null) {
-			CommonProxy.NETWORK.sendToServer(new SyncStatePacket(TASstate.NONE));
+			CommonProxy.NETWORK.sendToServer(new SyncStatePacket(state));
 		}else {
-			ClientProxy.virtual.getContainer().setTASState(TASstate.NONE);
+			ClientProxy.virtual.getContainer().setTASState(state);
 		}
 	}
 }
