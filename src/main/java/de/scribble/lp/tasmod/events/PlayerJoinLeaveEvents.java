@@ -45,6 +45,7 @@ public class PlayerJoinLeaveEvents {
 		TASmod.logger.info("Firing login events for {} on the CLIENT", player.getName());
 		ClientProxy.virtual.unpressEverything();
 		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
+		LoadWorldEvent.doneLoadingIngame();
 	}
 	
 	/**

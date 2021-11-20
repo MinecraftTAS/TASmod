@@ -4,49 +4,35 @@ import de.scribble.lp.tasmod.util.TASstate;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
-public class SyncStatePacket implements IMessage{
+/**
+ * Syncs the current state of the input recorder with the state on the server side and witht the state on all other clients
+ * 
+ * @author ScribbleLP
+ *
+ */
+public class SyncStatePacket implements IMessage {
 
 	private short state;
 	private boolean verbose;
-	
+
 	public SyncStatePacket() {
-		state=0;
+		state = 0;
 	}
-	
+
 	public SyncStatePacket(TASstate state) {
-		verbose=true;
-		switch(state) {
-		case NONE:
-			this.state=0;
-			break;
-		case PLAYBACK:
-			this.state=1;
-			break;
-		case RECORDING:
-			this.state=2;
-			break;
-		}
+		verbose = true;
+		this.state = (short) state.getIndex();
 	}
-	
+
 	public SyncStatePacket(TASstate state, boolean verbose) {
-		this.verbose=verbose;
-		switch(state) {
-		case NONE:
-			this.state=0;
-			break;
-		case PLAYBACK:
-			this.state=1;
-			break;
-		case RECORDING:
-			this.state=2;
-			break;
-		}
+		this.verbose = verbose;
+		this.state = (short) state.getIndex();
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		state=buf.readShort();
-		verbose=buf.readBoolean();
+		state = buf.readShort();
+		verbose = buf.readBoolean();
 	}
 
 	@Override
@@ -56,17 +42,9 @@ public class SyncStatePacket implements IMessage{
 	}
 
 	public TASstate getState() {
-		switch (state) {
-		case 0:
-			return TASstate.NONE;
-		case 1:
-			return TASstate.PLAYBACK;
-		case 2:
-			return TASstate.RECORDING;
-		}
-		return TASstate.NONE;
+		return TASstate.fromIndex(state);
 	}
-	
+
 	public boolean isVerbose() {
 		return verbose;
 	}

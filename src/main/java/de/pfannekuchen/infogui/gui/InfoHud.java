@@ -310,6 +310,9 @@ public class InfoHud extends GuiScreen {
 				}else if(state==TASstate.RECORDING){
 					out="Recording";
 					format=ChatFormatting.RED;
+				}else if(state==TASstate.PAUSED) {
+					out="Paused";
+					format=ChatFormatting.YELLOW;
 				}else if(state==TASstate.NONE) {
 					out="";
 				}

@@ -32,8 +32,8 @@ public class ContainerStateServer {
 
 	public void joinServer(EntityPlayerMP player) {
 		if (!shouldChange) {
-			shouldChange=true;
-			CommonProxy.NETWORK.sendTo(new RequestStatePacket(), player);
+			shouldChange = true;
+			CommonProxy.NETWORK.sendTo(new RequestStatePacket(), player); //TODO Rewrite this s***
 		} else {
 			CommonProxy.NETWORK.sendTo(new SyncStatePacket(state, false), player);
 		}
@@ -47,38 +47,27 @@ public class ContainerStateServer {
 				shouldChange = false;
 			}
 		}
-
 	}
 
 	public void setState(TASstate stateIn) {
-		if (state!=stateIn) {
-			if(state==TASstate.NONE) {
-				TASmod.logger.info(String.format("Set the server state to %s", stateIn.toString()));
-				this.state = stateIn;
-			}else if(state==TASstate.RECORDING) {
-				if(stateIn==TASstate.PLAYBACK) {
-					return;
-				}
-				TASmod.logger.info(String.format("Set the server state to %s", stateIn.toString()));
-				this.state = stateIn;
-			}else if(state==TASstate.PLAYBACK) {
-				if(stateIn==TASstate.RECORDING) {
-					return;
-				}
-				TASmod.logger.info(String.format("Set the server state to %s", stateIn.toString()));
-				this.state = stateIn;
+		if (state != stateIn) {
+			if (state == TASstate.RECORDING && stateIn == TASstate.PLAYBACK || state == TASstate.PLAYBACK && stateIn == TASstate.RECORDING)
+				return;
+			if(state==TASstate.NONE&&state==TASstate.PAUSED) {
+				return;
 			}
+			this.state = stateIn;
+			TASmod.logger.info(String.format("Set the server state to %s", stateIn.toString()));
 		}
+		CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
 	}
-	
-	public TASstate toggleRecording() {
-		setState(state==TASstate.RECORDING ? TASstate.NONE : TASstate.RECORDING);
-		return state;
+
+	public void toggleRecording() {
+		setState(state == TASstate.RECORDING ? TASstate.NONE : TASstate.RECORDING);
 	}
-	
-	public TASstate togglePlayback() {
+
+	public void togglePlayback() {
 		setState(state == TASstate.PLAYBACK ? TASstate.NONE : TASstate.PLAYBACK);
-		return state;
 	}
 
 	public TASstate getState() {

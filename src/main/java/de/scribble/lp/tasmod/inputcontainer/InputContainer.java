@@ -48,6 +48,7 @@ public class InputContainer {
 	 */
 	private TASstate state = TASstate.NONE;
 
+	private TASstate tempPause = TASstate.NONE;
 	/**
 	 * The current index of the inputs
 	 */
@@ -106,6 +107,8 @@ public class InputContainer {
 				return verbose ? TextFormatting.RED + "A playback is already running" : "";
 			case RECORDING:
 				return verbose ? TextFormatting.RED + "A recording is already running" : "";
+			case PAUSED:
+				return verbose ? TextFormatting.RED + "The game is already paused" : "";
 			case NONE:
 				return verbose ? TextFormatting.RED + "Nothing is running" : "";
 			}
@@ -132,6 +135,8 @@ public class InputContainer {
 				}
 				state = TASstate.RECORDING;
 				return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
+			case PAUSED:
+				return verbose ? TextFormatting.RED + "Can't pause anything because nothing is running" : "";
 			case NONE:
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: None)";
 			}
@@ -141,6 +146,10 @@ public class InputContainer {
 				return verbose ? TextFormatting.RED + "A recording is currently running. Please stop the recording first before starting a playback" : "";
 			case RECORDING:
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Recording)";
+			case PAUSED:
+				state = TASstate.PAUSED;
+				tempPause = TASstate.RECORDING;
+				return verbose ? TextFormatting.GREEN + "Pausing a recording" : "";
 			case NONE:
 				ClientProxy.virtual.unpressEverything();
 				state = TASstate.NONE;
@@ -152,21 +161,69 @@ public class InputContainer {
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Playback)";
 			case RECORDING:
 				return verbose ? TextFormatting.RED + "A playback is currently running. Please stop the playback first before starting a recording" : "";
+			case PAUSED:
+				state = TASstate.PAUSED;
+				tempPause = TASstate.PLAYBACK;
+				ClientProxy.virtual.unpressEverything();
+				return verbose ? TextFormatting.GREEN + "Pausing a playback" : "";
 			case NONE:
 				ClientProxy.virtual.unpressEverything();
 				state = TASstate.NONE;
 				return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";
 			}
+		} else if (state == TASstate.PAUSED) {
+			switch (stateIn) {
+			case PLAYBACK:
+				state=TASstate.PLAYBACK;
+				tempPause=TASstate.NONE;
+				return verbose ? TextFormatting.GREEN + "Resuming a playback" : "";
+			case RECORDING:
+				state=TASstate.RECORDING;
+				tempPause=TASstate.NONE;
+				return verbose ? TextFormatting.GREEN + "Resuming a recording" : "";
+			case PAUSED:
+				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Paused)";
+			case NONE:
+				state=TASstate.NONE;
+				TASstate statey=tempPause;
+				tempPause=TASstate.NONE;
+				return TextFormatting.GREEN + "Aborting a "+statey.toString().toLowerCase()+" that was paused";
+			}
 		}
 		return "Something went wrong ._.";
 	}
 
+	public TASstate togglePause() {
+		if(state!=TASstate.PAUSED) {
+			setTASState(TASstate.PAUSED);
+		}else {
+			setTASState(tempPause);
+		}
+		return state;
+	}
+
+	public void pause(boolean pause) {
+		if(pause) {
+			if(state!=TASstate.NONE) {
+				setTASState(TASstate.PAUSED);
+			}
+		}else {
+			if(state == TASstate.PAUSED) {
+				setTASState(tempPause, false);
+			}
+		}
+	}
+	
 	public boolean isPlayingback() {
 		return state == TASstate.PLAYBACK;
 	}
 
 	public boolean isRecording() {
 		return state == TASstate.RECORDING;
+	}
+	
+	public boolean isPaused() {
+		return state == TASstate.PAUSED;
 	}
 
 	public boolean isNothingPlaying() {
@@ -247,29 +304,36 @@ public class InputContainer {
 	 */
 	public void nextTick() {
 		if (state == TASstate.RECORDING) {
-			index++;
-			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
-			dMonitor.capturePosition(); // Capturing the current position of the player
+			recordNextTick();
 		} else if (state == TASstate.PLAYBACK) {
-			if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe,
-										// secondly as potential exploit protection
-				setTASState(TASstate.NONE);
-			}
-			index++;
-			if (index == inputs.size()) { // When the last input is supposed to occur
-				this.keyboard = new VirtualKeyboard();
-				this.mouse = new VirtualMouse();
-			} else if (index > inputs.size()) {
-				TASstate.setOrSend(TASstate.NONE);
-//				TickrateChangerServer.changeServerTickrate(0);	//Tickrate 0 once the playback is done
-//				TickrateChangerServer.changeClientTickrate(0);
-				index--;
-			} else {
-				TickInputContainer tickcontainer = inputs.get(index);
-				this.keyboard = tickcontainer.getKeyboard().clone();
-				this.mouse = tickcontainer.getMouse().clone();
-				this.subticks = tickcontainer.getSubticks().clone();
-			}
+			playbackNextTick();
+		}
+	}
+	
+	private void recordNextTick() {
+		index++;
+		inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
+		dMonitor.capturePosition(); // Capturing the current position of the player
+	}
+
+	private void playbackNextTick() {
+		if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe, secondly as potential exploit protection
+			setTASState(TASstate.NONE);
+		}
+		System.out.println(index); // TODO Remove
+		index++;	// Increase the index and load the next inputs
+		
+		if (index == inputs.size()) { 		// When the last 
+			this.keyboard = new VirtualKeyboard();	//C
+			this.mouse = new VirtualMouse();
+		} else if (index > inputs.size()) {
+			TASstate.setOrSend(TASstate.NONE);
+			index--;
+		} else {
+			TickInputContainer tickcontainer = inputs.get(index);	//Loads the new inputs from the container
+			this.keyboard = tickcontainer.getKeyboard().clone();
+			this.mouse = tickcontainer.getMouse().clone();
+			this.subticks = tickcontainer.getSubticks().clone();
 		}
 	}
 	// =====================================================================================================

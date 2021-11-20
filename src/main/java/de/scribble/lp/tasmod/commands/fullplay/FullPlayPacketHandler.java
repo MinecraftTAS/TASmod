@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class FullPlayPacketHandler implements IMessageHandler<FullPlayPacket, IMessage> {
 
@@ -21,14 +22,19 @@ public class FullPlayPacketHandler implements IMessageHandler<FullPlayPacket, IM
 			if(ctx.side == Side.CLIENT) {
 				Minecraft mc = Minecraft.getMinecraft();
 				mc.addScheduledTask(()->{
-					OpenGuiEvent.stateWhenOpened=TASstate.PLAYBACK;
-					mc.world.sendQuittingDisconnectingPacket();
-			        mc.loadWorld((WorldClient)null);
-			        mc.displayGuiScreen(new GuiMainMenu());
+					workaround(mc);
 				});
 			}
 		}
 		return null;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	private void workaround(Minecraft mc) {
+		OpenGuiEvent.stateWhenOpened=TASstate.PLAYBACK;
+		mc.world.sendQuittingDisconnectingPacket();
+        mc.loadWorld((WorldClient)null);
+        mc.displayGuiScreen(new GuiMainMenu());
 	}
 
 }
