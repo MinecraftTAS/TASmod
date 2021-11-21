@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestates.server;
+package de.scribble.lp.tasmod.savestates.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

@@ -48,7 +48,9 @@ public class KeybindingEvents {
 			TickrateChangerClient.advanceTick();
 			
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.testingKey)) {
+			
 			TASstate.setOrSend(ClientProxy.virtual.getContainer().togglePause());
+			
 		}
 	}
 }
