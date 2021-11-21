@@ -29,7 +29,7 @@ public abstract class MixinMinecraftServer {
 
 	@ModifyConstant(method = "run", constant = @Constant(longValue = 50L))
 	public long modifyMSPT(long fiftyLong) {
-		return TickrateChangerServer.MILISECONDS_PER_TICK;
+		return TickrateChangerServer.millisecondsPerTick;
 	}
 
 	// =====================================================================================================================================
@@ -54,9 +54,9 @@ public abstract class MixinMinecraftServer {
 			TickSyncServer.incrementServerTickCounter();
 			CommonProxy.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(), false, false));
 		}
-		if (TickrateChangerServer.ADVANCE_TICK) {
+		if (TickrateChangerServer.advanceTick) {
 			TickrateChangerServer.changeServerTickrate(0F);
-			TickrateChangerServer.ADVANCE_TICK = false;
+			TickrateChangerServer.advanceTick = false;
 		}
 	}
 
@@ -87,13 +87,13 @@ public abstract class MixinMinecraftServer {
 	public void redirectThreadSleep(long msToTick) {
 
 		if (msToTick <= 0L) {
-			if (TickrateChangerServer.TICKS_PER_SECOND > 20.0)
+			if (TickrateChangerServer.ticksPerSecond > 20.0)
 				msToTick = 0L;
 			else
 				msToTick = 1L;
 		}
 		for (long o = 0; o < msToTick; o++) {
-			if (TickrateChangerServer.TICKS_PER_SECOND == 0) {
+			if (TickrateChangerServer.ticksPerSecond == 0) {
 				currentTime = System.currentTimeMillis();
 				faketick++;
 				if (faketick >= 20) {
@@ -104,10 +104,10 @@ public abstract class MixinMinecraftServer {
 					}
 				}
 			}
-			if (TickrateChangerServer.INTERRUPT) {
+			if (TickrateChangerServer.interrupt) {
 				currentTime = System.currentTimeMillis();
 				msToTick = 1L;
-				TickrateChangerServer.INTERRUPT = false;
+				TickrateChangerServer.interrupt = false;
 			}
 			synchronized (this.futureTaskQueue) {
 				while (!this.futureTaskQueue.isEmpty()) {

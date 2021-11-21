@@ -44,6 +44,7 @@
 		"events.MixinWorldClient",
 		"events.MixinGuiMainMenu",
 		"events.MixinGuiIngameMenu",
+		"events.MixinGuiControls",
 		"events.MixinMinecraft",
 		
 		//Playbackhooks

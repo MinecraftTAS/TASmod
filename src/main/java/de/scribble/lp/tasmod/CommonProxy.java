@@ -28,8 +28,12 @@ import de.scribble.lp.tasmod.savestates.server.motion.RequestMotionPacket;
 import de.scribble.lp.tasmod.savestates.server.motion.RequestMotionPacketHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacketHandler;
-import de.scribble.lp.tasmod.tickratechanger.TickratePacket;
-import de.scribble.lp.tasmod.tickratechanger.TickratePacketHandler;
+import de.scribble.lp.tasmod.tickratechanger.AdvanceTickratePacket;
+import de.scribble.lp.tasmod.tickratechanger.AdvanceTickratePacket.AdvanceTickratePacketHandler;
+import de.scribble.lp.tasmod.tickratechanger.ChangeTickratePacket;
+import de.scribble.lp.tasmod.tickratechanger.ChangeTickratePacket.ChangeTickratePacketHandler;
+import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket;
+import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket.PauseTickratePacketHandler;
 import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
 import de.scribble.lp.tasmod.ticksync.TickSyncPacketHandler;
 import de.scribble.lp.tasmod.util.changestates.RequestStatePacket;
@@ -50,9 +54,16 @@ public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent ev) {
 		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("tasmod");
 		int i = -1;
+		
 		// Tickrate
-		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, i++, Side.SERVER);
-		NETWORK.registerMessage(TickratePacketHandler.class, TickratePacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(ChangeTickratePacketHandler.class, ChangeTickratePacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(ChangeTickratePacketHandler.class, ChangeTickratePacket.class, i++, Side.CLIENT);
+		
+		NETWORK.registerMessage(AdvanceTickratePacketHandler.class, AdvanceTickratePacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(AdvanceTickratePacketHandler.class, AdvanceTickratePacket.class, i++, Side.CLIENT);
+		
+		NETWORK.registerMessage(PauseTickratePacketHandler.class, PauseTickratePacket.class, i++, Side.SERVER);
+		NETWORK.registerMessage(PauseTickratePacketHandler.class, PauseTickratePacket.class, i++, Side.CLIENT);
 
 		// Ticksync
 		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, i++, Side.CLIENT);

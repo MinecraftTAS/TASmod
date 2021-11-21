@@ -37,10 +37,9 @@ public abstract class MixinMinecraft {
 	
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void injectRunGameLoop(CallbackInfo ci) {
-		// TASmod
+		
 		KeybindingEvents.fireKeybindingsEvent();
 		
-		TickrateChangerClient.bypass();
 		if(((Minecraft) (Object) this).player!=null) {
 			ClientProxy.hud.tick();
 		}
@@ -50,10 +49,10 @@ public abstract class MixinMinecraft {
 		}
 		while (Mouse.next()) {
 			if(this.currentScreen==null) {
-				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.TICKS_PER_SECOND==0);
+				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.ticksPerSecond==0);
 			} else {
 				GuiScreenDuck screen=(GuiScreenDuck) currentScreen;
-				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.TICKS_PER_SECOND==0);
+				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.ticksPerSecond==0);
 			}
 		}
 	}
@@ -73,13 +72,13 @@ public abstract class MixinMinecraft {
 	public void redirectRunTick(Minecraft mc) {
 		for (int j2 = 0; j2 < TickSync.getTickAmount((Minecraft) (Object) this); j2++) {
 			ClientProxy.virtual.updateContainer();
-			if (TickrateChangerClient.TICKS_PER_SECOND != 0) {
+			if (TickrateChangerClient.ticksPerSecond != 0) {
 				((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 			}
 			this.runTick();
 		}
-		if (TickrateChangerClient.ADVANCE_TICK) {
-			TickrateChangerClient.ADVANCE_TICK = false;
+		if (TickrateChangerClient.advanceTick) {
+			TickrateChangerClient.advanceTick = false;
 			TickrateChangerClient.changeClientTickrate(0F);
 		}
 	}
@@ -175,7 +174,7 @@ public abstract class MixinMinecraft {
 
 	@ModifyConstant(method = "runTickMouse", constant = @Constant(longValue = 200L))
 	public long fixMouseWheel(long twohundredLong) {
-		return (long) Math.max(4000F / TickrateChangerClient.TICKS_PER_SECOND, 200L);
+		return (long) Math.max(4000F / TickrateChangerClient.ticksPerSecond, 200L);
 	}
 
 	// =====================================================================================================================================

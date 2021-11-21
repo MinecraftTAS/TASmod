@@ -41,7 +41,7 @@ public class KeybindingEvents {
 			
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickratezeroKey)) {
 			
-			TickrateChangerClient.pauseUnpauseGame();
+			TickrateChangerClient.togglePause();
 			
 		} else if (VirtualKeybindings.isKeyDown(ClientProxy.tickAdvance)) {
 			

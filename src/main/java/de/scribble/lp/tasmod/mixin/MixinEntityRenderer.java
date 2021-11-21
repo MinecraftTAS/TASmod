@@ -71,7 +71,7 @@ public class MixinEntityRenderer implements SubtickDuck {
 
 	@Redirect(at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;inGameHasFocus:Z", opcode = Opcodes.GETFIELD, ordinal = 1), method = "updateCameraAndRender")
 	public boolean stopVanilla(Minecraft mc) {
-		if (TickrateChangerClient.TICKS_PER_SECOND != 0) {
+		if (TickrateChangerClient.ticksPerSecond != 0) {
 			return false;
 		} else {
 			return mc.inGameHasFocus;
