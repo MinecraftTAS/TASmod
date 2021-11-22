@@ -2,9 +2,15 @@
     "required": true,
     "minVersion": "0.7.10",
     "package": "de.scribble.lp.tasmod.mixin",
-    "refmap": "mixins.tasmod.refmap.json",
+    "refmap": "refmap.json",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
+    
+    	//Accessors
+    	"AccessorWorld",
+    	"AccessorMinecraftServer",
+    	"AccessorEntity",
+    	"AccessorSaveHandler",
     
         //General
         "MixinMinecraftServer",
@@ -23,6 +29,9 @@
         
     ],
     "client": [
+    	//Client Accessors
+    	"AccessorTimer",
+    
         //General
         "MixinMinecraft",
         "MixinEntityRenderer",

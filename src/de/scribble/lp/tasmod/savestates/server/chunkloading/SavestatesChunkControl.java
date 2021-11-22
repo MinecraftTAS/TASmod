@@ -3,6 +3,8 @@ package de.scribble.lp.tasmod.savestates.server.chunkloading;
 import java.util.List;
 
 import de.scribble.lp.tasmod.duck.ChunkProviderDuck;
+import de.scribble.lp.tasmod.mixin.AccessorSaveHandler;
+import de.scribble.lp.tasmod.mixin.AccessorWorld;
 import de.scribble.lp.tasmod.mixin.savestates.MixinChunkProviderClient;
 import de.scribble.lp.tasmod.mixin.savestates.MixinChunkProviderServer;
 import net.minecraft.client.Minecraft;
@@ -151,7 +153,7 @@ public class SavestatesChunkControl {
 		//MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		//WorldServer[] worlds=server.worlds;
 		for(WorldServer world : worlds) {
-			((SaveHandler)world.getSaveHandler()).setSessionLock();
+			((AccessorSaveHandler) ((SaveHandler)world.getSaveHandler())).setSessionLock();
 		}
 	}
 	/**
@@ -168,7 +170,7 @@ public class SavestatesChunkControl {
 	 */
 	@SideOnly(Side.CLIENT)
 	public static void keepPlayerInLoadedEntityList(net.minecraft.entity.player.EntityPlayer player) {
-		Minecraft.getMinecraft().world.unloadedEntityList.remove(player);
+		((AccessorWorld) Minecraft.getMinecraft().world).unloadedEntityList().remove(player);
 	}
 	
 	/**

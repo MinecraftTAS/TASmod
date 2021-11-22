@@ -7,8 +7,8 @@ import net.minecraft.client.resources.I18n;
 
 public class GuiSavestateLoadingScreen extends GuiScreen{
 
-	private static boolean copying;
-	private static boolean deleting;
+//	private static boolean copying;
+//	private static boolean deleting;
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
