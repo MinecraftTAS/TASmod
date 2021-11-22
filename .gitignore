@@ -1,23 +1,9 @@
-# eclipse
-bin
+# Eclipse Files
+run-server/
+run/
+build/
 *.launch
-.settings
-.metadata
+.settings/
+.factorypath
 .classpath
 .project
-
-# idea
-out
-*.ipr
-*.iws
-*.iml
-.idea
-
-# gradle
-build
-.gradle
-
-# other
-eclipse
-run
-logs/
