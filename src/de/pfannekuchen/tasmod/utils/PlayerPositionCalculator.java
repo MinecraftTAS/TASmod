@@ -335,13 +335,13 @@ public class PlayerPositionCalculator {
         
         if (partialTicks == 1.0F)
         {
-            vec3d1 = ((AccessorEntity) source).getVectorForRotation(CameraInterpolationEvents.rotationPitch, source.rotationYawHead);
+            vec3d1 = ((AccessorEntity) source).invokeGetVectorForRotation(CameraInterpolationEvents.rotationPitch, source.rotationYawHead);
         }
         else
         {
             float f2 = CameraInterpolationEvents.rotationPitch;
             float f1 = CameraInterpolationEvents.rotationYaw + 180f;
-            vec3d1 = ((AccessorEntity) source).getVectorForRotation(f2, f1);
+            vec3d1 = ((AccessorEntity) source).invokeGetVectorForRotation(f2, f1);
         }
         
         Vec3d vec3d2 = vec3d.addVector(vec3d1.x * mc.playerController.getBlockReachDistance(), vec3d1.y * mc.playerController.getBlockReachDistance(), vec3d1.z * mc.playerController.getBlockReachDistance());

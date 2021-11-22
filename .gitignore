@@ -5,5 +5,7 @@ build/
 *.launch
 .settings/
 .factorypath
+.apt_generated
+.apt_generated_tests
 .classpath
 .project
