@@ -9,6 +9,6 @@ import net.minecraft.world.storage.SaveHandler;
 public interface AccessorSaveHandler {
 
 	@Invoker("setSessionLock")
-	public void setSessionLock();
+	public void invokeSetSessionLock();
 	
 }

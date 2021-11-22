@@ -16,7 +16,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
-import net.minecraft.world.storage.SaveHandler;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -153,7 +152,7 @@ public class SavestatesChunkControl {
 		//MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		//WorldServer[] worlds=server.worlds;
 		for(WorldServer world : worlds) {
-			((AccessorSaveHandler) ((SaveHandler)world.getSaveHandler())).setSessionLock();
+			((AccessorSaveHandler) world.getSaveHandler()).invokeSetSessionLock();
 		}
 	}
 	/**
