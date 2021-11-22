@@ -1,0 +1,3 @@
+[submodule "KillTheRNG"]
+	path = KillTheRNG
+	url = https://github.com/ScribbleLP/KillTheRNG.git
