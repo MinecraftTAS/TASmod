@@ -8,7 +8,7 @@ import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiMainMenu;
 
-public class OpenGuiEvent {
+public class OpenGuiEvents {
 	/**
 	 * The state that should be used when the main menu opens
 	 */
@@ -24,7 +24,7 @@ public class OpenGuiEvent {
 			ClientProxy.virtual.getContainer().setTASState(stateWhenOpened);
 			stateWhenOpened = null;
 		}
-		LoadWorldEvent.doneLoadingMainMenu();
+		LoadWorldEvents.doneLoadingMainMenu();
 	}
 
 	/**

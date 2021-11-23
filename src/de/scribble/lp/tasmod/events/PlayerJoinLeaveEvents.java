@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -45,6 +46,7 @@ public class PlayerJoinLeaveEvents {
 		TASmod.logger.info("Firing login events for {} on the CLIENT", player.getName());
 		ClientProxy.virtual.unpressEverything();
 		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
+		TickrateChangerClient.joinServer();
 	}
 	
 	/**
@@ -67,7 +69,7 @@ public class PlayerJoinLeaveEvents {
 			GameProfile profile = ((net.minecraft.entity.player.EntityPlayer)event.getEntity()).getGameProfile();
 			TASmod.logger.info("Firing other login events for {} on the CLIENT", profile.getName());
 			ClientProxy.shieldDownloader.onPlayerJoin(profile);
-			LoadWorldEvent.doneLoadingIngame();
+			LoadWorldEvents.doneLoadingIngame();
 		}
 	}
 	

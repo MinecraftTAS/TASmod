@@ -151,7 +151,12 @@ public class TickrateChangerClient {
 		}
 	}
 	
+	public static void joinServer() {
+		changeServerTickrate(ticksPerSecond);
+	}
+	
 	private static void log(String msg) {
 //		TASmod.logger.info(msg);
 	}
+
 }
