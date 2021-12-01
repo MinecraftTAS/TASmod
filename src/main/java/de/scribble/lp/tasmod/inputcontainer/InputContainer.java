@@ -53,6 +53,8 @@ public class InputContainer {
 	 * The current index of the inputs
 	 */
 	private int index;
+	
+	private boolean shouldPause;
 
 	private VirtualKeyboard keyboard = new VirtualKeyboard();
 
@@ -195,8 +197,9 @@ public class InputContainer {
 
 	public TASstate togglePause() {
 		if(state!=TASstate.PAUSED) {
-			setTASState(TASstate.PAUSED);
+			shouldPause=true;
 		}else {
+			shouldPause=false;
 			setTASState(tempPause);
 		}
 		return state;
@@ -205,9 +208,10 @@ public class InputContainer {
 	public void pause(boolean pause) {
 		if(pause) {
 			if(state!=TASstate.NONE) {
-				setTASState(TASstate.PAUSED);
+				shouldPause=true;
 			}
 		}else {
+			shouldPause=false;
 			if(state == TASstate.PAUSED) {
 				setTASState(tempPause, false);
 			}

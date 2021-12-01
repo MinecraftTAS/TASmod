@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import de.scribble.lp.tasmod.events.OpenGuiEvent;
+import de.scribble.lp.tasmod.events.OpenGuiEvents;
 import de.scribble.lp.tasmod.gui.GuiMultiplayerWarn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -17,7 +17,7 @@ public class MixinGuiMainMenu extends GuiScreen {
 
 	@Inject(method = "initGui", at = @At("HEAD"))
 	public void inject_initGui(CallbackInfo ci) {
-		OpenGuiEvent.openGuiMainMenu((GuiMainMenu) (Object) this);
+		OpenGuiEvents.openGuiMainMenu((GuiMainMenu) (Object) this);
 	}
 	
 	@Redirect(method = "actionPerformed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;displayGuiScreen(Lnet/minecraft/client/gui/GuiScreen;)V", ordinal = 3))

@@ -157,7 +157,7 @@ public class TutorialHandler {
 			checkForKeys();
 			ScaledResolution scaled = new ScaledResolution(mc);
 			int width = scaled.getScaledWidth();
-			int height = scaled.getScaledHeight();
+//			int height = scaled.getScaledHeight();
 			String[] text = getTutorialText();
 			
 			

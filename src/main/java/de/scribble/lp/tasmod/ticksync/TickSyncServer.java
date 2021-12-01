@@ -2,6 +2,7 @@ package de.scribble.lp.tasmod.ticksync;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.mixin.accessors.AccessorMinecraftServer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class TickSyncServer {
@@ -17,7 +18,7 @@ public class TickSyncServer {
 	}
 
 	public static void resetTickCounter() {
-		TASmod.getServerInstance().getServer().tickCounter = 0;
+		((AccessorMinecraftServer) TASmod.getServerInstance().getServer()).tickCounter(0);
 		serverticksync = 0;
 	}
 

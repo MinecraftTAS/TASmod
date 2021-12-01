@@ -19,7 +19,14 @@
         
         //Fixing forge and vanilla stuff
         "fixes.MixinDragonFightManager",
-        "fixes.MixinMinecraftFullscreen"
+        "fixes.MixinMinecraftFullscreen",
+        
+        //Accessors
+        "accessors.AccessorEntity",
+        "accessors.AccessorMinecraftServer",
+        "accessors.AccessorSaveHandler",
+        "accessors.AccessorWorld"
+        
         
     ],
     "client": [
@@ -31,7 +38,6 @@
         
         //Savestates
 		"savestates.MixinChunkProviderClient",
-		"AccessorRunStuff",
 		
 		//Interpolation
 		"MixinFrustum",
@@ -60,6 +66,10 @@
 		
 		//Shields
 		"shields.MixinRenderItem",
-		"shields.MixinTileEntityItemStackRenderer"
+		"shields.MixinTileEntityItemStackRenderer",
+		
+		//Accessors
+		"accessors.AccessorRunStuff",
+		"accessors.AccessorTimer"
 	]
 }

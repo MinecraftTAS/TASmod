@@ -44,6 +44,7 @@ minecraft {
     mappings = "snapshot_20171003"
     makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     replace '${version}':project.version,'${mcversion}':project.minecraft.version
+    clientRunArgs += "--mixin mixins.tasmod.json --tweakClass org.spongepowered.asm.launch.MixinTweaker"
 }
 repositories {
     mavenCentral()

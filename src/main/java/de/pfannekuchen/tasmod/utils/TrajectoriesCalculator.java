@@ -1,5 +1,6 @@
 package de.pfannekuchen.tasmod.utils;
 
+import de.scribble.lp.tasmod.mixin.accessors.AccessorRunStuff;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.item.ItemBow;
@@ -23,15 +24,15 @@ public class TrajectoriesCalculator {
 		
 		// calculate starting position
 		double arrowPosX = player.lastTickPosX
-			+ (player.posX - player.lastTickPosX) * Minecraft.getMinecraft().timer.renderPartialTicks
+			+ (player.posX - player.lastTickPosX) * ((AccessorRunStuff) Minecraft.getMinecraft()).timer().renderPartialTicks
 			- Math.cos((float)Math.toRadians(player.rotationYaw)) * 0.16F;
 		double arrowPosY = player.lastTickPosY
 			+ (player.posY - player.lastTickPosY)
-				* Minecraft.getMinecraft().timer.renderPartialTicks
+				* ((AccessorRunStuff) Minecraft.getMinecraft()).timer().renderPartialTicks
 			+ player.getEyeHeight() - 0.1;
 		double arrowPosZ = player.lastTickPosZ
 			+ (player.posZ - player.lastTickPosZ)
-				* Minecraft.getMinecraft().timer.renderPartialTicks
+				* ((AccessorRunStuff) Minecraft.getMinecraft()).timer().renderPartialTicks
 			- Math.sin((float)Math.toRadians(player.rotationYaw)) * 0.16F;
 		
 		// calculate starting motion

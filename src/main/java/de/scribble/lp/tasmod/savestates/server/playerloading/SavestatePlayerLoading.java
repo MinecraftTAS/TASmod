@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.mixin.accessors.AccessorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -34,7 +35,7 @@ public class SavestatePlayerLoading {
 		WorldServer[] worlds=DimensionManager.getWorlds();
 		for (WorldServer world : worlds) {
 			WorldInfo info=world.getSaveHandler().loadWorldInfo();
-			world.worldInfo=info;
+			((AccessorWorld) world).worldInfo(info);
 		}
 		for(EntityPlayerMP player : players) {
 			
@@ -51,7 +52,7 @@ public class SavestatePlayerLoading {
 			if(dimensionNow!=dimensionPrev) {
 				list.transferPlayerToDimension(player, dimensionNow, new NoPortalTeleporter());
 			}else {
-				player.getServerWorld().unloadedEntityList.remove(player);
+				((AccessorWorld) player.getServerWorld()).unloadedEntityList().remove(player);
 			}
 			
 			player.readFromNBT(nbttagcompound);

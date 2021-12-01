@@ -1,6 +1,6 @@
 package de.scribble.lp.tasmod.commands.fullplay;
 
-import de.scribble.lp.tasmod.events.OpenGuiEvent;
+import de.scribble.lp.tasmod.events.OpenGuiEvents;
 import de.scribble.lp.tasmod.util.TASstate;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -41,10 +41,12 @@ public class FullPlayPacket implements IMessage {
 		@SideOnly(Side.CLIENT)
 		private void workaround() {
 			Minecraft mc = Minecraft.getMinecraft();
-			OpenGuiEvent.stateWhenOpened=TASstate.PLAYBACK;
-			mc.world.sendQuittingDisconnectingPacket();
-	        mc.loadWorld((WorldClient)null);
-	        mc.displayGuiScreen(new GuiMainMenu());
+			mc.addScheduledTask(() ->{
+				OpenGuiEvents.stateWhenOpened=TASstate.PLAYBACK;
+				mc.world.sendQuittingDisconnectingPacket();
+		        mc.loadWorld((WorldClient)null);
+		        mc.displayGuiScreen(new GuiMainMenu());
+			});
 		}
 	}
 }

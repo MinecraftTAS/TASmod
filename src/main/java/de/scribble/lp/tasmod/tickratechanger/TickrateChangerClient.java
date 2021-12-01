@@ -1,6 +1,8 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.mixin.accessors.AccessorRunStuff;
+import de.scribble.lp.tasmod.mixin.accessors.AccessorTimer;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -48,12 +50,12 @@ public class TickrateChangerClient {
 		}
 		Minecraft mc = Minecraft.getMinecraft();
 		if (tickrate > 0) {
-			mc.timer.tickLength = 1000F / tickrate;
+			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(1000F / tickrate);
 		} else if (tickrate == 0F) {
 			if (ticksPerSecond != 0) {
 				tickrateSaved = ticksPerSecond;
 			}
-			mc.timer.tickLength = Float.MAX_VALUE;
+			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(Float.MAX_VALUE);
 		}
 		ticksPerSecond = tickrate;
 		log("Setting the client tickrate to "+ ticksPerSecond);
@@ -149,7 +151,12 @@ public class TickrateChangerClient {
 		}
 	}
 	
+	public static void joinServer() {
+		changeServerTickrate(ticksPerSecond);
+	}
+	
 	private static void log(String msg) {
 //		TASmod.logger.info(msg);
 	}
+
 }

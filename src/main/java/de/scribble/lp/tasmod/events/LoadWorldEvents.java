@@ -3,7 +3,7 @@ package de.scribble.lp.tasmod.events;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import net.minecraft.client.multiplayer.WorldClient;
 
-public class LoadWorldEvent {
+public class LoadWorldEvents {
 
 	private enum LoadingState {
 		LOADING, UNLOADING
@@ -15,7 +15,6 @@ public class LoadWorldEvent {
 
 	public static void startLoading(WorldClient world) {
 		state = world != null ? LoadingState.LOADING : LoadingState.UNLOADING;
-		System.out.println("Loading");
 		if (TickrateChangerClient.ticksPerSecond == 0 || TickrateChangerClient.advanceTick) {
 			TickrateChangerClient.pauseGame(false);
 			waszero = true;
@@ -37,7 +36,6 @@ public class LoadWorldEvent {
 	}
 
 	private static void doneLoading() {
-		System.out.println("Done");
 		if (waszero) {
 			TickrateChangerClient.pauseGame(true);
 			waszero = false;
