@@ -95,6 +95,19 @@ public class TickrateChangerServer {
 	}
 	
 	/**
+	 * Pauses the game without sending a command to the clients
+	 * @param pause The state of the server
+	 */
+	public static void pauseServerGame(boolean pause) {
+		if(pause) {
+			changeServerTickrate(0F);
+		}else {
+			changeServerTickrate(tickrateSaved);
+		}
+	}
+	
+	
+	/**
 	 * Advances the game by 1 tick.
 	 */
     public static void advanceTick() {
@@ -131,6 +144,6 @@ public class TickrateChangerServer {
 	}
 	
 	private static void log(String msg) {
-//		TASmod.logger.info(msg);
+		TASmod.logger.info(msg);
 	}
 }

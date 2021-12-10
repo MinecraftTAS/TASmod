@@ -24,7 +24,7 @@ public class OpenGuiEvents {
 			ClientProxy.virtual.getContainer().setTASState(stateWhenOpened);
 			stateWhenOpened = null;
 		}
-		LoadWorldEvents.doneLoadingMainMenu();
+		LoadWorldEvents.doneShuttingDown();
 	}
 
 	/**

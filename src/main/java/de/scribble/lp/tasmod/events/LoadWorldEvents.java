@@ -1,44 +1,52 @@
 package de.scribble.lp.tasmod.events;
 
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import net.minecraft.client.multiplayer.WorldClient;
+import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
+import de.scribble.lp.tasmod.ticksync.TickSync;
+import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 
 public class LoadWorldEvents {
 
-	private enum LoadingState {
-		LOADING, UNLOADING
-	}
+	public static boolean waszero = false;
 
-	private static LoadingState state = null;
-
-	private static boolean waszero = false;
-
-	public static void startLoading(WorldClient world) {
-		state = world != null ? LoadingState.LOADING : LoadingState.UNLOADING;
+	/**
+	 * Executed when an integrated server is launched
+	 */
+	public static void startLaunchServer() {
 		if (TickrateChangerClient.ticksPerSecond == 0 || TickrateChangerClient.advanceTick) {
-			TickrateChangerClient.pauseGame(false);
 			waszero = true;
 		}
 	}
 
-	public static void doneLoadingIngame() {
-		if (state == LoadingState.LOADING) {
-			doneLoading();
-			state = null;
+	public static void doneLaunchingServer() {
+		if (!TASmod.getServerInstance().isDedicatedServer()) {
+			if (waszero) { // If the server is dedicated: waszero=false;
+				TickrateChangerClient.pauseClientGame(true);
+				TickrateChangerServer.pauseServerGame(true);
+				waszero = false;
+			}else {
+				TickSync.resetTickCounter();
+				TickSyncServer.resetTickCounter();
+				TickrateChangerServer.changeServerTickrate(TickrateChangerClient.ticksPerSecond);
+			}
 		}
 	}
 
-	public static void doneLoadingMainMenu() {
-		if (state == LoadingState.UNLOADING) {
-			doneLoading();
-			state = null;
+	/* The following code is for integrated and dedicated server! */
+
+	public static void startShutdown() {
+		if (TickrateChangerServer.ticksPerSecond == 0 || TickrateChangerServer.advanceTick) {
+			TickrateChangerServer.pauseGame(false);
+			waszero = true;
 		}
 	}
 
-	private static void doneLoading() {
+	public static void doneShuttingDown() {
 		if (waszero) {
 			TickrateChangerClient.pauseGame(true);
 			waszero = false;
 		}
 	}
+
 }

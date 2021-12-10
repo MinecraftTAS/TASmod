@@ -16,6 +16,7 @@
         
         //Events
         "events.MixinPlayerList",
+        "events.MixinMinecraftServer",
         
         //Fixing forge and vanilla stuff
         "fixes.MixinDragonFightManager",

@@ -1,9 +1,12 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.events.LoadWorldEvents;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorRunStuff;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorTimer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
 
 /**
  * Changes the {@link Minecraft#timer} variable
@@ -34,7 +37,13 @@ public class TickrateChangerClient {
 	 */
 	public static void changeTickrate(float tickrate) {
 		changeClientTickrate(tickrate);
-		changeServerTickrate(tickrate);
+		MinecraftServer server=TASmod.getServerInstance();
+		if(server!=null) {
+			if(server.isDedicatedServer())
+				changeServerTickrate(tickrate);
+			else
+				TickrateChangerServer.changeServerTickrate(tickrate);
+		}
 	}
 
 	/**
@@ -152,11 +161,13 @@ public class TickrateChangerClient {
 	}
 	
 	public static void joinServer() {
-		changeServerTickrate(ticksPerSecond);
+		if(!LoadWorldEvents.waszero) {
+			changeServerTickrate(ticksPerSecond);
+		}
 	}
 	
 	private static void log(String msg) {
-//		TASmod.logger.info(msg);
+		TASmod.logger.info(msg);
 	}
 
 }

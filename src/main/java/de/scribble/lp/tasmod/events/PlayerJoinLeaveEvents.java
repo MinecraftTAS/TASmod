@@ -69,7 +69,6 @@ public class PlayerJoinLeaveEvents {
 			GameProfile profile = ((net.minecraft.entity.player.EntityPlayer)event.getEntity()).getGameProfile();
 			TASmod.logger.info("Firing other login events for {} on the CLIENT", profile.getName());
 			ClientProxy.shieldDownloader.onPlayerJoin(profile);
-			LoadWorldEvents.doneLoadingIngame();
 		}
 	}
 	
