@@ -24,7 +24,6 @@ import de.scribble.lp.tasmod.ticksync.TickSync;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.Timer;
 
 @Mixin(Minecraft.class)
@@ -35,8 +34,6 @@ public abstract class MixinMinecraft {
 
 	@Shadow
 	private GuiScreen currentScreen;
-	@Shadow
-	public GameSettings gameSettings;
 	
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void injectRunGameLoop(CallbackInfo ci) {
