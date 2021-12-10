@@ -54,6 +54,7 @@ public class InputContainer {
 	 */
 	private int index;
 	
+	@SuppressWarnings("unused")
 	private boolean shouldPause;
 
 	private VirtualKeyboard keyboard = new VirtualKeyboard();

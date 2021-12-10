@@ -15,7 +15,7 @@ public class MixinMinecraftFullscreen {
 	
 	@Shadow
 	public GameSettings gameSettings;
-
+	
 	@Inject(method = "toggleFullscreen", at = @At("RETURN"))
 	public void inject_toggleFullscreen(CallbackInfo ci) {
 		int keyF11=this.gameSettings.keyBindFullscreen.getKeyCode();

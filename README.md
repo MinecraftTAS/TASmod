@@ -22,6 +22,6 @@ Special thanks: Darkmoon, The Minecraft TAS Community
 `/clearinputs` Delete all stored inputs, use this before starting a brand new recording. `/record` will resume the recording and not clear the inputs first.  
   
 ## Development
-This Project uses ForgeNoGradle. Please download and run [this file](https://mgnet.work/ForgeNoGradle-1.0.0.jar) in your repository root directory
-  
-You will also find a KillTheRNG.jar (not with -deobf at the end!) in the libs folder. First add it to the build path. Then copy that into `run/mods` to tell ForgeNoGradle to load a second mod.
+This Project uses ForgeNoGradle. Please download and run [this file](https://mgnet.work/ForgeNoGradle-1.0.1.jar) in your repository root directory
+To export a jar, clean the project first. Project -> Clean, then run the -export.launch file
+You will also find a KillTheRNG.jar, copy that into `run/mods` to tell ForgeNoGradle to load a second mod.
