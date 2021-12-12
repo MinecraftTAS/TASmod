@@ -2,7 +2,7 @@ package de.scribble.lp.tasmod.events;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.monitoring.BufferView;
+import de.scribble.lp.tasmod.externalGui.InputContainerView;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
 import de.scribble.lp.tasmod.savestates.server.SavestatePacket;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -29,7 +29,7 @@ public class KeybindingEvents {
 
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.bufferViewKey)) {
 			
-			BufferView.startBufferView();
+			InputContainerView.startBufferView();
 			
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(ClientProxy.infoGuiKey)) {
 			

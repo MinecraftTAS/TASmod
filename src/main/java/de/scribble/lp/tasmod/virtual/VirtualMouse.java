@@ -192,6 +192,14 @@ public class VirtualMouse implements Serializable {
 	public List<PathNode> getPath() {
 		return path;
 	}
+	
+	public String getPathAsString() {
+		String out="";
+		for(PathNode node: path) {
+			out=out.concat(node.toString());
+		}
+		return out;
+	}
 
 	public void addPathNode() {
 		path.add(new PathNode(keyList, scrollwheel, cursorX, cursorY));

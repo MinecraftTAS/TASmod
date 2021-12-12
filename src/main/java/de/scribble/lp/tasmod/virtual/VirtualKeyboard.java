@@ -228,6 +228,14 @@ public class VirtualKeyboard implements Serializable {
 	public List<Character> getCharList() {
 		return charList;
 	}
+	
+	public String getCharListAsString() {
+		String out="";
+		for(char chars: charList) {
+			out=out.concat(Character.toString(chars));
+		}
+		return out;
+	}
 
 	public void clearCharList() {
 		charList.clear();

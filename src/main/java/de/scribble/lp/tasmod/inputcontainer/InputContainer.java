@@ -324,7 +324,6 @@ public class InputContainer {
 		if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe, secondly as potential exploit protection
 			setTASState(TASstate.NONE);
 		}
-		System.out.println(index); // TODO Remove
 		index++;	// Increase the index and load the next inputs
 		
 		if (index == inputs.size()) { 		// When the last 
