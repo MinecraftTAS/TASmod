@@ -27,6 +27,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -72,6 +73,18 @@ public class TASmod {
 		} else if (Loader.isModLoaded("lotas")) {
 			throw new ModIncompatibleException("\n========================================================================\n" + "\n" + "Detected LoTAS to be loaded. TASMod and LoTAS are incompatible!\n" + "\n" + "========================================================================");
 		}
+		for (ModContainer mod : Loader.instance().getModList())
+        {
+            if(mod.getModId().equals("forge")) {
+            	String [] versionsplit=mod.getVersion().split("\\.");
+            	int forgeversion=Integer.parseInt(versionsplit[3]);
+            	if(MCVERSION.equals("1.12.2")&&forgeversion<2857) {
+            		throw new SecurityException("\n========================================================================\n" + "\n" + "The forge version you are using contains a critical Log4J exploit: 14.23.5." +forgeversion+ "\n"
+            				+ "Please update the forge version to something above 14.23.5.2857.\n"
+            				+ "You can find new versions under https://files.minecraftforge.net/net/minecraftforge/forge/index_1.12.2.html\n\n ========================================================================");
+            	}
+            }
+        }
 	}
 
 	@EventHandler
