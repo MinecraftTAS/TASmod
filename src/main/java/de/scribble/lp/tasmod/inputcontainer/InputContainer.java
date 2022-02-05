@@ -54,8 +54,6 @@ public class InputContainer {
 	 */
 	private int index;
 	
-	private boolean shouldPause;
-
 	private VirtualKeyboard keyboard = new VirtualKeyboard();
 
 	private VirtualMouse mouse = new VirtualMouse();
@@ -195,23 +193,29 @@ public class InputContainer {
 		return "Something went wrong ._.";
 	}
 
+	/**
+	 * Switches between the paused state and the state it was in before the pause
+	 * @return The new state
+	 */
 	public TASstate togglePause() {
 		if(state!=TASstate.PAUSED) {
-			shouldPause=true;
+			setTASState(TASstate.PAUSED);
 		}else {
-			shouldPause=false;
 			setTASState(tempPause);
 		}
 		return state;
 	}
 
+	/**
+	 * Forces the playback to pause or unpause
+	 * @param pause True, if it should be paused
+	 */
 	public void pause(boolean pause) {
 		if(pause) {
 			if(state!=TASstate.NONE) {
-				shouldPause=true;
+				setTASState(TASstate.PAUSED, false);
 			}
 		}else {
-			shouldPause=false;
 			if(state == TASstate.PAUSED) {
 				setTASState(tempPause, false);
 			}
@@ -234,6 +238,9 @@ public class InputContainer {
 		return state == TASstate.NONE;
 	}
 
+	/**
+	 * @return The current state of the playback
+	 */
 	public TASstate getState() {
 		return state;
 	}
@@ -321,18 +328,20 @@ public class InputContainer {
 	}
 
 	private void playbackNextTick() {
+		
 		if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe, secondly as potential exploit protection
 			setTASState(TASstate.NONE);
 		}
+		
 		index++;	// Increase the index and load the next inputs
 		
-		if (index == inputs.size()) { 		// When the last 
-			this.keyboard = new VirtualKeyboard();	//C
-			this.mouse = new VirtualMouse();
-		} else if (index > inputs.size()) {
+		/*Stop condition*/
+		if (index >= inputs.size()) {
+			unpressContainer();
 			TASstate.setOrSend(TASstate.NONE);
-			index--;
-		} else {
+		}
+		/*Continue condition*/
+		else {
 			TickInputContainer tickcontainer = inputs.get(index);	//Loads the new inputs from the container
 			this.keyboard = tickcontainer.getKeyboard().clone();
 			this.mouse = tickcontainer.getMouse().clone();
