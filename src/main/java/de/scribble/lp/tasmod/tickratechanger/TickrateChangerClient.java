@@ -37,7 +37,6 @@ public class TickrateChangerClient {
 	 */
 	public static void changeTickrate(float tickrate) {
 		changeClientTickrate(tickrate);
-		MinecraftServer server=TASmod.getServerInstance();
 		changeServerTickrate(tickrate);
 	}
 

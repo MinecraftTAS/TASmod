@@ -12,13 +12,14 @@ import net.minecraft.server.MinecraftServer;
 @Mixin(MinecraftServer.class)
 public class MixinMinecraftServer {
 	
+	@Inject(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;init()Z", shift = Shift.AFTER))
+	public void inject_run(CallbackInfo ci) {
+		LoadWorldEvents.initServer();
+	}
+	
 	@Inject(method = "initiateShutdown", at = @At("HEAD"))
 	public void inject_initiateShutDown(CallbackInfo ci) {
 		LoadWorldEvents.startShutdown();
 	}
 	
-	@Inject(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;init()Z", shift = Shift.AFTER))
-	public void inject_run(CallbackInfo ci) {
-		LoadWorldEvents.doneLaunchingServer();
-	}
 }
