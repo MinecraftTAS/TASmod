@@ -144,6 +144,6 @@ public class TickrateChangerServer {
 	}
 	
 	private static void log(String msg) {
-		TASmod.logger.info(msg);
+		TASmod.logger.debug(msg);
 	}
 }

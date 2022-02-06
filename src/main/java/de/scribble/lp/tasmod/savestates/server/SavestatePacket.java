@@ -63,7 +63,7 @@ public class SavestatePacket implements IMessage{
 			if(ctx.side.isServer()) {
 				ctx.getServerHandler().player.getServerWorld().addScheduledTask(()->{
 					EntityPlayerMP player=ctx.getServerHandler().player;
-					if (!player.canUseCommand(2, "tickrate")) {
+					if (!player.canUseCommand(2, "savestate")) {
 						player.sendMessage(new TextComponentString(TextFormatting.RED+"You don't have permission to do that"));
 						return;
 					}

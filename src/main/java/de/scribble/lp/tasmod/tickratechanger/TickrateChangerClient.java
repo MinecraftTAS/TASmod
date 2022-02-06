@@ -38,12 +38,7 @@ public class TickrateChangerClient {
 	public static void changeTickrate(float tickrate) {
 		changeClientTickrate(tickrate);
 		MinecraftServer server=TASmod.getServerInstance();
-		if(server!=null) {
-			if(server.isDedicatedServer())
-				changeServerTickrate(tickrate);
-			else
-				TickrateChangerServer.changeServerTickrate(tickrate);
-		}
+		changeServerTickrate(tickrate);
 	}
 
 	/**
@@ -161,13 +156,11 @@ public class TickrateChangerClient {
 	}
 	
 	public static void joinServer() {
-		if(!LoadWorldEvents.waszero) {
-			changeServerTickrate(ticksPerSecond);
-		}
+		changeServerTickrate(ticksPerSecond);
 	}
 	
 	private static void log(String msg) {
-		TASmod.logger.info(msg);
+		TASmod.logger.debug(msg);
 	}
 
 }

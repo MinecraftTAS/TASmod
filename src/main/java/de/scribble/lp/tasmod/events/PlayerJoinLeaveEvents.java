@@ -22,7 +22,7 @@ public class PlayerJoinLeaveEvents {
 	 * @param player The player that joined the server
 	 */
 	public static void firePlayerJoinedServerSide(EntityPlayerMP player) {
-		TASmod.logger.info("Firing login events for {} on the SERVER", player.getName());
+		TASmod.logger.debug("Firing login events for {} on the SERVER", player.getName());
 		TickSyncServer.joinServer(player);
 		TASmod.containerStateServer.joinServer(player);
 		TickrateChangerServer.joinServer(player);
@@ -43,7 +43,7 @@ public class PlayerJoinLeaveEvents {
 	 */
 	@SideOnly(Side.CLIENT)
 	public static void firePlayerJoinedClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
-		TASmod.logger.info("Firing login events for {} on the CLIENT", player.getName());
+		TASmod.logger.debug("Firing login events for {} on the CLIENT", player.getName());
 		ClientProxy.virtual.unpressEverything();
 		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
 		TickrateChangerClient.joinServer();
@@ -55,7 +55,7 @@ public class PlayerJoinLeaveEvents {
 	 */
 	@SideOnly(Side.CLIENT)
 	public static void firePlayerLeaveClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
-		TASmod.logger.info("Firing logout events for {} on the CLIENT", player.getName());
+		TASmod.logger.debug("Firing logout events for {} on the CLIENT", player.getName());
 		ClientProxy.virtual.unpressEverything();
 	}
 
@@ -67,7 +67,7 @@ public class PlayerJoinLeaveEvents {
 	public void fireOtherPlayerJoinedClientSide(EntityJoinWorldEvent event) {
 		if ((event.getWorld().isRemote) && ((event.getEntity() instanceof net.minecraft.entity.player.EntityPlayer))){
 			GameProfile profile = ((net.minecraft.entity.player.EntityPlayer)event.getEntity()).getGameProfile();
-			TASmod.logger.info("Firing other login events for {} on the CLIENT", profile.getName());
+			TASmod.logger.debug("Firing other login events for {} on the CLIENT", profile.getName());
 			ClientProxy.shieldDownloader.onPlayerJoin(profile);
 		}
 	}
@@ -77,7 +77,7 @@ public class PlayerJoinLeaveEvents {
 	 * @param profile
 	 */
 	public static void fireOtherPlayerJoinedClientSide(GameProfile profile) {
-		TASmod.logger.info("Firing other login events for {} on the CLIENT", profile.getName());
+		TASmod.logger.debug("Firing other login events for {} on the CLIENT", profile.getName());
 		ClientProxy.shieldDownloader.onPlayerJoin(profile);
 	}
 }

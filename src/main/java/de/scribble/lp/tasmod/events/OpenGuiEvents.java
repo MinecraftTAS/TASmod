@@ -58,7 +58,7 @@ public class OpenGuiEvents {
 	 */
 	public static void closeGuiControls(GuiControls guiControls) {
 		if (waszero) {
-			TASmod.logger.info("Unausing the game again");
+			TASmod.logger.info("Unpausing the game again");
 			waszero = false;
 			TickrateChangerClient.pauseGame(true);
 		}
