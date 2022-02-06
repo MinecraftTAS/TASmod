@@ -61,7 +61,9 @@ public class LoadWorldEvents {
 	 */
 	public static void doneLoadingClientWorld() {
 		TASmod.logger.info("Finished loading the world on the client");
-		cd = 1;
+		if(TASmod.getServerInstance()!=null) {
+			cd = 1;
+		}
 	}
 
 	/**

@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.tasmod.commands.clearinputs.CommandClearInputs;
 import de.scribble.lp.tasmod.commands.folder.CommandFolder;
 import de.scribble.lp.tasmod.commands.fullplay.CommandFullPlay;
@@ -94,7 +93,7 @@ public class TASmod {
 		logger.info("Testing connection with KillTheRNG");
 		isKTRNGLoaded=Loader.isModLoaded("killtherng");
 		if (isKTRNGLoaded) {
-			KillTheRNG.LOGGER.info("Connection established with TASmod");
+//			KillTheRNG.LOGGER.info("Connection established with TASmod");
 		}else {
 			logger.info("KillTheRNG doesn't appear to be loaded");
 		}
