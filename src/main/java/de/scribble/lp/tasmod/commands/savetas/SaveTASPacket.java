@@ -1,6 +1,5 @@
 package de.scribble.lp.tasmod.commands.savetas;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -50,9 +49,8 @@ public class SaveTASPacket implements IMessage {
 		public IMessage onMessage(SaveTASPacket message, MessageContext ctx) {
 			if (ctx.side.isClient()) {
 				Minecraft.getMinecraft().addScheduledTask(() -> {
-					ClientProxy.createTASDir();
 					try {
-						ClientProxy.serialiser.saveToFileV1(new File(ClientProxy.tasdirectory + "/" + message.getName() + ".tas"), ClientProxy.virtual.getContainer());
+						ClientProxy.virtual.saveInputs(message.getName());
 					} catch (IOException e) {
 						Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
 						return;

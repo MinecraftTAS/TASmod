@@ -37,7 +37,6 @@ public class CommandFullPlay extends CommandBase{
 		} finally {
 			TASmod.savestateHandler.state=SavestateState.NONE;
 		}
-		
 		CommonProxy.NETWORK.sendToAll(new FullPlayPacket());
 	}
 

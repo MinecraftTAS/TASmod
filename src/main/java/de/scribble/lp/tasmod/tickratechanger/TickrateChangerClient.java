@@ -2,11 +2,9 @@ package de.scribble.lp.tasmod.tickratechanger;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.events.LoadWorldEvents;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorRunStuff;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorTimer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
 
 /**
  * Changes the {@link Minecraft#timer} variable
@@ -159,7 +157,7 @@ public class TickrateChangerClient {
 	}
 	
 	private static void log(String msg) {
-		TASmod.logger.debug(msg);
+		TASmod.logger.info(msg);
 	}
 
 }

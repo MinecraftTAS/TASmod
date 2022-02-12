@@ -47,6 +47,7 @@ public class PlayerJoinLeaveEvents {
 		ClientProxy.virtual.unpressEverything();
 		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
 		TickrateChangerClient.joinServer();
+		ClientProxy.virtual.getContainer().printCredits();
 	}
 	
 	/**

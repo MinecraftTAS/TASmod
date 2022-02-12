@@ -6,11 +6,8 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Vector;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,12 +16,9 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
-import de.scribble.lp.tasmod.virtual.VirtualKeyboardEvent;
-import de.scribble.lp.tasmod.virtual.VirtualMouseEvent;
 
 public class InputContainerView extends JFrame {
 

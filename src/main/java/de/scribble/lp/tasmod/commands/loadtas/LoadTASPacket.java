@@ -1,6 +1,5 @@
 package de.scribble.lp.tasmod.commands.loadtas;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -53,8 +52,7 @@ public class LoadTASPacket implements IMessage{
 			} else {
 				Minecraft.getMinecraft().addScheduledTask(() -> {
 					try {
-						ClientProxy.virtual.setContainer(ClientProxy.serialiser.fromEntireFileV1(new File(ClientProxy.tasdirectory + "/" + message.getName() + ".tas")));
-						ClientProxy.virtual.getContainer().fixTicks();
+						ClientProxy.virtual.loadInputs(message.getName());
 					} catch (IOException e) {
 						Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
 						return;

@@ -47,7 +47,7 @@ public class ClientProxy extends CommonProxy {
 	
 	public static KeyBinding bufferViewKey = new KeyBinding("Buffer View", Keyboard.KEY_NUMPAD0, "TASmod");
 
-	public static VirtualInput virtual = new VirtualInput();
+	public static VirtualInput virtual;
 
 	public static ContainerSerialiser serialiser = new ContainerSerialiser();
 
@@ -66,10 +66,21 @@ public class ClientProxy extends CommonProxy {
 		config = new Configuration(ev.getSuggestedConfigurationFile());
 		Config.reloadClientConfig(config);
 
+		config.load();
+		String fileOnStart=config.get("General", "fileToLoad", "").getString();
+		config.get("General", "fileToLoad", "").set("");
+		config.save();
+		
+		if(fileOnStart.isEmpty()) {
+			fileOnStart=null;
+		}
+		virtual=new VirtualInput(fileOnStart);
+		
 		super.preInit(ev);
 	}
 
 	public void init(FMLInitializationEvent ev) {
+		
 		hud = new InfoHud();
 		shieldDownloader = new ShieldDownloader();
 

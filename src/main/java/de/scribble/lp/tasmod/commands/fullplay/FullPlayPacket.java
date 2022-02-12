@@ -42,6 +42,11 @@ public class FullPlayPacket implements IMessage {
 		private void workaround() {
 			Minecraft mc = Minecraft.getMinecraft();
 			mc.addScheduledTask(() ->{
+				try {
+					Thread.sleep(10L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				OpenGuiEvents.stateWhenOpened=TASstate.PLAYBACK;
 				mc.world.sendQuittingDisconnectingPacket();
 		        mc.loadWorld((WorldClient)null);

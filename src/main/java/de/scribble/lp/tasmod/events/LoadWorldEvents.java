@@ -15,7 +15,7 @@ public class LoadWorldEvents {
 	 * @see de.scribble.lp.tasmod.mixin.events.MixinMinecraft#inject_launchIntegratedServer(org.spongepowered.asm.mixin.injection.callback.CallbackInfo)
 	 */
 	public static void startLaunchServer() {
-		TASmod.logger.debug("Starting the integrated server");
+		TASmod.logger.info("Starting the integrated server");
 		if (TickrateChangerClient.ticksPerSecond == 0 || TickrateChangerClient.advanceTick) {
 			waszero = true;
 		}
@@ -53,7 +53,7 @@ public class LoadWorldEvents {
 	 * Executed when the player is in the main menu on the client
 	 */
 	public static void doneShuttingDown() {
-		TASmod.logger.info("Server is done shutting down");
+		TASmod.logger.debug("Server is done shutting down");
 	}
 
 	/**

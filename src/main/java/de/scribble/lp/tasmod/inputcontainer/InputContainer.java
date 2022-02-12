@@ -5,6 +5,7 @@ import java.io.File;
 import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
+import com.mojang.realmsclient.gui.ChatFormatting;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
@@ -18,6 +19,7 @@ import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -83,6 +85,8 @@ public class InputContainer {
 
 	// =====================================================================================================
 
+	private boolean creditsPrinted=false;
+	
 	/**
 	 * Starts or stops a recording/playback
 	 * 
@@ -128,6 +132,7 @@ public class InputContainer {
 				Minecraft.getMinecraft().gameSettings.chatLinks = false; // #119
 				index = 0;
 				state = TASstate.PLAYBACK;
+				creditsPrinted=false;
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
 				if (Minecraft.getMinecraft().player != null) {
@@ -577,5 +582,28 @@ public class InputContainer {
 	public void unpressContainer() {
 		keyboard.clear();
 		mouse.clear();
+	}
+	
+	// ==============================================================
+
+	public void printCredits() {
+		if (state == TASstate.PLAYBACK&&!creditsPrinted) {
+			creditsPrinted=true;
+			printMessage(title, ChatFormatting.GOLD);
+			printMessage("", null);
+			printMessage("by " + authors, ChatFormatting.AQUA);
+			printMessage("", null);
+			printMessage("in " + playtime, null);
+			printMessage("", null);
+			printMessage("Rerecords: " + rerecords, null);
+		}
+	}
+	
+	private void printMessage(String msg, ChatFormatting format) {
+		String formatString="";
+		if(format!=null)
+			formatString=format.toString();
+		
+		Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(formatString + msg));
 	}
 }

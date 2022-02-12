@@ -1,10 +1,15 @@
 package de.scribble.lp.tasmod.virtual;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.scribble.lp.killtherng.repack.org.msgpack.core.annotations.Nullable;
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.events.OpenGuiEvents;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorRunStuff;
@@ -114,6 +119,21 @@ public class VirtualInput {
 
 	public VirtualKeyboard getNextKeyboard() {
 		return nextKeyboard;
+	}
+	
+	/**
+	 * Loads the inputs and starts a TAS on initialize
+	 * @param fileToLoad (Nullable) Loads this filename and starts playing back the TAS
+	 */
+	public VirtualInput(@Nullable String fileToLoad) {
+		if (fileToLoad != null) {
+			try {
+				loadInputs(fileToLoad);
+				OpenGuiEvents.stateWhenOpened = TASstate.PLAYBACK;
+			} catch (IOException e) {
+				TASmod.logger.error("Cannot load inputs from the start of the TAS: {}", e.getMessage());
+			}
+		}
 	}
 
 	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
@@ -474,6 +494,17 @@ public class VirtualInput {
 		} else {
 			TASmod.logger.warn("Can't preload inputs, specified inputs are null!");
 		}
+	}
+	// ================================Load/Save Inputs=====================================
+	
+	public void loadInputs(String filename) throws IOException {
+		setContainer(ClientProxy.serialiser.fromEntireFileV1(new File(ClientProxy.tasdirectory + "/" + filename + ".tas")));
+		getContainer().fixTicks();
+	}
+	
+	public void saveInputs(String filename) throws IOException {
+		ClientProxy.createTASDir();
+		ClientProxy.serialiser.saveToFileV1(new File(ClientProxy.tasdirectory + "/" + filename + ".tas"), ClientProxy.virtual.getContainer());
 	}
 
 	// =====================================Debug===========================================
