@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.events;
 
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
@@ -54,6 +55,7 @@ public class LoadWorldEvents {
 	 */
 	public static void doneShuttingDown() {
 		TASmod.logger.debug("Server is done shutting down");
+		ClientProxy.virtual.unpressNext();
 	}
 
 	/**

@@ -391,9 +391,13 @@ public class VirtualInput {
 	}
 
 	public void unpressEverything() {
+		container.unpressContainer();
+		unpressNext();
+	}
+	
+	public void unpressNext() {
 		clearNextKeyboard();
 		clearNextMouse();
-		container.unpressContainer();
 	}
 
 	// ======================================Subticks===========================================

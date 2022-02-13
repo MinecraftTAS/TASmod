@@ -73,13 +73,13 @@ public class InputContainer {
 	
 	// =====================================================================================================
 
+	private String title = "Insert TAS category here";
+	
 	private String authors = "Insert author here";
 
-	private String title = "Insert TAS category here";
-
-	private int rerecords = 0;
-
 	private String playtime = "00:00.0";
+	
+	private int rerecords = 0;
 
 	private String startLocation = "";
 
@@ -396,6 +396,14 @@ public class InputContainer {
 		inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 		index = 0;
 		dMonitor.getPos().clear();
+		clearCredits();
+	}
+	
+	private void clearCredits() {
+		title="Insert Author here";
+		authors = "Insert author here";
+		playtime = "00:00.0";
+		rerecords = 0;
 	}
 
 	/**
