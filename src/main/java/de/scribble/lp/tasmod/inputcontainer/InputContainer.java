@@ -319,6 +319,15 @@ public class InputContainer {
 	 * the next inputs
 	 */
 	public void nextTick() {
+		/*Stop the playback while player is still loading*/
+		EntityPlayerSP player=Minecraft.getMinecraft().player;
+		if(player!=null&&!player.addedToChunk) {
+			pause(true);
+		}else {
+			pause(false);
+		}
+		
+		/*Tick the next playback or recording*/
 		if (state == TASstate.RECORDING) {
 			recordNextTick();
 		} else if (state == TASstate.PLAYBACK) {
