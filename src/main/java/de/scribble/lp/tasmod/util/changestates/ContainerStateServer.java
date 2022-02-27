@@ -50,6 +50,11 @@ public class ContainerStateServer {
 	}
 
 	public void setState(TASstate stateIn) {
+		setServerState(stateIn);
+		CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
+	}
+	
+	public void setServerState(TASstate stateIn) {
 		if (state != stateIn) {
 			if (state == TASstate.RECORDING && stateIn == TASstate.PLAYBACK || state == TASstate.PLAYBACK && stateIn == TASstate.RECORDING)
 				return;
@@ -59,9 +64,8 @@ public class ContainerStateServer {
 			this.state = stateIn;
 			TASmod.logger.info(String.format("Set the server state to %s", stateIn.toString()));
 		}
-		CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
 	}
-
+	
 	public void toggleRecording() {
 		setState(state == TASstate.RECORDING ? TASstate.NONE : TASstate.RECORDING);
 	}
@@ -69,6 +73,8 @@ public class ContainerStateServer {
 	public void togglePlayback() {
 		setState(state == TASstate.PLAYBACK ? TASstate.NONE : TASstate.PLAYBACK);
 	}
+	
+
 
 	public TASstate getState() {
 		return state;

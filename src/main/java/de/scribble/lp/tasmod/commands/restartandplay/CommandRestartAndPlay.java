@@ -9,6 +9,7 @@ import java.util.List;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
+import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -51,6 +52,7 @@ public class CommandRestartAndPlay extends CommandBase{
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				TASmod.containerStateServer.setServerState(TASstate.PLAYBACK);
 				CommonProxy.NETWORK.sendToAll(new RestartAndPlayPacket(args[0]));
 			}
 		} else {

@@ -4,6 +4,7 @@ import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.savestates.server.SavestateState;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
+import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -37,7 +38,7 @@ public class CommandFullRecord extends CommandBase {
 		} finally {
 			TASmod.savestateHandler.state = SavestateState.NONE;
 		}
-		
+		TASmod.containerStateServer.setServerState(TASstate.RECORDING);
 		CommonProxy.NETWORK.sendToAll(new FullRecordPacket());
 	}
 
