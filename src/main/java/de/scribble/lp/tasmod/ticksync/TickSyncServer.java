@@ -2,8 +2,7 @@ package de.scribble.lp.tasmod.ticksync;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
+import de.scribble.lp.tasmod.mixin.accessors.AccessorMinecraftServer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class TickSyncServer {
@@ -19,7 +18,7 @@ public class TickSyncServer {
 	}
 
 	public static void resetTickCounter() {
-		TASmod.getServerInstance().getServer().tickCounter = 0;
+		((AccessorMinecraftServer) TASmod.getServerInstance().getServer()).tickCounter(0);
 		serverticksync = 0;
 	}
 
@@ -34,9 +33,5 @@ public class TickSyncServer {
 	public static void joinServer(EntityPlayerMP player) {
 		TickSyncServer.resetTickCounter();
 		CommonProxy.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(), true, TickSyncServer.isEnabled()));
-
-		if (TickrateChangerClient.TICKS_PER_SECOND == 0) {
-			TickrateChangerServer.changeServerTickrate(0F);
-		}
 	}
 }

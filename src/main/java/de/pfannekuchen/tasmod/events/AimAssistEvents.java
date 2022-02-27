@@ -26,7 +26,7 @@ public class AimAssistEvents {
 		Minecraft mc = Minecraft.getMinecraft();
 		
 		if (mc.world == null) return;
-		if (TickrateChangerClient.TICKS_PER_SECOND == 0) {
+		if (TickrateChangerClient.ticksPerSecond == 0) {
 			PlayerPositionCalculator.calculateNextPosition(mc, mc.player);
 			ev.setCanceled(true);
 		}

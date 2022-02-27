@@ -1,7 +1,15 @@
 package de.scribble.lp.tasmod.util;
 
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMultiplayer;
+import net.minecraft.client.gui.GuiWorldSelection;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 
 /**
  * Adjusts the pointer/cursor of the playback to different gui scalings.
@@ -25,7 +33,17 @@ public class PointerNormalizer {
 	public static int getNormalizedY(int pointerY) {
 		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution scaled = new ScaledResolution(mc);
-		int out = (int) (pointerY - (scaled.getScaledHeight() / 2D));
+
+		int out = pointerY;
+
+		if (mc.currentScreen instanceof GuiContainer || mc.currentScreen instanceof GuiContainerCreative) {
+			out = (int) (pointerY - (scaled.getScaledHeight() / 2D));
+		} else if (mc.currentScreen instanceof GuiWorldSelection|| mc.currentScreen instanceof GuiMultiplayer) {
+			
+		} else {
+			out = (int) (pointerY - (scaled.getScaledHeight() / 4 + 72 + -16));
+		}
+
 		return out;
 	}
 
@@ -39,7 +57,16 @@ public class PointerNormalizer {
 	public static int getCoordsY(int normalizedY) {
 		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution scaled = new ScaledResolution(mc);
-		int out = (int) Math.round(normalizedY + (scaled.getScaledHeight() / 2D));
+
+		int out = normalizedY;
+		if (mc.currentScreen instanceof GuiContainer || mc.currentScreen instanceof GuiContainerCreative) {
+			out = (int) Math.round(normalizedY + (scaled.getScaledHeight() / 2D));
+		} else if (mc.currentScreen instanceof GuiWorldSelection || mc.currentScreen instanceof GuiMultiplayer) {
+			
+		} else {
+			out = (int) (normalizedY + (scaled.getScaledHeight() / 4 + 72 + -16));
+		}
+
 		return limiterY(out, scaled);
 	}
 
@@ -60,6 +87,45 @@ public class PointerNormalizer {
 			out = 0;
 		return out;
 	}
+
+	private static int gcd(int a, int b) {
+		return (b == 0) ? a : gcd(b, a % b);
+	}
+
+	public static void printAspectRatio() {
+		int height = Minecraft.getMinecraft().displayHeight;
+		int width = Minecraft.getMinecraft().displayWidth;
+		int gcd = gcd(width, height);
+		if (gcd == 0) {
+			System.out.println(gcd);
+		} else {
+			System.out.println(width / gcd + ":" + height / gcd);
+		}
+	}
+	
+	public static void resize(int width, int height) {
+		double temp=(double)width/height;
+		int newHeight=Minecraft.getMinecraft().displayHeight;
+		int newWidth=(int)(temp*newHeight);
+		
+		try {
+			Display.setDisplayMode(new DisplayMode(newWidth, newHeight));
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+		}
+		
+		Minecraft.getMinecraft().displayHeight=newHeight;
+		Minecraft.getMinecraft().displayWidth=newWidth;
+		
+		
+		Minecraft.getMinecraft().resize(newWidth, newHeight);
+		Display.setResizable(false);
+		Display.setResizable(true);
+		Minecraft.getMinecraft().updateDisplay();
+	}
+	
+	
+
 	/*
 	 * Here lies 10 hours of work for something I didn't even use. This code
 	 * normalizes the pointers coordinates and scales it depending on the screen

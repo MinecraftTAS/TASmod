@@ -16,10 +16,17 @@
         
         //Events
         "events.MixinPlayerList",
+        "events.MixinMinecraftServer",
         
         //Fixing forge and vanilla stuff
         "fixes.MixinDragonFightManager",
-        "fixes.MixinMinecraftFullscreen"
+        
+        //Accessors
+        "accessors.AccessorEntity",
+        "accessors.AccessorMinecraftServer",
+        "accessors.AccessorSaveHandler",
+        "accessors.AccessorWorld"
+        
         
     ],
     "client": [
@@ -31,7 +38,6 @@
         
         //Savestates
 		"savestates.MixinChunkProviderClient",
-		"AccessorRunStuff",
 		
 		//Interpolation
 		"MixinFrustum",
@@ -39,9 +45,15 @@
 		//Keybinding
 		"MixinTextfield",
 		
+		"fixes.MixinMinecraftFullscreen",
+		
 		//Join and leave game event on the client
 		"events.MixinNetHandlerPlayClient",
 		"events.MixinWorldClient",
+		"events.MixinGuiMainMenu",
+		"events.MixinGuiIngameMenu",
+		"events.MixinGuiControls",
+		"events.MixinMinecraft",
 		
 		//Playbackhooks
 		"playbackhooks.MixinGameSettings",
@@ -49,7 +61,6 @@
 		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",
 		"playbackhooks.MixinGuiContainer",
 		"playbackhooks.MixinGuiContainerCreative",
-		"playbackhooks.MixinGuiMainMenu",
 		"playbackhooks.MixinGuiScreenAdvancements",
 		"playbackhooks.MixinGuiSlot",
 		"playbackhooks.MixinGuiStats",
@@ -57,6 +68,10 @@
 		
 		//Shields
 		"shields.MixinRenderItem",
-		"shields.MixinTileEntityItemStackRenderer"
+		"shields.MixinTileEntityItemStackRenderer",
+		
+		//Accessors
+		"accessors.AccessorRunStuff",
+		"accessors.AccessorTimer"
 	]
 }

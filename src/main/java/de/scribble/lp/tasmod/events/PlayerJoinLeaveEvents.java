@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -43,8 +44,10 @@ public class PlayerJoinLeaveEvents {
 	@SideOnly(Side.CLIENT)
 	public static void firePlayerJoinedClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
 		TASmod.logger.info("Firing login events for {} on the CLIENT", player.getName());
-		ClientProxy.virtual.unpressEverything();
+		ClientProxy.virtual.unpressNext();
 		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
+		TickrateChangerClient.joinServer();
+		ClientProxy.virtual.getContainer().printCredits();
 	}
 	
 	/**
@@ -54,7 +57,6 @@ public class PlayerJoinLeaveEvents {
 	@SideOnly(Side.CLIENT)
 	public static void firePlayerLeaveClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
 		TASmod.logger.info("Firing logout events for {} on the CLIENT", player.getName());
-		ClientProxy.virtual.unpressEverything();
 	}
 
 	/**

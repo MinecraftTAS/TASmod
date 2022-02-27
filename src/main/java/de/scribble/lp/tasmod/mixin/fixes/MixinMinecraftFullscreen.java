@@ -14,7 +14,7 @@ import net.minecraft.client.settings.GameSettings;
 public class MixinMinecraftFullscreen {
 	
 	@Shadow
-	private GameSettings gameSettings;
+	public GameSettings gameSettings;
 
 	@Inject(method = "toggleFullscreen", at = @At("RETURN"))
 	public void inject_toggleFullscreen(CallbackInfo ci) {

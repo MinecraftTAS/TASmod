@@ -5,10 +5,10 @@ import java.io.File;
 import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
+import com.mojang.realmsclient.gui.ChatFormatting;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.commands.changestates.SyncStatePacket;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.util.TASstate;
@@ -19,6 +19,7 @@ import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -49,11 +50,12 @@ public class InputContainer {
 	 */
 	private TASstate state = TASstate.NONE;
 
+	private TASstate tempPause = TASstate.NONE;
 	/**
 	 * The current index of the inputs
 	 */
 	private int index;
-
+	
 	private VirtualKeyboard keyboard = new VirtualKeyboard();
 
 	private VirtualMouse mouse = new VirtualMouse();
@@ -71,18 +73,20 @@ public class InputContainer {
 	
 	// =====================================================================================================
 
+	private String title = "Insert TAS category here";
+	
 	private String authors = "Insert author here";
 
-	private String title = "Insert TAS category here";
-
-	private int rerecords = 0;
-
 	private String playtime = "00:00.0";
+	
+	private int rerecords = 0;
 
 	private String startLocation = "";
 
 	// =====================================================================================================
 
+	private boolean creditsPrinted=false;
+	
 	/**
 	 * Starts or stops a recording/playback
 	 * 
@@ -107,6 +111,8 @@ public class InputContainer {
 				return verbose ? TextFormatting.RED + "A playback is already running" : "";
 			case RECORDING:
 				return verbose ? TextFormatting.RED + "A recording is already running" : "";
+			case PAUSED:
+				return verbose ? TextFormatting.RED + "The game is already paused" : "";
 			case NONE:
 				return verbose ? TextFormatting.RED + "Nothing is running" : "";
 			}
@@ -126,6 +132,7 @@ public class InputContainer {
 				Minecraft.getMinecraft().gameSettings.chatLinks = false; // #119
 				index = 0;
 				state = TASstate.PLAYBACK;
+				creditsPrinted=false;
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
 				if (Minecraft.getMinecraft().player != null) {
@@ -133,6 +140,8 @@ public class InputContainer {
 				}
 				state = TASstate.RECORDING;
 				return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
+			case PAUSED:
+				return verbose ? TextFormatting.RED + "Can't pause anything because nothing is running" : "";
 			case NONE:
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: None)";
 			}
@@ -142,6 +151,10 @@ public class InputContainer {
 				return verbose ? TextFormatting.RED + "A recording is currently running. Please stop the recording first before starting a playback" : "";
 			case RECORDING:
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Recording)";
+			case PAUSED:
+				state = TASstate.PAUSED;
+				tempPause = TASstate.RECORDING;
+				return verbose ? TextFormatting.GREEN + "Pausing a recording" : "";
 			case NONE:
 				ClientProxy.virtual.unpressEverything();
 				state = TASstate.NONE;
@@ -153,15 +166,67 @@ public class InputContainer {
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Playback)";
 			case RECORDING:
 				return verbose ? TextFormatting.RED + "A playback is currently running. Please stop the playback first before starting a recording" : "";
+			case PAUSED:
+				state = TASstate.PAUSED;
+				tempPause = TASstate.PLAYBACK;
+				ClientProxy.virtual.unpressEverything();
+				return verbose ? TextFormatting.GREEN + "Pausing a playback" : "";
 			case NONE:
 				ClientProxy.virtual.unpressEverything();
 				state = TASstate.NONE;
 				return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";
 			}
+		} else if (state == TASstate.PAUSED) {
+			switch (stateIn) {
+			case PLAYBACK:
+				state=TASstate.PLAYBACK;
+				tempPause=TASstate.NONE;
+				return verbose ? TextFormatting.GREEN + "Resuming a playback" : "";
+			case RECORDING:
+				state=TASstate.RECORDING;
+				tempPause=TASstate.NONE;
+				return verbose ? TextFormatting.GREEN + "Resuming a recording" : "";
+			case PAUSED:
+				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Paused)";
+			case NONE:
+				state=TASstate.NONE;
+				TASstate statey=tempPause;
+				tempPause=TASstate.NONE;
+				return TextFormatting.GREEN + "Aborting a "+statey.toString().toLowerCase()+" that was paused";
+			}
 		}
 		return "Something went wrong ._.";
 	}
 
+	/**
+	 * Switches between the paused state and the state it was in before the pause
+	 * @return The new state
+	 */
+	public TASstate togglePause() {
+		if(state!=TASstate.PAUSED) {
+			setTASState(TASstate.PAUSED);
+		}else {
+			setTASState(tempPause);
+		}
+		return state;
+	}
+
+	/**
+	 * Forces the playback to pause or unpause
+	 * @param pause True, if it should be paused
+	 */
+	public void pause(boolean pause) {
+		if(pause) {
+			if(state!=TASstate.NONE) {
+				setTASState(TASstate.PAUSED, false);
+			}
+		}else {
+			if(state == TASstate.PAUSED) {
+				setTASState(tempPause, false);
+			}
+		}
+	}
+	
 	public boolean isPlayingback() {
 		return state == TASstate.PLAYBACK;
 	}
@@ -169,11 +234,18 @@ public class InputContainer {
 	public boolean isRecording() {
 		return state == TASstate.RECORDING;
 	}
+	
+	public boolean isPaused() {
+		return state == TASstate.PAUSED;
+	}
 
 	public boolean isNothingPlaying() {
 		return state == TASstate.NONE;
 	}
 
+	/**
+	 * @return The current state of the playback
+	 */
 	public TASstate getState() {
 		return state;
 	}
@@ -247,30 +319,47 @@ public class InputContainer {
 	 * the next inputs
 	 */
 	public void nextTick() {
+		/*Stop the playback while player is still loading*/
+		EntityPlayerSP player=Minecraft.getMinecraft().player;
+		if(player!=null&&!player.addedToChunk) {
+			pause(true);
+		}else {
+			pause(false);
+		}
+		
+		/*Tick the next playback or recording*/
 		if (state == TASstate.RECORDING) {
-			index++;
-			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
-			dMonitor.capturePosition(); // Capturing the current position of the player
+			recordNextTick();
 		} else if (state == TASstate.PLAYBACK) {
-			if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe,
-										// secondly as potential exploit protection
-				setTASState(TASstate.NONE);
-			}
-			index++;
-			if (index == inputs.size()) { // When the last input is supposed to occur
-				this.keyboard = new VirtualKeyboard();
-				this.mouse = new VirtualMouse();
-			} else if (index > inputs.size()) {
-				CommonProxy.NETWORK.sendToServer(new SyncStatePacket(TASstate.NONE));
-//				TickrateChangerServer.changeServerTickrate(0);	//Tickrate 0 once the playback is done
-//				TickrateChangerServer.changeClientTickrate(0);
-				index--;
-			} else {
-				TickInputContainer tickcontainer = inputs.get(index);
-				this.keyboard = tickcontainer.getKeyboard().clone();
-				this.mouse = tickcontainer.getMouse().clone();
-				this.subticks = tickcontainer.getSubticks().clone();
-			}
+			playbackNextTick();
+		}
+	}
+	
+	private void recordNextTick() {
+		index++;
+		inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
+		dMonitor.capturePosition(); // Capturing the current position of the player
+	}
+
+	private void playbackNextTick() {
+		
+		if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe, secondly as potential exploit protection
+			setTASState(TASstate.NONE);
+		}
+		
+		index++;	// Increase the index and load the next inputs
+		
+		/*Stop condition*/
+		if (index >= inputs.size()) {
+			unpressContainer();
+			TASstate.setOrSend(TASstate.NONE);
+		}
+		/*Continue condition*/
+		else {
+			TickInputContainer tickcontainer = inputs.get(index);	//Loads the new inputs from the container
+			this.keyboard = tickcontainer.getKeyboard().clone();
+			this.mouse = tickcontainer.getMouse().clone();
+			this.subticks = tickcontainer.getSubticks().clone();
 		}
 	}
 	// =====================================================================================================
@@ -316,6 +405,14 @@ public class InputContainer {
 		inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 		index = 0;
 		dMonitor.getPos().clear();
+		clearCredits();
+	}
+	
+	private void clearCredits() {
+		title="Insert Author here";
+		authors = "Insert author here";
+		playtime = "00:00.0";
+		rerecords = 0;
 	}
 
 	/**
@@ -502,5 +599,28 @@ public class InputContainer {
 	public void unpressContainer() {
 		keyboard.clear();
 		mouse.clear();
+	}
+	
+	// ==============================================================
+
+	public void printCredits() {
+		if (state == TASstate.PLAYBACK&&!creditsPrinted) {
+			creditsPrinted=true;
+			printMessage(title, ChatFormatting.GOLD);
+			printMessage("", null);
+			printMessage("by " + authors, ChatFormatting.AQUA);
+			printMessage("", null);
+			printMessage("in " + playtime, null);
+			printMessage("", null);
+			printMessage("Rerecords: " + rerecords, null);
+		}
+	}
+	
+	private void printMessage(String msg, ChatFormatting format) {
+		String formatString="";
+		if(format!=null)
+			formatString=format.toString();
+		
+		Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(formatString + msg));
 	}
 }

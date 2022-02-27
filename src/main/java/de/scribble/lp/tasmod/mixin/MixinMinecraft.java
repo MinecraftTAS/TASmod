@@ -17,6 +17,8 @@ import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.duck.GuiScreenDuck;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.events.KeybindingEvents;
+import de.scribble.lp.tasmod.events.LoadWorldEvents;
+import de.scribble.lp.tasmod.externalGui.InputContainerView;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -35,35 +37,26 @@ public abstract class MixinMinecraft {
 	@Shadow
 	private GuiScreen currentScreen;
 	
-//	private int faketick=0;
-	
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void injectRunGameLoop(CallbackInfo ci) {
-		// TASmod
+		
 		KeybindingEvents.fireKeybindingsEvent();
 		
-		TickrateChangerClient.bypass();
+		LoadWorldEvents.doneWithLoadingScreen();
+		
 		if(((Minecraft) (Object) this).player!=null) {
 			ClientProxy.hud.tick();
 		}
 		
-		//Fake tickrate loop when you are in tickrate 0
-//    	if(TickrateChangerClient.TICKS_PER_SECOND==0) {
-//    		faketick++;
-//    		if(faketick>=Minecraft.getDebugFPS()/3) {	//Not yet used but maybe in the future
-//    			faketick=0;
-//    		}
-//    	}
-    	
 		while (Keyboard.next()) {
 			ClientProxy.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
 		while (Mouse.next()) {
 			if(this.currentScreen==null) {
-				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.TICKS_PER_SECOND==0);
+				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.ticksPerSecond==0);
 			} else {
 				GuiScreenDuck screen=(GuiScreenDuck) currentScreen;
-				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.TICKS_PER_SECOND==0);
+				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.ticksPerSecond==0);
 			}
 		}
 	}
@@ -83,13 +76,13 @@ public abstract class MixinMinecraft {
 	public void redirectRunTick(Minecraft mc) {
 		for (int j2 = 0; j2 < TickSync.getTickAmount((Minecraft) (Object) this); j2++) {
 			ClientProxy.virtual.updateContainer();
-			if (TickrateChangerClient.TICKS_PER_SECOND != 0) {
+			if (TickrateChangerClient.ticksPerSecond != 0) {
 				((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 			}
 			this.runTick();
 		}
-		if (TickrateChangerClient.ADVANCE_TICK) {
-			TickrateChangerClient.ADVANCE_TICK = false;
+		if (TickrateChangerClient.advanceTick) {
+			TickrateChangerClient.advanceTick = false;
 			TickrateChangerClient.changeClientTickrate(0F);
 		}
 	}
@@ -101,10 +94,14 @@ public abstract class MixinMinecraft {
 
 	@Inject(method = "runTick", at = @At(value = "HEAD"))
 	public void injectRunTick(CallbackInfo ci) throws IOException {
+		InputContainerView.update(ClientProxy.virtual);
 		TickSync.incrementClienttickcounter();
 		if (SavestatePlayerLoading.wasLoading) {
 			SavestatePlayerLoading.wasLoading = false;
-			SavestateHandler.playerLoadSavestateEventClient();
+			
+			if(Minecraft.getMinecraft().player!=null) { 		//The player can be null when loading a savestate and quitting to the main menu
+				SavestateHandler.playerLoadSavestateEventClient();
+			}
 		}
 	}
 
@@ -182,7 +179,7 @@ public abstract class MixinMinecraft {
 
 	@ModifyConstant(method = "runTickMouse", constant = @Constant(longValue = 200L))
 	public long fixMouseWheel(long twohundredLong) {
-		return (long) Math.max(4000F / TickrateChangerClient.TICKS_PER_SECOND, 200L);
+		return (long) Math.max(4000F / TickrateChangerClient.ticksPerSecond, 200L);
 	}
 
 	// =====================================================================================================================================

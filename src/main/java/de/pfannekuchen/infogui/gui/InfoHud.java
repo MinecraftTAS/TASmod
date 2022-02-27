@@ -18,6 +18,7 @@ import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.mixin.accessors.AccessorWorld;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
@@ -216,7 +217,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Tickrate";
-				return String.format("Tickrate: %s", TickrateChangerClient.TICKS_PER_SECOND);
+				return String.format("Tickrate: %s", TickrateChangerClient.ticksPerSecond);
 			}));
 			
 			title = "position";
@@ -248,7 +249,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Worldseed";
-				return "World Seed: " + Minecraft.getMinecraft().world.worldInfo.getSeed();
+				return "World Seed: " + ((AccessorWorld) Minecraft.getMinecraft().world).worldInfo().getSeed();
 			}));
 			
 			y += 14;
@@ -310,6 +311,9 @@ public class InfoHud extends GuiScreen {
 				}else if(state==TASstate.RECORDING){
 					out="Recording";
 					format=ChatFormatting.RED;
+				}else if(state==TASstate.PAUSED) {
+					out="Paused";
+					format=ChatFormatting.YELLOW;
 				}else if(state==TASstate.NONE) {
 					out="";
 				}
@@ -370,14 +374,6 @@ public class InfoHud extends GuiScreen {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Position";
 				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().dMonitor;
 				return dMonitor.getX()+" "+ dMonitor.getY()+" "+dMonitor.getZ();
-			}));
-			
-			title = "Lagging";
-			y += 14;
-			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-				if (Minecraft.getMinecraft().currentScreen == this) return "Ticksync Lag";
-				return "Lagging: "+(TickSync.isLagging?ChatFormatting.RED+"YES":"No");
 			}));
 			
 		} catch (Exception e) {

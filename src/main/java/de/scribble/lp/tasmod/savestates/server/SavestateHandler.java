@@ -81,7 +81,7 @@ public class SavestateHandler {
 	 * @throws IOException
 	 */
 	public void saveState() throws SavestateException, IOException {
-		saveState(-1);
+		saveState(-1, true);
 	}
 
 	/**
@@ -91,12 +91,13 @@ public class SavestateHandler {
 	 * Side: Server
 	 * 
 	 * @param savestateIndex The index where the mod will save the savestate.
-	 *                       index<=0 if it should save it in the next index from
+	 *                       index<0 if it should save it in the next index from
 	 *                       the currentindex
+	 * @param tickrate0 When true: Set's the game to tickrate 0 after creating a savestate
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
-	public void saveState(int savestateIndex) throws SavestateException, IOException {
+	public void saveState(int savestateIndex, boolean tickrate0) throws SavestateException, IOException {
 		if (state == SavestateState.SAVING) {
 			throw new SavestateException("A savestating operation is already being carried out");
 		}
@@ -110,8 +111,7 @@ public class SavestateHandler {
 		createSavestateDirectory();
 
 		// Enable tickrate 0
-		TickrateChangerServer.changeServerTickrate(0);
-		TickrateChangerServer.changeClientTickrate(0);
+		TickrateChangerServer.pauseGame(true);
 
 		// Update the server variable
 		server = TASmod.getServerInstance();
@@ -143,9 +143,17 @@ public class SavestateHandler {
 			FileUtils.deleteDirectory(targetfolder);
 		}
 
-		// Send the name of the world to all players. This will make a savestate of the
-		// recording on the client with that name
-		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, getSavestateName(currentIndex)));
+		/*
+		 * Prevents creating an InputSavestate when saving at index 0 (Index 0 is the
+		 * savestate when starting a recording)
+		 */
+		if (savestateIndex != 0) {
+			/*
+			 * Send the name of the world to all players. This will make a savestate of the
+			 * recording on the client with that name
+			 */
+			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, getSavestateName(currentIndex)));
+		}
 
 		// Wait for the chunkloader to save the game
 		for (WorldServer world : server.worlds) {
@@ -170,6 +178,10 @@ public class SavestateHandler {
 		// Close the GuiSavestateScreen on the client
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
 
+		if (!tickrate0) {
+			TickrateChangerServer.pauseGame(false);
+		}
+
 		// Unlock savestating
 		state = SavestateState.NONE;
 	}
@@ -184,7 +196,7 @@ public class SavestateHandler {
 	 * @throws IOException
 	 */
 	public void loadState() throws LoadstateException, IOException {
-		loadState(-1);
+		loadState(-1, true);
 	}
 
 	/**
@@ -193,10 +205,13 @@ public class SavestateHandler {
 	 * 
 	 * Side: Server
 	 * 
+	 * @param savestateIndex The index where the mod will load the savestate.
+	 *                       index<0 if it should load the currentindex
+	 * @param tickrate0 When true: Set's the game to tickrate 0 after creating a savestate
 	 * @throws LoadstateException
 	 * @throws IOException
 	 */
-	public void loadState(int savestateIndex) throws LoadstateException, IOException {
+	public void loadState(int savestateIndex, boolean tickrate0) throws LoadstateException, IOException {
 		if (state == SavestateState.SAVING) {
 			throw new LoadstateException("A savestating operation is already being carried out");
 		}
@@ -210,8 +225,7 @@ public class SavestateHandler {
 		createSavestateDirectory();
 
 		// Enable tickrate 0
-		TickrateChangerServer.changeServerTickrate(0);
-		TickrateChangerServer.changeClientTickrate(0);
+		TickrateChangerServer.pauseGame(true);
 
 		// Update the server instance
 		server = TASmod.getServerInstance();
@@ -231,8 +245,15 @@ public class SavestateHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(currentIndex);
 
-		// Load savestate on the client
-		CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateName(currentIndex)));
+		/*
+		 * Prevents loading an InputSavestate when loading index 0 (Index 0 is the
+		 * savestate when starting a recording. Not doing this will load an empty
+		 * InputSavestate)
+		 */
+		if (savestateIndex != 0) {
+			// Load savestate on the client
+			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateName(currentIndex)));
+		}
 
 		// Disabeling level saving for all worlds in case the auto save kicks in during
 		// world unload
@@ -278,6 +299,10 @@ public class SavestateHandler {
 
 		for (WorldServer world : worlds) {
 			world.tick();
+		}
+
+		if (!tickrate0) {
+			TickrateChangerServer.pauseGame(false);
 		}
 
 		// Unlock loadstating
@@ -419,7 +444,7 @@ public class SavestateHandler {
 		refresh();
 		String out = "";
 		for (int i : indexList) {
-			out = out.concat(" " + i + (i==indexList.size()-1?"":","));
+			out = out.concat(" " + i + (i == indexList.size() - 1 ? "" : ","));
 		}
 		return out;
 	}
