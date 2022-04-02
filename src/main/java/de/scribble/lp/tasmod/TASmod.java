@@ -17,6 +17,7 @@ import de.scribble.lp.tasmod.commands.recording.CommandRecord;
 import de.scribble.lp.tasmod.commands.restartandplay.CommandRestartAndPlay;
 import de.scribble.lp.tasmod.commands.savetas.CommandSaveTAS;
 import de.scribble.lp.tasmod.commands.tutorial.CommandPlaybacktutorial;
+import de.scribble.lp.tasmod.ktrng.KillTheRNGHandler;
 import de.scribble.lp.tasmod.savestates.server.SavestateCommand;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.SavestateTrackerFile;
@@ -55,16 +56,19 @@ public class TASmod {
 
 	private static MinecraftServer serverInstance;
 	
-	public static boolean isKTRNGLoaded;
-
 	public static final Logger logger = LogManager.getLogger("TASMod");
 	
 	public static ContainerStateServer containerStateServer;
 	
 	public static SavestateHandler savestateHandler;
+	
+	public static KillTheRNGHandler ktrngHandler;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent ev) throws Exception {
+		logger.info("Initializing TASmod");
+		logger.info("Testing connection with KillTheRNG");
+		ktrngHandler=new KillTheRNGHandler(Loader.isModLoaded("killtherng"));
 		proxy.preInit(ev);
 		if (Loader.isModLoaded("tastools")) {
 			throw new ModIncompatibleException("\n========================================================================\n" + "\n" + "Detected TASTools to be loaded. TASMod and TASTools are incompatible!\n" + "\n" + "========================================================================");
@@ -91,14 +95,6 @@ public class TASmod {
 
 	@EventHandler
 	public void init(FMLInitializationEvent ev) {
-		logger.info("Initializing TASmod");
-		logger.info("Testing connection with KillTheRNG");
-		isKTRNGLoaded=Loader.isModLoaded("killtherng");
-		if (isKTRNGLoaded) {
-			KillTheRNG.LOGGER.info("Connection established with TASmod");
-		}else {
-			logger.info("KillTheRNG doesn't appear to be loaded");
-		}
 		proxy.init(ev);
 	}
 

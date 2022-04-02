@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import com.dselent.bigarraylist.BigArrayList;
 import com.mojang.realmsclient.util.Pair;
 
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
@@ -79,6 +80,8 @@ public class ContainerSerialiser {
 				 + "#																											#\n"
 				 + "#----------------------------------------------- Settings --------------------------------------------------#\n"
 				 + "#StartPosition:"+container.getStartLocation()+"\n"
+				 + "#																											#\n"
+				 + "#StartSeed:" + container.getStartSeed() + "\n"
 				 + "#############################################################################################################\n");
 		
 		BigArrayList<TickInputContainer> ticks = container.getInputs();
@@ -125,7 +128,7 @@ public class ContainerSerialiser {
 
 		InputContainer container = new InputContainer();
 
-		String author = "Insert author here"; //TODO Make this print out in chat
+		String author = "Insert author here";
 
 		String title = "Insert TAS category here";
 
@@ -134,6 +137,8 @@ public class ContainerSerialiser {
 		int rerecords = 0;
 		
 		String startLocation="";
+		
+		long startSeed=TASmod.ktrngHandler.getGlobalSeedClient();
 
 		container.clear();
 
@@ -152,6 +157,8 @@ public class ContainerSerialiser {
 					rerecords = Integer.parseInt(line.split(":")[1]);
 				} else if (line.startsWith("#StartPosition:")) {
 					startLocation = line.replace("#StartPosition:", "");
+				} else if (line.startsWith("#StartSeed")) {
+					startSeed = Long.parseLong(line.replace("#StartSeed", ""));
 				}
 			} else if (line.startsWith("$") && line.replace('$', ' ').trim().contains(" ")) {
 				String[] sections = line.replace('$', ' ').trim().split(" ", 2);
@@ -177,6 +184,7 @@ public class ContainerSerialiser {
 		container.setPlaytime(playtime);
 		container.setRerecords(rerecords);
 		container.setStartLocation(startLocation);
+		container.setStartSeed(startSeed);
 		if(monitorLines!=null) {
 			container.dMonitor.setPos(monitorLines);
 		}

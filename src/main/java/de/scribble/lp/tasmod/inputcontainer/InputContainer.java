@@ -14,6 +14,7 @@ import com.mojang.realmsclient.util.Pair;
 import de.pfannekuchen.tasmod.controlbytes.ControlByteHandler;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.util.TASstate;
@@ -90,6 +91,8 @@ public class InputContainer {
 	private int rerecords = 0;
 
 	private String startLocation = "";
+	
+	private long startSeed = TASmod.ktrngHandler.getGlobalSeedClient();
 
 	// =====================================================================================================
 
@@ -142,12 +145,14 @@ public class InputContainer {
 				index = 0;
 				state = TASstate.PLAYBACK;
 				creditsPrinted=false;
+				TASmod.ktrngHandler.setGlobalSeedServer(startSeed);
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
 				if (Minecraft.getMinecraft().player != null) {
 					startLocation = getStartLocation(Minecraft.getMinecraft().player);
 				}
 				state = TASstate.RECORDING;
+				startSeed=TASmod.ktrngHandler.getGlobalSeedClient();
 				return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
 			case PAUSED:
 				return verbose ? TextFormatting.RED + "Can't pause anything because nothing is running" : "";
@@ -496,6 +501,14 @@ public class InputContainer {
 		for (int i = 0; i < inputs.size(); i++) {
 			inputs.get(i).setTick(i + 1);
 		}
+	}
+	
+	public long getStartSeed() {
+		return startSeed;
+	}
+
+	public void setStartSeed(long startSeed) {
+		this.startSeed = startSeed;
 	}
 
 	// =====================================================================================================
