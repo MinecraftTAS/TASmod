@@ -54,6 +54,7 @@
 		"events.MixinGuiIngameMenu",
 		"events.MixinGuiControls",
 		"events.MixinMinecraft",
+		"events.MixinIntegratedServer",
 		
 		//Playbackhooks
 		"playbackhooks.MixinGameSettings",
