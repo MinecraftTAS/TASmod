@@ -25,7 +25,7 @@ public class SavestateCommand extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "/savestate <save|load|delete|info> [index]";
+		return "/savestate <save|load|delete|list> [index]";
 	}
 
 	@Override
@@ -71,9 +71,9 @@ public class SavestateCommand extends CommandBase {
 				if (args.length == 3) {
 					deleteMultiple(args);
 				}
-			} else if ("info".equals(args[0])) {
+			} else if ("list".equals(args[0])) {
 				sender.sendMessage(new TextComponentString(String.format("The current savestate index is %s%s", TextFormatting.AQUA, TASmod.savestateHandler.getCurrentIndex())));
-				sender.sendMessage(new TextComponentString(String.format("Available indexes are %s%s", TextFormatting.AQUA, TASmod.savestateHandler.getIndexesAsString())));
+				sender.sendMessage(new TextComponentString(String.format("Available indexes are %s%s", TextFormatting.AQUA, TASmod.savestateHandler.getIndexesAsString().isEmpty() ? "None" : TASmod.savestateHandler.getIndexesAsString())));
 			} else if ("help".equals(args[0])) {
 				if (args.length == 1) {
 					sendHelp(sender);
@@ -125,7 +125,7 @@ public class SavestateCommand extends CommandBase {
 					+ "%3$s/savestate %4$sload%5$s <index>%2$s - Load the savestate at the specified index\n"
 					+ "%3$s/savestate %4$sdelete%5$s <index>%2$s - Delete the savestate at the specified index\n"
 					+ "%3$s/savestate %4$sdelete%5$s <fromIndex> <toIndex>%2$s - Delete the savestates from the fromIndex to the toIndex\n"
-					+ "%3$s/savestate %4$sinfo%2$s - Shows the current index as well as the available indexes\n"
+					+ "%3$s/savestate %4$slist%2$s - Shows the current index as well as the available indexes\n"
 					+ "\nInstead of %4$s<index> %2$syou can use ~ to specify an index relative to the current index e.g. %3$s~-1%2$s will currently load %6$s\n",
 					/*1*/TextFormatting.GOLD, /*2*/TextFormatting.RESET, /*3*/TextFormatting.AQUA, /*4*/TextFormatting.GREEN, /*5*/TextFormatting.YELLOW, /*6*/(currentIndex - 1))));
 			return;
@@ -138,8 +138,8 @@ public class SavestateCommand extends CommandBase {
 	@Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
 		if (args.length == 1) {
-			return getListOfStringsMatchingLastWord(args, new String[] { "save", "load", "delete", "info", "help"});
-		} else if (args.length == 2 && !"info".equals(args[0])) {
+			return getListOfStringsMatchingLastWord(args, new String[] { "save", "load", "delete", "list", "help"});
+		} else if (args.length == 2 && !"list".equals(args[0])) {
 			sender.sendMessage(new TextComponentString("Available indexes: " + TextFormatting.AQUA + TASmod.savestateHandler.getIndexesAsString()));
 		}
 		return super.getTabCompletions(server, sender, args, targetPos);
