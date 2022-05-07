@@ -51,7 +51,6 @@ public class InfoGui extends Gui {
 //			new Gui().drawString(mc.fontRenderer, "Client Ticks: " + TickSync.getClienttickcounter(), 16, 110, 0xFFFFFF); // Current Pointer location
 //			
 //			new Gui().drawString(mc.fontRenderer, "EntitySeed: "+ EntityRandom.currentSeed, 16, 130, 0xFFFFFF); // Current Pointer location
-//			new Gui().drawString(mc.fontRenderer, "ItemSeed: "+ ItemRandom.currentSeed, 16, 140, 0xFFFFFF); // Current Pointer location
 //			
 //			EntityPlayerSP player=Minecraft.getMinecraft().player;
 
@@ -64,7 +63,7 @@ public class InfoGui extends Gui {
 				for (String mouse : ClientProxy.virtual.getNextMousePresses()) {
 					out1 = out1.concat(mouse + " ");
 				}
-				new Gui().drawString(mc.fontRenderer, out1, 5, height - 20, 0xFFFFFF); // Current Pointer location
+				drawString(mc.fontRenderer, out1, 5, height - 20, 0xFFFFFF); // Current Pointer location
 				
 				String out2 = "";
 				for (String key : ClientProxy.virtual.getCurrentKeyboardPresses()) {
@@ -74,12 +73,12 @@ public class InfoGui extends Gui {
 				for (String key : ClientProxy.virtual.getNextKeyboardPresses()) {
 					out2 = out2.concat(key + " ");
 				}
-				new Gui().drawString(mc.fontRenderer, out2, 5, height - 10, 0xFFFFFF); // Current Pointer location
+				drawString(mc.fontRenderer, out2, 5, height - 10, 0xFFFFFF); // Current Pointer location
 			}
 			
 			
-			new Gui().drawString(mc.fontRenderer, ClientProxy.virtual.getContainer().index() + "", 5, height - 30, 0xFFFFFF); // Current Pointer location
-			new Gui().drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width / 2, height - 50, 0xFF8400); // Current Pointer location
+			drawString(mc.fontRenderer, ClientProxy.virtual.getContainer().index() + "", 5, height - 30, 0xFFFFFF); // Current Pointer location
+			drawCenteredString(mc.fontRenderer, "TASmod is still in development! Major issues may arise!", width / 2, height - 50, 0xFF8400); // Current Pointer location
 
 //            }
 //            if (Strokesenabled) {

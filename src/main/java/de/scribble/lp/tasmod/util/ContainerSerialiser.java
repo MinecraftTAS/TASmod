@@ -157,8 +157,8 @@ public class ContainerSerialiser {
 					rerecords = Integer.parseInt(line.split(":")[1]);
 				} else if (line.startsWith("#StartPosition:")) {
 					startLocation = line.replace("#StartPosition:", "");
-				} else if (line.startsWith("#StartSeed")) {
-					startSeed = Long.parseLong(line.replace("#StartSeed", ""));
+				} else if (line.startsWith("#StartSeed:")) {
+					startSeed = Long.parseLong(line.replace("#StartSeed:", ""));
 				}
 			} else if (line.startsWith("$") && line.replace('$', ' ').trim().contains(" ")) {
 				String[] sections = line.replace('$', ' ').trim().split(" ", 2);
