@@ -27,7 +27,7 @@ public class CommandFullPlay extends CommandBase{
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		try {
-			TASmod.savestateHandler.loadState(0, false);
+			TASmod.savestateHandler.loadState(0, false, false);
 		} catch (LoadstateException e) {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to load a savestate: "+e.getMessage()));
 			return;

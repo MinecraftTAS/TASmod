@@ -1,5 +1,6 @@
 package de.scribble.lp.tasmod.commands.fullrecord;
 
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.events.OpenGuiEvents;
 import de.scribble.lp.tasmod.util.TASstate;
 import io.netty.buffer.ByteBuf;
@@ -43,6 +44,7 @@ public class FullRecordPacket implements IMessage {
 		@SideOnly(Side.CLIENT)
 		private void workaround(Minecraft mc) {
 			OpenGuiEvents.stateWhenOpened = TASstate.RECORDING;
+			ClientProxy.virtual.getContainer().clear();
 			mc.world.sendQuittingDisconnectingPacket();
 			mc.loadWorld((WorldClient) null);
 			mc.displayGuiScreen(new net.minecraft.client.gui.GuiMainMenu());

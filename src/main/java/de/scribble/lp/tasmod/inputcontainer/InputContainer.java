@@ -399,13 +399,17 @@ public class InputContainer {
 		return controls;
 	}
 	
-	public void setIndex(int index) {
-		this.index = index;
-		if (state == TASstate.PLAYBACK) {
-			TickInputContainer tickcontainer = inputs.get(index);
-			this.keyboard = tickcontainer.getKeyboard();
-			this.mouse = tickcontainer.getMouse();
-			this.subticks = tickcontainer.getSubticks();
+	public void setIndex(int index) throws IndexOutOfBoundsException{
+		if(index<=size()) {
+			this.index = index;
+			if (state == TASstate.PLAYBACK) {
+				TickInputContainer tickcontainer = inputs.get(index);
+				this.keyboard = tickcontainer.getKeyboard();
+				this.mouse = tickcontainer.getMouse();
+				this.subticks = tickcontainer.getSubticks();
+			}
+		}else {
+			throw new IndexOutOfBoundsException("Index is bigger than the container");
 		}
 	}
 
