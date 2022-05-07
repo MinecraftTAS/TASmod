@@ -8,6 +8,7 @@ import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 public class LoadWorldEvents {
 
 	public static boolean waszero = false;
+	private static boolean isLoading =false;
 	
 	/**
 	 * Delay after the loading screen is finished before firing "doneWithLoadingScreen"
@@ -24,6 +25,7 @@ public class LoadWorldEvents {
 		if (TickrateChangerClient.ticksPerSecond == 0 || TickrateChangerClient.advanceTick) {
 			waszero = true;
 		}
+		isLoading = true;
 	}
 
 	/**
@@ -85,9 +87,13 @@ public class LoadWorldEvents {
 				} else {
 					waszero = false;
 				}
+				isLoading=false;
 			}
 			loadingScreenDelay--;
 		}
 	}
 
+	public static boolean isLoading() {
+		return isLoading;
+	}
 }

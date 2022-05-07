@@ -96,11 +96,20 @@ public abstract class MixinMinecraftServer {
 			if (TickrateChangerServer.ticksPerSecond == 0) {
 				currentTime = System.currentTimeMillis();
 				faketick++;
-				if (faketick >= 20) {
+				if (faketick >= 50) {
 					faketick = 0;
 					networkSystem.networkTick();
 					if (((MinecraftServer) (Object) this).isDedicatedServer()) {
 						runPendingCommands();
+					}
+					synchronized (this.futureTaskQueue) {
+						while (!this.futureTaskQueue.isEmpty()) {
+							try {
+								((FutureTask<?>) this.futureTaskQueue.poll()).run();
+							} catch (Throwable var9) {
+								var9.printStackTrace();
+							}
+						}
 					}
 				}
 			}
@@ -108,15 +117,6 @@ public abstract class MixinMinecraftServer {
 				currentTime = System.currentTimeMillis();
 				msToTick = 1L;
 				TickrateChangerServer.interrupt = false;
-			}
-			synchronized (this.futureTaskQueue) {
-				while (!this.futureTaskQueue.isEmpty()) {
-					try {
-						((FutureTask<?>) this.futureTaskQueue.poll()).run();
-					} catch (Throwable var9) {
-						var9.printStackTrace();
-					}
-				}
 			}
 
 			try {
