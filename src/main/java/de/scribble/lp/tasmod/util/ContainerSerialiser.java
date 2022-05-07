@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.dselent.bigarraylist.BigArrayList;
+import com.mojang.realmsclient.util.Pair;
 
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
@@ -152,6 +153,15 @@ public class ContainerSerialiser {
 				} else if (line.startsWith("#StartPosition:")) {
 					startLocation = line.replace("#StartPosition:", "");
 				}
+			} else if (line.startsWith("$") && line.replace('$', ' ').trim().contains(" ")) {
+				String[] sections = line.replace('$', ' ').trim().split(" ", 2);
+				if (sections.length == 0)
+					continue;
+				String control = sections[0];
+				String[] params = sections[1].split(" ");
+				List<Pair<String, String[]>> cbytes = container.getControlBytes().getOrDefault((int) container.getInputs().size(), new ArrayList<>());
+				cbytes.add(Pair.of(control, params));
+				container.getControlBytes().put((int) container.getInputs().size(), cbytes);
 			} else {
 				String[] sections = line.split("\\|");
 

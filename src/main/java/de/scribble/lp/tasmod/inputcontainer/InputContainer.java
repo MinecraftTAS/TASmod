@@ -1,12 +1,17 @@
 package de.scribble.lp.tasmod.inputcontainer;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
 import com.mojang.realmsclient.gui.ChatFormatting;
+import com.mojang.realmsclient.util.Pair;
 
+import de.pfannekuchen.tasmod.controlbytes.ControlByteHandler;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
@@ -69,6 +74,9 @@ public class InputContainer {
 	 */
 	private BigArrayList<TickInputContainer> inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 
+	// All control characters
+	private Map<Integer, List<Pair<String, String[]>>> controls = new HashMap<Integer, List<Pair<String, String[]>>>();
+	
 	public DesyncMonitoring dMonitor = new DesyncMonitoring();
 	
 	// =====================================================================================================
@@ -105,6 +113,7 @@ public class InputContainer {
 	 * @return The message printed in the chat
 	 */
 	public String setTASState(TASstate stateIn, boolean verbose) {
+		ControlByteHandler.reset();
 		if (state == stateIn) {
 			switch (stateIn) {
 			case PLAYBACK:
@@ -360,6 +369,11 @@ public class InputContainer {
 			this.keyboard = tickcontainer.getKeyboard().clone();
 			this.mouse = tickcontainer.getMouse().clone();
 			this.subticks = tickcontainer.getSubticks().clone();
+			// check for control bytes
+			List<Pair<String, String[]>> controlbyte = controls.get(index);
+			if (controlbyte != null)
+				for (Pair<String, String[]> pair : controlbyte)
+					ControlByteHandler.onControlByte(pair.first(), pair.second());
 		}
 	}
 	// =====================================================================================================
@@ -381,6 +395,10 @@ public class InputContainer {
 		return inputs;
 	}
 
+	public Map<Integer, List<Pair<String, String[]>>> getControlBytes() {
+		return controls;
+	}
+	
 	public void setIndex(int index) {
 		this.index = index;
 		if (state == TASstate.PLAYBACK) {
@@ -403,6 +421,7 @@ public class InputContainer {
 
 	public void clear() {
 		inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
+		controls.clear();
 		index = 0;
 		dMonitor.getPos().clear();
 		clearCredits();

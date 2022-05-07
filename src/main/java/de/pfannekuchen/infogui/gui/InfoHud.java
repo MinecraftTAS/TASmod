@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 
+import de.pfannekuchen.tasmod.controlbytes.ControlByteHandler;
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
 import de.scribble.lp.killtherng.KillTheRNG;
@@ -386,6 +387,12 @@ public class InfoHud extends GuiScreen {
 	 * Render the Info Hud only
 	 */
 	public void drawHud() {
+		// render custom info box if control byte is set
+		if (!ControlByteHandler.hideInfoBox && ClientProxy.virtual.getContainer().isPlayingback())
+			drawRectWithText(ControlByteHandler.text, 10, 10, true);
+		// skip rendering of control byte is set
+		if (!ControlByteHandler.shouldRenderHud && ClientProxy.virtual.getContainer().isPlayingback())
+			return;
 		int xpos=40;
 		int ypos=190;
 		for (InfoLabel label : lists) {

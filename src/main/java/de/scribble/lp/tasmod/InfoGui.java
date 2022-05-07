@@ -4,6 +4,7 @@ import org.lwjgl.opengl.Display;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 
+import de.pfannekuchen.tasmod.controlbytes.ControlByteHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -26,6 +27,9 @@ public class InfoGui extends Gui {
 		if (event.isCancelable() || event.getType() != ElementType.HOTBAR) {
 			return;
 		}
+		// skip rendering control byte hide hud is set
+		if (!ControlByteHandler.shouldRenderHud && ClientProxy.virtual.getContainer().isPlayingback())
+			return;
 		ScaledResolution scaled = new ScaledResolution(mc);
 		int width = scaled.getScaledWidth();
 		int height = scaled.getScaledHeight();
