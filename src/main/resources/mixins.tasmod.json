@@ -20,13 +20,14 @@
         
         //Fixing forge and vanilla stuff
         "fixes.MixinDragonFightManager",
+        "fixes.MixinNetworkManager",
         
         //Accessors
         "accessors.AccessorEntity",
         "accessors.AccessorMinecraftServer",
         "accessors.AccessorSaveHandler",
-        "accessors.AccessorWorld"
-        
+        "accessors.AccessorWorld",
+        "accessors.AccessorWorldServer"
         
     ],
     "client": [
@@ -54,6 +55,7 @@
 		"events.MixinGuiIngameMenu",
 		"events.MixinGuiControls",
 		"events.MixinMinecraft",
+		"events.MixinIntegratedServer",
 		
 		//Playbackhooks
 		"playbackhooks.MixinGameSettings",

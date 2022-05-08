@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.scribble.lp.killtherng.repack.org.msgpack.core.annotations.Nullable;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.events.OpenGuiEvents;
@@ -125,7 +124,7 @@ public class VirtualInput {
 	 * Loads the inputs and starts a TAS on initialize
 	 * @param fileToLoad (Nullable) Loads this filename and starts playing back the TAS
 	 */
-	public VirtualInput(@Nullable String fileToLoad) {
+	public VirtualInput(String fileToLoad) {
 		if (fileToLoad != null) {
 			try {
 				loadInputs(fileToLoad);
@@ -447,21 +446,50 @@ public class VirtualInput {
 	 * Loads and preloads the inputs from the new InputContainer to
 	 * {@link #container}
 	 * 
+	 * Saving a savestate is done via {@linkplain de.scribble.lp.tasmod.util.ContainerSerialiser#saveToFileV1(File, InputContainer)} in {@linkplain de.scribble.lp.tasmod.savestates.client.InputSavestatesHandler#savestate(String)}
+	 * 
 	 * @param savestatecontainer The container that should be loaded.
 	 */
-	public void loadSavestate(InputContainer savestatecontainer) {
+	public void loadClientSavestate(InputContainer savestatecontainer) {
 
-		if (this.container.isPlayingback()) {
-			preloadInput(this.container, savestatecontainer.size() - 1); // Preloading from the current container and from the second to last index of
-																			// the savestatecontainer. Since this is executed during playback,
-																			// we will only load the position of the savestate container and not replace the
-																			// container itself
+		if (container.isPlayingback()) {
+			preloadInput(container, savestatecontainer.size() - 1); // Preloading from the current container and
+																			// from the second to last index of
+																			// the savestatecontainer. Since this is
+																			// executed during playback,
+																			// we will only load the position of the
+																			// savestate container and not replace the
+																			// container itself. This is due to the fact
+																			// that the playback would immediately end
+																			// when you replace the container.
+			
+			if (container.size() >= savestatecontainer.size()) { // Check if the current container is bigger than the
+																	// savestated one.
 
-			this.container.setIndex(savestatecontainer.size()); // Set the "playback" index of the current container to the latest index of the
-																// savestatecontainer. Meaning this index will be played next
+				try {
+					container.setIndex(savestatecontainer.size()); // Set the "playback" index of the current
+																	// container to the latest index of the
+																	// savestatecontainer. Meaning this index will
+																	// be played next
+				} catch (IndexOutOfBoundsException e) {
+					e.printStackTrace();
+				}
+			} else {
+				String start = savestatecontainer.getStartLocation();
+				savestatecontainer.setStartLocation("");
 
-		} else if (this.container.isRecording()) {
-			String start = savestatecontainer.getStartLocation(); // TODO Another start location thing to keep in mind
+				try {
+					savestatecontainer.setIndex(savestatecontainer.size() - 1);
+				} catch (IndexOutOfBoundsException e) {
+					e.printStackTrace();
+				}
+				savestatecontainer.setTASState(TASstate.PLAYBACK);
+				savestatecontainer.setStartLocation(start);
+				container = savestatecontainer;
+			}
+
+		} else if (container.isRecording()) {
+			String start = savestatecontainer.getStartLocation();
 			preloadInput(savestatecontainer, savestatecontainer.size() - 1); // Preload the input of the savestate
 
 			nextKeyboard = new VirtualKeyboard(); // Unpress the nextKeyboard and mouse to get rid of the preloaded inputs in the
@@ -469,10 +497,15 @@ public class VirtualInput {
 													// keyboard
 			nextMouse = new VirtualMouse();
 
-			savestatecontainer.setIndex(savestatecontainer.size());
+			try {
+				savestatecontainer.setIndex(savestatecontainer.size());
+			} catch(IndexOutOfBoundsException e) {
+				e.printStackTrace();
+			}
+			
 			savestatecontainer.setTASState(TASstate.RECORDING);
-			savestatecontainer.setStartLocation(start); // TODO Another one
-			this.container = savestatecontainer; // Replace the current container with the savestated container
+			savestatecontainer.setStartLocation(start);
+			container = savestatecontainer; // Replace the current container with the savestated container
 		}
 	}
 

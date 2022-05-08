@@ -14,7 +14,6 @@ public class MixinMinecraftServer {
 	
 	@Inject(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;init()Z", shift = Shift.AFTER))
 	public void inject_run(CallbackInfo ci) {
-		LoadWorldEvents.initServer();
 	}
 	
 	@Inject(method = "initiateShutdown", at = @At("HEAD"))

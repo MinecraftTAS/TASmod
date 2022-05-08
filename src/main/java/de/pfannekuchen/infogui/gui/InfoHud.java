@@ -13,6 +13,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 
+import de.pfannekuchen.tasmod.controlbytes.ControlByteHandler;
+import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
 import de.scribble.lp.killtherng.KillTheRNG;
@@ -197,7 +199,6 @@ public class InfoHud extends GuiScreen {
 	 */
 	public void tick() {
 		if (checkInit()) return;
-		for (InfoLabel label : lists) label.tick();
 	}
 	
 	public boolean checkInit() {
@@ -268,7 +269,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Facing";
-				return String.format("%.2f %.2f", Minecraft.getMinecraft().player.rotationYaw, Minecraft.getMinecraft().player.rotationPitch);
+				return String.format("%.2f %.2f", CameraInterpolationEvents.rotationYaw, CameraInterpolationEvents.rotationPitch);
 			}));
 			
 			title = "cticks";
@@ -386,9 +387,16 @@ public class InfoHud extends GuiScreen {
 	 * Render the Info Hud only
 	 */
 	public void drawHud() {
+		// render custom info box if control byte is set
+		if (!ControlByteHandler.hideInfoBox && ClientProxy.virtual.getContainer().isPlayingback())
+			drawRectWithText(ControlByteHandler.text, 10, 10, true);
+		// skip rendering of control byte is set
+		if (!ControlByteHandler.shouldRenderHud && ClientProxy.virtual.getContainer().isPlayingback())
+			return;
 		int xpos=40;
 		int ypos=190;
 		for (InfoLabel label : lists) {
+			label.tick();
 			if (label.visible) {
 				drawRectWithText(label.renderText, label.x, label.y, label.renderRect);
 			} else if (Minecraft.getMinecraft().currentScreen != null) {

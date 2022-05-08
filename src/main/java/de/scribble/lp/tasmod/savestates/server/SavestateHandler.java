@@ -83,6 +83,10 @@ public class SavestateHandler {
 	public void saveState() throws SavestateException, IOException {
 		saveState(-1, true);
 	}
+	
+	public void saveState(int savestateIndex, boolean tickrate0) throws SavestateException, IOException {
+		saveState(savestateIndex, tickrate0, true);
+	}
 
 	/**
 	 * Creates a copy of the world that is currently being played and saves it in
@@ -94,10 +98,11 @@ public class SavestateHandler {
 	 *                       index<0 if it should save it in the next index from
 	 *                       the currentindex
 	 * @param tickrate0 When true: Set's the game to tickrate 0 after creating a savestate
+	 * @param changeIndex When true: Changes the index to the savestateIndex
 	 * @throws SavestateException
 	 * @throws IOException
 	 */
-	public void saveState(int savestateIndex, boolean tickrate0) throws SavestateException, IOException {
+	public void saveState(int savestateIndex, boolean tickrate0, boolean changeIndex) throws SavestateException, IOException {
 		if (state == SavestateState.SAVING) {
 			throw new SavestateException("A savestating operation is already being carried out");
 		}
@@ -127,19 +132,19 @@ public class SavestateHandler {
 		refresh();
 
 		// Setting the current index depending on the savestateIndex.
+		int indexToSave=savestateIndex;
 		if (savestateIndex < 0) {
-			setCurrentIndex(currentIndex + 1); // If the savestateIndex <= 0, create a savestate at currentIndex+1
-		} else {
-			setCurrentIndex(savestateIndex);
-		}
+			indexToSave=currentIndex + 1; // If the savestateIndex <= 0, create a savestate at currentIndex+1
+		} 
+		setCurrentIndex(indexToSave, changeIndex);
 
 		// Get the current and target directory for copying
 		String worldname = server.getFolderName();
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
-		File targetfolder = getSavestateFile(currentIndex);
+		File targetfolder = getSavestateFile(indexToSave);
 
 		if (targetfolder.exists()) {
-			TASmod.logger.warn("WARNING! Overwriting the savestate with the index {}", currentIndex);
+			TASmod.logger.warn("WARNING! Overwriting the savestate with the index {}", indexToSave);
 			FileUtils.deleteDirectory(targetfolder);
 		}
 
@@ -152,7 +157,7 @@ public class SavestateHandler {
 			 * Send the name of the world to all players. This will make a savestate of the
 			 * recording on the client with that name
 			 */
-			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, getSavestateName(currentIndex)));
+			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, getSavestateName(indexToSave)));
 		}
 
 		// Wait for the chunkloader to save the game
@@ -173,7 +178,7 @@ public class SavestateHandler {
 		saveCurrentIndexToFile();
 
 		// Send a notification that the savestate has been loaded
-		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + currentIndex + " saved"));
+		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + indexToSave + " saved"));
 
 		// Close the GuiSavestateScreen on the client
 		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
@@ -198,6 +203,18 @@ public class SavestateHandler {
 	public void loadState() throws LoadstateException, IOException {
 		loadState(-1, true);
 	}
+	
+	/**
+	 * 
+	 * @param savestateIndex
+	 * @param tickrate0
+	 * 
+	 * @throws LoadstateException
+	 * @throws IOException
+	 */
+	public void loadState(int savestateIndex, boolean tickrate0) throws LoadstateException, IOException {
+		loadState(savestateIndex, tickrate0, true);
+	}
 
 	/**
 	 * Loads the latest savestate it can find in
@@ -208,10 +225,11 @@ public class SavestateHandler {
 	 * @param savestateIndex The index where the mod will load the savestate.
 	 *                       index<0 if it should load the currentindex
 	 * @param tickrate0 When true: Set's the game to tickrate 0 after creating a savestate
+	 * @param changeIndex When true: Changes the index to the savestateIndex
 	 * @throws LoadstateException
 	 * @throws IOException
 	 */
-	public void loadState(int savestateIndex, boolean tickrate0) throws LoadstateException, IOException {
+	public void loadState(int savestateIndex, boolean tickrate0, boolean changeIndex) throws LoadstateException, IOException {
 		if (state == SavestateState.SAVING) {
 			throw new LoadstateException("A savestating operation is already being carried out");
 		}
@@ -234,16 +252,16 @@ public class SavestateHandler {
 
 		int indexToLoad = savestateIndex < 0 ? currentIndex : savestateIndex;
 
-		if (!getSavestateFile(indexToLoad).exists()) {
-			throw new LoadstateException("Savestate " + indexToLoad + " doesn't exist");
+		if (getSavestateFile(indexToLoad).exists()) {
+			setCurrentIndex(indexToLoad, changeIndex);
 		} else {
-			setCurrentIndex(indexToLoad);
+			throw new LoadstateException("Savestate " + indexToLoad + " doesn't exist");
 		}
 
 		// Get the current and target directory for copying
 		String worldname = server.getFolderName();
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
-		File targetfolder = getSavestateFile(currentIndex);
+		File targetfolder = getSavestateFile(indexToLoad);
 
 		/*
 		 * Prevents loading an InputSavestate when loading index 0 (Index 0 is the
@@ -252,7 +270,7 @@ public class SavestateHandler {
 		 */
 		if (savestateIndex != 0) {
 			// Load savestate on the client
-			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateName(currentIndex)));
+			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateName(indexToLoad)));
 		}
 
 		// Disabeling level saving for all worlds in case the auto save kicks in during
@@ -293,8 +311,16 @@ public class SavestateHandler {
 		saveCurrentIndexToFile();
 
 		// Send a notification that the savestate has been loaded
-		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + currentIndex + " loaded"));
+		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + indexToLoad + " loaded"));
 
+		// Add players to the chunk
+		server.getPlayerList().getPlayers().forEach(player->{
+			SavestatesChunkControl.addPlayerToServerChunk(player);
+		});
+		
+		// Updating redstone component timers to the new world time (#136)
+		SavestatesChunkControl.updateWorldServerTickListEntries();
+		
 		WorldServer[] worlds = DimensionManager.getWorlds();
 
 		for (WorldServer world : worlds) {
@@ -404,7 +430,7 @@ public class SavestateHandler {
 		}
 		refresh();
 		if (!indexList.contains(currentIndex)) {
-			setCurrentIndex(latestIndex);
+			setCurrentIndex(latestIndex, true);
 		}
 		// Send a notification that the savestate has been deleted
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + index + " deleted"));
@@ -496,16 +522,20 @@ public class SavestateHandler {
 				}
 			}
 		}
-		setCurrentIndex(index);
+		setCurrentIndex(index, true);
 	}
 
-	private void setCurrentIndex(int index) {
-		if (index < 0) {
-			currentIndex = latestIndex;
+	private void setCurrentIndex(int index, boolean changeIndex) {
+		if(changeIndex) {
+			if (index < 0) {
+				currentIndex = latestIndex;
+			} else {
+				currentIndex = index;
+			}
+			TASmod.logger.info("Setting the savestate index to {}", currentIndex);
 		} else {
-			currentIndex = index;
+			TASmod.logger.warn("Keeping the savestate index at {}", currentIndex);
 		}
-		TASmod.logger.info("Setting the savestate index to {}", currentIndex);
 	}
 
 	public int getCurrentIndex() {
@@ -526,6 +556,6 @@ public class SavestateHandler {
 
 	@SideOnly(Side.CLIENT)
 	public static void playerLoadSavestateEventClient() {
-		SavestatesChunkControl.addPlayerToChunk(Minecraft.getMinecraft().player);
+		SavestatesChunkControl.addPlayerToClientChunk(Minecraft.getMinecraft().player);
 	}
 }

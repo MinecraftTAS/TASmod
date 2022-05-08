@@ -8,7 +8,12 @@ import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 public class LoadWorldEvents {
 
 	public static boolean waszero = false;
-	public static int cd = -1;
+	private static boolean isLoading =false;
+	
+	/**
+	 * Delay after the loading screen is finished before firing "doneWithLoadingScreen"
+	 */
+	private static int loadingScreenDelay = -1;
 
 	/**
 	 * Executed when an integrated server is launched
@@ -20,20 +25,19 @@ public class LoadWorldEvents {
 		if (TickrateChangerClient.ticksPerSecond == 0 || TickrateChangerClient.advanceTick) {
 			waszero = true;
 		}
+		isLoading = true;
 	}
 
 	/**
 	 * Executed when the server is initialising
 	 * Side: Integrated Server
 	 * 
-	 * @see de.scribble.lp.tasmod.mixin.events.MixinMinecraftServer#inject_run(org.spongepowered.asm.mixin.injection.callback.CallbackInfo)
+	 * @see de.scribble.lp.tasmod.mixin.events.MixinIntegratedServer#inject_init(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable)
 	 */
 	public static void initServer() {
-		if (!TASmod.getServerInstance().isDedicatedServer()) {
-			TASmod.logger.info("Integrated server initialised");
-			TickrateChangerClient.pauseClientGame(true);
-			TickrateChangerServer.pauseServerGame(true);
-		}
+		TASmod.logger.info("Integrated server initialised");
+		TickrateChangerClient.pauseClientGame(true);
+		TickrateChangerServer.pauseServerGame(true);
 	}
 
 	/* The following code is for integrated and dedicated server! */
@@ -63,8 +67,8 @@ public class LoadWorldEvents {
 	 */
 	public static void doneLoadingClientWorld() {
 		TASmod.logger.info("Finished loading the world on the client");
-		if(TASmod.getServerInstance()!=null) {
-			cd = 1;
+		if(TASmod.getServerInstance()!=null) { //Check if a server is running and if it's an integrated server
+			loadingScreenDelay = 1;
 		}
 	}
 
@@ -72,17 +76,24 @@ public class LoadWorldEvents {
 	 * Executed a frame after the world is done loading
 	 */
 	public static void doneWithLoadingScreen() {
-		if (cd > -1) {
-			if (cd == 0) {
+		if (loadingScreenDelay > -1) {
+			if (loadingScreenDelay == 0) {
 				TASmod.logger.info("Finished loading screen on the client");
 				if (!waszero) {
-					TickrateChangerClient.pauseGame(false);
+					if(TASmod.getServerInstance()!=null) {	//Check if a server is running and if it's an integrated server
+						TickrateChangerClient.pauseClientGame(false);
+						TickrateChangerServer.pauseServerGame(false);
+					}
 				} else {
 					waszero = false;
 				}
+				isLoading=false;
 			}
-			cd--;
+			loadingScreenDelay--;
 		}
 	}
 
+	public static boolean isLoading() {
+		return isLoading;
+	}
 }
