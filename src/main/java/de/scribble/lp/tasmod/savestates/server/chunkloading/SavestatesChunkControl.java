@@ -2,9 +2,11 @@ package de.scribble.lp.tasmod.savestates.server.chunkloading;
 
 import java.util.List;
 
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.duck.ChunkProviderDuck;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorSaveHandler;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorWorld;
+import de.scribble.lp.tasmod.mixin.accessors.AccessorWorldServer;
 import de.scribble.lp.tasmod.mixin.savestates.MixinChunkProviderClient;
 import de.scribble.lp.tasmod.mixin.savestates.MixinChunkProviderServer;
 import net.minecraft.client.Minecraft;
@@ -13,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
@@ -177,26 +180,59 @@ public class SavestatesChunkControl {
 	 * <br>
 	 * Even after adding the player to the world, the chunks may not load the player correctly. <br>
 	 * <br>
-	 * Without this, no model is shown in third person and the player is able to place blocks inside of him.<br>
+	 * Without this, no model is shown in third person<br>
 	 * This state is fixed, once the player moves into a different chunk, since the new chunk adds the player to it's list. <br>
 	 * <br>
 	 * 
 	 * TLDR:<br>
-	 * Adds the player to the chunk so he can't place any blocks inside himself <br>
+	 * Adds the player to the chunk so the player is shown in third person <br>
 	 * <br>
 	 * Side: Client
 	 */
 	@SideOnly(Side.CLIENT)
-	public static void addPlayerToChunk(net.minecraft.entity.player.EntityPlayer player) {
+	public static void addPlayerToClientChunk(net.minecraft.entity.player.EntityPlayer player) {
 		int i = MathHelper.floor(player.posX / 16.0D);
-        int j = MathHelper.floor(player.posZ / 16.0D);
-        Chunk chunk=Minecraft.getMinecraft().world.getChunkFromChunkCoords(i, j);
-        for (int k = 0; k < chunk.getEntityLists().length; k++) {
-        	if(chunk.getEntityLists()[k].contains(player)) {
-        		return;
-        	}
+		int j = MathHelper.floor(player.posZ / 16.0D);
+		Chunk chunk = Minecraft.getMinecraft().world.getChunkFromChunkCoords(i, j);
+		for (int k = 0; k < chunk.getEntityLists().length; k++) {
+			if (chunk.getEntityLists()[k].contains(player)) {
+				return;
+			}
 		}
-        chunk.addEntity(player);
+		chunk.addEntity(player);
 	}
 	
+	/**
+	 * Just like {@link #addPlayerToClientChunk(EntityPlayer)}, adds the player to the chunk on the server.
+	 * This prevents the player from being able to place block inside of him
+	 * 
+	 * Side: Server
+	 */
+	public static void addPlayerToServerChunk(net.minecraft.entity.player.EntityPlayerMP player) {
+		int i = MathHelper.floor(player.posX / 16.0D);
+		int j = MathHelper.floor(player.posZ / 16.0D);
+		WorldServer world = player.getServerWorld();
+		Chunk chunk = world.getChunkFromChunkCoords(i, j);
+		for (int k = 0; k < chunk.getEntityLists().length; k++) {
+			if (chunk.getEntityLists()[k].contains(player)) {
+				return;
+			}
+		}
+		chunk.addEntity(player);
+	}
+	
+	/**
+	 * Updates ticklist entries to the current world time, allowing them to not be stuck in a pressed state #136
+	 */
+	public static void updateWorldServerTickListEntries() {
+		MinecraftServer server=TASmod.getServerInstance();
+		for (WorldServer world : server.worlds) {
+			AccessorWorldServer acworld=(AccessorWorldServer) world;
+			
+            for (NextTickListEntry nextticklistentry : acworld.getTickListEntries())
+            {
+            	nextticklistentry.setScheduledTime(world.getTotalWorldTime());
+            }
+		}
+	}
 }

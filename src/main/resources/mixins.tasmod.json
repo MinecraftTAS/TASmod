@@ -26,8 +26,8 @@
         "accessors.AccessorEntity",
         "accessors.AccessorMinecraftServer",
         "accessors.AccessorSaveHandler",
-        "accessors.AccessorWorld"
-        
+        "accessors.AccessorWorld",
+        "accessors.AccessorWorldServer"
         
     ],
     "client": [

@@ -313,6 +313,14 @@ public class SavestateHandler {
 		// Send a notification that the savestate has been loaded
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + indexToLoad + " loaded"));
 
+		// Add players to the chunk
+		server.getPlayerList().getPlayers().forEach(player->{
+			SavestatesChunkControl.addPlayerToServerChunk(player);
+		});
+		
+		// Updating redstone component timers to the new world time (#136)
+		SavestatesChunkControl.updateWorldServerTickListEntries();
+		
 		WorldServer[] worlds = DimensionManager.getWorlds();
 
 		for (WorldServer world : worlds) {
@@ -548,6 +556,6 @@ public class SavestateHandler {
 
 	@SideOnly(Side.CLIENT)
 	public static void playerLoadSavestateEventClient() {
-		SavestatesChunkControl.addPlayerToChunk(Minecraft.getMinecraft().player);
+		SavestatesChunkControl.addPlayerToClientChunk(Minecraft.getMinecraft().player);
 	}
 }
