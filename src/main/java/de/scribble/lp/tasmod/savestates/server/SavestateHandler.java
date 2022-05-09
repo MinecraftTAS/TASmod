@@ -318,9 +318,6 @@ public class SavestateHandler {
 			SavestatesChunkControl.addPlayerToServerChunk(player);
 		});
 		
-		// Updating redstone component timers to the new world time (#136)
-		SavestatesChunkControl.updateWorldServerTickListEntries();
-		
 		WorldServer[] worlds = DimensionManager.getWorlds();
 
 		for (WorldServer world : worlds) {
@@ -552,6 +549,8 @@ public class SavestateHandler {
 			NBTTagCompound nbttagcompound = playerList.getPlayerNBT(player);
 			SavestatePlayerLoading.reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
 		}
+		// Updating redstone component timers to the new world time (#136)
+		SavestatesChunkControl.updateWorldServerTickListEntries();
 	}
 
 	@SideOnly(Side.CLIENT)
