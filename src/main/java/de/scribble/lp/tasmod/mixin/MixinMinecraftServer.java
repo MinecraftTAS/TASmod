@@ -102,21 +102,21 @@ public abstract class MixinMinecraftServer {
 					if (((MinecraftServer) (Object) this).isDedicatedServer()) {
 						runPendingCommands();
 					}
-					synchronized (this.futureTaskQueue) {
-						while (!this.futureTaskQueue.isEmpty()) {
-							try {
-								((FutureTask<?>) this.futureTaskQueue.poll()).run();
-							} catch (Throwable var9) {
-								var9.printStackTrace();
-							}
-						}
-					}
 				}
 			}
 			if (TickrateChangerServer.interrupt) {
 				currentTime = System.currentTimeMillis();
 				msToTick = 1L;
 				TickrateChangerServer.interrupt = false;
+			}
+			synchronized (this.futureTaskQueue) {
+				while (!this.futureTaskQueue.isEmpty()) {
+					try {
+						((FutureTask<?>) this.futureTaskQueue.poll()).run();
+					} catch (Throwable var9) {
+						var9.printStackTrace();
+					}
+				}
 			}
 
 			try {
