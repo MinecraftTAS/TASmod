@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.duck.GuiScreenDuck;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.events.KeybindingEvents;
@@ -23,6 +24,7 @@ import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSync;
+import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -123,6 +125,11 @@ public abstract class MixinMinecraft {
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int redirectKeyboardGetEventKey() {
+		
+		if(!VirtualKeybindings.isKeyCodeAlwaysBlocked(ClientProxy.virtual.getEventKeyboardKey())) {
+			TASmod.ktrngHandler.nextPlayerInput(); // Advance ktrng seed on player input
+		}
+		
 		return ClientProxy.virtual.getEventKeyboardKey();
 	}
 
@@ -165,6 +172,10 @@ public abstract class MixinMinecraft {
 
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
 	public int redirectMouseGetEventButton() {
+		
+//		if(!VirtualKeybindings.isKeyCodeAlwaysBlocked(ClientProxy.virtual.getEventMouseKey()-100)) {
+//			TASmod.ktrngHandler.nextPlayerInput(); // Advance ktrng seed on player input
+//		}
 		return ClientProxy.virtual.getEventMouseKey() + 100;
 	}
 

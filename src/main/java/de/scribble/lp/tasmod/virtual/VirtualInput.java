@@ -176,10 +176,6 @@ public class VirtualInput {
 		boolean hasnext = currentKeyboardEventIterator.hasNext();
 		if (hasnext) {
 			currentKeyboardEvent = currentKeyboardEventIterator.next();
-			
-			if(!VirtualKeybindings.isKeyCodeAlwaysBlocked(currentKeyboardEvent.getKeyCode())) {
-				TASmod.ktrngHandler.nextPlayerInput(); // Advance ktrng seed on player input
-			}
 		}
 		return hasnext;
 	}
@@ -334,10 +330,6 @@ public class VirtualInput {
 		boolean hasnext = currentMouseEventIterator.hasNext();
 		if (hasnext) {
 			currentMouseEvent = currentMouseEventIterator.next();
-			
-//			if(!VirtualKeybindings.isKeyCodeAlwaysBlocked(currentMouseEvent.getKeyCode()-100)) {
-//				TASmod.ktrngHandler.nextPlayerInput(); // Advance ktrng seed on player input
-//			}
 		}
 		return hasnext;
 	}

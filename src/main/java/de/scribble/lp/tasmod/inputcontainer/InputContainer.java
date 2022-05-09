@@ -352,7 +352,7 @@ public class InputContainer {
 	private void recordNextTick() {
 		index++;
 		inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
-		dMonitor.capturePosition(); // Capturing the current position of the player
+		dMonitor.recordMonitor(); // Capturing monitor values
 	}
 
 	private void playbackNextTick() {
