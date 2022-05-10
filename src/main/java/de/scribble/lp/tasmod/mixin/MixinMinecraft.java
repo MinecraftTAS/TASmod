@@ -126,7 +126,7 @@ public abstract class MixinMinecraft {
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int redirectKeyboardGetEventKey() {
 		
-		if(!VirtualKeybindings.isKeyCodeAlwaysBlocked(ClientProxy.virtual.getEventKeyboardKey())) {
+		if(!VirtualKeybindings.isKeyCodeAlwaysBlocked(ClientProxy.virtual.getEventKeyboardKey()) && ClientProxy.virtual.getEventKeyboardCharacter()!='\0') {
 			TASmod.ktrngHandler.nextPlayerInput(); // Advance ktrng seed on player input
 		}
 		
@@ -225,6 +225,7 @@ public abstract class MixinMinecraft {
 	
 	@Inject(method = "runTick", at = @At(value = "RETURN"))
 	public void injectRunTickReturn(CallbackInfo ci) {
+		TASmod.ktrngHandler.sendAndResetNextPlayerInput();
 		ClientProxy.virtual.getContainer().nextTick();
 	}
 }

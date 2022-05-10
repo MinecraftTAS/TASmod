@@ -17,7 +17,6 @@ import de.pfannekuchen.tasmod.controlbytes.ControlByteHandler;
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
-import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorWorld;

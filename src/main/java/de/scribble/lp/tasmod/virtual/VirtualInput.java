@@ -146,10 +146,10 @@ public class VirtualInput {
 				character = '\u2907';
 			}
 		}
+		nextKeyboard.addChar(character);
 		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
 			return;
 		}
-		nextKeyboard.addChar(character);
 		VirtualKey key = nextKeyboard.get(keycode);
 		
 		key.setPressed(keystate);

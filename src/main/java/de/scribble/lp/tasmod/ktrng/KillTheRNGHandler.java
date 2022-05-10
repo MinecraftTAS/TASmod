@@ -1,6 +1,7 @@
 package de.scribble.lp.tasmod.ktrng;
 
 import de.scribble.lp.killtherng.KillTheRNG;
+import de.scribble.lp.killtherng.NextSeedHandler;
 import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.URToolsClient;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
@@ -15,6 +16,8 @@ import de.scribble.lp.tasmod.TASmod;
 public class KillTheRNGHandler {
 	
 	private boolean isLoaded;
+	
+	private final NextSeedHandler nextSeedHandler=new NextSeedHandler();
 
 	public KillTheRNGHandler(boolean isLoaded) {
 		this.isLoaded=isLoaded;
@@ -47,7 +50,13 @@ public class KillTheRNGHandler {
 	
 	public void nextPlayerInput() {
 		if(isLoaded()) {
-			SeedingModes.nextPlayerInput();
+			nextSeedHandler.increaseNextSeedCounter();
+		}
+	}
+	
+	public void sendAndResetNextPlayerInput() {
+		if(isLoaded()) {
+			nextSeedHandler.sendAndReset();
 		}
 	}
 
