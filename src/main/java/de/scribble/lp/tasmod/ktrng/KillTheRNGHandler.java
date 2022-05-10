@@ -2,7 +2,6 @@ package de.scribble.lp.tasmod.ktrng;
 
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.NextSeedHandler;
-import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.URToolsClient;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import de.scribble.lp.tasmod.TASmod;
@@ -17,14 +16,16 @@ public class KillTheRNGHandler {
 	
 	private boolean isLoaded;
 	
-	private final NextSeedHandler nextSeedHandler=new NextSeedHandler();
+	private final NextSeedHandler nextSeedHandler;
 
 	public KillTheRNGHandler(boolean isLoaded) {
 		this.isLoaded=isLoaded;
 		if (isLoaded) {
 			KillTheRNG.LOGGER.info("Connection established with TASmod");
 			KillTheRNG.isLibrary=true;
+			nextSeedHandler=new NextSeedHandler();
 		}else {
+			nextSeedHandler=null;
 			TASmod.logger.info("KillTheRNG doesn't appear to be loaded");
 		}
 	}
