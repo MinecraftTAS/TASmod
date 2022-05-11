@@ -3,9 +3,7 @@ package de.scribble.lp.tasmod.monitoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
-import de.scribble.lp.tasmod.ktrng.KillTheRNGHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.text.TextFormatting;
@@ -28,13 +26,10 @@ public class DesyncMonitoring {
 	private String My;
 	private String Mz;
 	
-	private String expectedRNG;
-
-
 	public void recordMonitor() {
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		if (player != null) {
-			pos.add(player.posX + " " + player.posY + " " + player.posZ + " " + player.motionX + " " + player.motionY + " " + player.motionZ + " " + TASmod.ktrngHandler.getGlobalSeedClient());
+			pos.add(player.posX + " " + player.posY + " " + player.posZ + " " + player.motionX + " " + player.motionY + " " + player.motionZ);
 		}else {
 			pos.add(0 + " " + 0 + " " + 0 + " " + 0 + " " + 0 + " " + 0 + " " + 0);
 		}
@@ -78,7 +73,6 @@ public class DesyncMonitoring {
 		double mx = 0;
 		double my = 0;
 		double mz = 0;
-		long rng = 0L;
 		try {
 			x = Double.parseDouble(split[0]);
 			y = Double.parseDouble(split[1]);
@@ -86,21 +80,12 @@ public class DesyncMonitoring {
 			mx = Double.parseDouble(split[3]);
 			my = Double.parseDouble(split[4]);
 			mz = Double.parseDouble(split[5]);
-			rng = Long.parseLong(split[6]);
 		} catch (Exception e) {
 			return TextFormatting.DARK_PURPLE + "Error";
 		}
 
 		boolean isEqual = player.posX == x && player.posY == y && player.posZ == z && player.motionX == mx && player.motionY == my && player.motionZ == mz;
 
-		if(rng!=TASmod.ktrngHandler.getGlobalSeedClient()) {
-			expectedRNG=TextFormatting.LIGHT_PURPLE+"ExpectedRNG: "+Long.toString(rng);
-			lastDesync=TextFormatting.LIGHT_PURPLE+"RNG Desync";
-			return lastDesync;
-		} else {
-			expectedRNG="";
-		}
-		
 		if (isEqual) {
 			this.x="";
 			this.y="";
@@ -215,10 +200,6 @@ public class DesyncMonitoring {
 
 	public String getMz() {
 		return Mz;
-	}
-	
-	public String getExpectedRNG() {
-		return expectedRNG;
 	}
 	
 	private void clearDelta(){

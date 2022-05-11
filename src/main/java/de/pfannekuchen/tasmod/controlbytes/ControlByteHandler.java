@@ -10,10 +10,10 @@ public class ControlByteHandler {
 	 * Resets all control-byte-controlled settings
 	 */
 	public static void reset() {
+		ControlByteHandler.hideInfoBox = true;
+		ControlByteHandler.text = "";
 		ControlByteHandler.shouldInterpolate = false;
 		ControlByteHandler.shouldRenderHud = true;
-		ControlByteHandler.text = "";
-		ControlByteHandler.hideInfoBox = true;
 	}
 	
 	/**

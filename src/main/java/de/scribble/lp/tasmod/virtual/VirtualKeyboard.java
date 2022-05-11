@@ -12,6 +12,8 @@ import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Maps;
 
+import de.scribble.lp.tasmod.util.ContainerSerialiser;
+
 public class VirtualKeyboard implements Serializable {
 
 	/**
@@ -375,6 +377,6 @@ public class VirtualKeyboard implements Serializable {
 			charString = StringUtils.replace(charString, "\n", "\\n");
 		}
 		
-		return "Keyboard:"+keyString + ";" + charString;
+		return ContainerSerialiser.SectionsV1.KEYBOARD.getName()+":"+keyString + ";" + charString;
 	}
 }

@@ -9,6 +9,8 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import de.scribble.lp.tasmod.util.ContainerSerialiser;
+
 public class VirtualMouse implements Serializable {
 
 	/**
@@ -332,7 +334,7 @@ public class VirtualMouse implements Serializable {
 				pathString = pathString.concat("[" + path.get(i).toString() + "]" + seperator);
 			}
 		}
-		return "Mouse:"+keyString + ";" + pathString;
+		return ContainerSerialiser.SectionsV1.MOUSE.getName()+":"+keyString + ";" + pathString;
 	}
 	
 	public void setPath(List<PathNode> path) {

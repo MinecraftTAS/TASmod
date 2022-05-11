@@ -2,6 +2,8 @@ package de.scribble.lp.tasmod.virtual;
 
 import java.io.Serializable;
 
+import de.scribble.lp.tasmod.util.ContainerSerialiser;
+
 public class VirtualSubticks implements Serializable{
 	/**
 	 * 
@@ -35,6 +37,6 @@ public class VirtualSubticks implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "Camera:"+pitch+";"+yaw;
+		return ContainerSerialiser.SectionsV1.CAMERA.getName()+":"+pitch+";"+yaw;
 	}
 }

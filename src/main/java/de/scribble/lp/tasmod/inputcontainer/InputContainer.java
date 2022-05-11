@@ -75,7 +75,14 @@ public class InputContainer {
 	 */
 	private BigArrayList<TickInputContainer> inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 
-	// All control characters
+	/**
+	 * A map of control bytes. Used to change settings during playback via the playback file.
+	 * <p>
+	 * A full list of changes can be found in {@link ControlByteHandler}
+	 * <p>
+	 * The values are as follows:<p>
+	 * <code>Map(int playbackLine, List(Pair(String controlCommand, String[] arguments))</code>"
+	 */
 	private Map<Integer, List<Pair<String, String[]>>> controls = new HashMap<Integer, List<Pair<String, String[]>>>();
 	
 	public DesyncMonitoring dMonitor = new DesyncMonitoring();

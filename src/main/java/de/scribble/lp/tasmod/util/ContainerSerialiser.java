@@ -37,6 +37,48 @@ import de.scribble.lp.tasmod.virtual.VirtualSubticks;
 public class ContainerSerialiser {
 	
 	/**
+	 * A list of sections to check for in the playback file
+	 * @author ScribbleLP
+	 *
+	 */
+	public enum SectionsV1{
+		TICKS("Ticks", ""),
+		KEYBOARD("Keyboard", "(\\|Keyboard:)"),
+		MOUSE("Mouse", "(\\|Mouse:)"),
+		CAMERA("Camera", "(\\|Camera:)");
+		
+		private String name;
+		private String regex;
+		
+		private SectionsV1(String nameIn, String regexIn) {
+			name=nameIn;
+			regex=regexIn;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public String getRegex() {
+			return regex;
+		}
+		
+		public static String getRegexString() {
+			String out="";
+			for(SectionsV1 section : values()) {
+				if(!section.getRegex().isEmpty()) {
+					String seperator="|";
+					if(values().length-1==section.ordinal()) {
+						seperator="";
+					}
+					out=out.concat(section.getRegex()+seperator);
+				}
+			}
+			return out;
+		}
+	}
+	
+	/**
 	 * Saves all inputs of the input container
 	 * @param file Where to save the container
 	 * @param container The container to save
@@ -58,10 +100,10 @@ public class ContainerSerialiser {
 			throw new IOException("There are no inputs to save to a file");
 		}
 		FileThread fileThread = new FileThread(file, false);
-		FileThread monitorThread= new FileThread(new File(file, "../"+file.getName().replace(".tas", "")+".mon"), false);
+//		FileThread monitorThread= new FileThread(new File(file, "../"+file.getName().replace(".tas", "")+".mon"), false);
 
 		fileThread.start();
-		monitorThread.start();
+//		monitorThread.start();
 		
 		fileThread.addLine("################################################# TASFile ###################################################\n"
 				 + "#												Version:1													#\n"
@@ -90,11 +132,10 @@ public class ContainerSerialiser {
 				break;
 			}
 			TickInputContainer tick = ticks.get(i);
-			fileThread.addLine(tick.toString() + "\n");
-			monitorThread.addLine(container.dMonitor.get(i) + "\n");
+			fileThread.addLine(tick.toString() + "~&\t\t\t\t//Monitoring:"+container.dMonitor.get(i)+"\n");
 		}
 		fileThread.close();
-		monitorThread.close();
+//		monitorThread.close();
 	}
 
 	public int getFileVersion(File file) throws IOException {
@@ -120,7 +161,7 @@ public class ContainerSerialiser {
 		
 		File monitorFile=new File(file, "../"+file.getName().replace(".tas", "")+".mon");
 		
-		List<String> monitorLines=null;
+		List<String> monitorLines=new ArrayList<>();
 		
 		if(monitorFile.exists()) {
 			monitorLines = FileUtils.readLines(monitorFile, StandardCharsets.UTF_8);
@@ -136,43 +177,63 @@ public class ContainerSerialiser {
 
 		int rerecords = 0;
 		
+		// No default start location
 		String startLocation="";
 		
+		// Default the start seed to the current global ktrng seed. If KTRNG is not loaded, defaults to 0
 		long startSeed=TASmod.ktrngHandler.getGlobalSeedClient();
 
+		// Clear the current container before reading new data
 		container.clear();
 
-		int linenumber = 0;
+		int linenumber = 0; //The current line number
+		
 		for (String line : lines) {
 			linenumber++;
-			//Read out the data
+			//Read out header
 			if (line.startsWith("#")) {
+				// Read author tag
 				if (line.startsWith("#Author:")) {
 					author = line.split(":")[1];
+				//Read title tag
 				} else if (line.startsWith("#Title:")) {
 					title = line.split(":")[1];
+				//Read playtime
 				} else if (line.startsWith("#Playing Time:")) {
 					playtime = line.split(":")[1];
+				//Read rerecords
 				} else if (line.startsWith("#Rerecords:")) {
 					rerecords = Integer.parseInt(line.split(":")[1]);
+				//Read start position
 				} else if (line.startsWith("#StartPosition:")) {
 					startLocation = line.replace("#StartPosition:", "");
+				//Read start seed
 				} else if (line.startsWith("#StartSeed:")) {
 					startSeed = Long.parseLong(line.replace("#StartSeed:", ""));
 				}
+			//Read control bytes
 			} else if (line.startsWith("$") && line.replace('$', ' ').trim().contains(" ")) {
 				String[] sections = line.replace('$', ' ').trim().split(" ", 2);
 				if (sections.length == 0)
 					continue;
 				String control = sections[0];
 				String[] params = sections[1].split(" ");
-				List<Pair<String, String[]>> cbytes = container.getControlBytes().getOrDefault((int) container.getInputs().size(), new ArrayList<>());
+				List<Pair<String, String[]>> cbytes = container.getControlBytes().getOrDefault(linenumber, new ArrayList<>());
 				cbytes.add(Pair.of(control, params));
-				container.getControlBytes().put((int) container.getInputs().size(), cbytes);
+				container.getControlBytes().put(linenumber, cbytes);
 			} else {
-				String[] sections = line.split("\\|");
+				
+				//Splitting the line into a data- and commentPart, the comment part will most likely contain the Monitoring
+				String dataPart=line;
+				String commentPart="";
+				if(line.contains("~&")) {
+					String[] splitComments=line.split("~&");
+					dataPart=splitComments[0];
+					commentPart=splitComments[1];
+				}
+				String[] sections = line.split(SectionsV1.getRegexString());
 
-				if (sections.length != 4) {
+				if (sections.length != SectionsV1.values().length) {
 					throw new IOException("Error in line " + linenumber + ". Cannot read the line correctly");
 				}
 
@@ -185,7 +246,7 @@ public class ContainerSerialiser {
 		container.setRerecords(rerecords);
 		container.setStartLocation(startLocation);
 		container.setStartSeed(startSeed);
-		if(monitorLines!=null) {
+		if(!monitorLines.isEmpty()) {
 			container.dMonitor.setPos(monitorLines);
 		}
 		

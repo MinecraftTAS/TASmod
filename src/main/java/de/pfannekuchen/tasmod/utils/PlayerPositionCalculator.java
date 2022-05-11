@@ -352,7 +352,9 @@ public class PlayerPositionCalculator {
         yNew = posY;
         zNew = posZ;
         
-        Minecraft.getMinecraft().renderGlobal.drawSelectionBox(source, result, 0, Minecraft.getMinecraft().getRenderPartialTicks());
+        if(result!=null) {
+        	Minecraft.getMinecraft().renderGlobal.drawSelectionBox(source, result, 0, Minecraft.getMinecraft().getRenderPartialTicks());
+        }
 		GlStateManager.enableAlpha();
 	}
 
