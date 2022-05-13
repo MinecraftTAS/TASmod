@@ -6,12 +6,14 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
 import com.dselent.bigarraylist.BigArrayList;
 import com.mojang.realmsclient.util.Pair;
 
+import de.pfannekuchen.tasmod.controlbytes.ControlByteHandler;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
@@ -124,18 +126,40 @@ public class ContainerSerialiser {
 				 + "#StartPosition:"+container.getStartLocation()+"\n"
 				 + "#																											#\n"
 				 + "#StartSeed:" + container.getStartSeed() + "\n"
-				 + "#############################################################################################################\n");
+				 + "#############################################################################################################\n"
+				 + "#Comments start with \"//\" at the start of the line, comments with # will not be saved\n");
 		
 		BigArrayList<TickInputContainer> ticks = container.getInputs();
+		Map<Integer, List<Pair<String, String[]>>> cbytes= container.getControlBytes();
+		Map<Integer, List<String>> comments = container.getComments();
+		
 		for (int i = 0; i < ticks.size(); i++) {
 			if(i==index) {
 				break;
 			}
+			
+			// Add comments
+			if(comments.containsKey(i)) {
+				List<String> multiLine=comments.get(i);
+				multiLine.forEach(comment -> {
+					fileThread.addLine("//"+comment+"\n");
+				});
+			}
+			
+			// Add controlbytes
+			if(cbytes.containsKey(i)) {
+				List<Pair<String, String[]>> cbytelist= cbytes.get(i);
+				String cbyteString= ControlByteHandler.toString(cbytelist);
+				if(!cbyteString.isEmpty()) {
+					fileThread.addLine(cbyteString);
+				}
+			}
+			
+			// Add a data line
 			TickInputContainer tick = ticks.get(i);
 			fileThread.addLine(tick.toString() + "~&\t\t\t\t//Monitoring:"+container.dMonitor.get(i)+"\n");
 		}
 		fileThread.close();
-//		monitorThread.close();
 	}
 
 	public int getFileVersion(File file) throws IOException {
@@ -163,9 +187,12 @@ public class ContainerSerialiser {
 		
 		List<String> monitorLines=new ArrayList<>();
 		
+		// Read the legacy monitoring file system. Still reads the file but deletes it afterwards
 		if(monitorFile.exists()) {
 			monitorLines = FileUtils.readLines(monitorFile, StandardCharsets.UTF_8);
+			monitorFile.delete();
 		}
+		boolean oldmonfileLoaded=!monitorLines.isEmpty();
 
 		InputContainer container = new InputContainer();
 
@@ -190,40 +217,47 @@ public class ContainerSerialiser {
 		
 		for (String line : lines) {
 			linenumber++;
-			//Read out header
+			int tickcount=(int) container.getInputs().size();
+			// Read out header
 			if (line.startsWith("#")) {
 				// Read author tag
 				if (line.startsWith("#Author:")) {
 					author = line.split(":")[1];
-				//Read title tag
+				// Read title tag
 				} else if (line.startsWith("#Title:")) {
 					title = line.split(":")[1];
-				//Read playtime
+				// Read playtime
 				} else if (line.startsWith("#Playing Time:")) {
-					playtime = line.split(":")[1];
-				//Read rerecords
+					playtime = line.split("Playing Time:")[1];
+				// Read rerecords
 				} else if (line.startsWith("#Rerecords:")) {
 					rerecords = Integer.parseInt(line.split(":")[1]);
-				//Read start position
+				// Read start position
 				} else if (line.startsWith("#StartPosition:")) {
 					startLocation = line.replace("#StartPosition:", "");
-				//Read start seed
+				// Read start seed
 				} else if (line.startsWith("#StartSeed:")) {
 					startSeed = Long.parseLong(line.replace("#StartSeed:", ""));
 				}
-			//Read control bytes
+			// Read control bytes
 			} else if (line.startsWith("$") && line.replace('$', ' ').trim().contains(" ")) {
 				String[] sections = line.replace('$', ' ').trim().split(" ", 2);
 				if (sections.length == 0)
 					continue;
 				String control = sections[0];
 				String[] params = sections[1].split(" ");
-				List<Pair<String, String[]>> cbytes = container.getControlBytes().getOrDefault(linenumber, new ArrayList<>());
+				List<Pair<String, String[]>> cbytes = container.getControlBytes().getOrDefault(tickcount, new ArrayList<>());
 				cbytes.add(Pair.of(control, params));
-				container.getControlBytes().put(linenumber, cbytes);
+				container.getControlBytes().put(tickcount, cbytes);
+			//Read comments
+			} else if (line.startsWith("//")) {
+				List<String> commentList = container.getComments().getOrDefault(tickcount, new ArrayList<>());
+				commentList.add(line.replace("//", ""));
+				container.getComments().put(tickcount, commentList);
+			//Read data
 			} else {
 				
-				//Splitting the line into a data- and commentPart, the comment part will most likely contain the Monitoring
+				// Splitting the line into a data- and commentPart, the comment part will most likely contain the Monitoring
 				String dataPart=line;
 				String commentPart="";
 				if(line.contains("~&")) {
@@ -231,13 +265,20 @@ public class ContainerSerialiser {
 					dataPart=splitComments[0];
 					commentPart=splitComments[1];
 				}
-				String[] sections = line.split(SectionsV1.getRegexString());
+				String[] sections = dataPart.split(SectionsV1.getRegexString());
 
 				if (sections.length != SectionsV1.values().length) {
 					throw new IOException("Error in line " + linenumber + ". Cannot read the line correctly");
 				}
-
+				
 				container.getInputs().add(new TickInputContainer(readTicks(sections[0], linenumber), readKeyboard(sections[1], linenumber), readMouse(sections[2], linenumber), readSubtick(sections[3], linenumber)));
+			
+				if(!oldmonfileLoaded) {
+					String[] commentData = commentPart.split("Monitoring:");
+					if(commentData.length==2) {
+						monitorLines.add(commentData[1]);
+					}
+				}
 			}
 		}
 		container.setAuthors(author);
@@ -248,6 +289,11 @@ public class ContainerSerialiser {
 		container.setStartSeed(startSeed);
 		if(!monitorLines.isEmpty()) {
 			container.dMonitor.setPos(monitorLines);
+		}
+		
+		//If an old monitoring file is loaded, save the file immediately to not loose any data.
+		if(oldmonfileLoaded) {
+			saveToFileV1(file, container);
 		}
 		
 		return container;
@@ -399,6 +445,8 @@ public class ContainerSerialiser {
 		
 		return new VirtualSubticks(x, y);
 	}
+	
+	
 
 //	private String getStartLocation() {
 //		Minecraft mc = Minecraft.getMinecraft();

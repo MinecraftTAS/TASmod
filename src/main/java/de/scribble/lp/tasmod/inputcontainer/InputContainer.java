@@ -83,7 +83,12 @@ public class InputContainer {
 	 * The values are as follows:<p>
 	 * <code>Map(int playbackLine, List(Pair(String controlCommand, String[] arguments))</code>"
 	 */
-	private Map<Integer, List<Pair<String, String[]>>> controls = new HashMap<Integer, List<Pair<String, String[]>>>();
+	private Map<Integer, List<Pair<String, String[]>>> controlBytes = new HashMap<Integer, List<Pair<String, String[]>>>();
+	
+	/**
+	 * The comments in the file, used to store them again later
+	 */
+	private Map<Integer, List<String>> comments = new HashMap<>();
 	
 	public DesyncMonitoring dMonitor = new DesyncMonitoring();
 	
@@ -382,10 +387,8 @@ public class InputContainer {
 			this.mouse = tickcontainer.getMouse().clone();
 			this.subticks = tickcontainer.getSubticks().clone();
 			// check for control bytes
-			List<Pair<String, String[]>> controlbyte = controls.get(index);
-			if (controlbyte != null)
-				for (Pair<String, String[]> pair : controlbyte)
-					ControlByteHandler.onControlByte(pair.first(), pair.second());
+			ControlByteHandler.readCotrolByte(controlBytes.get(index));
+			
 		}
 	}
 	// =====================================================================================================
@@ -408,7 +411,11 @@ public class InputContainer {
 	}
 
 	public Map<Integer, List<Pair<String, String[]>>> getControlBytes() {
-		return controls;
+		return controlBytes;
+	}
+	
+	public Map<Integer, List<String>> getComments() {
+		return comments;
 	}
 	
 	public void setIndex(int index) throws IndexOutOfBoundsException{
@@ -437,7 +444,8 @@ public class InputContainer {
 
 	public void clear() {
 		inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
-		controls.clear();
+		controlBytes.clear();
+		comments.clear();
 		index = 0;
 		dMonitor.getPos().clear();
 		clearCredits();

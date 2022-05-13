@@ -126,7 +126,7 @@ public class SavestateHandler {
 
 		// Save the world!
 		server.getPlayerList().saveAllPlayerData();
-		server.saveAllWorlds(true);
+		server.saveAllWorlds(false);
 
 		// Refreshing the index list
 		refresh();

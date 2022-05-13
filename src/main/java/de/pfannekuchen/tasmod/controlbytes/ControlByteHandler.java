@@ -1,5 +1,10 @@
 package de.pfannekuchen.tasmod.controlbytes;
 
+import java.util.Iterator;
+import java.util.List;
+
+import com.mojang.realmsclient.util.Pair;
+
 /**
  * Handles playback control bytes
  * @author Pancake
@@ -14,6 +19,36 @@ public class ControlByteHandler {
 		ControlByteHandler.text = "";
 		ControlByteHandler.shouldInterpolate = false;
 		ControlByteHandler.shouldRenderHud = true;
+	}
+	
+	public static void readCotrolByte(List<Pair<String, String[]>> list) {
+		if (list != null)
+			for (Pair<String, String[]> pair : list)
+				ControlByteHandler.onControlByte(pair.first(), pair.second());
+	}
+	
+	public static String toString(List<Pair<String, String[]>> cbytes) {
+		String out="";
+		// Iterating over the list of cbytes
+		for(Pair<String, String[]> pair : cbytes) {
+			
+			//Add the command byte
+			out=out.concat("$"+pair.first()+" ");
+			
+			//Add the arguments
+			String[] args=pair.second();
+			for (int i = 0; i < args.length; i++) {
+				String limiter=" ";
+				if(args.length-1==i) {
+					limiter="";
+				}
+				out=out.concat(args[i]+limiter);
+			}
+			//Add a new line for a new controlbyte
+			out=out.concat("\n");
+		}
+		
+		return out;
 	}
 	
 	/**
