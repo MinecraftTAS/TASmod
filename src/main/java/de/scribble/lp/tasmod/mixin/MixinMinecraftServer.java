@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import de.scribble.lp.tasmod.CommonProxy;
@@ -150,12 +151,12 @@ public abstract class MixinMinecraftServer {
 //		}
 //	}
 
-//	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
-//	public long limitLag(long j) {
-//		if(j>(500L*(20/TickrateChangerServer.TICKS_PER_SECOND))){
-//			return 50L;
-//		}
-//		return j;
-//	}
+	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
+	public long limitLag(long j) {
+		if(j>=TickrateChangerServer.millisecondsPerTick*5){
+			return TickrateChangerServer.millisecondsPerTick;
+		}
+		return j;
+	}
 
 }
