@@ -13,6 +13,7 @@
         //Savestates
         "savestates.MixinChunkProviderServer",
         "savestates.MixinEntityPlayerMP",
+        "savestates.MixinNetHandlerPlayServer",
         
         //Events
         "events.MixinPlayerList",
