@@ -69,7 +69,7 @@ dependencies {
     }
     compile 'org.msgpack:msgpack-core:0.8.16'
     compile 'org.msgpack:jackson-dataformat-msgpack:0.8.16'
-    compile files('libs/KillTheRNG-1.12.2-1.5-deobf.jar')
+    compile files('libs/KillTheRNG-1.12.2-1.6-deobf.jar')
     //compile files('libs/BigArrayList-1.3.jar')
     compile 'com.dselent:bigarraylist:1.0'
     // real examples
@@ -126,7 +126,7 @@ shadowJar {
     relocate 'com.fasterxml', 'de.scribble.lp.tasmod.repack.com.fasterxml'
     classifier "shadow"
     exclude 'dummyThing'
-    exclude 'de/scribble/lp/killtherng/', 'assets/killtherng/', 'mixins.killtherng.json', 'kaptainwutax/', 'com/seedfinding/'
+    exclude 'de/scribble/lp/killtherng/', 'assets/killtherng/', 'mixins.killtherng.json', 'mixins.killtherng.refmap.json', 'kaptainwutax/', 'com/seedfinding/'
 
     afterEvaluate {
         from zipTree(reobfJar.jar)

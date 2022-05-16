@@ -158,6 +158,7 @@ public class InputContainer {
 				state = TASstate.PLAYBACK;
 				creditsPrinted=false;
 				TASmod.ktrngHandler.setGlobalSeedServer(startSeed);
+				TASmod.ktrngHandler.setTestSeed(startSeed);
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
 				if (Minecraft.getMinecraft().player != null) {
@@ -448,6 +449,7 @@ public class InputContainer {
 		comments.clear();
 		index = 0;
 		dMonitor.getPos().clear();
+		TASmod.ktrngHandler.clear();
 		clearCredits();
 	}
 	

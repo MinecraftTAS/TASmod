@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.tasmod.commands.clearinputs.CommandClearInputs;
 import de.scribble.lp.tasmod.commands.folder.CommandFolder;
 import de.scribble.lp.tasmod.commands.fullplay.CommandFullPlay;
