@@ -48,6 +48,11 @@ public class KillTheRNGHandler{
 			return 0;
 	}
 	
+	public void setGlobalSeed(long seedIn) {
+		setGlobalSeedClient(seedIn);
+		setGlobalSeedServer(seedIn);
+	}
+	
 	public void setGlobalSeedClient(long seedIn) {
 		if (isLoaded()) {
 			URToolsClient.setSeedAll(seedIn);

@@ -157,7 +157,7 @@ public class InputContainer {
 				index = 0;
 				state = TASstate.PLAYBACK;
 				creditsPrinted=false;
-				TASmod.ktrngHandler.setGlobalSeedServer(startSeed);
+				TASmod.ktrngHandler.setGlobalSeed(startSeed);
 				TASmod.ktrngHandler.setTestSeed(startSeed);
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
