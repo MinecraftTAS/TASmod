@@ -1,5 +1,8 @@
 package de.scribble.lp.tasmod.ktrng;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.NextSeedHandler;
 import de.scribble.lp.killtherng.URToolsClient;
@@ -7,6 +10,8 @@ import de.scribble.lp.killtherng.custom.CustomRandom;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
 
 /**
@@ -25,6 +30,8 @@ public class KillTheRNGHandler{
 	
 	private int seedCounter;
 	
+	private List<Integer> blockedKeyCodes = new ArrayList<>();
+	
 	
 	public KillTheRNGHandler(boolean isLoaded) {
 		this.isLoaded=isLoaded;
@@ -33,6 +40,8 @@ public class KillTheRNGHandler{
 			KillTheRNG.isLibrary=true;
 			nextSeedHandler=new NextSeedHandler();
 			monitor=new KTRNGMonitor();
+			
+			registerBlockedStuff();
 		}else {
 			nextSeedHandler=null;
 			monitor=null;
@@ -40,6 +49,11 @@ public class KillTheRNGHandler{
 		}
 	}
 	
+	private void registerBlockedStuff() {
+		blockedKeyCodes.add(0);
+		blockedKeyCodes.add(Minecraft.getMinecraft().gameSettings.keyBindChat.getKeyCode());
+		blockedKeyCodes.add(1);
+	}
 	
 	public long getGlobalSeedClient() {
 		if(isLoaded()) 
@@ -99,6 +113,10 @@ public class KillTheRNGHandler{
 		return isLoaded;
 	}
 
+	public boolean isKeyCodeBlocked(int keycodeIn) {
+		return VirtualKeybindings.isKeyCodeAlwaysBlocked(keycodeIn) || blockedKeyCodes.contains(keycodeIn);
+	}
+	
 	private class KTRNGMonitor implements de.scribble.lp.killtherng.custom.KTRNGEventHandler.KTRNGEvent{
 
 		public String monitorString;

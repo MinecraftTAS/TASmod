@@ -126,7 +126,7 @@ public abstract class MixinMinecraft {
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int redirectKeyboardGetEventKey() {
 		
-		if(!VirtualKeybindings.isKeyCodeAlwaysBlocked(ClientProxy.virtual.getEventKeyboardKey()) && ClientProxy.virtual.getEventKeyboardCharacter()!='\0') {
+		if(!TASmod.ktrngHandler.isKeyCodeBlocked(ClientProxy.virtual.getEventKeyboardKey())) {
 			TASmod.ktrngHandler.nextPlayerInput(); // Advance ktrng seed on player input
 		}
 		
