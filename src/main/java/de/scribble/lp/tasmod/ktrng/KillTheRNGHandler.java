@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.NextSeedHandler;
+import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.URToolsClient;
 import de.scribble.lp.killtherng.custom.CustomRandom;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
@@ -38,6 +39,7 @@ public class KillTheRNGHandler{
 		if (isLoaded) {
 			KillTheRNG.LOGGER.info("Connection established with TASmod");
 			KillTheRNG.isLibrary=true;
+			KillTheRNG.mode=SeedingModes.Tick;
 			nextSeedHandler=new NextSeedHandler();
 			monitor=new KTRNGMonitor();
 			

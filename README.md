@@ -23,5 +23,3 @@ Special thanks: Darkmoon, The Minecraft TAS Community
   
 ## Development
 To load mixins in eclipse use `--mixin mixins.tasmod.json --tweakClass org.spongepowered.asm.launch.MixinTweaker` in program arguments  
-  
-You will also find a KillTheRNG.jar (not with -deobf at the end!) in the libs folder. Copy that into `run/mods` to trick Minecraft into loading a second mod.
