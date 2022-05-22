@@ -7,6 +7,7 @@ import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.NextSeedHandler;
 import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.URToolsClient;
+import de.scribble.lp.killtherng.URToolsServer;
 import de.scribble.lp.killtherng.custom.CustomRandom;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import de.scribble.lp.tasmod.ClientProxy;
@@ -14,6 +15,8 @@ import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Easy access to the KillTheRNG library without littering the rest of the code
@@ -25,38 +28,35 @@ public class KillTheRNGHandler{
 	
 	private boolean isLoaded;
 	
-	private final NextSeedHandler nextSeedHandler;
-	
 	private final KTRNGMonitor monitor;
 	
-	private int seedCounter;
-	
-	private List<Integer> blockedKeyCodes = new ArrayList<>();
-	
-	
+	/**
+	 * Instantiates a KillTheRNGHandler instance
+	 * @param isLoaded If the KillTheRNG mod is loaded
+	 */
 	public KillTheRNGHandler(boolean isLoaded) {
 		this.isLoaded=isLoaded;
 		if (isLoaded) {
 			KillTheRNG.LOGGER.info("Connection established with TASmod");
 			KillTheRNG.isLibrary=true;
 			KillTheRNG.mode=SeedingModes.Tick;
-			nextSeedHandler=new NextSeedHandler();
 			monitor=new KTRNGMonitor();
 			
-			registerBlockedStuff();
 		}else {
-			nextSeedHandler=null;
 			monitor=null;
 			TASmod.logger.info("KillTheRNG doesn't appear to be loaded");
 		}
 	}
 	
-	private void registerBlockedStuff() {
-		blockedKeyCodes.add(0);
-		blockedKeyCodes.add(Minecraft.getMinecraft().gameSettings.keyBindChat.getKeyCode());
-		blockedKeyCodes.add(1);
+	public boolean isLoaded() {
+		return isLoaded;
 	}
 	
+	//=================================================Setting the seed
+	/**
+	 * @return The global seed of the client
+	 */
+	@SideOnly(Side.CLIENT)
 	public long getGlobalSeedClient() {
 		if(isLoaded()) 
 			return URToolsClient.getRandomFromString("Global").getSeed();
@@ -64,82 +64,83 @@ public class KillTheRNGHandler{
 			return 0;
 	}
 	
+	/**
+	 * Set the global seed on both client and server
+	 * @param seedIn The seed on both client and server
+	 */
+	@SideOnly(Side.CLIENT)
 	public void setGlobalSeed(long seedIn) {
 		setGlobalSeedClient(seedIn);
 		setGlobalSeedServer(seedIn);
 	}
 	
+	/**
+	 * Set the global seed on the client
+	 * @param seedIn The seed on the client
+	 */
+	@SideOnly(Side.CLIENT)
 	public void setGlobalSeedClient(long seedIn) {
 		if (isLoaded()) {
 			URToolsClient.setSeedAll(seedIn);
 		}
 	}
 	
+	/**
+	 * Sends a packet to the server, setting the global seed
+	 * @param seedIn The seed on the server
+	 */
+	@SideOnly(Side.CLIENT)
 	public void setGlobalSeedServer(long seedIn) {
 		if(isLoaded()) {
 			KillTheRNG.NETWORK.sendToServer(new ChangeSeedPacket(seedIn));
 		}
 	}
+	//=================================================TASmod integration
 	
-	public void nextPlayerInput() {
-		if(isLoaded()) {
-			nextSeedHandler.increaseNextSeedCounter();
-			seedCounter++;
+	/**
+	 * Executed every tick. Advances the seed on the client
+	 */
+	@SideOnly(Side.CLIENT)
+	public void updateClient() {
+		if(isLoaded() && TASmod.getServerInstance() == null) {
+			URToolsClient.nextSeed();
 		}
 	}
 	
-	public void sendAndResetNextPlayerInput() {
+	public void updateServer() {
 		if(isLoaded()) {
-			nextSeedHandler.sendAndReset();
-			monitor.testRand.advance(seedCounter);
-			seedCounter=0;
+			URToolsServer.nextSeed();
 		}
 	}
 	
-	public void setTestSeed(long seed) {
-		if(isLoaded()) {
-			clear();
-			monitor.testRand.setSeed(seed);
-		}
-	}
+	//=================================================Monitoring
 	
+	/**
+	 * @return Monitor information displayed in InfoGui
+	 */
 	public String getDesyncString() {
 		return monitor.monitorString;
 	}
 	
+	/**
+	 * Clears the monitor string
+	 */
 	public void clear(){
 		monitor.monitorString="";
 	}
 
-	public boolean isLoaded() {
-		return isLoaded;
-	}
-
-	public boolean isKeyCodeBlocked(int keycodeIn) {
-		return VirtualKeybindings.isKeyCodeAlwaysBlocked(keycodeIn) || blockedKeyCodes.contains(keycodeIn);
-	}
-	
-	private class KTRNGMonitor implements de.scribble.lp.killtherng.custom.KTRNGEventHandler.KTRNGEvent{
+	private class KTRNGMonitor{
 
 		public String monitorString;
 		
-		public CustomRandom testRand;
-		
 		public KTRNGMonitor() {
-			testRand=new CustomRandom("TestRand");
-			KillTheRNG.eventHandler.register(this);
 		}
 		
-		@Override
-		public void trigger() {
-			updateDesyncString();
-		}
-
 		private void updateDesyncString() {
-			if(ClientProxy.virtual.getContainer().isPlayingback())
-				monitorString=KillTheRNG.randomness.Global.getSeed()==testRand.getSeed() ? "" : TextFormatting.RED+String.format("Expected: %s %s", testRand.getSeed(), testRand.steps(KillTheRNG.randomness.Global));
+			if(ClientProxy.virtual.getContainer().isPlayingback()) {
+//				monitorString=KillTheRNG.randomness.Global.getSeed()==testRand.getSeed() ? "" : TextFormatting.RED+String.format("Expected: %s %s", testRand.getSeed(), testRand.steps(KillTheRNG.randomness.Global));
+			}
 		}
-
 	}
 	
 }

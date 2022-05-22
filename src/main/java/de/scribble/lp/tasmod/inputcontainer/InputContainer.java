@@ -158,7 +158,7 @@ public class InputContainer {
 				state = TASstate.PLAYBACK;
 				creditsPrinted=false;
 				TASmod.ktrngHandler.setGlobalSeed(startSeed);
-				TASmod.ktrngHandler.setTestSeed(startSeed);
+//				TASmod.ktrngHandler.setTestSeed(startSeed); TODO Do monitoring again
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
 				if (Minecraft.getMinecraft().player != null) {
