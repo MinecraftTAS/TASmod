@@ -1,20 +1,12 @@
 package de.scribble.lp.tasmod.ktrng;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.scribble.lp.killtherng.KillTheRNG;
-import de.scribble.lp.killtherng.NextSeedHandler;
 import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.URToolsClient;
 import de.scribble.lp.killtherng.URToolsServer;
-import de.scribble.lp.killtherng.custom.CustomRandom;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -29,6 +21,8 @@ public class KillTheRNGHandler{
 	private boolean isLoaded;
 	
 	private final KTRNGMonitor monitor;
+	
+	private boolean changeSeed=true;
 	
 	/**
 	 * Instantiates a KillTheRNGHandler instance
@@ -50,6 +44,20 @@ public class KillTheRNGHandler{
 	
 	public boolean isLoaded() {
 		return isLoaded;
+	}
+	
+	//=================================================ChangeSeed
+	
+	public boolean isChangeSeed() {
+		return changeSeed;
+	}
+	
+	public void setChangeSeed(boolean newval) {
+		changeSeed=newval;
+	}
+	
+	public void toggleChangeSeed() {
+		changeSeed=!changeSeed;
 	}
 	
 	//=================================================Setting the seed
@@ -102,13 +110,13 @@ public class KillTheRNGHandler{
 	 */
 	@SideOnly(Side.CLIENT)
 	public void updateClient() {
-		if(isLoaded() && TASmod.getServerInstance() == null) {
+		if(isLoaded() && TASmod.getServerInstance() == null && isChangeSeed()) {
 			URToolsClient.nextSeed();
 		}
 	}
 	
 	public void updateServer() {
-		if(isLoaded()) {
+		if(isLoaded() && isChangeSeed()) {
 			URToolsServer.nextSeed();
 		}
 	}

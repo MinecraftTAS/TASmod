@@ -46,6 +46,8 @@ public class ClientProxy extends CommonProxy {
 	public static KeyBinding infoGuiKey = new KeyBinding("Open InfoGui Editor", Keyboard.KEY_F6, "TASmod");
 	
 	public static KeyBinding bufferViewKey = new KeyBinding("Buffer View", Keyboard.KEY_NUMPAD0, "TASmod");
+	
+	public static KeyBinding ktrngKey = null;
 
 	public static VirtualInput virtual;
 
@@ -100,6 +102,12 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(testingKey);
 		ClientRegistry.registerKeyBinding(infoGuiKey);
 		ClientRegistry.registerKeyBinding(bufferViewKey);
+		
+		if(TASmod.ktrngHandler.isLoaded()) {
+			ktrngKey=new KeyBinding("KTRNG SeedChange Pause", Keyboard.KEY_B, "TASmod");
+			ClientRegistry.registerKeyBinding(ktrngKey);
+			VirtualKeybindings.registerBlockedKeyBinding(ktrngKey);
+		}
 
 		
 		VirtualKeybindings.registerBlockedKeyBinding(tickratezeroKey);
