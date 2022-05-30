@@ -28,10 +28,6 @@ compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
 }
 
-shadowJar {
-	archiveName = "${archivesBaseName}-${version}-forge.jar"
-}
-
 minecraft {
     version = "1.12.2-14.23.5.2847"
     runDir = "run"
@@ -116,7 +112,9 @@ processResources {
         exclude 'mcmod.info'
     }
 }
+
 shadowJar {
+	archiveName = "${archivesBaseName}-${version}-shadow.jar"
     mainSpec.sourcePaths.clear()
 
     dependsOn reobfJar
@@ -130,6 +128,12 @@ shadowJar {
 
     afterEvaluate {
         from zipTree(reobfJar.jar)
+    }
+    
+    //Rename delete the mixinless version and rename the shadow jar
+    doLast {
+    	delete("${buildDir}/libs/${archivesBaseName}-${version}.jar")
+    	ant.move(file:"build/libs/${archivesBaseName}-${version}-shadow.jar", tofile:"build/libs/${archivesBaseName}-${version}.jar")
     }
 }
 mixin {

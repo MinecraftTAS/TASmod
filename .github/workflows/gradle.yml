@@ -1,12 +1,13 @@
 # This workflow will build a Java project with Gradle
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Java CI with Gradle
+name: Build and Upload to Discord
 
-on: [push]
+on:
+  push
 
 jobs:
-  build:
+  build-and-upload:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -14,18 +15,22 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '8'
-        distribution: 'adopt'
+        distribution: 'temurin'
         architecture: x64
-    - name: Prepare folders
-      run: mkdir -p gradle/wrapper
-    - name: Download gradle properties
-      run: wget -P gradle/wrapper https://data.mgnet.work/tasmod/gradle-wrapper.properties
-    - name: Obtain gradle
-      run: wget -P gradle/wrapper https://data.mgnet.work/tasmod/gradle-wrapper.jar
+    - name: Setup Gradle
+    - uses: gradle/gradle-build-action@v2
+   	  with:
+   	    gradle-version: 4.10.3
     - name: Build TASmod with Gradle
-      run: java -cp gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain shadowJar --no-daemon
-    - run: find . -type f ! -name "*forge.jar" -delete
-    - uses: actions/upload-artifact@v2
+    - run: ./gradlew shadowJar --no-daemon
+    - name: Upload artifact
+    - uses: actions/upload-artifact@v3
       with:
         name: TASmod-Dev-Build
         path: build/libs
+   	- name: Send file to discord channel
+    - uses: sinshutu/upload-to-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: build/libs/TASmod-*.jar
