@@ -19,8 +19,8 @@ jobs:
         architecture: x64
     - name: Setup Gradle
     - uses: gradle/gradle-build-action@v2
-   	  with:
-   	    gradle-version: 4.10.3
+      with:
+        gradle-version: 4.10.3
     - name: Build TASmod with Gradle
     - run: ./gradlew shadowJar --no-daemon
     - name: Upload artifact
@@ -28,7 +28,7 @@ jobs:
       with:
         name: TASmod-Dev-Build
         path: build/libs
-   	- name: Send file to discord channel
+    - name: Send file to discord channel
     - uses: sinshutu/upload-to-discord@master
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
