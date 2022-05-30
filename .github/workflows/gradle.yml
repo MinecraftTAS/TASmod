@@ -3,8 +3,7 @@
 
 name: Build and Upload to Discord
 
-on:
-  push
+on: [push]
 
 jobs:
   build-and-upload:
@@ -18,18 +17,18 @@ jobs:
         distribution: 'temurin'
         architecture: x64
     - name: Setup Gradle
-    - uses: gradle/gradle-build-action@v2
+      uses: gradle/gradle-build-action@v2
       with:
         gradle-version: 4.10.3
     - name: Build TASmod with Gradle
-    - run: ./gradlew shadowJar --no-daemon
+      run: ./gradlew shadowJar --no-daemon
     - name: Upload artifact
-    - uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: TASmod-Dev-Build
         path: build/libs
     - name: Send file to discord channel
-    - uses: sinshutu/upload-to-discord@master
+      uses: sinshutu/upload-to-discord@master
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       with:
