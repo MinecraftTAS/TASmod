@@ -13,7 +13,6 @@ buildscript {
 plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.4'
     id 'java'
-    id 'application'
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
@@ -95,8 +94,6 @@ jar {
                    'ForceLoadAsMod': 'true'
     }
 }
-
-mainClassName='de.scribble.lp.tasmod.externalGui.InstallationNotice'
 
 processResources {
     // this will ensure that this task is redone when the versions change.
