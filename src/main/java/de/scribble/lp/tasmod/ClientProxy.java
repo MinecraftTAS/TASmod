@@ -10,6 +10,7 @@ import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.commands.tutorial.TutorialHandler;
 import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
 import de.scribble.lp.tasmod.shield.ShieldDownloader;
+import de.scribble.lp.tasmod.ticksync.TickSyncClient;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
@@ -60,6 +61,8 @@ public class ClientProxy extends CommonProxy {
 	public static InfoHud hud;
 	
 	public static ShieldDownloader shieldDownloader;
+	
+	public static TickSyncClient ticksyncClient = new TickSyncClient();
 	
 	public void preInit(FMLPreInitializationEvent ev) {
 		isDevEnvironment = (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");

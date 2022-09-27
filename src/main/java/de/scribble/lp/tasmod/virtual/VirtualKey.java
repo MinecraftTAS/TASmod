@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Class to store which keys on the keyboard have been pressed, similar to how Keybindings work.<br>
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class VirtualKey implements Serializable {

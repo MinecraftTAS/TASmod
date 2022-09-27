@@ -2,7 +2,6 @@ package de.scribble.lp.tasmod.events;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.externalGui.InputContainerView;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
 import de.scribble.lp.tasmod.savestates.server.SavestatePacket;
@@ -12,8 +11,9 @@ import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 
 /**
+ * 
  * The class where all keybinding functionality is executed
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class KeybindingEvents {
@@ -53,8 +53,6 @@ public class KeybindingEvents {
 			TASstate.setOrSend(ClientProxy.virtual.getContainer().togglePause());
 			
 		} else if (ClientProxy.ktrngKey!=null && VirtualKeybindings.isKeyDown(ClientProxy.ktrngKey)) {
-			
-			TASmod.ktrngHandler.toggleChangeSeed();
 			
 		}
 	}

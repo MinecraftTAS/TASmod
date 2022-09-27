@@ -1,9 +1,10 @@
 package de.scribble.lp.tasmod.ktrng;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.SeedingModes;
-import de.scribble.lp.killtherng.URToolsClient;
-import de.scribble.lp.killtherng.URToolsServer;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Easy access to the KillTheRNG library without littering the rest of the code
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class KillTheRNGHandler{
@@ -22,18 +23,18 @@ public class KillTheRNGHandler{
 	
 	private final KTRNGMonitor monitor;
 	
-	private boolean changeSeed=true;
-	
 	/**
 	 * Instantiates a KillTheRNGHandler instance
 	 * @param isLoaded If the KillTheRNG mod is loaded
 	 */
 	public KillTheRNGHandler(boolean isLoaded) {
+		
 		this.isLoaded=isLoaded;
+		
 		if (isLoaded) {
 			KillTheRNG.LOGGER.info("Connection established with TASmod");
 			KillTheRNG.isLibrary=true;
-			KillTheRNG.mode=SeedingModes.Tick;
+			KillTheRNG.mode=SeedingModes.TickChange;
 			monitor=new KTRNGMonitor();
 			
 		}else {
@@ -42,23 +43,26 @@ public class KillTheRNGHandler{
 		}
 	}
 	
+	public long advanceGlobalSeedServer() {
+		if(isLoaded()) {
+			return KillTheRNG.commonRandom.nextSeed();
+		} else {
+			return 0;
+		}
+	}
+	
+	public long getGlobalSeedServer() {
+		if(isLoaded()) {
+			return KillTheRNG.commonRandom.GlobalServer.getSeed();
+		} else {
+			return 0;
+		}
+	}
+	
 	public boolean isLoaded() {
 		return isLoaded;
 	}
 	
-	//=================================================ChangeSeed
-	
-	public boolean isChangeSeed() {
-		return changeSeed;
-	}
-	
-	public void setChangeSeed(boolean newval) {
-		changeSeed=newval;
-	}
-	
-	public void toggleChangeSeed() {
-		changeSeed=!changeSeed;
-	}
 	
 	//=================================================Setting the seed
 	/**
@@ -67,7 +71,7 @@ public class KillTheRNGHandler{
 	@SideOnly(Side.CLIENT)
 	public long getGlobalSeedClient() {
 		if(isLoaded()) 
-			return URToolsClient.getRandomFromString("Global").getSeed();
+			return KillTheRNG.clientRandom.GlobalClient.getSeed();
 		else
 			return 0;
 	}
@@ -89,7 +93,7 @@ public class KillTheRNGHandler{
 	@SideOnly(Side.CLIENT)
 	public void setGlobalSeedClient(long seedIn) {
 		if (isLoaded()) {
-			URToolsClient.setSeedAll(seedIn);
+			KillTheRNG.clientRandom.setSeedAll(seedIn);
 		}
 	}
 	
@@ -106,22 +110,42 @@ public class KillTheRNGHandler{
 	//=================================================TASmod integration
 	
 	/**
-	 * Executed every tick. Advances the seed on the client
+	 * Executed every tick.
 	 */
 	@SideOnly(Side.CLIENT)
 	public void updateClient() {
-		if(isLoaded() && TASmod.getServerInstance() == null && isChangeSeed()) {
-			URToolsClient.nextSeed();
+		if(isLoaded()) {
+			Long seed = pollSeed();
+			if(seed != null) {
+				setGlobalSeedClient(seed);
+			}
 		}
 	}
 	
+	/**
+	 * Executed every tick on the server
+	 */
 	public void updateServer() {
-		if(isLoaded() && isChangeSeed()) {
-			URToolsServer.nextSeed();
+		if(isLoaded()) {
+//			KillTheRNG.tickmodeServer.tickCustom();
 		}
 	}
 	
 	//=================================================Monitoring
+	
+	private Queue<Long> seedQueue = new ConcurrentLinkedQueue<>();
+	
+	public void addToQueue(long seed) {
+		seedQueue.add(seed);
+	}
+	
+	public Long pollSeed() {
+		return seedQueue.poll();
+	}
+	
+	public void clearQueue() {
+		seedQueue.clear();
+	}
 	
 	/**
 	 * @return Monitor information displayed in InfoGui

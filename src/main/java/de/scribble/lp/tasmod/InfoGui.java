@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  * The InfoGui returns! 
  * Pancake says: No it doesn't.
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class InfoGui extends Gui {

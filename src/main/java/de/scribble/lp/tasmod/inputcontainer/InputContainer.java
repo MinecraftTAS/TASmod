@@ -146,7 +146,7 @@ public class InputContainer {
 			case PLAYBACK:
 				if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
 					try {
-						tpPlayer(startLocation); // TODO #99 Make this a secondary command
+						tpPlayer(startLocation);
 					} catch (NumberFormatException e) {
 						state = TASstate.NONE;
 						e.printStackTrace();
@@ -157,6 +157,7 @@ public class InputContainer {
 				index = 0;
 				state = TASstate.PLAYBACK;
 				creditsPrinted=false;
+				TASmod.ktrngHandler.clearQueue();  // Clear the queue 
 				TASmod.ktrngHandler.setGlobalSeed(startSeed);
 //				TASmod.ktrngHandler.setTestSeed(startSeed); TODO Do monitoring again
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
@@ -199,6 +200,7 @@ public class InputContainer {
 				ClientProxy.virtual.unpressEverything();
 				return verbose ? TextFormatting.GREEN + "Pausing a playback" : "";
 			case NONE:
+				Minecraft.getMinecraft().gameSettings.chatLinks = true;
 				ClientProxy.virtual.unpressEverything();
 				state = TASstate.NONE;
 				return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";

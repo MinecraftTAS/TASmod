@@ -79,7 +79,7 @@ import net.minecraft.client.Minecraft;
  * <li>Recording support for the full keyboard/eventual modding support</li>
  * </ul>
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class VirtualInput {

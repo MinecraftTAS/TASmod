@@ -22,7 +22,7 @@ import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorWorld;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.ticksync.TickSync;
+import de.scribble.lp.tasmod.ticksync.TickSyncClient;
 import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -276,7 +276,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Client Ticks";
-				return "Client Ticks: " + TickSync.getClienttickcounter();
+				return "Client Ticks: " + ClientProxy.ticksyncClient.getClienttickcounter();
 			}));
 			
 			title = "sticks";
@@ -284,7 +284,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Server Ticks";
-				return "Server Ticks: " + TickSync.getServertickcounter();
+				return "Server Ticks: " + ClientProxy.ticksyncClient.getServertickcounter();
 			}));
 			
 			title = "nextxyz";
@@ -379,12 +379,12 @@ public class InfoHud extends GuiScreen {
 			y += 14;
 			
 			if(TASmod.ktrngHandler.isLoaded()) {
-				title = "ktrng_desync";
-				if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-				lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-					if (Minecraft.getMinecraft().currentScreen == this) return "Desync KTRNG";
-					return TASmod.ktrngHandler.getDesyncString();
-				}));
+//				title = "ktrng_desync";
+//				if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+//				lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+//					if (Minecraft.getMinecraft().currentScreen == this) return "Desync KTRNG";
+//					return TASmod.ktrngHandler.getDesyncString();
+//				}));
 			}
 
 			

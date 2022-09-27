@@ -36,8 +36,11 @@ import de.scribble.lp.tasmod.tickratechanger.ChangeTickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.ChangeTickratePacket.ChangeTickratePacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket.PauseTickratePacketHandler;
-import de.scribble.lp.tasmod.ticksync.TickSyncPackage;
-import de.scribble.lp.tasmod.ticksync.TickSyncPackage.TickSyncPacketHandler;
+import de.scribble.lp.tasmod.ticksync.TickSyncKTRNGPacket;
+import de.scribble.lp.tasmod.ticksync.TickSyncKTRNGPacket.TickSyncKTRNGPacketHandler;
+import de.scribble.lp.tasmod.ticksync.TickSyncPacket;
+import de.scribble.lp.tasmod.ticksync.TickSyncPacket.TickSyncPacketHandler;
+import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import de.scribble.lp.tasmod.util.changestates.RequestStatePacket;
 import de.scribble.lp.tasmod.util.changestates.RequestStatePacket.RequestStatePacketHandler;
 import de.scribble.lp.tasmod.util.changestates.SyncStatePacket;
@@ -52,6 +55,8 @@ import net.minecraftforge.fml.relauncher.Side;
 public class CommonProxy {
 	public static SimpleNetworkWrapper NETWORK;
 	public static Logger logger = LogManager.getLogger("TASmod");
+	
+	public static TickSyncServer ticksyncServer = new TickSyncServer();
 
 	public void preInit(FMLPreInitializationEvent ev) {
 		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("tasmod");
@@ -68,7 +73,8 @@ public class CommonProxy {
 		NETWORK.registerMessage(PauseTickratePacketHandler.class, PauseTickratePacket.class, i++, Side.CLIENT);
 
 		// Ticksync
-		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(TickSyncKTRNGPacketHandler.class, TickSyncKTRNGPacket.class, i++, Side.CLIENT);
 
 		// Sync State
 		NETWORK.registerMessage(RequestStatePacketHandler.class, RequestStatePacket.class, i++, Side.CLIENT);

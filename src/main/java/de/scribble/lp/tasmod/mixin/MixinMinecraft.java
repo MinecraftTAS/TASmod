@@ -23,7 +23,7 @@ import de.scribble.lp.tasmod.externalGui.InputContainerView;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.ticksync.TickSync;
+import de.scribble.lp.tasmod.ticksync.TickSyncClient;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -76,7 +76,7 @@ public abstract class MixinMinecraft {
 
 	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;runTick()V"))
 	public void redirectRunTick(Minecraft mc) {
-		for (int j2 = 0; j2 < TickSync.getTickAmount((Minecraft) (Object) this); j2++) {
+		for (int j2 = 0; j2 < ClientProxy.ticksyncClient.getTickAmount((Minecraft) (Object) this); j2++) {
 			ClientProxy.virtual.updateContainer();
 			if (TickrateChangerClient.ticksPerSecond != 0) {
 				((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
@@ -97,7 +97,7 @@ public abstract class MixinMinecraft {
 	@Inject(method = "runTick", at = @At(value = "HEAD"))
 	public void injectRunTick(CallbackInfo ci) throws IOException {
 		InputContainerView.update(ClientProxy.virtual);
-		TickSync.incrementClienttickcounter();
+		ClientProxy.ticksyncClient.incrementClienttickcounter();
 		if (SavestatePlayerLoading.wasLoading) {
 			SavestatePlayerLoading.wasLoading = false;
 			

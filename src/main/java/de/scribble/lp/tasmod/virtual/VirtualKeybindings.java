@@ -28,7 +28,7 @@ import net.minecraft.client.settings.KeyBinding;
  * Keybindings registered with {@link #registerBlockedKeyBinding(KeyBinding)}
  * will not be recorded during a recording or pressed in a playback
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class VirtualKeybindings {

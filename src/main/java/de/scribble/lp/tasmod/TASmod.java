@@ -39,7 +39,7 @@ import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 /**
  * ModLoader for TASmod
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 @Mod(modid = "tasmod", name = "Tool-Assisted Speedrun Mod", version = TASmod.VERSION)

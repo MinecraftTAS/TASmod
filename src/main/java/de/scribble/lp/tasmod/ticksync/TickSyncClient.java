@@ -12,38 +12,17 @@ import net.minecraft.client.multiplayer.WorldClient;
  * @author ScribbleLP
  *
  */
-public class TickSync {
-	private static int servertickcounter;
-	private static int clienttickcounter;
-	private static boolean enabled = true;
-	private static int softLockTimer;
-
-	public static boolean isLagging;
-
-	/**
-	 * Turns the ticksync on and off
-	 * 
-	 * @param enable
-	 */
-	public static void sync(boolean enable) {
-		enabled = enable;
-	}
-
-	/**
-	 * If ticksync is enabled
-	 * 
-	 * @return enabled
-	 */
-	public static boolean isEnabled() {
-		return enabled;
-	}
+public class TickSyncClient {
+	private int servertickcounter;
+	private int clienttickcounter;
+	private int softLockTimer;
 
 	/**
 	 * The tick counter of the server
 	 * 
 	 * @return
 	 */
-	public static int getServertickcounter() {
+	public int getServertickcounter() {
 		return servertickcounter;
 	}
 
@@ -52,14 +31,14 @@ public class TickSync {
 	 * 
 	 * @return
 	 */
-	public static int getClienttickcounter() {
+	public int getClienttickcounter() {
 		return clienttickcounter;
 	}
 
 	/**
 	 * Increment tickcounter and reset softlock timer, called in runTick
 	 */
-	public static void incrementClienttickcounter() {
+	public void incrementClienttickcounter() {
 		softLockTimer = 0;
 		clienttickcounter++;
 	}
@@ -69,27 +48,27 @@ public class TickSync {
 	 * 
 	 * @param counter
 	 */
-	public static void setServerTickcounter(int counter) {
+	public void setServerTickcounter(int counter) {
 		servertickcounter = counter;
 	}
 
 	/**
 	 * Reset the tick counter on server start
 	 */
-	public static void resetTickCounter() {
+	public void resetTickCounter() {
 		clienttickcounter = 0;
 		servertickcounter = 0;
 	}
 
-	public static int getTickAmount(Minecraft mc) {
+	public int getTickAmount(Minecraft mc) {
 		if (mc.world != null) {
 			int ticking = servertickcounter - clienttickcounter;
-			TickSync.isLagging = false;
 			if (ticking < 0) {
-				TickSync.isLagging = true;
+				
 				if (!ClientProxy.isDevEnvironment) { // For the Dev environment to stop a disconnect when debugging on the server side
 					softLockTimer++;
 				}
+				
 				if (softLockTimer == 100) {
 					mc.world.sendQuittingDisconnectingPacket();
 					mc.loadWorld((WorldClient) null);

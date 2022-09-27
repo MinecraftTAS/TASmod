@@ -6,32 +6,44 @@ import de.scribble.lp.tasmod.mixin.accessors.AccessorMinecraftServer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class TickSyncServer {
-	private static int serverticksync = 0;
-	private static boolean enabled = true;
+	
+	private int serverticksync = 0;
 
-	public static void sync(boolean enable) {
-		enabled = enable;
-	}
-
-	public static void incrementServerTickCounter() {
+	public void incrementServerTickCounter() {
 		serverticksync++;
+		sendToClients(false);
 	}
 
-	public static void resetTickCounter() {
+	public void resetTickCounter() {
 		((AccessorMinecraftServer) TASmod.getServerInstance().getServer()).tickCounter(0);
 		serverticksync = 0;
+		sendToClients(true);
 	}
 
-	public static int getServertickcounter() {
+	public int getServertickcounter() {
 		return serverticksync;
 	}
 
-	public static boolean isEnabled() {
-		return enabled;
+	public void onJoinServer(EntityPlayerMP player) {
+		resetTickCounter();
+	}
+
+	public void onServerTick() {
+		/* Overflow prevention */
+		if (getServertickcounter() == Integer.MAX_VALUE - 1) {
+			resetTickCounter();
+		} else {
+			incrementServerTickCounter();
+		}
 	}
 	
-	public static void joinServer(EntityPlayerMP player) {
-		TickSyncServer.resetTickCounter();
-		CommonProxy.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(), true, TickSyncServer.isEnabled()));
+	private void sendToClients(boolean reset) {
+		
+		if(TASmod.ktrngHandler.isLoaded()) {
+			CommonProxy.NETWORK.sendToAll(new TickSyncKTRNGPacket(serverticksync, reset, TASmod.ktrngHandler.advanceGlobalSeedServer()));
+		}
+		else {
+			CommonProxy.NETWORK.sendToAll(new TickSyncPacket(serverticksync, reset));
+		}
 	}
 }
