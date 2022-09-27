@@ -414,6 +414,9 @@ public class SavestateHandler {
 		if (index < 0) {
 			throw new SavestateDeleteException("Cannot delete the negative indexes");
 		}
+		if(index == 0) {
+			throw new SavestateDeleteException("Cannot delete protected savestate 0");
+		}
 		File toDelete = getSavestateFile(index);
 		if (toDelete.exists()) {
 			try {
@@ -437,7 +440,7 @@ public class SavestateHandler {
 	 * Deletes savestates in a range from "from" to "to"
 	 * 
 	 * @param from
-	 * @param to   (exclusive)
+	 * @param to   (inclusive)
 	 * @throws SavestateDeleteException
 	 */
 	public void deleteSavestate(int from, int to) throws SavestateDeleteException {
@@ -450,10 +453,8 @@ public class SavestateHandler {
 		if (from >= to) {
 			throw new SavestateDeleteException("Can't delete amounts that are negative or 0");
 		}
-		for (int i = from; i < to; i++) {
-			if (i == 0) {
-				continue;
-			}
+		for (int i = from; i <= to; i++) {
+//			System.out.println("Would've deleted savestate: "+i);
 			try {
 				deleteSavestate(i);
 			} catch (SavestateDeleteException e) {

@@ -60,7 +60,7 @@ public class SavestateCommand extends CommandBase {
 				} else if (args.length == 3) {
 					int args1 = processIndex(args[1]);
 					int args2 = processIndex(args[2]);
-					int count = args2 - args1;
+					int count = (args2+1) - args1;
 					TextComponentString confirm = new TextComponentString(TextFormatting.YELLOW + "Are you sure you want to delete " + count + (count == 1 ? " savestate? " : " savestates? ") + TextFormatting.GREEN + "[YES]");
 					confirm.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/savestate deletDis %s %s", args[1], args[2])));
 					sender.sendMessage(confirm);
@@ -205,9 +205,6 @@ public class SavestateCommand extends CommandBase {
 
 	private void delete(String[] args) throws CommandException {
 		int arg1 = processIndex(args[1]);
-		if (arg1 == 0) {
-			throw new CommandException("Cannot delete savestate 0", new Object[] {});
-		}
 		try {
 			TASmod.savestateHandler.deleteSavestate(arg1);
 		} catch (SavestateDeleteException e) {
