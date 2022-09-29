@@ -1,9 +1,9 @@
-package de.scribble.lp.tasmod.util.changestates;
+package de.scribble.lp.tasmod.inputcontainer.server;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
-import de.scribble.lp.tasmod.util.TASstate;
+import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
- * Syncs the current state of the input recorder with the state on the server side and witht the state on all other clients
+ * Syncs the current state of the input recorder with the state on the server side and with the state on all other clients
  * 
  * @author ScribbleLP
  *

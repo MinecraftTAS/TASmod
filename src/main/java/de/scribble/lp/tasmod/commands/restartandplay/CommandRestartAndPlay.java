@@ -8,8 +8,8 @@ import java.util.List;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
-import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;

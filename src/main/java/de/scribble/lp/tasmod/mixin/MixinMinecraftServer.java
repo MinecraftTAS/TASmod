@@ -42,6 +42,7 @@ public abstract class MixinMinecraftServer {
 		}
 
 		CommonProxy.ticksyncServer.onServerTick();
+		TASmod.ktrngHandler.updateServer();
 		
 		if (TickrateChangerServer.advanceTick) {
 			TickrateChangerServer.changeServerTickrate(0F);

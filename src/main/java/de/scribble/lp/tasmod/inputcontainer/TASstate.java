@@ -1,9 +1,8 @@
-package de.scribble.lp.tasmod.util;
+package de.scribble.lp.tasmod.inputcontainer;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.inputcontainer.InputContainer;
-import de.scribble.lp.tasmod.util.changestates.SyncStatePacket;
+import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket;
 import net.minecraft.client.Minecraft;
 
 /**

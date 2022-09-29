@@ -22,7 +22,6 @@ public class MixinMinecraftServer {
 		LoadWorldEvents.startShutdown();
 	}
 	
-	
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void inject_tick(CallbackInfo ci) {
 		TickEvents.onServerTick();

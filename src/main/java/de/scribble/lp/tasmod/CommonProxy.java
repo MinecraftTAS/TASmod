@@ -18,6 +18,12 @@ import de.scribble.lp.tasmod.commands.restartandplay.RestartAndPlayPacket.Restar
 import de.scribble.lp.tasmod.commands.savetas.SaveTASPacket;
 import de.scribble.lp.tasmod.commands.savetas.SaveTASPacket.SaveTASPacketHandler;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
+import de.scribble.lp.tasmod.inputcontainer.server.RequestStatePacket;
+import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket;
+import de.scribble.lp.tasmod.inputcontainer.server.RequestStatePacket.RequestStatePacketHandler;
+import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket.SyncStatePacketHandler;
+import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket;
+import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket.KTRNGStartSeedPacketHandler;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket.InputSavestatesPacketHandler;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
@@ -41,10 +47,6 @@ import de.scribble.lp.tasmod.ticksync.TickSyncKTRNGPacket.TickSyncKTRNGPacketHan
 import de.scribble.lp.tasmod.ticksync.TickSyncPacket;
 import de.scribble.lp.tasmod.ticksync.TickSyncPacket.TickSyncPacketHandler;
 import de.scribble.lp.tasmod.ticksync.TickSyncServer;
-import de.scribble.lp.tasmod.util.changestates.RequestStatePacket;
-import de.scribble.lp.tasmod.util.changestates.RequestStatePacket.RequestStatePacketHandler;
-import de.scribble.lp.tasmod.util.changestates.SyncStatePacket;
-import de.scribble.lp.tasmod.util.changestates.SyncStatePacket.SyncStatePacketHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -116,6 +118,9 @@ public class CommonProxy {
 		NETWORK.registerMessage(FullPlayPacketHandler.class, FullPlayPacket.class, i++, Side.CLIENT);
 		// RestartAndPlay
 		NETWORK.registerMessage(RestartAndPlayPacketHandler.class, RestartAndPlayPacket.class, i++, Side.CLIENT);
+		
+		// KillTheRNG
+		NETWORK.registerMessage(KTRNGStartSeedPacketHandler.class, KTRNGStartSeedPacket.class, i++, Side.CLIENT);
 
 	}
 

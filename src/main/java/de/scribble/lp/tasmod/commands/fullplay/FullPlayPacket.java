@@ -1,7 +1,7 @@
 package de.scribble.lp.tasmod.commands.fullplay;
 
 import de.scribble.lp.tasmod.events.OpenGuiEvents;
-import de.scribble.lp.tasmod.util.TASstate;
+import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;

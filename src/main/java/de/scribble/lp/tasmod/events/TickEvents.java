@@ -9,6 +9,6 @@ public class TickEvents {
 	}
 	
 	public static void onServerTick() {
-		TASmod.ktrngHandler.updateServer();
+//		TASmod.ktrngHandler.updateServer();
 	}
 }

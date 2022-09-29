@@ -19,11 +19,10 @@ import de.pfannekuchen.tasmod.utils.PlayerPositionCalculator;
 import de.pfannekuchen.tasmod.utils.TrajectoriesCalculator;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorWorld;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.ticksync.TickSyncClient;
-import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.math.Vec3d;
@@ -259,7 +258,7 @@ public class InfoHud extends GuiScreen {
 				if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 				lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 					if (Minecraft.getMinecraft().currentScreen == this) return "KTRNG";
-					return "RandomSeed: " + TASmod.ktrngHandler.getGlobalSeedClient();
+					return "RandomSeed: " + TASmod.ktrngHandler.getGlobalSeedServer(); //TODO This will not work on servers remove pls
 				}));
 			}
 			

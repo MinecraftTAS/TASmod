@@ -17,7 +17,6 @@ import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
-import de.scribble.lp.tasmod.util.TASstate;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeyboard;
 import de.scribble.lp.tasmod.virtual.VirtualMouse;
@@ -158,7 +157,7 @@ public class InputContainer {
 				state = TASstate.PLAYBACK;
 				creditsPrinted=false;
 				TASmod.ktrngHandler.clearQueue();  // Clear the queue 
-				TASmod.ktrngHandler.setGlobalSeed(startSeed);
+				TASmod.ktrngHandler.setGlobalSeedServer(startSeed);
 //				TASmod.ktrngHandler.setTestSeed(startSeed); TODO Do monitoring again
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
@@ -166,7 +165,6 @@ public class InputContainer {
 					startLocation = getStartLocation(Minecraft.getMinecraft().player);
 				}
 				state = TASstate.RECORDING;
-				startSeed=TASmod.ktrngHandler.getGlobalSeedClient();
 				return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
 			case PAUSED:
 				return verbose ? TextFormatting.RED + "Can't pause anything because nothing is running" : "";
@@ -451,7 +449,6 @@ public class InputContainer {
 		comments.clear();
 		index = 0;
 		dMonitor.getPos().clear();
-		TASmod.ktrngHandler.clear();
 		clearCredits();
 	}
 	

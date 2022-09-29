@@ -6,8 +6,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
-import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.monitoring.KTRNGMonitor;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -21,8 +22,6 @@ public class KillTheRNGHandler{
 	
 	private boolean isLoaded;
 	
-	private final KTRNGMonitor monitor;
-	
 	/**
 	 * Instantiates a KillTheRNGHandler instance
 	 * @param isLoaded If the KillTheRNG mod is loaded
@@ -35,10 +34,8 @@ public class KillTheRNGHandler{
 			KillTheRNG.LOGGER.info("Connection established with TASmod");
 			KillTheRNG.isLibrary=true;
 			KillTheRNG.mode=SeedingModes.TickChange;
-			monitor=new KTRNGMonitor();
-			
+			KillTheRNG.annotations.register(new KTRNGMonitor());
 		}else {
-			monitor=null;
 			TASmod.logger.info("KillTheRNG doesn't appear to be loaded");
 		}
 	}
@@ -74,16 +71,6 @@ public class KillTheRNGHandler{
 			return KillTheRNG.clientRandom.GlobalClient.getSeed();
 		else
 			return 0;
-	}
-	
-	/**
-	 * Set the global seed on both client and server
-	 * @param seedIn The seed on both client and server
-	 */
-	@SideOnly(Side.CLIENT)
-	public void setGlobalSeed(long seedIn) {
-		setGlobalSeedClient(seedIn);
-		setGlobalSeedServer(seedIn);
 	}
 	
 	/**
@@ -126,12 +113,9 @@ public class KillTheRNGHandler{
 	 * Executed every tick on the server
 	 */
 	public void updateServer() {
-		if(isLoaded()) {
-//			KillTheRNG.tickmodeServer.tickCustom();
-		}
 	}
 	
-	//=================================================Monitoring
+	//================================================= Seedsync
 	
 	private Queue<Long> seedQueue = new ConcurrentLinkedQueue<>();
 	
@@ -147,32 +131,13 @@ public class KillTheRNGHandler{
 		seedQueue.clear();
 	}
 	
-	/**
-	 * @return Monitor information displayed in InfoGui
-	 */
-	public String getDesyncString() {
-		return monitor.monitorString;
-	}
 	
-	/**
-	 * Clears the monitor string
-	 */
-	public void clear(){
-		monitor.monitorString="";
-	}
-
-	private class KTRNGMonitor{
-
-		public String monitorString;
-		
-		public KTRNGMonitor() {
-		}
-		
-		private void updateDesyncString() {
-			if(ClientProxy.virtual.getContainer().isPlayingback()) {
-//				monitorString=KillTheRNG.randomness.Global.getSeed()==testRand.getSeed() ? "" : TextFormatting.RED+String.format("Expected: %s %s", testRand.getSeed(), testRand.steps(KillTheRNG.randomness.Global));
-			}
+	public void broadcastStartSeed() {
+		if(isLoaded()) {
+			long seed = getGlobalSeedServer();
+			System.out.println(seed);
+			CommonProxy.NETWORK.sendToAll(new KTRNGStartSeedPacket(seed));
 		}
 	}
-	
+
 }

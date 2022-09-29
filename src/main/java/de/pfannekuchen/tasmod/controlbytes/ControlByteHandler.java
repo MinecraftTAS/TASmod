@@ -1,6 +1,5 @@
 package de.pfannekuchen.tasmod.controlbytes;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.mojang.realmsclient.util.Pair;

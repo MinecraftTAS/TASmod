@@ -16,13 +16,13 @@ import de.scribble.lp.tasmod.commands.recording.CommandRecord;
 import de.scribble.lp.tasmod.commands.restartandplay.CommandRestartAndPlay;
 import de.scribble.lp.tasmod.commands.savetas.CommandSaveTAS;
 import de.scribble.lp.tasmod.commands.tutorial.CommandPlaybacktutorial;
+import de.scribble.lp.tasmod.inputcontainer.server.ContainerStateServer;
 import de.scribble.lp.tasmod.ktrng.KillTheRNGHandler;
 import de.scribble.lp.tasmod.savestates.server.SavestateCommand;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
-import de.scribble.lp.tasmod.savestates.server.SavestateTrackerFile;
+import de.scribble.lp.tasmod.savestates.server.files.SavestateTrackerFile;
 import de.scribble.lp.tasmod.tickratechanger.CommandTickrate;
 import de.scribble.lp.tasmod.util.ModIncompatibleException;
-import de.scribble.lp.tasmod.util.changestates.ContainerStateServer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -128,7 +128,7 @@ public class TASmod {
 			e.printStackTrace();
 		}
 		
-		savestateHandler=new SavestateHandler(ev.getServer());
+		savestateHandler=new SavestateHandler(ev.getServer(), logger);
 	}
 	
 	@EventHandler

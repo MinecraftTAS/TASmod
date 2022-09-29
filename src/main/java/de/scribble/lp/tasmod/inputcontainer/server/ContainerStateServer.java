@@ -1,8 +1,8 @@
-package de.scribble.lp.tasmod.util.changestates;
+package de.scribble.lp.tasmod.inputcontainer.server;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.util.TASstate;
+import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
@@ -52,6 +52,10 @@ public class ContainerStateServer {
 	public void setState(TASstate stateIn) {
 		setServerState(stateIn);
 		CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
+		
+		if(state == TASstate.RECORDING) { // Set the start seed of the recording
+			TASmod.ktrngHandler.broadcastStartSeed();
+		}
 	}
 	
 	public void setServerState(TASstate stateIn) {

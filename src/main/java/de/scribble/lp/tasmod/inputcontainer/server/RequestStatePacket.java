@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.util.changestates;
+package de.scribble.lp.tasmod.inputcontainer.server;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;

@@ -10,10 +10,10 @@ import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.events.OpenGuiEvents;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
+import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import de.scribble.lp.tasmod.inputcontainer.TickInputContainer;
 import de.scribble.lp.tasmod.mixin.accessors.AccessorRunStuff;
 import de.scribble.lp.tasmod.util.PointerNormalizer;
-import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.client.Minecraft;
 
 /**

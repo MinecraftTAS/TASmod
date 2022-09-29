@@ -2,9 +2,9 @@ package de.scribble.lp.tasmod.commands.fullrecord;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import de.scribble.lp.tasmod.savestates.server.SavestateState;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
-import de.scribble.lp.tasmod.util.TASstate;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

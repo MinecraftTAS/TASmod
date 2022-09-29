@@ -3,10 +3,10 @@ package de.scribble.lp.tasmod.events;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.externalGui.InputContainerView;
+import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
 import de.scribble.lp.tasmod.savestates.server.SavestatePacket;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
-import de.scribble.lp.tasmod.util.TASstate;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 

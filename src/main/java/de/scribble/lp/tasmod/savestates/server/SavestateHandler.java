@@ -11,14 +11,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.events.SavestateEvents;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
 import de.scribble.lp.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import de.scribble.lp.tasmod.savestates.server.exceptions.LoadstateException;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateDeleteException;
 import de.scribble.lp.tasmod.savestates.server.exceptions.SavestateException;
+import de.scribble.lp.tasmod.savestates.server.files.SavestateDataFile;
+import de.scribble.lp.tasmod.savestates.server.files.SavestateTrackerFile;
+import de.scribble.lp.tasmod.savestates.server.files.SavestateDataFile.DataValues;
 import de.scribble.lp.tasmod.savestates.server.motion.ClientMotionServer;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
@@ -57,14 +62,18 @@ public class SavestateHandler {
 
 	private int latestIndex = 0;
 	private int currentIndex;
+	
+	private final Logger logger;
 
 	/**
 	 * Creates a savestate handler on the specified server
+	 * @param logger 
 	 * 
 	 * @param The server that should store the savestates
 	 */
-	public SavestateHandler(MinecraftServer server) {
+	public SavestateHandler(MinecraftServer server, Logger logger) {
 		this.server = server;
+		this.logger = logger;
 		createSavestateDirectory();
 		refresh();
 		loadCurrentIndexFromFile();
@@ -73,8 +82,7 @@ public class SavestateHandler {
 	/**
 	 * Creates a copy of the world that is currently being played and saves it in
 	 * .minecraft/saves/savestates/worldname-Savestate[{@linkplain #currentIndex}+1]
-	 * <br>
-	 * <br>
+	 * <p>
 	 * Side: Server
 	 * 
 	 * @throws SavestateException
@@ -90,8 +98,8 @@ public class SavestateHandler {
 
 	/**
 	 * Creates a copy of the world that is currently being played and saves it in
-	 * .minecraft/saves/savestates/worldname-Savestate[savestateIndex] <br>
-	 * <br>
+	 * .minecraft/saves/savestates/worldname-Savestate[savestateIndex]
+	 * <p>
 	 * Side: Server
 	 * 
 	 * @param savestateIndex The index where the mod will save the savestate.
@@ -111,7 +119,7 @@ public class SavestateHandler {
 		}
 		// Lock savestating and loadstating
 		state = SavestateState.SAVING;
-
+		
 		// Create a directory just in case
 		createSavestateDirectory();
 
@@ -142,9 +150,11 @@ public class SavestateHandler {
 		String worldname = server.getFolderName();
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(indexToSave);
+		
+		SavestateEvents.triggerSavestateEvent(targetfolder);
 
 		if (targetfolder.exists()) {
-			TASmod.logger.warn("WARNING! Overwriting the savestate with the index {}", indexToSave);
+			logger.warn("WARNING! Overwriting the savestate with the index {}", indexToSave);
 			FileUtils.deleteDirectory(targetfolder);
 		}
 
@@ -167,6 +177,8 @@ public class SavestateHandler {
 			}
 		}
 
+		saveSavestateDataFile(false);
+		
 		// Copy the directory
 		FileUtils.copyDirectory(currentfolder, targetfolder);
 
@@ -174,8 +186,6 @@ public class SavestateHandler {
 		SavestateTrackerFile tracker = new SavestateTrackerFile(new File(savestateDirectory, worldname + "-info.txt"));
 		tracker.increaseSavestates();
 		tracker.saveFile();
-
-		saveCurrentIndexToFile();
 
 		// Send a notification that the savestate has been loaded
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + indexToSave + " saved"));
@@ -194,7 +204,7 @@ public class SavestateHandler {
 	/**
 	 * Loads the latest savestate at {@linkplain #currentIndex}
 	 * .minecraft/saves/savestates/worldname-Savestate[{@linkplain #currentIndex}]
-	 * 
+	 * <p>
 	 * Side: Server
 	 * 
 	 * @throws LoadstateException
@@ -219,7 +229,7 @@ public class SavestateHandler {
 	/**
 	 * Loads the latest savestate it can find in
 	 * .minecraft/saves/savestates/worldname-Savestate
-	 * 
+	 * <p>
 	 * Side: Server
 	 * 
 	 * @param savestateIndex The index where the mod will load the savestate.
@@ -238,7 +248,7 @@ public class SavestateHandler {
 		}
 		// Lock savestating and loadstating
 		state = SavestateState.LOADING;
-
+		
 		// Create a directory just in case
 		createSavestateDirectory();
 
@@ -263,6 +273,8 @@ public class SavestateHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(indexToLoad);
 
+		SavestateEvents.triggerLoadstateEvent(targetfolder);
+		
 		/*
 		 * Prevents loading an InputSavestate when loading index 0 (Index 0 is the
 		 * savestate when starting a recording. Not doing this will load an empty
@@ -290,6 +302,9 @@ public class SavestateHandler {
 		// Delete and copy directories
 		FileUtils.deleteDirectory(currentfolder);
 		FileUtils.copyDirectory(targetfolder, currentfolder);
+		
+		// Loads savestate data from the file like name and ktrng seed if ktrng is loaded
+		loadSavestateDataFile();
 
 		// Update the player and the client
 		SavestatePlayerLoading.loadAndSendMotionToPlayer();
@@ -307,8 +322,6 @@ public class SavestateHandler {
 		SavestateTrackerFile tracker = new SavestateTrackerFile(new File(savestateDirectory, worldname + "-info.txt"));
 		tracker.increaseRerecords();
 		tracker.saveFile();
-
-		saveCurrentIndexToFile();
 
 		// Send a notification that the savestate has been loaded
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + indexToLoad + " loaded"));
@@ -365,11 +378,11 @@ public class SavestateHandler {
 				if (matcher.find()) {
 					index = Integer.parseInt(matcher.group(0));
 				} else {
-					TASmod.logger.warn(String.format("Could not process the savestate %s", file.getName()));
+					logger.warn(String.format("Could not process the savestate %s", file.getName()));
 					continue;
 				}
 			} catch (NumberFormatException e) {
-				TASmod.logger.warn(String.format("Could not process the savestate %s", e.getMessage()));
+				logger.warn(String.format("Could not process the savestate %s", e.getMessage()));
 				continue;
 			}
 			indexList.add(index);
@@ -464,6 +477,9 @@ public class SavestateHandler {
 		}
 	}
 
+	/**
+	 * @return A list of index numbers as string in the form of: <code>"0, 1, 2, 3"</code>
+	 */
 	public String getIndexesAsString() {
 		refresh();
 		String out = "";
@@ -476,53 +492,92 @@ public class SavestateHandler {
 	/**
 	 * Saves the current index to the current world-folder (not the savestate
 	 * folder)
+	 * 
+	 * @param legacy If the data file should only store the index, since it comes from a legacy file format
 	 */
-	private void saveCurrentIndexToFile() {
+	private void saveSavestateDataFile(boolean legacy) {
 		File tasmodDir = new File(savestateDirectory, "../" + server.getFolderName() + "/tasmod/");
 		if (!tasmodDir.exists()) {
 			tasmodDir.mkdir();
 		}
-		File savestateDat = new File(tasmodDir, "savestate.data");
-		List<String> lines = new ArrayList<String>();
-		lines.add("currentIndex=" + currentIndex);
-		try {
-			FileUtils.writeLines(savestateDat, lines);
-		} catch (IOException e) {
-			e.printStackTrace();
+		File savestateDat = new File(tasmodDir, "savestateData.txt");
+		
+		if(savestateDat.exists()) {
+			savestateDat.delete();
 		}
+		
+		SavestateDataFile file = new SavestateDataFile();
+		
+		file.set(DataValues.INDEX, Integer.toString(currentIndex));
+		
+		if(!legacy) {
+			if(TASmod.ktrngHandler.isLoaded()) {
+				file.set(DataValues.SEED, Long.toString(TASmod.ktrngHandler.getGlobalSeedServer()));
+			}
+		}
+		
+		file.save(savestateDat);
 	}
 
 	/**
+	 * Loads information from savestateData.txt
+	 * <p>
+	 * This loads everything except the index, since that is loaded when the world is loaded
+	 */
+	private void loadSavestateDataFile() {
+		File tasmodDir = new File(savestateDirectory, "../" + server.getFolderName() + "/tasmod/");
+		File savestateDat = new File(tasmodDir, "savestateData.txt");
+		
+		if(!savestateDat.exists()) {
+			return;
+		}
+		
+		SavestateDataFile datafile = new SavestateDataFile();
+		
+		datafile.load(savestateDat);
+		
+		if(TASmod.ktrngHandler.isLoaded()) {
+			String seedString = datafile.get(DataValues.SEED);
+			if(seedString != null) {
+				TASmod.ktrngHandler.setGlobalSeedServer(Long.parseLong(seedString));
+			} else {
+				logger.warn("KTRNG seed not loaded because it was not found in savestateData.txt!");
+			}
+		}
+	}
+	
+	/**
 	 * Loads the current index to the current world-folder (not the savestate
 	 * folder)
+	 * <p>
+	 * This ensures that the server knows the current index when loading the world
 	 */
 	public void loadCurrentIndexFromFile() {
 		int index = -1;
-		List<String> lines = new ArrayList<String>();
 		File tasmodDir = new File(savestateDirectory, "../" + server.getFolderName() + "/tasmod/");
 		if (!tasmodDir.exists()) {
 			tasmodDir.mkdir();
 		}
+		
 		File savestateDat = new File(tasmodDir, "savestate.data");
-		try {
-			lines = FileUtils.readLines(savestateDat, StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			TASmod.logger.warn("No savestate.data file found in current world folder, ignoring it");
+		if(savestateDat.exists()) {
+			index = legacyIndexFile(savestateDat);
+			setCurrentIndex(index, true);
+			saveSavestateDataFile(true);
+			savestateDat.delete();
+			return;
 		}
-		if (!lines.isEmpty()) {
-			for (String line : lines) {
-				if (line.startsWith("currentIndex=")) {
-					try {
-						index = Integer.parseInt(line.split("=")[1]);
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
+		
+		savestateDat = new File(tasmodDir, "savestateData.txt");
+		
+		SavestateDataFile file = new SavestateDataFile();
+		file.load(savestateDat);
+		
+		index = Integer.parseInt(file.get(DataValues.INDEX));
+		
 		setCurrentIndex(index, true);
 	}
-
+	
 	private void setCurrentIndex(int index, boolean changeIndex) {
 		if(changeIndex) {
 			if (index < 0) {
@@ -530,9 +585,9 @@ public class SavestateHandler {
 			} else {
 				currentIndex = index;
 			}
-			TASmod.logger.info("Setting the savestate index to {}", currentIndex);
+			logger.info("Setting the savestate index to {}", currentIndex);
 		} else {
-			TASmod.logger.warn("Keeping the savestate index at {}", currentIndex);
+			logger.warn("Keeping the savestate index at {}", currentIndex);
 		}
 	}
 
@@ -557,5 +612,27 @@ public class SavestateHandler {
 	@SideOnly(Side.CLIENT)
 	public static void playerLoadSavestateEventClient() {
 		SavestatesChunkControl.addPlayerToClientChunk(Minecraft.getMinecraft().player);
+	}
+	
+	private int legacyIndexFile(File savestateDat) {
+		int index = -1;
+		List<String> lines = new ArrayList<String>();
+		try {
+			lines = FileUtils.readLines(savestateDat, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			logger.warn("No savestate.data file found in current world folder, ignoring it");
+		}
+		if (!lines.isEmpty()) {
+			for (String line : lines) {
+				if (line.startsWith("currentIndex=")) {
+					try {
+						index = Integer.parseInt(line.split("=")[1]);
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return index;
 	}
 }

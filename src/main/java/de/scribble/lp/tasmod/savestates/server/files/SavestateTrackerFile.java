@@ -1,4 +1,4 @@
-package de.scribble.lp.tasmod.savestates.server;
+package de.scribble.lp.tasmod.savestates.server.files;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils;
 
 /**
  * Used to keep track of savestates and rerecordings
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class SavestateTrackerFile {
