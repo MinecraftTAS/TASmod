@@ -3,7 +3,6 @@ package de.scribble.lp.tasmod.ticksync;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -39,17 +38,15 @@ public class TickSyncKTRNGPacket extends TickSyncPacket {
 		@Override
 		public IMessage onMessage(TickSyncKTRNGPacket message, MessageContext ctx) {
 			if(ctx.side.isClient()) {
-				Minecraft.getMinecraft().addScheduledTask(() -> {
-					if (message.shouldreset) {
-						ClientProxy.ticksyncClient.resetTickCounter();
-					} else {
-						ClientProxy.ticksyncClient.setServerTickcounter(message.ticks);
-					}
+				if (message.shouldreset) {
+					ClientProxy.ticksyncClient.resetTickCounter();
+				} else {
+					ClientProxy.ticksyncClient.setServerTickcounter(message.ticks);
+				}
 
-					if(TASmod.ktrngHandler.isLoaded()) {
-						TASmod.ktrngHandler.addToQueue(message.seed);
-					}
-				});
+				if (TASmod.ktrngHandler.isLoaded()) {
+					TASmod.ktrngHandler.addToQueue(message.seed);
+				}
 			}
 			return null;
 		}

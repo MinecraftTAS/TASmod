@@ -63,13 +63,15 @@ public class SyncStatePacket implements IMessage {
 			if (ctx.side.isServer()) {
 				TASmod.containerStateServer.setState(message.getState());
 			} else {
-				InputContainer container = ClientProxy.virtual.getContainer();
-				if (message.getState() != container.getState()) {
-					String chatMessage = container.setTASState(message.getState(), message.isVerbose());
-					if (!chatMessage.isEmpty()) {
-						Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(chatMessage));
+				ClientProxy.tickSchedulerClient.add(() -> {
+					InputContainer container = ClientProxy.virtual.getContainer();
+					if (message.getState() != container.getState()) {
+						String chatMessage = container.setTASState(message.getState(), message.isVerbose());
+						if (!chatMessage.isEmpty()) {
+							Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(chatMessage));
+						}
 					}
-				}
+				});
 			}
 			return null;
 		}

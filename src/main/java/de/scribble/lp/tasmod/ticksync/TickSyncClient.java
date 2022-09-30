@@ -60,7 +60,7 @@ public class TickSyncClient {
 		servertickcounter = 0;
 	}
 
-	public int getTickAmount(Minecraft mc) {
+	public int getTickAmount(Minecraft mc, int elapsedTicks) {
 		if (mc.world != null) {
 			int ticking = servertickcounter - clienttickcounter;
 			if (ticking < 0) {
@@ -75,9 +75,9 @@ public class TickSyncClient {
 					mc.displayGuiScreen(new GuiMultiplayerTimeOut());
 				}
 			}
-			return Math.max(ticking + 1, 0);
+			return Math.max(ticking, 0);
 		} else {
-			return 1;
+			return elapsedTicks;
 		}
 	}
 

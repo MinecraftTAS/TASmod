@@ -73,13 +73,12 @@ public abstract class MixinMinecraft {
 
 	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;runTick()V"))
 	public void redirectRunTick(Minecraft mc) {
-		for (int j2 = 0; j2 < ClientProxy.ticksyncClient.getTickAmount((Minecraft) (Object) this); j2++) {
-			ClientProxy.virtual.updateContainer();
-			if (TickrateChangerClient.ticksPerSecond != 0) {
-				((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
-			}
-			this.runTick();
+		ClientProxy.virtual.updateContainer();
+		if (TickrateChangerClient.ticksPerSecond != 0) {
+			((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 		}
+		this.runTick();
+		ClientProxy.tickSchedulerClient.runAllTasks();
 		if (TickrateChangerClient.advanceTick) {
 			TickrateChangerClient.advanceTick = false;
 			TickrateChangerClient.changeClientTickrate(0F);
@@ -89,6 +88,13 @@ public abstract class MixinMinecraft {
 	@Shadow
 	public abstract void runTick();
 
+	
+	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I"))
+	public int redirect_runGameLoop(int ten, int elapsedTicks) {
+		return ClientProxy.ticksyncClient.getTickAmount((Minecraft)(Object)this, elapsedTicks);
+	}
+	
+	
 	// =====================================================================================================================================
 
 	@Inject(method = "runTick", at = @At(value = "HEAD"))

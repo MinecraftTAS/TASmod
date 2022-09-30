@@ -19,8 +19,8 @@ import de.scribble.lp.tasmod.commands.savetas.SaveTASPacket;
 import de.scribble.lp.tasmod.commands.savetas.SaveTASPacket.SaveTASPacketHandler;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.server.RequestStatePacket;
-import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket;
 import de.scribble.lp.tasmod.inputcontainer.server.RequestStatePacket.RequestStatePacketHandler;
+import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket;
 import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket.SyncStatePacketHandler;
 import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket;
 import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket.KTRNGStartSeedPacketHandler;
@@ -47,6 +47,7 @@ import de.scribble.lp.tasmod.ticksync.TickSyncKTRNGPacket.TickSyncKTRNGPacketHan
 import de.scribble.lp.tasmod.ticksync.TickSyncPacket;
 import de.scribble.lp.tasmod.ticksync.TickSyncPacket.TickSyncPacketHandler;
 import de.scribble.lp.tasmod.ticksync.TickSyncServer;
+import de.scribble.lp.tasmod.util.TickScheduler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -59,7 +60,9 @@ public class CommonProxy {
 	public static Logger logger = LogManager.getLogger("TASmod");
 	
 	public static TickSyncServer ticksyncServer = new TickSyncServer();
-
+	
+	public static TickScheduler tickSchedulerServer = new TickScheduler();
+	
 	public void preInit(FMLPreInitializationEvent ev) {
 		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("tasmod");
 		int i = -1;

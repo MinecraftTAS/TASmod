@@ -35,7 +35,6 @@ public abstract class MixinMinecraftServer {
 
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick()V", ordinal = 1))
 	public void redirectTick(MinecraftServer server) {
-		this.tick();
 		if (TASmod.savestateHandler.state == SavestateState.WASLOADING) {
 			TASmod.savestateHandler.state = SavestateState.NONE;
 			SavestateHandler.playerLoadSavestateEventServer();
@@ -43,6 +42,10 @@ public abstract class MixinMinecraftServer {
 
 		CommonProxy.ticksyncServer.onServerTick();
 		TASmod.ktrngHandler.updateServer();
+		
+		this.tick();
+		
+		CommonProxy.tickSchedulerServer.runAllTasks();
 		
 		if (TickrateChangerServer.advanceTick) {
 			TickrateChangerServer.changeServerTickrate(0F);

@@ -12,6 +12,7 @@ import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
 import de.scribble.lp.tasmod.shield.ShieldDownloader;
 import de.scribble.lp.tasmod.ticksync.TickSyncClient;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
+import de.scribble.lp.tasmod.util.TickScheduler;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
@@ -63,6 +64,8 @@ public class ClientProxy extends CommonProxy {
 	public static ShieldDownloader shieldDownloader;
 	
 	public static TickSyncClient ticksyncClient = new TickSyncClient();
+	
+	public static TickScheduler tickSchedulerClient = new TickScheduler();
 	
 	public void preInit(FMLPreInitializationEvent ev) {
 		isDevEnvironment = (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");

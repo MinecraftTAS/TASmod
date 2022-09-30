@@ -54,7 +54,9 @@ public class ContainerStateServer {
 		CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
 		
 		if(state == TASstate.RECORDING) { // Set the start seed of the recording
-			TASmod.ktrngHandler.broadcastStartSeed();
+			CommonProxy.tickSchedulerServer.add(() ->{
+				TASmod.ktrngHandler.broadcastStartSeed();
+			});
 		}
 	}
 	
