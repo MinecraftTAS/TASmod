@@ -34,7 +34,6 @@
     "client": [
         //General
         "MixinMinecraft",
-        "MixinTimer",
         "MixinEntityRenderer",
         "MixinGuiScreen",
         "MixinInGameHud",

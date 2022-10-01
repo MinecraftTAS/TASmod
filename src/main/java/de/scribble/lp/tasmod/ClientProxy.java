@@ -8,6 +8,7 @@ import de.pfannekuchen.infogui.gui.InfoHud;
 import de.pfannekuchen.tasmod.events.AimAssistEvents;
 import de.pfannekuchen.tasmod.events.CameraInterpolationEvents;
 import de.scribble.lp.tasmod.commands.tutorial.TutorialHandler;
+import de.scribble.lp.tasmod.events.KeybindingEvents;
 import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
 import de.scribble.lp.tasmod.shield.ShieldDownloader;
 import de.scribble.lp.tasmod.ticksync.TickSyncClient;
@@ -32,24 +33,6 @@ public class ClientProxy extends CommonProxy {
 	private static TutorialHandler playbackTutorial;
 
 	public static boolean isDevEnvironment;
-
-	public static KeyBinding tickratezeroKey = new KeyBinding("Tickrate 0 Key", Keyboard.KEY_F8, "TASmod");
-
-	public static KeyBinding tickAdvance = new KeyBinding("Advance Tick", Keyboard.KEY_F9, "TASmod");
-
-	public static KeyBinding stopkey = new KeyBinding("Recording/Playback Stop", Keyboard.KEY_F10, "TASmod");
-
-	public static KeyBinding savestateSaveKey = new KeyBinding("Create Savestate", Keyboard.KEY_J, "TASmod");
-
-	public static KeyBinding savestateLoadKey = new KeyBinding("Load Latest Savestate", Keyboard.KEY_K, "TASmod");
-
-	public static KeyBinding testingKey = new KeyBinding("Various Testing", Keyboard.KEY_F12, "TASmod");
-
-	public static KeyBinding infoGuiKey = new KeyBinding("Open InfoGui Editor", Keyboard.KEY_F6, "TASmod");
-	
-	public static KeyBinding bufferViewKey = new KeyBinding("Buffer View", Keyboard.KEY_NUMPAD0, "TASmod");
-	
-	public static KeyBinding ktrngKey = null;
 
 	public static VirtualInput virtual;
 
@@ -100,30 +83,30 @@ public class ClientProxy extends CommonProxy {
 		//It pains me to do this ._.
 		MinecraftForge.EVENT_BUS.register(new PlayerJoinLeaveEvents());
 
-		ClientRegistry.registerKeyBinding(tickratezeroKey);
-		ClientRegistry.registerKeyBinding(tickAdvance);
-		ClientRegistry.registerKeyBinding(stopkey);
-		ClientRegistry.registerKeyBinding(savestateSaveKey);
-		ClientRegistry.registerKeyBinding(savestateLoadKey);
-		ClientRegistry.registerKeyBinding(testingKey);
-		ClientRegistry.registerKeyBinding(infoGuiKey);
-		ClientRegistry.registerKeyBinding(bufferViewKey);
+		ClientRegistry.registerKeyBinding(KeybindingEvents.tickratezeroKey);
+		ClientRegistry.registerKeyBinding(KeybindingEvents.tickAdvance);
+		ClientRegistry.registerKeyBinding(KeybindingEvents.stopkey);
+		ClientRegistry.registerKeyBinding(KeybindingEvents.savestateSaveKey);
+		ClientRegistry.registerKeyBinding(KeybindingEvents.savestateLoadKey);
+		ClientRegistry.registerKeyBinding(KeybindingEvents.testingKey);
+		ClientRegistry.registerKeyBinding(KeybindingEvents.infoGuiKey);
+		ClientRegistry.registerKeyBinding(KeybindingEvents.bufferViewKey);
 		
 		if(TASmod.ktrngHandler.isLoaded()) {
-			ktrngKey=new KeyBinding("KTRNG SeedChange Pause", Keyboard.KEY_B, "TASmod");
-			ClientRegistry.registerKeyBinding(ktrngKey);
-			VirtualKeybindings.registerBlockedKeyBinding(ktrngKey);
+			KeybindingEvents.ktrngKey=new KeyBinding("KTRNG SeedChange Pause", Keyboard.KEY_B, "TASmod");
+			ClientRegistry.registerKeyBinding(KeybindingEvents.ktrngKey);
+			VirtualKeybindings.registerBlockedKeyBinding(KeybindingEvents.ktrngKey);
 		}
 
 		
-		VirtualKeybindings.registerBlockedKeyBinding(tickratezeroKey);
-		VirtualKeybindings.registerBlockedKeyBinding(tickAdvance);
-		VirtualKeybindings.registerBlockedKeyBinding(stopkey);
-		VirtualKeybindings.registerBlockedKeyBinding(savestateSaveKey);
-		VirtualKeybindings.registerBlockedKeyBinding(savestateLoadKey);
-		VirtualKeybindings.registerBlockedKeyBinding(testingKey);
-		VirtualKeybindings.registerBlockedKeyBinding(infoGuiKey);
-		VirtualKeybindings.registerBlockedKeyBinding(bufferViewKey);
+		VirtualKeybindings.registerBlockedKeyBinding(KeybindingEvents.tickratezeroKey);
+		VirtualKeybindings.registerBlockedKeyBinding(KeybindingEvents.tickAdvance);
+		VirtualKeybindings.registerBlockedKeyBinding(KeybindingEvents.stopkey);
+		VirtualKeybindings.registerBlockedKeyBinding(KeybindingEvents.savestateSaveKey);
+		VirtualKeybindings.registerBlockedKeyBinding(KeybindingEvents.savestateLoadKey);
+		VirtualKeybindings.registerBlockedKeyBinding(KeybindingEvents.testingKey);
+		VirtualKeybindings.registerBlockedKeyBinding(KeybindingEvents.infoGuiKey);
+		VirtualKeybindings.registerBlockedKeyBinding(KeybindingEvents.bufferViewKey);
 
 		createTASDir();
 		createSavestatesDir();

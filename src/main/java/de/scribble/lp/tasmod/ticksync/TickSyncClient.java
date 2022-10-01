@@ -60,6 +60,8 @@ public class TickSyncClient {
 		servertickcounter = 0;
 	}
 
+	private int avgTick;
+	
 	public int getTickAmount(Minecraft mc, int elapsedTicks) {
 		if (mc.world != null) {
 			int ticking = servertickcounter - clienttickcounter;
@@ -75,7 +77,20 @@ public class TickSyncClient {
 					mc.displayGuiScreen(new GuiMultiplayerTimeOut());
 				}
 			}
-			return Math.max(ticking, 0);
+			
+			avgTick += ticking;
+			
+			if(elapsedTicks == 1) {
+				if(avgTick>=0) {
+					avgTick = 0;
+					return elapsedTicks + ticking;
+				}else {
+					avgTick = 0;
+					return 0;
+				}
+			} else
+				return elapsedTicks;
+			
 		} else {
 			return elapsedTicks;
 		}

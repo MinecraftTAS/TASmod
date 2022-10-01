@@ -131,17 +131,6 @@ public abstract class MixinMinecraftServer {
 
 	// =====================================================================================================================================
 
-//	@Inject(method = "tick", at = @At("HEAD"))
-//	public void lagServer(CallbackInfo ci) {
-//		if(SavestateEvents.lagServer) {
-//			SavestateEvents.lagServer=false;
-//			try {
-//				Thread.sleep(5000L);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
 
 	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
 	public long limitLag(long j) {
