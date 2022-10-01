@@ -89,7 +89,7 @@ public abstract class MixinMinecraft {
 	public abstract void runTick();
 
 	
-	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I"))
+//	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I"))
 	public int redirect_runGameLoop(int ten, int elapsedTicks) {
 		return ClientProxy.ticksyncClient.getTickAmount((Minecraft)(Object)this, elapsedTicks);
 	}
@@ -99,6 +99,7 @@ public abstract class MixinMinecraft {
 
 	@Inject(method = "runTick", at = @At(value = "HEAD"))
 	public void injectRunTick(CallbackInfo ci) throws IOException {
+		
 		InputContainerView.update(ClientProxy.virtual);
 		ClientProxy.ticksyncClient.incrementClienttickcounter();
 		if (SavestatePlayerLoading.wasLoading) {

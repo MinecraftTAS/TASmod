@@ -41,7 +41,8 @@ public class TickSyncKTRNGPacket extends TickSyncPacket {
 				if (message.shouldreset) {
 					ClientProxy.ticksyncClient.resetTickCounter();
 				} else {
-					ClientProxy.ticksyncClient.setServerTickcounter(message.ticks);
+//					ClientProxy.ticksyncClient.setServerTickcounter(message.ticks);
+					TickSyncClient.shouldTick=true;
 				}
 
 				if (TASmod.ktrngHandler.isLoaded()) {

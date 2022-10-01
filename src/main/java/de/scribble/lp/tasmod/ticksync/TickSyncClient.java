@@ -13,6 +13,7 @@ import net.minecraft.client.multiplayer.WorldClient;
  *
  */
 public class TickSyncClient {
+	public static boolean shouldTick;
 	private int servertickcounter;
 	private int clienttickcounter;
 	private int softLockTimer;
@@ -60,8 +61,6 @@ public class TickSyncClient {
 		servertickcounter = 0;
 	}
 
-	private int avgTick;
-	
 	public int getTickAmount(Minecraft mc, int elapsedTicks) {
 		if (mc.world != null) {
 			int ticking = servertickcounter - clienttickcounter;
@@ -71,25 +70,14 @@ public class TickSyncClient {
 					softLockTimer++;
 				}
 				
-				if (softLockTimer == 100) {
+				if (softLockTimer == 1000) {
 					mc.world.sendQuittingDisconnectingPacket();
 					mc.loadWorld((WorldClient) null);
 					mc.displayGuiScreen(new GuiMultiplayerTimeOut());
 				}
 			}
 			
-			avgTick += ticking;
-			
-			if(elapsedTicks == 1) {
-				if(avgTick>=0) {
-					avgTick = 0;
-					return elapsedTicks + ticking;
-				}else {
-					avgTick = 0;
-					return 0;
-				}
-			} else
-				return elapsedTicks;
+			return Math.max(ticking, 0);
 			
 		} else {
 			return elapsedTicks;
