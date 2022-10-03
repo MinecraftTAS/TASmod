@@ -36,8 +36,8 @@ public class LoadWorldEvents {
 	 */
 	public static void initServer() {
 		TASmod.logger.info("Integrated server initialised");
-		TickrateChangerClient.pauseClientGame(true);
-		TickrateChangerServer.pauseServerGame(true);
+//		TickrateChangerClient.pauseClientGame(true);
+//		TickrateChangerServer.pauseServerGame(true);
 	}
 
 	/* The following code is for integrated and dedicated server! */

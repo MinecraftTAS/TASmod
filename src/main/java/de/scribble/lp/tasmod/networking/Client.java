@@ -62,6 +62,7 @@ public class Client {
 	 * @throws If the last client wasn't succesfully shut down it will throw an exception and forcefully shut down the client
 	 */
 	public static void createClient() throws ClientAlreadyRunningException, IOException {
+		TASmod.logger.info("Creating client connection");
 		boolean isRunning = Client.instance == null ? false : Client.instance.isAlive();
 		// Cancel the currently running server
 		if (isRunning)

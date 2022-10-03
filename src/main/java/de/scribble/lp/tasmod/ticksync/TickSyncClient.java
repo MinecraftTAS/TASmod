@@ -4,7 +4,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.scribble.lp.tasmod.networking.Client;
 import de.scribble.lp.tasmod.networking.packets.ServerTickSyncPacket;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -26,7 +25,6 @@ public class TickSyncClient {
 	 * @param tick Current tick of the server
 	 */
 	public static void onPacket() {
-//		TickrateChangerClient.changeClientTickrate(20);
 		shouldTick.set(true);
 	}
 
@@ -37,7 +35,6 @@ public class TickSyncClient {
 	 * @param mc Instance of Minecraft
 	 */
 	public static void clientPostTick(Minecraft mc) {
-//		TickrateChangerClient.changeClientTickrate(0);
 		if (mc.player == null)
 			return;
 		Client.sendPacket(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));

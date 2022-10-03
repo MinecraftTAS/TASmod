@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.networking.Server;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.SavestateState;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
@@ -34,22 +35,9 @@ public abstract class MixinMinecraftServer {
 
 	// =====================================================================================================================================
 
-	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick()V", ordinal = 1))
+	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick()V"))
 	public void redirectTick(MinecraftServer server) {
-		if (TASmod.savestateHandler.state == SavestateState.WASLOADING) {
-			TASmod.savestateHandler.state = SavestateState.NONE;
-			SavestateHandler.playerLoadSavestateEventServer();
-		}
-
-		TASmod.ktrngHandler.updateServer();
-		this.tick();
-		CommonProxy.tickSchedulerServer.runAllTasks();
 		
-		if (TickrateChangerServer.advanceTick) {
-			TickrateChangerServer.changeServerTickrate(0F);
-			TickrateChangerServer.advanceTick = false;
-		}
-		TickSyncServer.serverPostTick();
 	}
 
 	@Shadow
@@ -57,7 +45,7 @@ public abstract class MixinMinecraftServer {
 
 	// =====================================================================================================================================
 
-	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(JJ)J"))
+//	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(JJ)J"))
 	public long redirectMathMax(long oneLong, long i) {
 		return i; // Getting the original value of i
 	}
@@ -75,49 +63,94 @@ public abstract class MixinMinecraftServer {
 
 	private int faketick = 0;
 
+	@Shadow
+	private boolean serverIsRunning;
+
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Thread;sleep(J)V"))
 	public void redirectThreadSleep(long msToTick) {
-
-		if (msToTick <= 0L) {
-			if (TickrateChangerServer.ticksPerSecond > 20.0)
-				msToTick = 0L;
-			else
-				msToTick = 1L;
-		}
-		for (long o = 0; o < msToTick; o++) {
-			if (TickrateChangerServer.ticksPerSecond == 0) {
-				currentTime = System.currentTimeMillis();
-				faketick++;
-				if (faketick >= 50) {
-					faketick = 0;
-					networkSystem.networkTick();
-					if (((MinecraftServer) (Object) this).isDedicatedServer()) {
-						runPendingCommands();
-					}
-				}
-			}
-			if (TickrateChangerServer.interrupt) {
-				currentTime = System.currentTimeMillis();
-				msToTick = 1L;
-				TickrateChangerServer.interrupt = false;
-			}
-			synchronized (this.futureTaskQueue) {
-				while (!this.futureTaskQueue.isEmpty()) {
-					try {
-						((FutureTask<?>) this.futureTaskQueue.poll()).run();
-					} catch (Throwable var9) {
-						var9.printStackTrace();
-					}
-				}
-			}
-
+		
+		if(!TickSyncServer.shouldTick.compareAndSet(true, false)  && Server.getConnectionCount() != 0) {
 			try {
-				Thread.sleep(1L);
+				Thread.sleep(1);
 			} catch (InterruptedException e) {
-				TASmod.logger.error("Thread Sleep Interrupted!");
 				e.printStackTrace();
 			}
+			return;
 		}
+		long timeBeforeTick = System.currentTimeMillis();
+		
+		if (TASmod.savestateHandler.state == SavestateState.WASLOADING) {
+			TASmod.savestateHandler.state = SavestateState.NONE;
+			SavestateHandler.playerLoadSavestateEventServer();
+		}
+
+		TASmod.ktrngHandler.updateServer();
+		this.tick();
+		CommonProxy.tickSchedulerServer.runAllTasks();
+		
+		if (TickrateChangerServer.advanceTick) {
+			TickrateChangerServer.changeServerTickrate(0F);
+			TickrateChangerServer.advanceTick = false;
+		}
+		TickSyncServer.serverPostTick();
+		
+		long tickDuration = System.currentTimeMillis() - timeBeforeTick;
+		
+		// ==================================================
+		
+		try {
+			Thread.sleep(Math.max(1L, TickrateChangerServer.millisecondsPerTick - tickDuration));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		while (TickrateChangerServer.ticksPerSecond == 0) {
+			currentTime = System.currentTimeMillis();
+			faketick++;
+			if (faketick >= 50) {
+				faketick = 0;
+				networkSystem.networkTick();
+				if (((MinecraftServer) (Object) this).isDedicatedServer()) {
+					runPendingCommands();
+				}
+			}
+		}
+		
+//		for (long o = 0; o < Math.max(1L, TickrateChangerServer.millisecondsPerTick - tickDuration); o++) {
+//			if (TickrateChangerServer.ticksPerSecond == 0) {
+//				currentTime = System.currentTimeMillis();
+//				faketick++;
+//				if (faketick >= 50) {
+//					faketick = 0;
+//					networkSystem.networkTick();
+//					if (((MinecraftServer) (Object) this).isDedicatedServer()) {
+//						runPendingCommands();
+//					}
+//				}
+//			}
+//			if (TickrateChangerServer.interrupt) {
+//				currentTime = System.currentTimeMillis();
+//				TickrateChangerServer.interrupt = false;
+//				break;
+//			}
+//			synchronized (this.futureTaskQueue) {
+//				while (!this.futureTaskQueue.isEmpty()) {
+//					try {
+//						((FutureTask<?>) this.futureTaskQueue.poll()).run();
+//					} catch (Throwable var9) {
+//						var9.printStackTrace();
+//					}
+//				}
+//			}
+//
+//			try {
+//				Thread.sleep(1L);
+//			} catch (InterruptedException e) {
+//				TASmod.logger.error("Thread Sleep Interrupted!");
+//				e.printStackTrace();
+//			}
+//			this.serverIsRunning = true;
+//		}
 	}
 
 	@SideOnly(Side.SERVER)
@@ -131,7 +164,7 @@ public abstract class MixinMinecraftServer {
 	// =====================================================================================================================================
 
 
-	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
+//	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
 	public long limitLag(long j) {
 		if(j>=TickrateChangerServer.millisecondsPerTick*5){
 			return TickrateChangerServer.millisecondsPerTick;

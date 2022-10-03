@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.scribble.lp.tasmod.networking.Server;
 import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 
 /**
  * This class manages tick sync
@@ -31,7 +30,6 @@ public class TickSyncServer {
 	 */
 	public static void onPacket(UUID uuid) {
 		shouldTick.set(true);
-//		TickrateChangerServer.changeServerTickrate(20);
 	}
 
 	/**
@@ -40,7 +38,6 @@ public class TickSyncServer {
 	 */
 	public static void serverPostTick() {
 		Server.sendPacket(new ClientTickSyncPacket());
-//		TickrateChangerServer.changeServerTickrate(0);
 	}
 
 }
