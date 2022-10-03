@@ -9,6 +9,8 @@ import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.monitoring.KTRNGMonitor;
+import de.scribble.lp.tasmod.networking.Server;
+import de.scribble.lp.tasmod.networking.packets.ClientKTRNGPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -113,6 +115,7 @@ public class KillTheRNGHandler{
 	 * Executed every tick on the server
 	 */
 	public void updateServer() {
+		Server.sendPacket(new ClientKTRNGPacket(advanceGlobalSeedServer()));
 	}
 	
 	//================================================= Seedsync
@@ -135,7 +138,6 @@ public class KillTheRNGHandler{
 	public void broadcastStartSeed() {
 		if(isLoaded()) {
 			long seed = getGlobalSeedServer();
-			System.out.println(seed);
 			CommonProxy.NETWORK.sendToAll(new KTRNGStartSeedPacket(seed));
 		}
 	}

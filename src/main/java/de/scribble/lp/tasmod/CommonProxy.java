@@ -25,6 +25,7 @@ import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket.SyncStatePack
 import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket;
 import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket.KTRNGStartSeedPacketHandler;
 import de.scribble.lp.tasmod.networking.PacketSerializer;
+import de.scribble.lp.tasmod.networking.packets.ClientKTRNGPacket;
 import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
 import de.scribble.lp.tasmod.networking.packets.ServerTickSyncPacket;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
@@ -121,6 +122,8 @@ public class CommonProxy {
 
 		PacketSerializer.registerPacket(ClientTickSyncPacket.class);
 		PacketSerializer.registerPacket(ServerTickSyncPacket.class);
+		
+		PacketSerializer.registerPacket(ClientKTRNGPacket.class);
 	}
 
 	public void init(FMLInitializationEvent ev) {

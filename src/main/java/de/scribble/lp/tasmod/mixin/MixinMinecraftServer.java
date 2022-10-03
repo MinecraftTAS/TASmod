@@ -42,7 +42,6 @@ public abstract class MixinMinecraftServer {
 		}
 
 		TASmod.ktrngHandler.updateServer();
-		
 		this.tick();
 		CommonProxy.tickSchedulerServer.runAllTasks();
 		

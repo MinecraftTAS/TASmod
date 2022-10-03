@@ -72,5 +72,11 @@ public class PacketSerializer {
 		REGISTRY.add(packet);
 	}
 
+	public static void unregisterPacket(Class<? extends Packet> packet) {
+		if(REGISTRY.contains(packet)) {
+			TASmod.logger.warn("Trying to unregister packet which doesn't exist in the registry: "+packet.getClass().getSimpleName());
+		}
+		REGISTRY.remove(packet);
+	}
 	
 }
