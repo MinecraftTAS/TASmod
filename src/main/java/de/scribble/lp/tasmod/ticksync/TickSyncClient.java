@@ -1,87 +1,46 @@
 package de.scribble.lp.tasmod.ticksync;
 
-import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.gui.GuiMultiplayerTimeOut;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import de.scribble.lp.tasmod.networking.Client;
+import de.scribble.lp.tasmod.networking.packets.ServerTickSyncPacket;
+import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 
 /**
- * Makes tickrate only dependent on the server, e.g. when the server lags, the
- * client lags too
- * 
- * @author ScribbleLP
+ * This class manages tick sync
+ * German: https://1drv.ms/p/s!Av_ysXerhm5CphLvLvguvL5QYe1A?e=MHPldP
+ * English: https://1drv.ms/p/s!Av_ysXerhm5Cpha7Qq2tiVebd4DY?e=pzxOva
  *
+ * @author Pancake
  */
 public class TickSyncClient {
-	public static boolean shouldTick;
-	private int servertickcounter;
-	private int clienttickcounter;
-	private int softLockTimer;
 
+	public static final AtomicBoolean shouldTick = new AtomicBoolean(true);
+	
 	/**
-	 * The tick counter of the server
-	 * 
-	 * @return
+	 * Handles incoming tick packets from the server to the client
+	 * This will simply tick the client as long as the tick is correct
+	 *
+	 * @param uuid Server UUID, null
+	 * @param tick Current tick of the server
 	 */
-	public int getServertickcounter() {
-		return servertickcounter;
+	public static void onPacket() {
+//		TickrateChangerClient.changeClientTickrate(20);
+		shouldTick.set(true);
 	}
 
 	/**
-	 * The tick counter of the client
-	 * 
-	 * @return
+	 * Called after a client tick. This will send a packet
+	 * to the server making it tick
+	 *
+	 * @param mc Instance of Minecraft
 	 */
-	public int getClienttickcounter() {
-		return clienttickcounter;
-	}
-
-	/**
-	 * Increment tickcounter and reset softlock timer, called in runTick
-	 */
-	public void incrementClienttickcounter() {
-		softLockTimer = 0;
-		clienttickcounter++;
-	}
-
-	/**
-	 * Setting the tickcounter of the server coming from the TicksyncPacketHandler
-	 * 
-	 * @param counter
-	 */
-	public void setServerTickcounter(int counter) {
-		servertickcounter = counter;
-	}
-
-	/**
-	 * Reset the tick counter on server start
-	 */
-	public void resetTickCounter() {
-		clienttickcounter = 0;
-		servertickcounter = 0;
-	}
-
-	public int getTickAmount(Minecraft mc, int elapsedTicks) {
-		if (mc.world != null) {
-			int ticking = servertickcounter - clienttickcounter;
-			if (ticking < 0) {
-				
-				if (!ClientProxy.isDevEnvironment) { // For the Dev environment to stop a disconnect when debugging on the server side
-					softLockTimer++;
-				}
-				
-				if (softLockTimer == 1000) {
-					mc.world.sendQuittingDisconnectingPacket();
-					mc.loadWorld((WorldClient) null);
-					mc.displayGuiScreen(new GuiMultiplayerTimeOut());
-				}
-			}
-			
-			return Math.max(ticking, 0);
-			
-		} else {
-			return elapsedTicks;
-		}
+	public static void clientPostTick(Minecraft mc) {
+//		TickrateChangerClient.changeClientTickrate(0);
+		if (mc.player == null)
+			return;
+		Client.sendPacket(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));
 	}
 
 }

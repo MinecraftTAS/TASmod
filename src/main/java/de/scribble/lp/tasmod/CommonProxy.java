@@ -24,6 +24,9 @@ import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket;
 import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket.SyncStatePacketHandler;
 import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket;
 import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket.KTRNGStartSeedPacketHandler;
+import de.scribble.lp.tasmod.networking.PacketSerializer;
+import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
+import de.scribble.lp.tasmod.networking.packets.ServerTickSyncPacket;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket.InputSavestatesPacketHandler;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
@@ -42,11 +45,6 @@ import de.scribble.lp.tasmod.tickratechanger.ChangeTickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.ChangeTickratePacket.ChangeTickratePacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket.PauseTickratePacketHandler;
-import de.scribble.lp.tasmod.ticksync.TickSyncKTRNGPacket;
-import de.scribble.lp.tasmod.ticksync.TickSyncKTRNGPacket.TickSyncKTRNGPacketHandler;
-import de.scribble.lp.tasmod.ticksync.TickSyncPacket;
-import de.scribble.lp.tasmod.ticksync.TickSyncPacket.TickSyncPacketHandler;
-import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import de.scribble.lp.tasmod.util.TickScheduler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -59,7 +57,7 @@ public class CommonProxy {
 	public static SimpleNetworkWrapper NETWORK;
 	public static Logger logger = LogManager.getLogger("TASmod");
 	
-	public static TickSyncServer ticksyncServer = new TickSyncServer();
+//	public static TickSyncServer ticksyncServer = new TickSyncServer();
 	
 	public static TickScheduler tickSchedulerServer = new TickScheduler();
 	
@@ -76,10 +74,6 @@ public class CommonProxy {
 
 		NETWORK.registerMessage(PauseTickratePacketHandler.class, PauseTickratePacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(PauseTickratePacketHandler.class, PauseTickratePacket.class, i++, Side.CLIENT);
-
-		// Ticksync
-		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPacket.class, i++, Side.CLIENT);
-		NETWORK.registerMessage(TickSyncKTRNGPacketHandler.class, TickSyncKTRNGPacket.class, i++, Side.CLIENT);
 
 		// Sync State
 		NETWORK.registerMessage(RequestStatePacketHandler.class, RequestStatePacket.class, i++, Side.CLIENT);
@@ -125,6 +119,8 @@ public class CommonProxy {
 		// KillTheRNG
 		NETWORK.registerMessage(KTRNGStartSeedPacketHandler.class, KTRNGStartSeedPacket.class, i++, Side.CLIENT);
 
+		PacketSerializer.registerPacket(ClientTickSyncPacket.class);
+		PacketSerializer.registerPacket(ServerTickSyncPacket.class);
 	}
 
 	public void init(FMLInitializationEvent ev) {

@@ -22,6 +22,7 @@ import de.scribble.lp.tasmod.externalGui.InputContainerView;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
+import de.scribble.lp.tasmod.ticksync.TickSyncClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -83,17 +84,12 @@ public abstract class MixinMinecraft {
 			TickrateChangerClient.advanceTick = false;
 			TickrateChangerClient.changeClientTickrate(0F);
 		}
+		TickSyncClient.clientPostTick((Minecraft)(Object)this);
 	}
 
 	@Shadow
 	public abstract void runTick();
 
-	
-//	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I"))
-	public int redirect_runGameLoop(int ten, int elapsedTicks) {
-		return ClientProxy.ticksyncClient.getTickAmount((Minecraft)(Object)this, elapsedTicks);
-	}
-	
 	
 	// =====================================================================================================================================
 
@@ -101,7 +97,6 @@ public abstract class MixinMinecraft {
 	public void injectRunTick(CallbackInfo ci) throws IOException {
 		
 		InputContainerView.update(ClientProxy.virtual);
-		ClientProxy.ticksyncClient.incrementClienttickcounter();
 		if (SavestatePlayerLoading.wasLoading) {
 			SavestatePlayerLoading.wasLoading = false;
 			

@@ -16,6 +16,7 @@ import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.SavestateState;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
+import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import net.minecraft.network.NetworkSystem;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.relauncher.Side;
@@ -40,17 +41,16 @@ public abstract class MixinMinecraftServer {
 			SavestateHandler.playerLoadSavestateEventServer();
 		}
 
-		CommonProxy.ticksyncServer.onServerTick();
 		TASmod.ktrngHandler.updateServer();
 		
 		this.tick();
-		
 		CommonProxy.tickSchedulerServer.runAllTasks();
 		
 		if (TickrateChangerServer.advanceTick) {
 			TickrateChangerServer.changeServerTickrate(0F);
 			TickrateChangerServer.advanceTick = false;
 		}
+		TickSyncServer.serverPostTick();
 	}
 
 	@Shadow
@@ -139,5 +139,5 @@ public abstract class MixinMinecraftServer {
 		}
 		return j;
 	}
-
+	
 }

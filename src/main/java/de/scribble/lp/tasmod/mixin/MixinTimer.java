@@ -39,8 +39,7 @@ public class MixinTimer {
 			lastSyncSysClock = Minecraft.getSystemTime(); // update the tick tracker so that after returning to scheduling the client won't catch up all ticks (max 10)
 			this.elapsedTicks = 0; // do not do any ticks
 			long newGameLoop = Minecraft.getSystemTime();
-			if (TickSyncClient.shouldTick) {
-				TickSyncClient.shouldTick = false;
+			if (TickSyncClient.shouldTick.compareAndSet(true, false)) {
 				this.elapsedTicks++;
 				this.lastTickDuration = newGameLoop - this.millisSinceTick;
 				this.millisSinceTick = newGameLoop;
@@ -59,7 +58,7 @@ public class MixinTimer {
 		} else {
 			this.millisSinceTick = Minecraft.getSystemTime();
 			this.lastGameLoop = Minecraft.getSystemTime();
-			TickSyncClient.shouldTick = true; // The client should always tick if it once thrown out of the vanilla scheduling part, to make the server tick, etc.
+			TickSyncClient.shouldTick.set(true); // The client should always tick if it once thrown out of the vanilla scheduling part, to make the server tick, etc.
 		}
 	}
 }

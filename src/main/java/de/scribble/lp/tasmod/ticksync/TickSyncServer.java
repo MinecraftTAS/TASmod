@@ -1,49 +1,46 @@
 package de.scribble.lp.tasmod.ticksync;
 
-import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.mixin.accessors.AccessorMinecraftServer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import de.scribble.lp.tasmod.networking.Server;
+import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
+import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
+
+/**
+ * This class manages tick sync
+ * German: https://1drv.ms/p/s!Av_ysXerhm5CphLvLvguvL5QYe1A?e=MHPldP
+ * English: https://1drv.ms/p/s!Av_ysXerhm5Cpha7Qq2tiVebd4DY?e=pzxOva
+ *
+ * @author Pancake
+ */
 public class TickSyncServer {
-	
-	private int serverticksync = 0;
 
-	public void incrementServerTickCounter() {
-		serverticksync++;
-		sendToClients(false);
-	}
+	/**
+	 * A multithreadable boolean that tells the MixinMinecraftServer to tick the server or not.
+	 */
+	public static AtomicBoolean shouldTick = new AtomicBoolean(true);
 
-	public void resetTickCounter() {
-		((AccessorMinecraftServer) TASmod.getServerInstance().getServer()).tickCounter(0);
-		serverticksync = 0;
-		sendToClients(true);
-	}
-
-	public int getServertickcounter() {
-		return serverticksync;
-	}
-
-	public void onJoinServer(EntityPlayerMP player) {
-		resetTickCounter();
+	/**
+	 * Handles incoming tick packets from the client to the server
+	 * This will put the uuid into a list of ticked clients and once every client
+	 * is in that list, tick the server.
+	 *
+	 * @param uuid Player UUID
+	 * @param tick Current tick of the player
+	 */
+	public static void onPacket(UUID uuid) {
+		shouldTick.set(true);
+//		TickrateChangerServer.changeServerTickrate(20);
 	}
 
-	public void onServerTick() {
-		/* Overflow prevention */
-		if (getServertickcounter() == Integer.MAX_VALUE - 1) {
-			resetTickCounter();
-		} else {
-			incrementServerTickCounter();
-		}
+	/**
+	 * Called after a server tick. This will send a packet
+	 * to all clients making them tick
+	 */
+	public static void serverPostTick() {
+		Server.sendPacket(new ClientTickSyncPacket());
+//		TickrateChangerServer.changeServerTickrate(0);
 	}
-	
-	private void sendToClients(boolean reset) {
-		
-		if(TASmod.ktrngHandler.isLoaded()) {
-			CommonProxy.NETWORK.sendToAll(new TickSyncKTRNGPacket(serverticksync, reset, TASmod.ktrngHandler.advanceGlobalSeedServer()));
-		}
-		else {
-			CommonProxy.NETWORK.sendToAll(new TickSyncPacket(serverticksync, reset));
-		}
-	}
+
 }

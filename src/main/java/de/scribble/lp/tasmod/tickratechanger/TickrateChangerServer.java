@@ -65,7 +65,7 @@ public class TickrateChangerServer {
         	millisecondsPerTick = Long.MAX_VALUE;
         }
         ticksPerSecond = tickrate;
-        log("Setting the server tickrate to "+ ticksPerSecond);
+//        log("Setting the server tickrate to "+ ticksPerSecond);
 	}
 	
 	/**

@@ -569,13 +569,14 @@ public class SavestateHandler {
 		}
 		
 		savestateDat = new File(tasmodDir, "savestateData.txt");
-		
-		SavestateDataFile file = new SavestateDataFile();
-		file.load(savestateDat);
-		
-		index = Integer.parseInt(file.get(DataValues.INDEX));
-		
-		setCurrentIndex(index, true);
+		if(savestateDat.exists()) {
+			SavestateDataFile file = new SavestateDataFile();
+			file.load(savestateDat);
+			
+			index = Integer.parseInt(file.get(DataValues.INDEX));
+			
+			setCurrentIndex(index, true);
+		}
 	}
 	
 	private void setCurrentIndex(int index, boolean changeIndex) {

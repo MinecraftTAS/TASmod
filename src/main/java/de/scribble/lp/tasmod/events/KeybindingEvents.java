@@ -9,6 +9,7 @@ import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
 import de.scribble.lp.tasmod.savestates.server.SavestatePacket;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
+import de.scribble.lp.tasmod.ticksync.TickSyncClient;
 import de.scribble.lp.tasmod.virtual.VirtualKeybindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;

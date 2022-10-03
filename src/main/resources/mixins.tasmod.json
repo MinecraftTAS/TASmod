@@ -74,6 +74,9 @@
 		"shields.MixinRenderItem",
 		"shields.MixinTileEntityItemStackRenderer",
 		
+		"networking.MixinNetHandlerLoginClient",
+		"networking.MixinNetworkManager",
+		
 		//Accessors
 		"accessors.AccessorRunStuff",
 		"accessors.AccessorTimer"
