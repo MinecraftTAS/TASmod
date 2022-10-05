@@ -4,7 +4,6 @@ package de.scribble.lp.tasmod.events;
 import com.mojang.authlib.GameProfile;
 
 import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;

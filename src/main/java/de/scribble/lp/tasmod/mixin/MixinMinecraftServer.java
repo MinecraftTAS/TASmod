@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import de.scribble.lp.tasmod.CommonProxy;
@@ -69,7 +68,19 @@ public abstract class MixinMinecraftServer {
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Thread;sleep(J)V"))
 	public void redirectThreadSleep(long msToTick) {
 		
-		if(!TickSyncServer.shouldTick.compareAndSet(true, false)  && Server.getConnectionCount() != 0) {
+		if(!TickSyncServer.shouldTick.compareAndSet(true, false) && Server.getConnectionCount() != 0 || TickrateChangerServer.ticksPerSecond == 0) {
+			
+			if(TickrateChangerServer.ticksPerSecond == 0) {
+				faketick++;
+				if (faketick >= 50) {
+					faketick = 0;
+					networkSystem.networkTick();
+					if (((MinecraftServer) (Object) this).isDedicatedServer()) {
+						runPendingCommands();
+					}
+				}
+			}
+			
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
@@ -104,17 +115,6 @@ public abstract class MixinMinecraftServer {
 			e.printStackTrace();
 		}
 		
-		while (TickrateChangerServer.ticksPerSecond == 0) {
-			currentTime = System.currentTimeMillis();
-			faketick++;
-			if (faketick >= 50) {
-				faketick = 0;
-				networkSystem.networkTick();
-				if (((MinecraftServer) (Object) this).isDedicatedServer()) {
-					runPendingCommands();
-				}
-			}
-		}
 		
 //		for (long o = 0; o < Math.max(1L, TickrateChangerServer.millisecondsPerTick - tickDuration); o++) {
 //			if (TickrateChangerServer.ticksPerSecond == 0) {

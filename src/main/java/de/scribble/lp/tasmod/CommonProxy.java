@@ -46,6 +46,7 @@ import de.scribble.lp.tasmod.tickratechanger.ChangeTickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.ChangeTickratePacket.ChangeTickratePacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket.PauseTickratePacketHandler;
+import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
 import de.scribble.lp.tasmod.util.TickScheduler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -63,6 +64,9 @@ public class CommonProxy {
 	public static TickScheduler tickSchedulerServer = new TickScheduler();
 	
 	public void preInit(FMLPreInitializationEvent ev) {
+		
+		TickrateChangerServer.logger = logger;
+		
 		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("tasmod");
 		int i = -1;
 

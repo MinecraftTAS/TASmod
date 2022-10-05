@@ -79,7 +79,7 @@ public class Client {
 			// Connect to the server
 			try(Socket clientSocket = new Socket()) {
 				// Wait until client is safely loaded
-				Thread.sleep(500);
+				Thread.sleep(2000);
 				// Connect to the server
 				clientSocket.connect(new InetSocketAddress(serverIp, 3111));
 				Client.clientSocket = clientSocket;
@@ -92,7 +92,7 @@ public class Client {
 				TASmod.logger.error("Custom TASmod client was unexpectedly shutdown {}", exception);
 			}
 		});
-		Client.instance.setName("Custom TASmod Network Client");
+		Client.instance.setName("TASmod Network Handler Client");
 		Client.instance.setDaemon(true); // If daemon is set, the jvm will quit without waiting for this thread to finish
 		Client.instance.start();
 

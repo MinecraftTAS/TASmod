@@ -110,7 +110,7 @@ public class Server {
 				TASmod.logger.error("Custom TASmod server was unexpectedly shutdown {}", exception);
 			}
 		});
-		Server.instance.setName("Custom TASmod Network Server");
+		Server.instance.setName("TASmod Network Handler Server");
 		Server.instance.setDaemon(true); // If daemon is set, the jvm will quit without waiting for this thread to finish
 		Server.instance.start();
 

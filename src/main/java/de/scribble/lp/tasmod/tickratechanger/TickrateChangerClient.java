@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 
 /**
  * Changes the {@link Minecraft#timer} variable
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class TickrateChangerClient {
@@ -37,6 +37,10 @@ public class TickrateChangerClient {
 		changeClientTickrate(tickrate);
 		changeServerTickrate(tickrate);
 	}
+	
+	public static void changeClientTickrate(float tickrate) {
+		changeClientTickrate(tickrate, true);
+	}
 
 	/**
 	 * Changes the tickrate of the client <br>
@@ -45,7 +49,7 @@ public class TickrateChangerClient {
 	 * 
 	 * @param tickrate The new tickrate of the client
 	 */
-	public static void changeClientTickrate(float tickrate) {
+	public static void changeClientTickrate(float tickrate, boolean log) {
 		if (tickrate < 0) {
 			return;
 		}
@@ -56,10 +60,11 @@ public class TickrateChangerClient {
 			if (ticksPerSecond != 0) {
 				tickrateSaved = ticksPerSecond;
 			}
-			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(Float.MAX_VALUE);
+//			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(Float.MAX_VALUE);
 		}
 		ticksPerSecond = tickrate;
-		log("Setting the client tickrate to "+ ticksPerSecond);
+		if(log)
+			log("Setting the client tickrate to "+ ticksPerSecond);
 	}
 
 	/**

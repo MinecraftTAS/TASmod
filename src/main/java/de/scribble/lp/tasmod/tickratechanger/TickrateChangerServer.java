@@ -1,10 +1,27 @@
 package de.scribble.lp.tasmod.tickratechanger;
 
+import org.apache.logging.log4j.Logger;
+
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
 import net.minecraft.entity.player.EntityPlayerMP;
 
+/**
+ * Controls the tickrate on the server side
+ * 
+ * The tickrate is controlled in MinecraftServer.run() where the server is halted for 50 milliseconds minus the time the tick took to execute.
+ * <p>
+ * To change the tickrate on server and all clients use {@link #changeTickrate(float)}.
+ * <p>
+ * You can individually set the tickrate with {@link #changeClientTickrate(float)} and {@link #changeServerTickrate(float)}.
+ * <p>
+ * 
+ * 
+ * @author Scribble
+ *
+ */
 public class TickrateChangerServer {
+	
 	/**
 	 * The current tickrate of the client
 	 */
@@ -25,13 +42,21 @@ public class TickrateChangerServer {
 	 * pausing
 	 */
 	public static float tickrateSaved=20F;
+	
 	/**
 	 * True if the tickrate is 20 and the server should advance 1 tick
 	 */
 	public static boolean advanceTick=false;
 	
 	/**
-	 * Changes both client and server tickrates
+	 * The logger used for logging. Has to be set seperately
+	 */
+	public static Logger logger;
+	
+	/**
+	 * Changes both client and server tickrates.
+	 * <p>
+	 * Tickrates can be tickrate>=0 with 0 pausing the game.
 	 * 
 	 * @param tickrate The new tickrate of client and server
 	 */
@@ -40,12 +65,19 @@ public class TickrateChangerServer {
 		changeServerTickrate(tickrate);
 	}
 	
+	public static void changeClientTickrate(float tickrate) {
+		changeClientTickrate(tickrate, false);
+	}
+	
 	/**
 	 * Changes the tickrate of all clients. Sends a {@link ChangeTickratePacket}
 	 * 
 	 * @param tickrate The new tickrate of the client
+	 * @param log If a message should logged
 	 */
-	public static void changeClientTickrate(float tickrate) {
+	public static void changeClientTickrate(float tickrate, boolean log) {
+		if(log)
+			log("Changing the tickrate "+ tickrate + " to all clients");
 		CommonProxy.NETWORK.sendToAll(new ChangeTickratePacket(tickrate));
 	}
 
@@ -55,6 +87,16 @@ public class TickrateChangerServer {
 	 * @param tickrate The new tickrate of the server
 	 */
 	public static void changeServerTickrate(float tickrate) {
+		changeServerTickrate(tickrate, true);
+	}
+	
+	/**
+	 * Changes the tickrate of the server
+	 * 
+	 * @param tickrate The new tickrate of the server
+	 * @param log If a message should logged
+	 */
+	public static void changeServerTickrate(float tickrate, boolean log) {
 		interrupt=true;
         if(tickrate>0) {
         	millisecondsPerTick = (long)(1000L / tickrate);
@@ -62,10 +104,11 @@ public class TickrateChangerServer {
         	if(ticksPerSecond!=0) {
         		tickrateSaved=ticksPerSecond;
         	}
-//        	millisecondsPerTick = Long.MAX_VALUE;
         }
         ticksPerSecond = tickrate;
-//        log("Setting the server tickrate to "+ ticksPerSecond);
+        if(log) {
+        	log("Setting the server tickrate to "+ ticksPerSecond);
+        }
 	}
 	
 	/**
@@ -138,12 +181,16 @@ public class TickrateChangerServer {
      */
 	public static void joinServer(EntityPlayerMP player) {
 		if(TASmod.getServerInstance().isDedicatedServer()) {
-			TASmod.logger.info("Sending the current tickrate ({}) to {}", ticksPerSecond, player.getName());
+			log("Sending the current tickrate ("+ticksPerSecond+") to " +player.getName());
 			CommonProxy.NETWORK.sendTo(new ChangeTickratePacket(ticksPerSecond), player);
 		}
 	}
 	
+	/**
+	 * The message to log
+	 * @param msg 
+	 */
 	private static void log(String msg) {
-		TASmod.logger.info(msg);
+		logger.info(msg);
 	}
 }
