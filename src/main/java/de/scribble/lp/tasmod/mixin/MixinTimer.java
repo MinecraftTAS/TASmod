@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSyncClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Timer;
@@ -40,7 +39,7 @@ public class MixinTimer {
 			lastSyncSysClock = Minecraft.getSystemTime(); // update the tick tracker so that after returning to scheduling the client won't catch up all ticks (max 10)
 			this.elapsedTicks = 0; // do not do any ticks
 			long newGameLoop = Minecraft.getSystemTime();
-			if (TickSyncClient.shouldTick.compareAndSet(true, false) || TickrateChangerClient.advanceTick) {
+			if (TickSyncClient.shouldTick.compareAndSet(true, false)) {
 				this.elapsedTicks++;
 				this.lastTickDuration = newGameLoop - this.millisSinceTick;
 				this.millisSinceTick = newGameLoop;

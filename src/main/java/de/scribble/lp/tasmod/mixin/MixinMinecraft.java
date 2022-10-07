@@ -19,6 +19,7 @@ import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.events.KeybindingEvents;
 import de.scribble.lp.tasmod.events.LoadWorldEvents;
 import de.scribble.lp.tasmod.externalGui.InputContainerView;
+import de.scribble.lp.tasmod.networking.Client;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
@@ -90,6 +91,14 @@ public abstract class MixinMinecraft {
 	@Shadow
 	public abstract void runTick();
 
+	@Inject(method = "shutdownMinecraftApplet", at = @At("HEAD"))
+	public void inject_shutdownMinecraftApplet(CallbackInfo ci) {
+		try {
+			Client.killClient();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	// =====================================================================================================================================
 
