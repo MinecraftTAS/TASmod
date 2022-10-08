@@ -36,7 +36,8 @@ public class KillTheRNGHandler{
 			KillTheRNG.LOGGER.info("Connection established with TASmod");
 			KillTheRNG.isLibrary=true;
 			KillTheRNG.mode=SeedingModes.TickChange;
-			KillTheRNG.annotations.register(new KTRNGMonitor());
+			
+//			KillTheRNG.annotations.register(new KTRNGMonitor());
 		}else {
 			TASmod.logger.info("KillTheRNG doesn't appear to be loaded");
 		}

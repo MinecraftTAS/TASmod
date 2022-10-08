@@ -27,6 +27,8 @@ public class TickrateChangerClient {
 	 * True if the tickrate is 20 and the client should advance 1 tick
 	 */
 	public static boolean advanceTick = false;
+	
+	public static long millisecondsPerTick = 50L;
 
 	/**
 	 * Changes both client and server tickrates
@@ -55,12 +57,14 @@ public class TickrateChangerClient {
 		}
 		Minecraft mc = Minecraft.getMinecraft();
 		if (tickrate > 0) {
-			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(1000F / tickrate);
+			millisecondsPerTick = (long) (1000F / tickrate);
+			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(millisecondsPerTick);
+			
 		} else if (tickrate == 0F) {
 			if (ticksPerSecond != 0) {
 				tickrateSaved = ticksPerSecond;
 			}
-//			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(Float.MAX_VALUE);
+			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(Float.MAX_VALUE);
 		}
 		ticksPerSecond = tickrate;
 		if(log)

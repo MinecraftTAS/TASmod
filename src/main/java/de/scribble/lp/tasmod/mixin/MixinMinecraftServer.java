@@ -68,8 +68,37 @@ public abstract class MixinMinecraftServer {
 	@Redirect(method = "run", at = @At(value = "INVOKE", target = "Ljava/lang/Thread;sleep(J)V"))
 	public void redirectThreadSleep(long msToTick) {
 		
-		if(!TickSyncServer.shouldTick.compareAndSet(true, false) && Server.getConnectionCount() != 0 || TickrateChangerServer.ticksPerSecond == 0) {
+		/*	The server should tick if:
+		 *	(shouldTick in ticksync is true OR there are no players connected to the custom server) AND the tickrate is not zero. That or advance tick is true*/
+		if( ((TickSyncServer.shouldTick.get() || Server.getConnectionCount() == 0) && TickrateChangerServer.ticksPerSecond != 0) || TickrateChangerServer.advanceTick) {
+			TickSyncServer.shouldTick.set(false);
+			long timeBeforeTick = System.currentTimeMillis();
 			
+			if (TASmod.savestateHandler.state == SavestateState.WASLOADING) {
+				TASmod.savestateHandler.state = SavestateState.NONE;
+				SavestateHandler.playerLoadSavestateEventServer();
+			}
+
+			TASmod.ktrngHandler.updateServer();
+			this.tick();
+			CommonProxy.tickSchedulerServer.runAllTasks();
+			
+			if (TickrateChangerServer.advanceTick) {
+				TickrateChangerServer.changeServerTickrate(0F);
+				TickrateChangerServer.advanceTick = false;
+			}
+			TickSyncServer.serverPostTick();
+			
+			long tickDuration = System.currentTimeMillis() - timeBeforeTick;
+			
+			// ==================================================
+			
+			try {
+				Thread.sleep(Math.max(1L, TickrateChangerServer.millisecondsPerTick - tickDuration));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else { // This is when the server should not tick... This is to ensure network tick stuff is working
 			if(TickrateChangerServer.ticksPerSecond == 0) {
 				faketick++;
 				if (faketick >= 50) {
@@ -86,71 +115,7 @@ public abstract class MixinMinecraftServer {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			return;
 		}
-		long timeBeforeTick = System.currentTimeMillis();
-		
-		if (TASmod.savestateHandler.state == SavestateState.WASLOADING) {
-			TASmod.savestateHandler.state = SavestateState.NONE;
-			SavestateHandler.playerLoadSavestateEventServer();
-		}
-
-		TASmod.ktrngHandler.updateServer();
-		this.tick();
-		CommonProxy.tickSchedulerServer.runAllTasks();
-		
-		if (TickrateChangerServer.advanceTick) {
-			TickrateChangerServer.changeServerTickrate(0F);
-			TickrateChangerServer.advanceTick = false;
-		}
-		TickSyncServer.serverPostTick();
-		
-		long tickDuration = System.currentTimeMillis() - timeBeforeTick;
-		
-		// ==================================================
-		
-		try {
-			Thread.sleep(Math.max(1L, TickrateChangerServer.millisecondsPerTick - tickDuration));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		
-//		for (long o = 0; o < Math.max(1L, TickrateChangerServer.millisecondsPerTick - tickDuration); o++) {
-//			if (TickrateChangerServer.ticksPerSecond == 0) {
-//				currentTime = System.currentTimeMillis();
-//				faketick++;
-//				if (faketick >= 50) {
-//					faketick = 0;
-//					networkSystem.networkTick();
-//					if (((MinecraftServer) (Object) this).isDedicatedServer()) {
-//						runPendingCommands();
-//					}
-//				}
-//			}
-//			if (TickrateChangerServer.interrupt) {
-//				currentTime = System.currentTimeMillis();
-//				TickrateChangerServer.interrupt = false;
-//				break;
-//			}
-//			synchronized (this.futureTaskQueue) {
-//				while (!this.futureTaskQueue.isEmpty()) {
-//					try {
-//						((FutureTask<?>) this.futureTaskQueue.poll()).run();
-//					} catch (Throwable var9) {
-//						var9.printStackTrace();
-//					}
-//				}
-//			}
-//
-//			try {
-//				Thread.sleep(1L);
-//			} catch (InterruptedException e) {
-//				TASmod.logger.error("Thread Sleep Interrupted!");
-//				e.printStackTrace();
-//			}
-//			this.serverIsRunning = true;
-//		}
 	}
 
 	@SideOnly(Side.SERVER)

@@ -45,7 +45,7 @@ public abstract class MixinMinecraft {
 		
 		LoadWorldEvents.doneWithLoadingScreen();
 		
-		if(((Minecraft) (Object) this).player!=null) {
+		if(((Minecraft) (Object) this).player != null) {
 			ClientProxy.hud.tick();
 		}
 		
@@ -53,10 +53,10 @@ public abstract class MixinMinecraft {
 			ClientProxy.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
 		while (Mouse.next()) {
-			if(this.currentScreen==null) {
+			if(this.currentScreen == null) {
 				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.ticksPerSecond==0);
 			} else {
-				GuiScreenDuck screen=(GuiScreenDuck) currentScreen;
+				GuiScreenDuck screen = (GuiScreenDuck) currentScreen;
 				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.ticksPerSecond==0);
 			}
 		}
@@ -98,6 +98,7 @@ public abstract class MixinMinecraft {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		TickrateChangerClient.changeTickrate(20);
 	}
 	
 	// =====================================================================================================================================

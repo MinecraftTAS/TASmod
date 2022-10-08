@@ -8,11 +8,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSyncClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Timer;
 
 @Mixin(Timer.class)
+/**
+ * Rewrites updateTimer to make it possible to interpolate ticks.
+ * @author Pancake
+ *
+ */
 public class MixinTimer {
 	
 	@Shadow
@@ -27,7 +33,7 @@ public class MixinTimer {
     private float tickLength;
 	
 	@Unique
-	private long millisSinceTick;
+	private long millisLastTick;
 	@Unique
 	private long lastGameLoop;
 	@Unique
@@ -41,8 +47,11 @@ public class MixinTimer {
 			long newGameLoop = Minecraft.getSystemTime();
 			if (TickSyncClient.shouldTick.compareAndSet(true, false)) {
 				this.elapsedTicks++;
-				this.lastTickDuration = newGameLoop - this.millisSinceTick;
-				this.millisSinceTick = newGameLoop;
+				this.lastTickDuration = newGameLoop - this.millisLastTick;
+				if(TickrateChangerClient.advanceTick) {
+					lastTickDuration = TickrateChangerClient.millisecondsPerTick;	// Keep the lastTick duration steady during tickadvance, since it grows larger the longer you wait in tickrate 0
+				}
+				this.millisLastTick = newGameLoop; // Update millisLastTick
 				this.renderPartialTicks = 0; // Reset after the tick
 			}
 			// Interpolating
@@ -56,7 +65,7 @@ public class MixinTimer {
 			this.lastGameLoop = newGameLoop;
 			ci.cancel();
 		} else {
-			this.millisSinceTick = Minecraft.getSystemTime();
+			this.millisLastTick = Minecraft.getSystemTime();
 			this.lastGameLoop = Minecraft.getSystemTime();
 			TickSyncClient.shouldTick.set(true); // The client should always tick if it once thrown out of the vanilla scheduling part, to make the server tick, etc.
 		}

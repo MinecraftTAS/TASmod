@@ -33,11 +33,6 @@ public class TickrateChangerServer {
 	public static long millisecondsPerTick=50L;
 	
 	/**
-	 * If true, interrupts the infinite loop that is used to enable tickratae 0 on the server
-	 */
-	public static boolean interrupt=false;
-	
-	/**
 	 * The tickrate before {@link #ticksPerSecond} was changed to 0, used to toggle
 	 * pausing
 	 */
@@ -97,7 +92,6 @@ public class TickrateChangerServer {
 	 * @param log If a message should logged
 	 */
 	public static void changeServerTickrate(float tickrate, boolean log) {
-		interrupt=true;
         if(tickrate>0) {
         	millisecondsPerTick = (long)(1000L / tickrate);
         }else if(tickrate==0) {
