@@ -1,14 +1,10 @@
 package de.scribble.lp.tasmod.ktrng;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.monitoring.KTRNGMonitor;
 import de.scribble.lp.tasmod.networking.Server;
 import de.scribble.lp.tasmod.networking.packets.ClientKTRNGPacket;
 import net.minecraftforge.fml.relauncher.Side;
@@ -104,12 +100,6 @@ public class KillTheRNGHandler{
 	 */
 	@SideOnly(Side.CLIENT)
 	public void updateClient() {
-		if(isLoaded()) {
-			Long seed = pollSeed();
-			if(seed != null) {
-				setGlobalSeedClient(seed);
-			}
-		}
 	}
 	
 	/**
@@ -120,21 +110,6 @@ public class KillTheRNGHandler{
 	}
 	
 	//================================================= Seedsync
-	
-	private Queue<Long> seedQueue = new ConcurrentLinkedQueue<>();
-	
-	public void addToQueue(long seed) {
-		seedQueue.add(seed);
-	}
-	
-	public Long pollSeed() {
-		return seedQueue.poll();
-	}
-	
-	public void clearQueue() {
-		seedQueue.clear();
-	}
-	
 	
 	public void broadcastStartSeed() {
 		if(isLoaded()) {

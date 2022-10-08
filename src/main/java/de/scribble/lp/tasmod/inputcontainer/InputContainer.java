@@ -156,7 +156,6 @@ public class InputContainer {
 				index = 0;
 				state = TASstate.PLAYBACK;
 				creditsPrinted=false;
-				TASmod.ktrngHandler.clearQueue();  // Clear the queue 
 				TASmod.ktrngHandler.setGlobalSeedServer(startSeed);
 //				TASmod.ktrngHandler.setTestSeed(startSeed); TODO Do monitoring again
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";

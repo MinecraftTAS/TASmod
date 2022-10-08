@@ -1,8 +1,12 @@
 package de.scribble.lp.tasmod.ticksync;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.networking.Server;
 import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
 
@@ -14,6 +18,8 @@ import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
  * @author Pancake
  */
 public class TickSyncServer {
+	
+	private static List<UUID> synchronizedList = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * A multithreadable boolean that tells the MixinMinecraftServer to tick the server or not.
@@ -29,7 +35,16 @@ public class TickSyncServer {
 	 * @param tick Current tick of the player
 	 */
 	public static void onPacket(UUID uuid) {
-		shouldTick.set(true);
+		synchronized (synchronizedList) {
+			if(!synchronizedList.contains(uuid)) {
+				synchronizedList.add(uuid);
+				
+				if(synchronizedList.size() == TASmod.getServerInstance().getCurrentPlayerCount()) {
+					shouldTick.set(true);
+					synchronizedList.clear();
+				}
+			}
+		}
 	}
 
 	/**
