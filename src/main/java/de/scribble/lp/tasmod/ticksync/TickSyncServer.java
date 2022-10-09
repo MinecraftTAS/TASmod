@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.networking.Server;
 import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
 
 /**
@@ -52,7 +51,10 @@ public class TickSyncServer {
 	 * to all clients making them tick
 	 */
 	public static void serverPostTick() {
-		Server.sendPacket(new ClientTickSyncPacket());
+		TASmod.packetServer.sendPacket(new ClientTickSyncPacket());
 	}
 
+	public static void clearList() {
+		synchronizedList.clear();
+	}
 }

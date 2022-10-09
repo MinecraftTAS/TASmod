@@ -22,6 +22,7 @@ import scala.reflect.internal.Trees.If;
  * The server creates a separate thread to run off so that it's non-blocking. Therefore it uses a queue for outgoing packets.
  * @author Pancake
  */
+@Deprecated
 public class Server {
 
 	/**

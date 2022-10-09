@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.networking.exceptions.ClientAlreadyRunningException;
+import de.scribble.lp.tasmod.networking.packets.ServerBoundQuitPacket;
 import net.minecraft.client.Minecraft;
 import scala.reflect.internal.Trees.If;
 
@@ -107,6 +108,7 @@ public class Client {
 	 */
 	public static void killClient() throws IOException {
 		if (Client.instance != null)
+			Client.sendPacket(new ServerBoundQuitPacket());
 			Client.clientSocket.close();
 	}
 
