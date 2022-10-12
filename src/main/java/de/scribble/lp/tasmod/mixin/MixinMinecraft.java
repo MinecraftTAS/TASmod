@@ -14,16 +14,17 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.scribble.lp.tasmod.ClientProxy;
+import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.duck.GuiScreenDuck;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
 import de.scribble.lp.tasmod.events.KeybindingEvents;
 import de.scribble.lp.tasmod.events.LoadWorldEvents;
 import de.scribble.lp.tasmod.externalGui.InputContainerView;
-import de.scribble.lp.tasmod.networking.Client;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.ticksync.TickSyncClient;
+import de.scribble.lp.tasmod.ticksync.TickSyncQuitPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -93,11 +94,12 @@ public abstract class MixinMinecraft {
 
 	@Inject(method = "shutdownMinecraftApplet", at = @At("HEAD"))
 	public void inject_shutdownMinecraftApplet(CallbackInfo ci) {
-		try {
-			Client.killClient();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Client.killClient();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		CommonProxy.NETWORK.sendToServer(new TickSyncQuitPacket());
 		TickrateChangerClient.changeTickrate(20);
 	}
 	

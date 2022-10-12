@@ -24,11 +24,6 @@ import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket;
 import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket.SyncStatePacketHandler;
 import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket;
 import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket.KTRNGStartSeedPacketHandler;
-import de.scribble.lp.tasmod.networking.PacketSerializer;
-import de.scribble.lp.tasmod.networking.packets.ClientKTRNGPacket;
-import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
-import de.scribble.lp.tasmod.networking.packets.ServerBoundQuitPacket;
-import de.scribble.lp.tasmod.networking.packets.ServerTickSyncPacket;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket.InputSavestatesPacketHandler;
 import de.scribble.lp.tasmod.savestates.server.LoadstatePacket;
@@ -48,6 +43,10 @@ import de.scribble.lp.tasmod.tickratechanger.ChangeTickratePacket.ChangeTickrate
 import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket;
 import de.scribble.lp.tasmod.tickratechanger.PauseTickratePacket.PauseTickratePacketHandler;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
+import de.scribble.lp.tasmod.ticksync.TickSyncPacket;
+import de.scribble.lp.tasmod.ticksync.TickSyncPacket.TickSyncPacketHandler;
+import de.scribble.lp.tasmod.ticksync.TickSyncQuitPacket;
+import de.scribble.lp.tasmod.ticksync.TickSyncQuitPacket.TickSyncQuitPacketHandler;
 import de.scribble.lp.tasmod.util.TickScheduler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -125,11 +124,16 @@ public class CommonProxy {
 		// KillTheRNG
 		NETWORK.registerMessage(KTRNGStartSeedPacketHandler.class, KTRNGStartSeedPacket.class, i++, Side.CLIENT);
 
-		PacketSerializer.registerPacket(ClientTickSyncPacket.class);
-		PacketSerializer.registerPacket(ServerTickSyncPacket.class);
+		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPacket.class, i++, Side.CLIENT);
+		NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPacket.class, i++, Side.SERVER);
 		
-		PacketSerializer.registerPacket(ClientKTRNGPacket.class);
-		PacketSerializer.registerPacket(ServerBoundQuitPacket.class);
+		NETWORK.registerMessage(TickSyncQuitPacketHandler.class, TickSyncQuitPacket.class, i++, Side.SERVER);
+		
+//		PacketSerializer.registerPacket(ClientTickSyncPacket.class);
+//		PacketSerializer.registerPacket(ServerTickSyncPacket.class);
+//		
+//		PacketSerializer.registerPacket(ClientKTRNGPacket.class);
+//		PacketSerializer.registerPacket(ServerBoundQuitPacket.class);
 	}
 
 	public void init(FMLInitializationEvent ev) {

@@ -5,7 +5,6 @@ import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.networking.packets.ClientKTRNGPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -105,7 +104,10 @@ public class KillTheRNGHandler{
 	 * Executed every tick on the server
 	 */
 	public void updateServer() {
-		TASmod.packetServer.sendPacket(new ClientKTRNGPacket(advanceGlobalSeedServer()));
+		if(isLoaded()) {
+//			TASmod.packetServer.sendPacket(new ClientKTRNGPacket(advanceGlobalSeedServer()));
+			KillTheRNG.NETWORK.sendToAll(new ChangeSeedPacket(advanceGlobalSeedServer()));
+		}
 	}
 	
 	//================================================= Seedsync

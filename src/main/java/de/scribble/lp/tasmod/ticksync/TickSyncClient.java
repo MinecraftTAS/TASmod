@@ -2,8 +2,7 @@ package de.scribble.lp.tasmod.ticksync;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import de.scribble.lp.tasmod.networking.Client;
-import de.scribble.lp.tasmod.networking.packets.ServerTickSyncPacket;
+import de.scribble.lp.tasmod.CommonProxy;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -35,9 +34,10 @@ public class TickSyncClient {
 	 * @param mc Instance of Minecraft
 	 */
 	public static void clientPostTick(Minecraft mc) {
-		if (mc.player == null)
-			return;
-		Client.sendPacket(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));
+//		if (mc.player == null)
+//			return;
+//		Client.sendPacket(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));
+		CommonProxy.NETWORK.sendToServer(new TickSyncPacket());
 	}
 
 }
