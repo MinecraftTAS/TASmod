@@ -4,9 +4,12 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -20,7 +23,7 @@ import net.minecraft.network.PacketBuffer;
  * @author Pancake, Scribble
  *
  */
-public class PacketServer {
+public class TASmodNetworkServer {
 	
 	private Logger logger;
 	
@@ -32,40 +35,46 @@ public class PacketServer {
 	
 	private int connections = 0;
 	
-	public PacketServer(Logger logger) throws IOException {
+	public TASmodNetworkServer(Logger logger) throws IOException {
 		this.logger = logger;
 		createServer(3111);
 	}
 	
-	public PacketServer(Logger logger, int port) throws IOException {
+	public TASmodNetworkServer(Logger logger, int port) throws IOException {
 		this.logger = logger;
 		createServer(port);
 	}
 	
 	private void createServer(int port) throws IOException {
-		serverSocket = new ServerSocket(port);
 		serverThread = new Thread(() -> {
 			
-			while (!serverSocket.isClosed()) {
-				Socket socket = null;
-				try {
+			try(ServerSocket serverS = new ServerSocket(port)){
+				this.serverSocket = serverS;
+				
+				while (!this.serverSocket.isClosed()) {
+					Socket socket = null;
+					
 					socket = serverSocket.accept();
 					socket.setTcpNoDelay(true);
-				} catch (IOException e) {
-					logger.error("Error creating socket");
-					e.printStackTrace();
-				} catch (Exception e) {
+						
+					connections++;
+					final LinkedBlockingQueue<Packet> queue = new LinkedBlockingQueue<>();
+					queues.add(queue);
+
+					new Handler(socket, queue);
 				}
-				connections++;
-				final LinkedBlockingQueue<Packet> queue = new LinkedBlockingQueue<>();
-				queues.add(queue);
-
-				new Handler(socket, queue);
-
+				
+			} catch (EOFException | SocketException | InterruptedIOException exception) {
+				logger.debug("Custom TASmod server was shutdown");
+				exception.printStackTrace();
+			} catch (Exception exception) {
+				logger.error("Custom TASmod server was unexpectedly shutdown {}", exception);
+				exception.printStackTrace();
 			}
 			
 		});
-		serverThread.setName("TASmod PacketServer");
+		serverThread.setName("TASmod Network Server Main");
+		serverThread.setDaemon(true);
 		serverThread.start();
 	}
 	
@@ -90,25 +99,25 @@ public class PacketServer {
 	
 	private class Handler {
 		
-		private SocketAcceptThread accept;
+		private SocketHandleAccept accept;
 		
-		private SocketSendThread send;
+		private SocketHandleSend send;
 		
 		public Handler(Socket socket, LinkedBlockingQueue<Packet> queue) {
-			this.accept = new SocketAcceptThread(socket);
-			this.send = new SocketSendThread(socket, queue);
+			this.accept = new SocketHandleAccept(socket);
+			this.send = new SocketHandleSend(socket, queue);
 			accept.start();
 			send.start();
 		}
 		
 	}
 	
-	private class SocketAcceptThread extends Thread{
+	private class SocketHandleAccept extends Thread{
 		
 		private Socket socket;
 		
-		public SocketAcceptThread(Socket socket) {
-			this.setName("ServerSocket Accept "+connections);
+		public SocketHandleAccept(Socket socket) {
+			this.setName(String.format("TASmod Network Server PacketAccept #%s", connections));
 			setDaemon(true);
 			this.socket = socket;
 		}
@@ -139,6 +148,7 @@ public class PacketServer {
 					logger.trace("Handled a " + packet.getClass().getSimpleName() + " from the socket.");
 				} catch (Exception e) {
 					logger.error(e.getMessage());
+					e.printStackTrace();
 					try {
 						socket.close();
 					} catch (IOException e1) {
@@ -151,14 +161,14 @@ public class PacketServer {
 		
 	}
 
-	private class SocketSendThread extends Thread{
+	private class SocketHandleSend extends Thread{
 		
 		private Socket socket;
 		
 		private BlockingQueue<Packet> packetQueue;
 		
-		public SocketSendThread(Socket socket, BlockingQueue<Packet> packetQueue) {
-			setName("ServerSocket Send "+ connections);
+		public SocketHandleSend(Socket socket, BlockingQueue<Packet> packetQueue) {
+			setName(String.format("TASmod Network Server PacketSend #%s", connections));
 			setDaemon(true);
 			this.socket = socket;
 			this.packetQueue = packetQueue;
@@ -184,6 +194,7 @@ public class PacketServer {
 					logger.trace("Sent a " + packet.getClass().getSimpleName() + " to the socket.");
 				}
 			} catch (Exception exception) {
+				exception.printStackTrace();
 				// This exception is already logged by the thread one layer above
 				// therefore nothing needs to be done here.
 			}

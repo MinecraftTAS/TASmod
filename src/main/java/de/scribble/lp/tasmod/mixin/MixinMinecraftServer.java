@@ -69,7 +69,7 @@ public abstract class MixinMinecraftServer {
 		
 		/*	The server should tick if:
 		 *	(shouldTick in ticksync is true OR there are no players connected to the custom server) AND the tickrate is not zero. That or advance tick is true*/
-		if( ((TickSyncServer.shouldTick.get() || ((MinecraftServer)(Object)this).getPlayerList().getCurrentPlayerCount()==0 /*|| TASmod.packetServer.getConnections() == 0*/) && TickrateChangerServer.ticksPerSecond != 0) || TickrateChangerServer.advanceTick) {
+		if( ((TickSyncServer.shouldTick.get() || TASmod.packetServer.getConnections() == 0) && TickrateChangerServer.ticksPerSecond != 0) || TickrateChangerServer.advanceTick) {
 			TickSyncServer.shouldTick.set(false);
 			long timeBeforeTick = System.currentTimeMillis();
 			

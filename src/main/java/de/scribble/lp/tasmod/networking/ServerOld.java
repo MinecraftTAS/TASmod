@@ -23,7 +23,7 @@ import scala.reflect.internal.Trees.If;
  * @author Pancake
  */
 @Deprecated
-public class Server {
+public class ServerOld {
 
 	/**
 	 * This is the thread that runs the server. It will exit once the server has disconnected.
@@ -51,11 +51,11 @@ public class Server {
 	 * @param packet Packet to send
 	 */
 	public static void sendPacket(Packet packet) {
-		if (Server.instance == null)
+		if (ServerOld.instance == null)
 			return;
-		if (!Server.instance.isAlive())
+		if (!ServerOld.instance.isAlive())
 			return;
-		Server.packetsToSend.forEach(queue -> queue.add(packet));
+		ServerOld.packetsToSend.forEach(queue -> queue.add(packet));
 	}
 
 	/**
@@ -69,26 +69,26 @@ public class Server {
 	 */
 	public static void createServer() throws ServerAlreadyRunningException, IOException {
 		TASmod.logger.info("Start creating a custom server");
-		boolean isRunning = Server.instance == null ? false : Server.instance.isAlive();
+		boolean isRunning = ServerOld.instance == null ? false : ServerOld.instance.isAlive();
 		// Cancel the currently running server
 		if (isRunning)
-			Server.serverSocket.close();
+			ServerOld.serverSocket.close();
 
 		// Clear the amount of connections
-		Server.connections = 0;
+		ServerOld.connections = 0;
 		// Clear the list of packets to send
-		Server.packetsToSend = new LinkedBlockingQueue<>();
+		ServerOld.packetsToSend = new LinkedBlockingQueue<>();
 		// Start a server
-		Server.instance = new Thread(() -> {
+		ServerOld.instance = new Thread(() -> {
 			try(ServerSocket serverSocket = new ServerSocket(3111)) {
-				Server.serverSocket = serverSocket;
+				ServerOld.serverSocket = serverSocket;
 				// Wait until new clients are there and then handle them.
 				while (true) {
 					Socket socket = serverSocket.accept();
 					final LinkedBlockingQueue<Packet> queue = new LinkedBlockingQueue<>();
-					Server.packetsToSend.add(queue);
+					ServerOld.packetsToSend.add(queue);
 					Thread handler = new Thread(() -> {
-						Server.connections++;
+						ServerOld.connections++;
 						TickSyncServer.shouldTick.set(true);
 						try {
 							CommonHandler.handleSocket(socket, queue); // this will create a new thread for outstream and use the current thread for instream
@@ -99,7 +99,7 @@ public class Server {
 							TASmod.logger.error("Custom TASmod client connection was unexpectedly shutdown {}", exception);
 						}
 						TickSyncServer.shouldTick.set(true);
-						Server.connections--;
+						ServerOld.connections--;
 					});
 					handler.setDaemon(true);
 					handler.start();
@@ -111,9 +111,9 @@ public class Server {
 				TASmod.logger.error("Custom TASmod server was unexpectedly shutdown {}", exception);
 			}
 		});
-		Server.instance.setName("TASmod Network Handler Server");
-		Server.instance.setDaemon(true); // If daemon is set, the jvm will quit without waiting for this thread to finish
-		Server.instance.start();
+		ServerOld.instance.setName("TASmod Network Handler Server");
+		ServerOld.instance.setDaemon(true); // If daemon is set, the jvm will quit without waiting for this thread to finish
+		ServerOld.instance.start();
 
 		// Make sure to throw an exception if the server was running
 		if (isRunning)
@@ -126,9 +126,9 @@ public class Server {
 	 */
 	public static void killServer() throws IOException {
 		TASmod.logger.info("Start killing custom server");
-		if (Server.instance != null)
-			Server.serverSocket.close();
-		Server.connections = 0;
+		if (ServerOld.instance != null)
+			ServerOld.serverSocket.close();
+		ServerOld.connections = 0;
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class Server {
 	 * @return Connection count
 	 */
 	public static int getConnectionCount() {
-		return Server.connections;
+		return ServerOld.connections;
 	}
 
 }

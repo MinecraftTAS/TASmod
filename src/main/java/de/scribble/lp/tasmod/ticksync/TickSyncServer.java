@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
 
 /**
  * This class manages tick sync
@@ -51,8 +51,7 @@ public class TickSyncServer {
 	 * to all clients making them tick
 	 */
 	public static void serverPostTick() {
-//		TASmod.packetServer.sendPacket(new ClientTickSyncPacket());
-		CommonProxy.NETWORK.sendToAll(new TickSyncPacket());
+		TASmod.packetServer.sendPacket(new ClientTickSyncPacket());
 	}
 
 	public static void clearList() {

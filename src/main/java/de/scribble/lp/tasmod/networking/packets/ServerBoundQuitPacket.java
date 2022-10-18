@@ -18,8 +18,6 @@ public class ServerBoundQuitPacket implements Packet {
 
 	@Override
 	public void deserialize(PacketBuffer buf) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

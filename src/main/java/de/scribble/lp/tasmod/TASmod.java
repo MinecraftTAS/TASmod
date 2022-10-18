@@ -18,6 +18,7 @@ import de.scribble.lp.tasmod.commands.savetas.CommandSaveTAS;
 import de.scribble.lp.tasmod.commands.tutorial.CommandPlaybacktutorial;
 import de.scribble.lp.tasmod.inputcontainer.server.ContainerStateServer;
 import de.scribble.lp.tasmod.ktrng.KillTheRNGHandler;
+import de.scribble.lp.tasmod.networking.TASmodNetworkServer;
 import de.scribble.lp.tasmod.savestates.server.SavestateCommand;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.files.SavestateTrackerFile;
@@ -63,7 +64,7 @@ public class TASmod {
 	
 	public static KillTheRNGHandler ktrngHandler;
 	
-//	public static PacketServer packetServer;
+	public static TASmodNetworkServer packetServer;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent ev) throws Exception {
@@ -132,17 +133,17 @@ public class TASmod {
 		
 		savestateHandler=new SavestateHandler(ev.getServer(), logger);
 		
-//		try {
-//			packetServer = new PacketServer(logger);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			packetServer = new TASmodNetworkServer(logger);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@EventHandler
 	public void serverStop(FMLServerStoppingEvent ev) {
 		serverInstance=null;
-//		packetServer.close();
+		packetServer.close();
 	}
 
 	public static TASmod getInstance() {
