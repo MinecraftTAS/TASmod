@@ -26,7 +26,6 @@ import de.scribble.lp.tasmod.networking.PacketSerializer;
 import de.scribble.lp.tasmod.networking.packets.ClientKTRNGPacket;
 import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
 import de.scribble.lp.tasmod.networking.packets.IdentificationPacket;
-import de.scribble.lp.tasmod.networking.packets.ServerBoundQuitPacket;
 import de.scribble.lp.tasmod.networking.packets.ServerTickSyncPacket;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket;
 import de.scribble.lp.tasmod.savestates.client.InputSavestatesPacket.InputSavestatesPacketHandler;
