@@ -12,7 +12,6 @@ import de.scribble.lp.tasmod.events.KeybindingEvents;
 import de.scribble.lp.tasmod.events.PlayerJoinLeaveEvents;
 import de.scribble.lp.tasmod.networking.TASmodNetworkClient;
 import de.scribble.lp.tasmod.shield.ShieldDownloader;
-import de.scribble.lp.tasmod.ticksync.TickSyncClient;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.util.TickScheduler;
 import de.scribble.lp.tasmod.virtual.VirtualInput;

@@ -1,35 +1,42 @@
 package de.scribble.lp.tasmod.networking.packets;
 
-import de.scribble.lp.tasmod.TASmod;
+import java.util.UUID;
+
 import de.scribble.lp.tasmod.networking.Packet;
 import de.scribble.lp.tasmod.networking.PacketSide;
+import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
-public class ClientKTRNGPacket implements Packet{
+public class IdentificationPacket implements Packet{
 
-	private long seed;
+	private UUID uuid;
 	
-	public ClientKTRNGPacket() {
+	public IdentificationPacket() {
+		
 	}
 	
-	public ClientKTRNGPacket(long seed) {
-		this.seed = seed;
+	public IdentificationPacket(UUID uuid) {
+		this.uuid = uuid;
 	}
-
+	
 	@Override
 	public void handle(PacketSide side, EntityPlayer player) {
-		TASmod.ktrngHandler.setGlobalSeedClient(seed);
+		TickSyncServer.clearList();
+		TickSyncServer.onPacket(this.uuid);
 	}
 
 	@Override
 	public void serialize(PacketBuffer buf) {
-		buf.writeLong(seed);
+		buf.writeUniqueId(uuid);
 	}
 
 	@Override
 	public void deserialize(PacketBuffer buf) {
-		seed = buf.readLong();
+		this.uuid=buf.readUniqueId();
 	}
 
+	public UUID getUuid() {
+		return uuid;
+	}
 }

@@ -37,7 +37,7 @@ public class TickSyncClient {
 	public static void clientPostTick(Minecraft mc) {
 		if (mc.player == null)
 			return;
-		ClientProxy.packetClient.sendPacket(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));
+		ClientProxy.packetClient.sendToServer(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));
 //		Client.sendPacket(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));
 	}
 

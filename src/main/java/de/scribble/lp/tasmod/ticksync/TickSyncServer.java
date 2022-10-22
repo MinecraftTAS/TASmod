@@ -51,10 +51,11 @@ public class TickSyncServer {
 	 * to all clients making them tick
 	 */
 	public static void serverPostTick() {
-		TASmod.packetServer.sendPacket(new ClientTickSyncPacket());
+		TASmod.packetServer.sendToAll(new ClientTickSyncPacket());
 	}
 
 	public static void clearList() {
 		synchronizedList.clear();
+		shouldTick.set(true);
 	}
 }

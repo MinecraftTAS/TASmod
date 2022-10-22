@@ -10,12 +10,20 @@ import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.logging.log4j.Logger;
 
+import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.networking.packets.IdentificationPacket;
+import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import io.netty.buffer.Unpooled;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 
 /**
@@ -31,13 +39,16 @@ public class TASmodNetworkServer {
 	
 	private ServerSocket serverSocket;
 	
-	private LinkedBlockingQueue<BlockingQueue<Packet>> queues = new LinkedBlockingQueue<>();
+//	private LinkedBlockingQueue<BlockingQueue<Packet>> queues = new LinkedBlockingQueue<>();
+	
+	private Map<Socket, UUID> connectedPlayers = Collections.synchronizedMap(new HashMap<Socket, UUID>());
+	
+	private Map<UUID, BlockingQueue<Packet>> queues = Collections.synchronizedMap(new HashMap<>());
 	
 	private int connections = 0;
 	
 	public TASmodNetworkServer(Logger logger) throws IOException {
-		this.logger = logger;
-		createServer(3111);
+		this(logger, 3111);
 	}
 	
 	public TASmodNetworkServer(Logger logger, int port) throws IOException {
@@ -56,17 +67,16 @@ public class TASmodNetworkServer {
 					
 					socket = serverSocket.accept();
 					socket.setTcpNoDelay(true);
-						
-					connections++;
+					
 					final LinkedBlockingQueue<Packet> queue = new LinkedBlockingQueue<>();
-					queues.add(queue);
 
-					new Handler(socket, queue);
+					connections++;
+					createSendThread(socket, queue);
+					createAcceptThread(socket, queue);
 				}
 				
 			} catch (EOFException | SocketException | InterruptedIOException exception) {
 				logger.debug("Custom TASmod server was shutdown");
-				exception.printStackTrace();
 			} catch (Exception exception) {
 				logger.error("Custom TASmod server was unexpectedly shutdown {}", exception);
 				exception.printStackTrace();
@@ -78,58 +88,47 @@ public class TASmodNetworkServer {
 		serverThread.start();
 	}
 	
-	public void sendPacket(Packet packet) {
-		if(serverThread.isAlive()) {
-			queues.forEach(queue -> queue.add(packet));
-		}
+	private void createSendThread(Socket socket, LinkedBlockingQueue<Packet> packetQueue) throws IOException, InterruptedException {
+		Thread sendThread = new Thread(()->{
+			DataOutputStream outputStream;
+			try {
+				outputStream = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+			Packet packet;
+			while (!socket.isClosed()) {
+				try {
+				// Try to poll another packet that wants to be sent
+				packet = packetQueue.poll();
+				if (packet == null) {
+					Thread.sleep(1); // If nothing has to be done, let the cpu rest by waiting
+					continue;
+				}
+				// A packet was found: Serialize then send it.
+				byte[] packetData = PacketSerializer.serialize(packet).array();
+				outputStream.writeInt(packetData.length);
+				outputStream.write(packetData);
+				outputStream.flush();
+				logger.trace("Sent a " + packet.getClass().getSimpleName() + " to the socket.");
+				} catch(Exception e) {
+					logger.catching(e);
+				}
+			}
+		});
+		sendThread.setDaemon(true);
+		sendThread.setName("TASmod Network Server Send #"+connections);
+		sendThread.start();
 	}
 	
-	public int getConnections() {
-		return connections;
-	}
-	
-	public void close() {
-		try {
-			serverSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		connections = 0;
-	}
-	
-	private class Handler {
-		
-		private SocketHandleAccept accept;
-		
-		private SocketHandleSend send;
-		
-		public Handler(Socket socket, LinkedBlockingQueue<Packet> queue) {
-			this.accept = new SocketHandleAccept(socket);
-			this.send = new SocketHandleSend(socket, queue);
-			accept.start();
-			send.start();
-		}
-		
-	}
-	
-	private class SocketHandleAccept extends Thread{
-		
-		private Socket socket;
-		
-		public SocketHandleAccept(Socket socket) {
-			this.setName(String.format("TASmod Network Server PacketAccept #%s", connections));
-			setDaemon(true);
-			this.socket = socket;
-		}
-		
-		@Override
-		public void run() {
-			
+	private void createAcceptThread(Socket socket, LinkedBlockingQueue<Packet> packetQueue) throws IOException {
+		Thread acceptThread = new Thread(()->{
 			DataInputStream inputStream;
-			
 			try {
 				inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-			} catch (Exception e2) {
+			} catch (IOException e2) {
+				e2.printStackTrace();
 				return;
 			}
 			Packet packet;
@@ -144,8 +143,26 @@ public class TASmodNetworkServer {
 					PacketBuffer packetBuf = new PacketBuffer(Unpooled.wrappedBuffer(packetData));
 					// Deserialize and run the packet
 					packet = PacketSerializer.deserialize(packetBuf);
-					packet.handle();
-					logger.trace("Handled a " + packet.getClass().getSimpleName() + " from the socket.");
+					
+					if(packet instanceof IdentificationPacket) {
+						handleIdentificationPacket(packet, socket, packetQueue);
+					}
+					
+					if(connectedPlayers.containsKey(socket)) {
+						UUID id = connectedPlayers.get(socket);
+						EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUUID(id);
+						
+						packet.handle(PacketSide.SERVER, player);
+						logger.trace("Handled a " + packet.getClass().getSimpleName() + " from the socket.");
+					}
+				}catch (EOFException e){
+					logger.info("Client socket was shut down");
+					TickSyncServer.clearList();
+					try {
+						socket.close();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 					e.printStackTrace();
@@ -156,48 +173,68 @@ public class TASmodNetworkServer {
 					}
 				}
 			}
+			UUID id = connectedPlayers.get(socket);
+			connectedPlayers.remove(socket);
+			queues.remove(id);
 			connections--;
+		});
+		acceptThread.setDaemon(true);
+		acceptThread.setName("TASmod Network Server Accept #"+connections);
+		acceptThread.start();
+	}
+	
+	private void handleIdentificationPacket(Packet packet, Socket socket, LinkedBlockingQueue<Packet> packetQueue) {
+		if(!connectedPlayers.containsKey(socket)) {
+			IdentificationPacket idPacket = (IdentificationPacket) packet;
+			logger.info("Identified player with uuid: {}", idPacket.getUuid());
+			connectedPlayers.put(socket, idPacket.getUuid());
+			queues.put(idPacket.getUuid(), packetQueue);
 		}
-		
 	}
 
-	private class SocketHandleSend extends Thread{
-		
-		private Socket socket;
-		
-		private BlockingQueue<Packet> packetQueue;
-		
-		public SocketHandleSend(Socket socket, BlockingQueue<Packet> packetQueue) {
-			setName(String.format("TASmod Network Server PacketSend #%s", connections));
-			setDaemon(true);
-			this.socket = socket;
-			this.packetQueue = packetQueue;
+	public void sendToAll(Packet packet) {
+		if(serverThread.isAlive()) {
+			queues.forEach((id, queue) -> queue.add(packet));
 		}
-		
-		@Override
-		public void run() {
-			try {
-				DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-				Packet packet;
-				while (!socket.isClosed()) {
-					// Try to poll another packet that wants to be sent
-					packet = packetQueue.poll();
-					if (packet == null) {
-						Thread.sleep(1); // If nothing has to be done, let the cpu rest by waiting
-						continue;
+	}
+	
+	public void sendTo(Packet packet, EntityPlayerMP... players) {
+		if(serverThread.isAlive()) {
+			queues.forEach((id, queue) -> {
+				for(EntityPlayerMP player : players) {
+					if(player.getUniqueID().equals(id)) {
+						queue.add(packet);
 					}
-					// A packet was found: Serialize then send it.
-					byte[] packetData = PacketSerializer.serialize(packet).array();
-					outputStream.writeInt(packetData.length);
-					outputStream.write(packetData);
-					outputStream.flush();
-					logger.trace("Sent a " + packet.getClass().getSimpleName() + " to the socket.");
 				}
-			} catch (Exception exception) {
-				exception.printStackTrace();
-				// This exception is already logged by the thread one layer above
-				// therefore nothing needs to be done here.
-			}
+				
+			});
 		}
+	}
+	
+	public void sendTo(Packet packet, UUID... uuids) {
+		if(serverThread.isAlive()) {
+			queues.forEach((id, queue) -> {
+				for(UUID idToSend : uuids) {
+					if(idToSend.equals(id)) {
+						queue.add(packet);
+					}
+				}
+			});
+		}
+	}
+	
+	public int getConnections() {
+		return connections;
+	}
+	
+	public void close() {
+		if(serverSocket==null)
+			return;
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		connections = 0;
 	}
 }

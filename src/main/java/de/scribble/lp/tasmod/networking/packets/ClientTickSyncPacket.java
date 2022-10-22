@@ -2,7 +2,9 @@ package de.scribble.lp.tasmod.networking.packets;
 
 
 import de.scribble.lp.tasmod.networking.Packet;
+import de.scribble.lp.tasmod.networking.PacketSide;
 import de.scribble.lp.tasmod.ticksync.TickSyncClient;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
 public class ClientTickSyncPacket implements Packet {
@@ -11,13 +13,12 @@ public class ClientTickSyncPacket implements Packet {
 	}
 	
 	@Override
-	public void handle() {
+	public void handle(PacketSide side, EntityPlayer player) {
 		TickSyncClient.onPacket();
 	}
 
 	@Override
-	public PacketBuffer serialize(PacketBuffer buf) {
-		return buf;
+	public void serialize(PacketBuffer buf) {
 	}
 
 	@Override

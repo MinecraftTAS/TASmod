@@ -3,7 +3,9 @@ package de.scribble.lp.tasmod.networking.packets;
 import java.util.UUID;
 
 import de.scribble.lp.tasmod.networking.Packet;
+import de.scribble.lp.tasmod.networking.PacketSide;
 import de.scribble.lp.tasmod.ticksync.TickSyncServer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
 public class ServerTickSyncPacket implements Packet {
@@ -19,14 +21,13 @@ public class ServerTickSyncPacket implements Packet {
 	}
 
 	@Override
-	public void handle() {
+	public void handle(PacketSide side, EntityPlayer player) {
 		TickSyncServer.onPacket(this.uuid);
 	}
 
 	@Override
-	public PacketBuffer serialize(PacketBuffer buf) {
+	public void serialize(PacketBuffer buf) {
 		buf.writeUniqueId(uuid);
-		return buf;
 	}
 
 	@Override
