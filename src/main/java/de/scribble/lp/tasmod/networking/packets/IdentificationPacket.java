@@ -22,7 +22,6 @@ public class IdentificationPacket implements Packet{
 	
 	@Override
 	public void handle(PacketSide side, EntityPlayer player) {
-		TickSyncServer.clearList();
 		TickSyncServer.onPacket(this.uuid);
 	}
 

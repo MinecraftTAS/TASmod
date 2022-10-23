@@ -1,13 +1,16 @@
 package de.scribble.lp.tasmod.events;
 
 
+import java.io.IOException;
+
 import com.mojang.authlib.GameProfile;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.networking.TASmodNetworkClient;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
-import de.scribble.lp.tasmod.ticksync.TickSyncServer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -47,6 +50,13 @@ public class PlayerJoinLeaveEvents {
 		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
 		TickrateChangerClient.joinServer();
 		ClientProxy.virtual.getContainer().printCredits();
+		
+		Minecraft mc = Minecraft.getMinecraft();
+		
+		if(mc.isIntegratedServerRunning())
+			ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger);
+		else
+			ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger, mc.getCurrentServerData().serverIP, 3111);
 	}
 	
 	/**
@@ -56,6 +66,14 @@ public class PlayerJoinLeaveEvents {
 	@SideOnly(Side.CLIENT)
 	public static void firePlayerLeaveClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
 		TASmod.logger.info("Firing logout events for {} on the CLIENT", player.getName());
+		try {
+			if(ClientProxy.packetClient!=null) {
+				ClientProxy.packetClient.killClient();
+				ClientProxy.packetClient=null;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

@@ -22,6 +22,8 @@ import de.scribble.lp.tasmod.inputcontainer.server.RequestStatePacket;
 import de.scribble.lp.tasmod.inputcontainer.server.RequestStatePacket.RequestStatePacketHandler;
 import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket;
 import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket.SyncStatePacketHandler;
+import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket;
+import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket.KTRNGStartSeedPacketHandler;
 import de.scribble.lp.tasmod.networking.PacketSerializer;
 import de.scribble.lp.tasmod.networking.packets.ClientKTRNGPacket;
 import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
@@ -117,6 +119,8 @@ public class CommonProxy {
 		NETWORK.registerMessage(FullPlayPacketHandler.class, FullPlayPacket.class, i++, Side.CLIENT);
 		// RestartAndPlay
 		NETWORK.registerMessage(RestartAndPlayPacketHandler.class, RestartAndPlayPacket.class, i++, Side.CLIENT);
+		
+		NETWORK.registerMessage(KTRNGStartSeedPacketHandler.class, KTRNGStartSeedPacket.class, i++, Side.CLIENT);
 		
 
 		

@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.networking.packets.IdentificationPacket;
-import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -38,8 +37,6 @@ public class TASmodNetworkServer {
 	private Thread serverThread;
 	
 	private ServerSocket serverSocket;
-	
-//	private LinkedBlockingQueue<BlockingQueue<Packet>> queues = new LinkedBlockingQueue<>();
 	
 	private Map<Socket, UUID> connectedPlayers = Collections.synchronizedMap(new HashMap<Socket, UUID>());
 	
@@ -157,7 +154,6 @@ public class TASmodNetworkServer {
 					}
 				}catch (EOFException e){
 					logger.info("Client socket was shut down");
-					TickSyncServer.clearList();
 					try {
 						socket.close();
 					} catch (IOException e1) {

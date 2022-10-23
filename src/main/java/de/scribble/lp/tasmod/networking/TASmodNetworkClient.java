@@ -15,7 +15,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.logging.log4j.Logger;
 
-import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.networking.packets.IdentificationPacket;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -33,11 +32,11 @@ public class TASmodNetworkClient {
 	
 	public TASmodNetworkClient(Logger logger) {
 		this(logger, "127.0.0.1", 3111); // Set ip for different server
-		this.logger = logger;
 	}
 	
 	public TASmodNetworkClient(Logger logger, String serverIP, int port) {
 		this.logger = logger;
+		this.logger.info("Trying to connect to {}:{}", serverIP, port);
 		createClient(serverIP, port);
 	}
 	
@@ -50,11 +49,9 @@ public class TASmodNetworkClient {
 	}
 	
 	private void createClient(String serverIp, int port) {
-		logger.info("Creating client connection");
 		
 		clientThread = new Thread(() -> {
 			try(Socket cSocket = new Socket()){
-				Thread.sleep(2000);
 				cSocket.connect(new InetSocketAddress(serverIp, port));
 				this.clientSocket = cSocket;
 				
@@ -77,14 +74,14 @@ public class TASmodNetworkClient {
 					// Deserialize and run the packet
 					packet = PacketSerializer.deserialize(packetBuf);
 					packet.handle(PacketSide.CLIENT, Minecraft.getMinecraft().player);
-					TASmod.logger.trace("Handled a " + packet.getClass().getSimpleName() + " from the socket.");
+					logger.trace("Handled a " + packet.getClass().getSimpleName() + " from the socket.");
 				}
 				
 			} catch (EOFException | SocketException | InterruptedIOException exception) {
 				// The custom TASmod client was closed and the end of stream was reached. The socket was shut down properly.
-				TASmod.logger.info("Custom TASmod client was shutdown");
+				logger.info("Custom TASmod client was shutdown");
 			} catch (Exception exception) {
-				TASmod.logger.error("Custom TASmod client was unexpectedly shutdown {}", exception);
+				logger.error("Custom TASmod client was unexpectedly shutdown {}", exception);
 				exception.printStackTrace();
 			}
 		});
@@ -111,7 +108,7 @@ public class TASmodNetworkClient {
 					outputStream.writeInt(packetData.length);
 					outputStream.write(packetData);
 					outputStream.flush();
-					TASmod.logger.trace("Sent a " + packet.getClass().getSimpleName() + " to the socket.");
+					logger.trace("Sent a " + packet.getClass().getSimpleName() + " to the socket.");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

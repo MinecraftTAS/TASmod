@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
@@ -21,11 +20,6 @@ public class TickSyncServer {
 	private static List<UUID> synchronizedList = Collections.synchronizedList(new ArrayList<>());
 
 	/**
-	 * A multithreadable boolean that tells the MixinMinecraftServer to tick the server or not.
-	 */
-	public static AtomicBoolean shouldTick = new AtomicBoolean(true);
-
-	/**
 	 * Handles incoming tick packets from the client to the server
 	 * This will put the uuid into a list of ticked clients and once every client
 	 * is in that list, tick the server.
@@ -37,15 +31,24 @@ public class TickSyncServer {
 		synchronized (synchronizedList) {
 			if(!synchronizedList.contains(uuid)) {
 				synchronizedList.add(uuid);
-				
-				if(synchronizedList.size() == TASmod.getServerInstance().getCurrentPlayerCount()) {
-					shouldTick.set(true);
-					synchronizedList.clear();
-				}
 			}
 		}
 	}
 
+	public static boolean shouldTick() {
+		synchronized (synchronizedList) {
+			int acknowledged = synchronizedList.size();
+			int totalConnections = TASmod.packetServer.getConnections();
+			if(acknowledged >= totalConnections) {
+				if(acknowledged>0)
+					synchronizedList.clear();
+				return true;
+			}else {
+				return false;
+			}
+		}
+	}
+	
 	/**
 	 * Called after a server tick. This will send a packet
 	 * to all clients making them tick
@@ -56,6 +59,5 @@ public class TickSyncServer {
 
 	public static void clearList() {
 		synchronizedList.clear();
-		shouldTick.set(true);
 	}
 }
