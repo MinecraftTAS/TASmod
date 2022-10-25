@@ -3,9 +3,7 @@ package de.scribble.lp.tasmod.ktrng;
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
-import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.networking.packets.ClientKTRNGPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -106,7 +104,7 @@ public class KillTheRNGHandler{
 	 */
 	public void updateServer() {
 		if(isLoaded()) {
-			TASmod.packetServer.sendToAll(new ClientKTRNGPacket(advanceGlobalSeedServer()));
+			TASmod.packetServer.sendToAll(new KTRNGSeedPacket(advanceGlobalSeedServer()));
 		}
 	}
 	
@@ -115,7 +113,7 @@ public class KillTheRNGHandler{
 	public void broadcastStartSeed() {
 		if(isLoaded()) {
 			long seed = getGlobalSeedServer();
-			CommonProxy.NETWORK.sendToAll(new KTRNGStartSeedPacket(seed));
+			TASmod.packetServer.sendToAll(new KTRNGStartSeedPacket(seed));
 		}
 	}
 

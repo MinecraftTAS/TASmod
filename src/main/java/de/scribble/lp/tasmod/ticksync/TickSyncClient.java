@@ -3,7 +3,6 @@ package de.scribble.lp.tasmod.ticksync;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.networking.packets.ServerTickSyncPacket;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -37,7 +36,7 @@ public class TickSyncClient {
 	public static void clientPostTick(Minecraft mc) {
 		if (mc.player == null)
 			return;
-		ClientProxy.packetClient.sendToServer(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));
+		ClientProxy.packetClient.sendToServer(new TickSyncPacket(mc.player.getGameProfile().getId()));
 //		Client.sendPacket(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));
 	}
 

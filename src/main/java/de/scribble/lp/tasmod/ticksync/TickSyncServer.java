@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import de.scribble.lp.tasmod.TASmod;
-import de.scribble.lp.tasmod.networking.packets.ClientTickSyncPacket;
 
 /**
  * This class manages tick sync
@@ -54,7 +53,7 @@ public class TickSyncServer {
 	 * to all clients making them tick
 	 */
 	public static void serverPostTick() {
-		TASmod.packetServer.sendToAll(new ClientTickSyncPacket());
+		TASmod.packetServer.sendToAll(new TickSyncPacket());
 	}
 
 	public static void clearList() {

@@ -1,17 +1,17 @@
 package de.scribble.lp.tasmod.ktrng;
 
 import de.scribble.lp.tasmod.ClientProxy;
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import de.scribble.lp.tasmod.networking.Packet;
+import de.scribble.lp.tasmod.networking.PacketSide;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 
-public class KTRNGStartSeedPacket implements IMessage{
+public class KTRNGStartSeedPacket implements Packet{
 
 	private long seed;
 	
 	/**
-	 * Only used by forge, do not use!
+	 * Do not use!
 	 */
 	@Deprecated
 	public KTRNGStartSeedPacket() {
@@ -26,23 +26,19 @@ public class KTRNGStartSeedPacket implements IMessage{
 	}
 	
 	@Override
-	public void fromBytes(ByteBuf buf) {
-		seed = buf.readLong();
+	public void handle(PacketSide side, EntityPlayer player) {
+		if(side.isClient()) {
+			ClientProxy.virtual.getContainer().setStartSeed(seed);
+		}
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf) {
+	public void serialize(PacketBuffer buf) {
 		buf.writeLong(seed);
 	}
 
-	public static class KTRNGStartSeedPacketHandler implements IMessageHandler<KTRNGStartSeedPacket, IMessage> {
-
-		@Override
-		public IMessage onMessage(KTRNGStartSeedPacket message, MessageContext ctx) {
-			if(ctx.side.isClient()){
-				ClientProxy.virtual.getContainer().setStartSeed(message.seed);
-			}
-			return null;
-		}
+	@Override
+	public void deserialize(PacketBuffer buf) {
+		seed = buf.readLong();
 	}
 }
