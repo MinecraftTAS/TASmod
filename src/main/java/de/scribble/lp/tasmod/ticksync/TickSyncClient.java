@@ -37,7 +37,6 @@ public class TickSyncClient {
 		if (mc.player == null)
 			return;
 		ClientProxy.packetClient.sendToServer(new TickSyncPacket(mc.player.getGameProfile().getId()));
-//		Client.sendPacket(new ServerTickSyncPacket(mc.player.getGameProfile().getId()));
 	}
-
+	
 }

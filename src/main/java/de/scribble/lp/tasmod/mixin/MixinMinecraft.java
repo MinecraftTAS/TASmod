@@ -16,8 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.duck.GuiScreenDuck;
 import de.scribble.lp.tasmod.duck.SubtickDuck;
-import de.scribble.lp.tasmod.events.KeybindingEvents;
 import de.scribble.lp.tasmod.events.LoadWorldEvents;
+import de.scribble.lp.tasmod.events.TickEvents;
 import de.scribble.lp.tasmod.externalGui.InputContainerView;
 import de.scribble.lp.tasmod.savestates.server.SavestateHandler;
 import de.scribble.lp.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
@@ -40,7 +40,7 @@ public abstract class MixinMinecraft {
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void injectRunGameLoop(CallbackInfo ci) {
 		
-		KeybindingEvents.fireKeybindingsEvent();
+		TickEvents.onRender();
 		
 		LoadWorldEvents.doneWithLoadingScreen();
 		

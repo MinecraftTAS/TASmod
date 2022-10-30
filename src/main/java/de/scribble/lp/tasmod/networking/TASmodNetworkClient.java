@@ -127,4 +127,8 @@ public class TASmodNetworkClient {
 		}
 	}
 	
+	public boolean isClosed() {
+		return clientSocket.isClosed();
+	}
+	
 }
