@@ -19,7 +19,11 @@ public class KTRNGSeedPacket implements Packet{
 
 	@Override
 	public void handle(PacketSide side, EntityPlayer player) {
-		TASmod.ktrngHandler.setGlobalSeedClient(seed);
+		if(side.isClient()) {
+			TASmod.ktrngHandler.setGlobalSeedClient(seed);
+		}else {
+			TASmod.ktrngHandler.setGlobalSeedServer(seed);
+		}
 	}
 
 	@Override
