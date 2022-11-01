@@ -114,6 +114,16 @@ public abstract class MixinMinecraftServer {
 				e.printStackTrace();
 			}
 		}
+		
+		synchronized (this.futureTaskQueue) {
+			while (!this.futureTaskQueue.isEmpty()) {
+				try {
+					((FutureTask<?>) this.futureTaskQueue.poll()).run();
+				} catch (Throwable var9) {
+					var9.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@SideOnly(Side.SERVER)

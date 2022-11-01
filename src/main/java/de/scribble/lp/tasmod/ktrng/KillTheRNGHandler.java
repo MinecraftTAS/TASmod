@@ -3,7 +3,9 @@ package de.scribble.lp.tasmod.ktrng;
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -30,7 +32,7 @@ public class KillTheRNGHandler{
 			KillTheRNG.isLibrary=true;
 			KillTheRNG.mode=SeedingModes.TickChange;
 			
-//			KillTheRNG.annotations.register(new KTRNGMonitor());
+			KillTheRNG.annotations.register(new KTRNGMonitor());
 		}else {
 			TASmod.logger.info("KillTheRNG doesn't appear to be loaded");
 		}
@@ -87,7 +89,10 @@ public class KillTheRNGHandler{
 	@SideOnly(Side.CLIENT)
 	public void setGlobalSeedServer(long seedIn) {
 		if(isLoaded()) {
-			KillTheRNG.NETWORK.sendToServer(new ChangeSeedPacket(seedIn));
+			if(Minecraft.getMinecraft().getConnection()!=null)
+				KillTheRNG.NETWORK.sendToServer(new ChangeSeedPacket(seedIn));
+			else
+				setGlobalSeedClient(seedIn);
 		}
 	}
 	//=================================================TASmod integration
@@ -115,6 +120,11 @@ public class KillTheRNGHandler{
 			long seed = getGlobalSeedServer();
 			TASmod.packetServer.sendToAll(new KTRNGStartSeedPacket(seed));
 		}
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public void setInitialSeed() {
+		ClientProxy.packetClient.sendToServer(new KTRNGSeedPacket(getGlobalSeedClient()));	// TODO Every new player in multiplayer will currently send the initial seed, which is BAD
 	}
 
 }

@@ -39,8 +39,6 @@ public class TickSyncServer {
 			int acknowledged = synchronizedList.size();
 			int totalConnections = TASmod.packetServer.getConnections();
 			if(acknowledged >= totalConnections) {
-				if(acknowledged>0)
-					synchronizedList.clear();
 				return true;
 			}else {
 				return false;
@@ -54,6 +52,8 @@ public class TickSyncServer {
 	 */
 	public static void serverPostTick() {
 		TASmod.packetServer.sendToAll(new TickSyncPacket());
+		if(synchronizedList.size()>0)
+			synchronizedList.clear();
 	}
 
 	public static void clearList() {

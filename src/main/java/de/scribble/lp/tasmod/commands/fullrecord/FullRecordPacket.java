@@ -5,6 +5,7 @@ import de.scribble.lp.tasmod.events.OpenGuiEvents;
 import de.scribble.lp.tasmod.inputcontainer.TASstate;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -45,9 +46,11 @@ public class FullRecordPacket implements IMessage {
 		private void workaround(Minecraft mc) {
 			OpenGuiEvents.stateWhenOpened = TASstate.RECORDING;
 			ClientProxy.virtual.getContainer().clear();
-			mc.world.sendQuittingDisconnectingPacket();
-			mc.loadWorld((WorldClient) null);
-			mc.displayGuiScreen(new net.minecraft.client.gui.GuiMainMenu());
+			ClientProxy.tickSchedulerClient.add(()->{
+				mc.world.sendQuittingDisconnectingPacket();
+				mc.loadWorld((WorldClient) null);
+				mc.displayGuiScreen(new GuiMainMenu());
+			});
 		}
 	}
 }
