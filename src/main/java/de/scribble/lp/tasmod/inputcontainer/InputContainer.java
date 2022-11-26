@@ -15,6 +15,7 @@ import de.pfannekuchen.tasmod.controlbytes.ControlByteHandler;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.CommonProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.inputcontainer.server.ContainerStateClient;
 import de.scribble.lp.tasmod.monitoring.DesyncMonitoring;
 import de.scribble.lp.tasmod.util.ContainerSerialiser;
 import de.scribble.lp.tasmod.virtual.VirtualInput;
@@ -378,7 +379,7 @@ public class InputContainer {
 		/*Stop condition*/
 		if (index >= inputs.size()) {
 			unpressContainer();
-			TASstate.setOrSend(TASstate.NONE);
+			ContainerStateClient.setOrSend(TASstate.NONE);
 		}
 		/*Continue condition*/
 		else {

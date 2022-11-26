@@ -21,21 +21,28 @@ import net.minecraft.server.MinecraftServer;
  *
  */
 public class ContainerStateServer {
+	
 	private TASstate state;
 
-	private boolean shouldChange;
+	private boolean shouldChange = true;
 
 	public ContainerStateServer() {
 		state = TASstate.NONE;
-		shouldChange = false;
+		shouldChange = true;
 	}
 
-	public void joinServer(EntityPlayerMP player) {
-		if (!shouldChange) {
-			shouldChange = true;
-			CommonProxy.NETWORK.sendTo(new RequestStatePacket(), player); //TODO Rewrite it, so the client sends the state packet on server join. The server should decide whether the packet should change the state or not.
-		} else {
-			CommonProxy.NETWORK.sendTo(new SyncStatePacket(state, false), player);
+	public void onInitialPacket(EntityPlayerMP player, TASstate tasState) {
+		if(player.canUseCommand(2, "") && shouldChange) {
+			setState(tasState);
+			shouldChange = false;
+		}else {
+			TASmod.packetServer.sendTo(new SyncStatePacket(tasState), player);
+		}
+	}
+	
+	public void onPacket(EntityPlayerMP player, TASstate tasState) {
+		if(player.canUseCommand(2, "")) {
+			setState(tasState);
 		}
 	}
 
@@ -44,14 +51,14 @@ public class ContainerStateServer {
 		if (server != null) {
 			if (server.getPlayerList().getPlayers().size() == 1) {
 				state = TASstate.NONE;
-				shouldChange = false;
+				shouldChange = true;
 			}
 		}
 	}
 
 	public void setState(TASstate stateIn) {
 		setServerState(stateIn);
-		CommonProxy.NETWORK.sendToAll(new SyncStatePacket(state));
+		TASmod.packetServer.sendToAll(new SyncStatePacket(state, true));
 		
 		if(state == TASstate.RECORDING) { // Set the start seed of the recording
 			CommonProxy.tickSchedulerServer.add(() ->{
@@ -80,8 +87,6 @@ public class ContainerStateServer {
 		setState(state == TASstate.PLAYBACK ? TASstate.NONE : TASstate.PLAYBACK);
 	}
 	
-
-
 	public TASstate getState() {
 		return state;
 	}

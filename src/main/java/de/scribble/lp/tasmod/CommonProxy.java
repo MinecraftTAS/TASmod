@@ -18,10 +18,8 @@ import de.scribble.lp.tasmod.commands.restartandplay.RestartAndPlayPacket.Restar
 import de.scribble.lp.tasmod.commands.savetas.SaveTASPacket;
 import de.scribble.lp.tasmod.commands.savetas.SaveTASPacket.SaveTASPacketHandler;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
-import de.scribble.lp.tasmod.inputcontainer.server.RequestStatePacket;
-import de.scribble.lp.tasmod.inputcontainer.server.RequestStatePacket.RequestStatePacketHandler;
+import de.scribble.lp.tasmod.inputcontainer.server.InitialSyncStatePacket;
 import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket;
-import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket.SyncStatePacketHandler;
 import de.scribble.lp.tasmod.ktrng.KTRNGSeedPacket;
 import de.scribble.lp.tasmod.ktrng.KTRNGStartSeedPacket;
 import de.scribble.lp.tasmod.networking.PacketSerializer;
@@ -77,12 +75,6 @@ public class CommonProxy {
 		NETWORK.registerMessage(PauseTickratePacketHandler.class, PauseTickratePacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(PauseTickratePacketHandler.class, PauseTickratePacket.class, i++, Side.CLIENT);
 
-		// Sync State
-		NETWORK.registerMessage(RequestStatePacketHandler.class, RequestStatePacket.class, i++, Side.CLIENT);
-
-		NETWORK.registerMessage(SyncStatePacketHandler.class, SyncStatePacket.class, i++, Side.CLIENT);
-		NETWORK.registerMessage(SyncStatePacketHandler.class, SyncStatePacket.class, i++, Side.SERVER);
-
 		// Trigger savestates/loadstates on the client
 		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.CLIENT);
@@ -125,6 +117,8 @@ public class CommonProxy {
 		PacketSerializer.registerPacket(KTRNGSeedPacket.class);
 		PacketSerializer.registerPacket(KTRNGStartSeedPacket.class);
 		
+		PacketSerializer.registerPacket(SyncStatePacket.class);
+		PacketSerializer.registerPacket(InitialSyncStatePacket.class);
 	}
 
 	public void init(FMLInitializationEvent ev) {

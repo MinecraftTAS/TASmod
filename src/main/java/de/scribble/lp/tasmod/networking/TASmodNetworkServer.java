@@ -185,6 +185,7 @@ public class TASmodNetworkServer {
 			logger.info("Identified player with uuid: {}", idPacket.getUuid());
 			connectedPlayers.put(socket, idPacket.getUuid());
 			queues.put(idPacket.getUuid(), packetQueue);
+			sendTo(new IdentificationPacket(), idPacket.getUuid());
 		}
 	}
 

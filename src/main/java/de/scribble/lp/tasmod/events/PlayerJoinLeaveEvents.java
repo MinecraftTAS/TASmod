@@ -7,6 +7,7 @@ import com.mojang.authlib.GameProfile;
 
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
+import de.scribble.lp.tasmod.inputcontainer.server.InitialSyncStatePacket;
 import de.scribble.lp.tasmod.networking.TASmodNetworkClient;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerServer;
@@ -26,7 +27,6 @@ public class PlayerJoinLeaveEvents {
 	 */
 	public static void firePlayerJoinedServerSide(EntityPlayerMP player) {
 		TASmod.logger.info("Firing login events for {} on the SERVER", player.getName());
-		TASmod.containerStateServer.joinServer(player);
 		TickrateChangerServer.joinServer(player);
 	}
 	
@@ -37,6 +37,7 @@ public class PlayerJoinLeaveEvents {
 	 */
 	public static void firePlayerLeaveServerSide(EntityPlayerMP player) {
 //		TASmod.logger.info("Firing logout events for {} on the SERVER", player.getName());
+		TASmod.containerStateServer.leaveServer(player);
 	}
 
 	/**
@@ -57,6 +58,8 @@ public class PlayerJoinLeaveEvents {
 			ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger);
 		else
 			ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger, mc.getCurrentServerData().serverIP, 3111);
+		
+		ClientProxy.packetClient.sendToServer(new InitialSyncStatePacket(ClientProxy.virtual.getContainer().getState()));
 	}
 	
 	/**

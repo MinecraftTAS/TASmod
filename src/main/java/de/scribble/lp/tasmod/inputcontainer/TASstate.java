@@ -1,10 +1,5 @@
 package de.scribble.lp.tasmod.inputcontainer;
 
-import de.scribble.lp.tasmod.ClientProxy;
-import de.scribble.lp.tasmod.CommonProxy;
-import de.scribble.lp.tasmod.inputcontainer.server.SyncStatePacket;
-import net.minecraft.client.Minecraft;
-
 /**
  * State of the input recorder
  * @author ScribbleLP
@@ -27,18 +22,6 @@ public enum TASstate {
 	 * The game is neither recording, playing back or paused, is also set when aborting all mentioned states.
 	 */
 	NONE;
-	
-	/**
-	 * Requests a state change to the server. If no server is available (e.g. in the main menu), it will set the state directly.
-	 * @param state The new state of the playback.
-	 */
-	public static void setOrSend(TASstate state) {
-		if(Minecraft.getMinecraft().player!=null) {
-			CommonProxy.NETWORK.sendToServer(new SyncStatePacket(state));
-		}else {
-			ClientProxy.virtual.getContainer().setTASState(state);
-		}
-	}
 	
 	public int getIndex() {
 		switch(this) {

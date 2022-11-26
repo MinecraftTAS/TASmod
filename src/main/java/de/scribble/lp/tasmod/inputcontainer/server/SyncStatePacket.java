@@ -4,20 +4,23 @@ import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.inputcontainer.InputContainer;
 import de.scribble.lp.tasmod.inputcontainer.TASstate;
-import io.netty.buffer.ByteBuf;
+import de.scribble.lp.tasmod.networking.Packet;
+import de.scribble.lp.tasmod.networking.PacketSide;
+import de.scribble.lp.tasmod.util.TickScheduler.TickTask;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * Syncs the current state of the input recorder with the state on the server side and with the state on all other clients
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
-public class SyncStatePacket implements IMessage {
+public class SyncStatePacket implements Packet {
+
 
 	private short state;
 	private boolean verbose;
@@ -37,45 +40,52 @@ public class SyncStatePacket implements IMessage {
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf) {
-		state = buf.readShort();
-		verbose = buf.readBoolean();
-	}
-
-	@Override
-	public void toBytes(ByteBuf buf) {
+	public void serialize(PacketBuffer buf) {
 		buf.writeShort(state);
 		buf.writeBoolean(verbose);
 	}
 
-	public TASstate getState() {
+	@Override
+	public void deserialize(PacketBuffer buf) {
+		state = buf.readShort();
+		verbose = buf.readBoolean();
+	}
+
+	protected TASstate getState() {
 		return TASstate.fromIndex(state);
 	}
 
 	public boolean isVerbose() {
 		return verbose;
 	}
-	
-	public static class SyncStatePacketHandler implements IMessageHandler<SyncStatePacket, IMessage> {
 
-		@Override
-		public IMessage onMessage(SyncStatePacket message, MessageContext ctx) {
-			if (ctx.side.isServer()) {
-				TASmod.containerStateServer.setState(message.getState());
-			} else {
-				ClientProxy.tickSchedulerClient.add(() -> {
-					InputContainer container = ClientProxy.virtual.getContainer();
-					if (message.getState() != container.getState()) {
-						String chatMessage = container.setTASState(message.getState(), message.isVerbose());
-						if (!chatMessage.isEmpty()) {
-							Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(chatMessage));
-						}
-					}
-				});
-			}
-			return null;
+	@Override
+	public void handle(PacketSide side, EntityPlayer player) {
+		if(side.isServer()) {
+			TASmod.containerStateServer.onPacket((EntityPlayerMP)player, getState());
 		}
-
+		else {
+			
+			TASstate state = getState();
+			
+			TickTask task = ()->{
+				
+				InputContainer container = ClientProxy.virtual.getContainer();
+				if (state != container.getState()) {
+					String chatMessage = container.setTASState(state, verbose);
+					if (!chatMessage.isEmpty()) {
+						Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(chatMessage));
+					}
+				}
+				
+			};
+			
+			
+			if(state == TASstate.RECORDING || state == TASstate.PLAYBACK) {
+				ClientProxy.tickSchedulerClient.add(task);	// Starts a recording in the next tick
+			} else {
+				ClientProxy.gameLoopSchedulerClient.add(task);	// Starts a recording in the next frame
+			}
+		}
 	}
-
 }
