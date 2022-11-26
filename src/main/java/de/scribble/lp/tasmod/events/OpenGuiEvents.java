@@ -3,6 +3,7 @@ package de.scribble.lp.tasmod.events;
 import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.TASmod;
 import de.scribble.lp.tasmod.inputcontainer.TASstate;
+import de.scribble.lp.tasmod.inputcontainer.server.ContainerStateClient;
 import de.scribble.lp.tasmod.tickratechanger.TickrateChangerClient;
 import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.gui.GuiIngameMenu;
@@ -46,7 +47,7 @@ public class OpenGuiEvents {
 		if (TickrateChangerClient.ticksPerSecond == 0 || TickrateChangerClient.advanceTick) {
 			TASmod.logger.info("Pausing game during GuiControls");
 			TickrateChangerClient.pauseGame(false);
-			TASstate.setOrSend(TASstate.NONE);
+			ContainerStateClient.setOrSend(stateWhenOpened);
 			waszero = true;
 		}
 	}

@@ -44,6 +44,8 @@ public abstract class MixinMinecraft {
 		
 		LoadWorldEvents.doneWithLoadingScreen();
 		
+		ClientProxy.gameLoopSchedulerClient.runAllTasks();
+		
 		if(((Minecraft) (Object) this).player != null) {
 			ClientProxy.hud.tick();
 		}

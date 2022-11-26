@@ -2,37 +2,46 @@ package de.scribble.lp.tasmod.networking.packets;
 
 import java.util.UUID;
 
+import de.scribble.lp.tasmod.ClientProxy;
 import de.scribble.lp.tasmod.networking.Packet;
 import de.scribble.lp.tasmod.networking.PacketSide;
 import de.scribble.lp.tasmod.ticksync.TickSyncServer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
-public class IdentificationPacket implements Packet{
+public class IdentificationPacket implements Packet {
 
 	private UUID uuid;
-	
+
 	public IdentificationPacket() {
-		
+
 	}
-	
+
 	public IdentificationPacket(UUID uuid) {
 		this.uuid = uuid;
 	}
-	
+
 	@Override
 	public void handle(PacketSide side, EntityPlayer player) {
-		TickSyncServer.onPacket(this.uuid);
+		if (side.isServer()) {
+			TickSyncServer.onPacket(this.uuid);
+		} else {
+			ClientProxy.packetClient.setReady();
+		}
 	}
 
 	@Override
 	public void serialize(PacketBuffer buf) {
-		buf.writeUniqueId(uuid);
+		if (uuid != null) {
+			buf.writeUniqueId(uuid);
+		}
 	}
 
 	@Override
 	public void deserialize(PacketBuffer buf) {
-		this.uuid=buf.readUniqueId();
+		if (buf.capacity() > 0) {
+			this.uuid = buf.readUniqueId();
+		}
 	}
 
 	public UUID getUuid() {

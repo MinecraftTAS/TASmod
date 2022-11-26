@@ -48,6 +48,8 @@ public class ClientProxy extends CommonProxy {
 	
 	public static TASmodNetworkClient packetClient;
 	
+	public static TickScheduler gameLoopSchedulerClient = new TickScheduler();
+	
 	public static TickScheduler tickSchedulerClient = new TickScheduler();
 	
 	public void preInit(FMLPreInitializationEvent ev) {

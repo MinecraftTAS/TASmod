@@ -30,6 +30,8 @@ public class TASmodNetworkClient {
 	
 	private BlockingQueue<Packet> packetsToSend = new LinkedBlockingQueue<>();
 	
+	private boolean ready = false;
+	
 	public TASmodNetworkClient(Logger logger) {
 		this(logger, "127.0.0.1", 3111); // Set ip for different server
 	}
@@ -50,6 +52,8 @@ public class TASmodNetworkClient {
 	
 	private void createClient(String serverIp, int port) {
 		
+		packetsToSend.add(new IdentificationPacket(Minecraft.getMinecraft().player.getUniqueID()));
+		
 		clientThread = new Thread(() -> {
 			try(Socket cSocket = new Socket()){
 				cSocket.connect(new InetSocketAddress(serverIp, port));
@@ -58,8 +62,6 @@ public class TASmodNetworkClient {
 				clientSocket.setTcpNoDelay(true);
 				// Prepare the in and out streams.
 				DataInputStream inputStream = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
-				
-				sendToServer(new IdentificationPacket(Minecraft.getMinecraft().player.getUniqueID()));
 				
 				createSendThread();
 				
@@ -98,11 +100,13 @@ public class TASmodNetworkClient {
 				Packet packet;
 				while (!clientSocket.isClosed()) {
 					// Try to poll another packet that wants to be sent
-					packet = packetsToSend.poll();
-					if (packet == null) {
+					packet = packetsToSend.peek();
+					boolean skip = !(packet instanceof IdentificationPacket) && !ready;
+					if (packet == null || skip) {
 						Thread.sleep(1); // If nothing has to be done, let the cpu rest by waiting
 						continue;
 					}
+					packetsToSend.poll();
 					// A packet was found: Serialize then send it.
 					byte[] packetData = PacketSerializer.serialize(packet).array();
 					outputStream.writeInt(packetData.length);
@@ -131,4 +135,7 @@ public class TASmodNetworkClient {
 		return clientSocket.isClosed();
 	}
 	
+	public void setReady() {
+		ready = true;
+	}
 }
