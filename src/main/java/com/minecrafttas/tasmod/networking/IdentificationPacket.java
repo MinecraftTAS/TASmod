@@ -1,10 +1,8 @@
-package com.minecrafttas.tasmod.networking.packets;
+package com.minecrafttas.tasmod.networking;
 
 import java.util.UUID;
 
 import com.minecrafttas.tasmod.ClientProxy;
-import com.minecrafttas.tasmod.networking.Packet;
-import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 
 import net.minecraft.entity.player.EntityPlayer;

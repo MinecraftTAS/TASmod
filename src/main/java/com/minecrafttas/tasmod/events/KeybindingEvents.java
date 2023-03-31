@@ -45,7 +45,7 @@ public class KeybindingEvents {
 		
 		if (VirtualKeybindings.isKeyDownExceptTextfield(savestateSaveKey)) {
 
-			CommonProxy.NETWORK.sendToServer(new SavestatePacket());
+			ClientProxy.packetClient.sendToServer(new SavestatePacket());
 
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(savestateLoadKey)) {
 
