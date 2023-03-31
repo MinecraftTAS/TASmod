@@ -192,7 +192,7 @@ public class SavestateHandler {
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + indexToSave + " saved"));
 
 		// Close the GuiSavestateScreen on the client
-		CommonProxy.NETWORK.sendToAll(new SavestatePacket());
+		TASmod.packetServer.sendToAll(new SavestatePacket());
 
 		if (!tickrate0) {
 			TickrateChangerServer.pauseGame(false);

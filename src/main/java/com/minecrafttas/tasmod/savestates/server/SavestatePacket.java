@@ -1,30 +1,23 @@
 package com.minecrafttas.tasmod.savestates.server;
 
+import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.Packet;
+import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
+import com.minecrafttas.tasmod.util.TickScheduler.TickTask;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-/**
- * Simple networking packet to initiate things on client and server
- * 
- * OnClient: Displays GuiSavestatingScreen. <br>If that is already open, closes gui
- * OnServer: Initiates savestating
- * @author ScribbleLP
- * 
- * @see SavestatePacketHandler
- *
- */
-public class SavestatePacket implements IMessage{
+public class SavestatePacket implements Packet {
 
 	public int index;
 	
@@ -45,55 +38,62 @@ public class SavestatePacket implements IMessage{
 	}
 	
 	@Override
-	public void fromBytes(ByteBuf buf) {
-		index=buf.readInt();
+	public void handle(PacketSide side, EntityPlayer player) {
+		if(side.isServer()) {
+			
+			TickTask task = () -> {
+				if (!player.canUseCommand(2, "savestate")) {
+					player.sendMessage(new TextComponentString(TextFormatting.RED+"You don't have permission to do that"));
+					return;
+				}
+				try {
+					TASmod.savestateHandler.saveState(index, true);
+				} catch (SavestateException e) {
+					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getMessage()));
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getCause().toString()));
+				} finally {
+					TASmod.savestateHandler.state=SavestateState.NONE;
+				}
+			};
+			
+			if(TickrateChangerServer.ticksPerSecond == 0) {
+				task.runTask();
+				return;
+			}
+			CommonProxy.tickSchedulerServer.add(task);
+		}
+		else {
+			
+			TickTask task = () -> {
+				Minecraft mc = Minecraft.getMinecraft();
+				if(!(mc.currentScreen instanceof GuiSavestateSavingScreen)) {
+					mc.displayGuiScreen(new GuiSavestateSavingScreen());
+				}else {
+					mc.displayGuiScreen(null);
+				}
+			};
+			
+			if(TickrateChangerClient.ticksPerSecond == 0) {
+				task.runTask();
+				return;
+			}
+			else {
+				ClientProxy.tickSchedulerClient.add(task);
+			}
+		}
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf) {
+	public void serialize(PacketBuffer buf) {
 		buf.writeInt(index);
 	}
 
-	public static class SavestatePacketHandler implements IMessageHandler<SavestatePacket, IMessage>{
-
-		public SavestatePacketHandler() {
-		}
-		
-		@Override
-		public IMessage onMessage(SavestatePacket message, MessageContext ctx) {
-			if(ctx.side.isServer()) {
-				ctx.getServerHandler().player.getServerWorld().addScheduledTask(()->{
-					EntityPlayerMP player=ctx.getServerHandler().player;
-					if (!player.canUseCommand(2, "savestate")) {
-						player.sendMessage(new TextComponentString(TextFormatting.RED+"You don't have permission to do that"));
-						return;
-					}
-					try {
-						TASmod.savestateHandler.saveState(message.index, true);
-					} catch (SavestateException e) {
-						player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getMessage()));
-						
-					} catch (Exception e) {
-						e.printStackTrace();
-						player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getCause().toString()));
-					} finally {
-						TASmod.savestateHandler.state=SavestateState.NONE;
-					}
-				});
-			}else {
-				net.minecraft.client.Minecraft mc=net.minecraft.client.Minecraft.getMinecraft();	//Forge will think this is executed on the server for some reason...
-				workaround(mc);
-			}
-			return null;
-		}
-		
-		@SideOnly(Side.CLIENT)
-		private void workaround(net.minecraft.client.Minecraft mc) {
-			if(!(mc.currentScreen instanceof GuiSavestateSavingScreen)) {
-				mc.displayGuiScreen(new GuiSavestateSavingScreen());
-			}else {
-				mc.displayGuiScreen(null);
-			}
-		}
+	@Override
+	public void deserialize(PacketBuffer buf) {
+		index=buf.readInt();
 	}
+
 }

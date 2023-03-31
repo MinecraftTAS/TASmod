@@ -22,27 +22,26 @@ import com.minecrafttas.tasmod.inputcontainer.server.InitialSyncStatePacket;
 import com.minecrafttas.tasmod.inputcontainer.server.SyncStatePacket;
 import com.minecrafttas.tasmod.ktrng.KTRNGSeedPacket;
 import com.minecrafttas.tasmod.ktrng.KTRNGStartSeedPacket;
+import com.minecrafttas.tasmod.networking.IdentificationPacket;
 import com.minecrafttas.tasmod.networking.PacketSerializer;
-import com.minecrafttas.tasmod.networking.packets.IdentificationPacket;
 import com.minecrafttas.tasmod.savestates.client.InputSavestatesPacket;
 import com.minecrafttas.tasmod.savestates.client.InputSavestatesPacket.InputSavestatesPacketHandler;
 import com.minecrafttas.tasmod.savestates.server.LoadstatePacket;
-import com.minecrafttas.tasmod.savestates.server.SavestatePacket;
 import com.minecrafttas.tasmod.savestates.server.LoadstatePacket.LoadstatePacketHandler;
-import com.minecrafttas.tasmod.savestates.server.SavestatePacket.SavestatePacketHandler;
+import com.minecrafttas.tasmod.savestates.server.SavestatePacket;
 import com.minecrafttas.tasmod.savestates.server.motion.MotionPacket;
-import com.minecrafttas.tasmod.savestates.server.motion.RequestMotionPacket;
 import com.minecrafttas.tasmod.savestates.server.motion.MotionPacket.MotionPacketHandler;
+import com.minecrafttas.tasmod.savestates.server.motion.RequestMotionPacket;
 import com.minecrafttas.tasmod.savestates.server.motion.RequestMotionPacket.RequestMotionPacketHandler;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket.SavestatePlayerLoadingPacketHandler;
 import com.minecrafttas.tasmod.tickratechanger.AdvanceTickratePacket;
-import com.minecrafttas.tasmod.tickratechanger.ChangeTickratePacket;
-import com.minecrafttas.tasmod.tickratechanger.PauseTickratePacket;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.tickratechanger.AdvanceTickratePacket.AdvanceTickratePacketHandler;
+import com.minecrafttas.tasmod.tickratechanger.ChangeTickratePacket;
 import com.minecrafttas.tasmod.tickratechanger.ChangeTickratePacket.ChangeTickratePacketHandler;
+import com.minecrafttas.tasmod.tickratechanger.PauseTickratePacket;
 import com.minecrafttas.tasmod.tickratechanger.PauseTickratePacket.PauseTickratePacketHandler;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncPacket;
 import com.minecrafttas.tasmod.util.TickScheduler;
 
@@ -77,8 +76,6 @@ public class CommonProxy {
 		NETWORK.registerMessage(PauseTickratePacketHandler.class, PauseTickratePacket.class, i++, Side.CLIENT);
 
 		// Trigger savestates/loadstates on the client
-		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.SERVER);
-		NETWORK.registerMessage(SavestatePacketHandler.class, SavestatePacket.class, i++, Side.CLIENT);
 		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.SERVER);
 		NETWORK.registerMessage(LoadstatePacketHandler.class, LoadstatePacket.class, i++, Side.CLIENT);
 
@@ -120,6 +117,8 @@ public class CommonProxy {
 		
 		PacketSerializer.registerPacket(SyncStatePacket.class);
 		PacketSerializer.registerPacket(InitialSyncStatePacket.class);
+		
+		PacketSerializer.registerPacket(SavestatePacket.class);
 	}
 
 	public void init(FMLInitializationEvent ev) {
