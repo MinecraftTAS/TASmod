@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
-import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorTimer;
 
@@ -81,7 +81,7 @@ public class TickrateChangerClient {
 		if (tickrate < 0) {
 			return;
 		}
-		CommonProxy.NETWORK.sendToServer(new ChangeTickratePacket(tickrate));
+		ClientProxy.packetClient.sendToServer(new ChangeTickratePacket(tickrate));
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class TickrateChangerClient {
 	 */
 	public static void togglePause() {
 		if (Minecraft.getMinecraft().world != null) {
-			CommonProxy.NETWORK.sendToServer(new PauseTickratePacket());
+			ClientProxy.packetClient.sendToServer(new PauseTickratePacket());
 		} else {
 			togglePauseClient();
 		}
@@ -148,7 +148,7 @@ public class TickrateChangerClient {
 	 * Sends a {@link AdvanceTickratePacket} to the server to advance the server
 	 */
 	public static void advanceServerTick() {
-		CommonProxy.NETWORK.sendToServer(new AdvanceTickratePacket());
+		ClientProxy.packetClient.sendToServer(new AdvanceTickratePacket());
 	}
 	
 	/**

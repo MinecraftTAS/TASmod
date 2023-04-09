@@ -18,7 +18,7 @@ public class ClientMotionServer {
 
 	public static void requestMotionFromClient() {
 		motion.clear();
-		CommonProxy.NETWORK.sendToAll(new RequestMotionPacket());
+		TASmod.packetServer.sendToAll(new RequestMotionPacket());
 
 		int i = 1;
 		while (motion.size() != TASmod.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
@@ -30,7 +30,7 @@ public class ClientMotionServer {
 			}
 			if(i % 30 == 1) {
 				CommonProxy.logger.info("Resending motion packet");
-				CommonProxy.NETWORK.sendToAll(new RequestMotionPacket());
+				TASmod.packetServer.sendToAll(new RequestMotionPacket());
 			}
 			if (i == 1000) {
 				CommonProxy.logger.warn("Client motion timed out!");

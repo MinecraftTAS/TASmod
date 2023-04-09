@@ -1,6 +1,5 @@
 package com.minecrafttas.tasmod.commands.fullrecord;
 
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.inputcontainer.TASstate;
 import com.minecrafttas.tasmod.savestates.server.SavestateState;
@@ -40,7 +39,7 @@ public class CommandFullRecord extends CommandBase {
 			TASmod.savestateHandler.state = SavestateState.NONE;
 		}
 		TASmod.containerStateServer.setServerState(TASstate.RECORDING);
-		CommonProxy.NETWORK.sendToAll(new FullRecordPacket());
+		TASmod.packetServer.sendToAll(new FullRecordPacket());
 	}
 
 }

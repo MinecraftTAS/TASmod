@@ -1,9 +1,10 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import com.minecrafttas.tasmod.networking.Packet;
+import com.minecrafttas.tasmod.networking.PacketSide;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 
 /**
  * Sets the game to tickrate 0 and back
@@ -11,7 +12,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * @author ScribbleLP
  *
  */
-public class PauseTickratePacket implements IMessage {
+public class PauseTickratePacket implements Packet {
 
 	private short status;
 
@@ -31,48 +32,10 @@ public class PauseTickratePacket implements IMessage {
 		this.status = state.toShort();
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		status = buf.readShort();
-	}
-
-	@Override
-	public void toBytes(ByteBuf buf) {
-		buf.writeShort(status);
-	}
-
 	public State getState() {
 		return State.fromShort(status);
 	}
 
-	public static class PauseTickratePacketHandler implements IMessageHandler<PauseTickratePacket, IMessage> {
-
-		public PauseTickratePacketHandler() {
-		}
-
-		@Override
-		public IMessage onMessage(PauseTickratePacket message, MessageContext ctx) {
-			if (ctx.side.isServer()) {
-				if (ctx.getServerHandler().player.canUseCommand(2, "tickrate")) {
-					if (message.getState() == State.PAUSE)
-						TickrateChangerServer.pauseGame(true);
-					else if (message.getState() == State.UNPAUSE)
-						TickrateChangerServer.pauseGame(false);
-					else if (message.getState() == State.TOGGLE)
-						TickrateChangerServer.togglePause();
-				}
-			} else if (ctx.side.isClient()) {
-				if (message.getState() == State.PAUSE)
-					TickrateChangerClient.pauseClientGame(true);
-				else if (message.getState() == State.UNPAUSE)
-					TickrateChangerClient.pauseClientGame(false);
-				else if (message.getState() == State.TOGGLE)
-					TickrateChangerClient.togglePauseClient();
-			}
-			return null;
-		}
-
-	}
 
 	/**
 	 * Can be {@link State#PAUSE}, {@link State#UNPAUSE} or {@link State#TOGGLE}
@@ -114,5 +77,38 @@ public class PauseTickratePacket implements IMessage {
 				return TOGGLE;
 			}
 		}
+	}
+
+	@Override
+	public void handle(PacketSide side, EntityPlayer player) {
+		if (side.isServer()) {
+			if (player.canUseCommand(2, "tickrate")) {
+				State state = getState();
+				if (state == State.PAUSE)
+					TickrateChangerServer.pauseGame(true);
+				else if (state == State.UNPAUSE)
+					TickrateChangerServer.pauseGame(false);
+				else if (state == State.TOGGLE)
+					TickrateChangerServer.togglePause();
+			}
+		} else if (side.isClient()) {
+			State state = getState();
+			if (state == State.PAUSE)
+				TickrateChangerClient.pauseClientGame(true);
+			else if (state == State.UNPAUSE)
+				TickrateChangerClient.pauseClientGame(false);
+			else if (state == State.TOGGLE)
+				TickrateChangerClient.togglePauseClient();
+		}
+	}
+
+	@Override
+	public void serialize(PacketBuffer buf) {
+		buf.writeShort(status);
+	}
+
+	@Override
+	public void deserialize(PacketBuffer buf) {
+		status = buf.readShort();
 	}
 }

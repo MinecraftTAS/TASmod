@@ -3,7 +3,7 @@ package com.minecrafttas.tasmod.commands.folder;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.TASmod;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -22,7 +22,7 @@ public class CommandFolder extends CommandBase {
 	@Override
 	public String getUsage(ICommandSender sender) {
 		return "/folder <type>";
-	}
+	}	
 
 	@Override
 	public int getRequiredPermissionLevel() {
@@ -33,9 +33,9 @@ public class CommandFolder extends CommandBase {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("savestates")) {
-				CommonProxy.NETWORK.sendTo(new FolderPacket(0), (EntityPlayerMP) sender);
+				TASmod.packetServer.sendTo(new FolderPacket(0), (EntityPlayerMP) sender);
 			} else if (args[0].equalsIgnoreCase("tasfiles")) {
-				CommonProxy.NETWORK.sendTo(new FolderPacket(1), (EntityPlayerMP) sender);
+				TASmod.packetServer.sendTo(new FolderPacket(1), (EntityPlayerMP) sender);
 			}
 		}
 	}

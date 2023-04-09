@@ -3,52 +3,36 @@ package com.minecrafttas.tasmod.commands.fullplay;
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.inputcontainer.TASstate;
+import com.minecrafttas.tasmod.networking.Packet;
+import com.minecrafttas.tasmod.networking.PacketSide;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 
-public class FullPlayPacket implements IMessage {
-
-	public FullPlayPacket() {
-	}
+public class FullPlayPacket implements Packet {
 
 	@Override
-	public void fromBytes(ByteBuf buf) {
-	}
-
-	@Override
-	public void toBytes(ByteBuf buf) {
-	}
-
-	public static class FullPlayPacketHandler implements IMessageHandler<FullPlayPacket, IMessage> {
-
-		public FullPlayPacketHandler() {
-		}
-
-		@Override
-		public IMessage onMessage(FullPlayPacket message, MessageContext ctx) {
-			if (ctx.side.isClient()) {
-				workaround();
-			}
-			return null;
-		}
-
-		@SideOnly(Side.CLIENT)
-		private void workaround() {
-			Minecraft mc = Minecraft.getMinecraft();
+	public void handle(PacketSide side, EntityPlayer player) {
+		if(side.isClient()) {
 			OpenGuiEvents.stateWhenOpened = TASstate.PLAYBACK;
 			ClientProxy.tickSchedulerClient.add(()->{
+				Minecraft mc = Minecraft.getMinecraft();
 				mc.world.sendQuittingDisconnectingPacket();
 				mc.loadWorld((WorldClient) null);
 				mc.displayGuiScreen(new GuiMainMenu());
 			});
- 		}
+		}
 	}
+
+	@Override
+	public void serialize(PacketBuffer buf) {
+	}
+
+	@Override
+	public void deserialize(PacketBuffer buf) {
+	}
+
 }

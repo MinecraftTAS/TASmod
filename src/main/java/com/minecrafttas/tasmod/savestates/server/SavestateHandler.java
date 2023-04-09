@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.SavestateEvents;
 import com.minecrafttas.tasmod.savestates.client.InputSavestatesPacket;
@@ -22,8 +21,8 @@ import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateDeleteException;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
 import com.minecrafttas.tasmod.savestates.server.files.SavestateDataFile;
-import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.savestates.server.files.SavestateDataFile.DataValues;
+import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
@@ -168,7 +167,7 @@ public class SavestateHandler {
 			 * Send the name of the world to all players. This will make a savestate of the
 			 * recording on the client with that name
 			 */
-			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(true, getSavestateName(indexToSave)));
+			TASmod.packetServer.sendToAll(new InputSavestatesPacket(true, getSavestateName(indexToSave)));
 		}
 
 		// Wait for the chunkloader to save the game
@@ -283,7 +282,7 @@ public class SavestateHandler {
 		 */
 		if (savestateIndex != 0) {
 			// Load savestate on the client
-			CommonProxy.NETWORK.sendToAll(new InputSavestatesPacket(false, getSavestateName(indexToLoad)));
+			TASmod.packetServer.sendToAll(new InputSavestatesPacket(false, getSavestateName(indexToLoad)));
 		}
 
 		// Disabeling level saving for all worlds in case the auto save kicks in during
@@ -293,7 +292,7 @@ public class SavestateHandler {
 		}
 
 		// Unload chunks on the client
-		CommonProxy.NETWORK.sendToAll(new LoadstatePacket());
+		TASmod.packetServer.sendToAll(new LoadstatePacket());
 
 		// Unload chunks on the server
 		SavestatesChunkControl.disconnectPlayersFromChunkMap();

@@ -1,6 +1,5 @@
 package com.minecrafttas.tasmod.commands.fullplay;
 
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.inputcontainer.TASstate;
 import com.minecrafttas.tasmod.savestates.server.SavestateState;
@@ -40,7 +39,7 @@ public class CommandFullPlay extends CommandBase{
 			TASmod.savestateHandler.state=SavestateState.NONE;
 		}
 		TASmod.containerStateServer.setServerState(TASstate.PLAYBACK);
-		CommonProxy.NETWORK.sendToAll(new FullPlayPacket());
+		TASmod.packetServer.sendToAll(new FullPlayPacket());
 	}
 
 }

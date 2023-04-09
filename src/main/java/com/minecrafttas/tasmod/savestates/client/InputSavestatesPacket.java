@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.networking.Packet;
+import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 
-public class InputSavestatesPacket implements IMessage{
+public class InputSavestatesPacket implements Packet{
 	private boolean mode;
 	private String name;
 	
@@ -28,49 +28,36 @@ public class InputSavestatesPacket implements IMessage{
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf) {
-		int length=buf.readInt();
-		name=(String) buf.readCharSequence(length, Charset.defaultCharset());
-		mode=buf.readBoolean();
+	public void handle(PacketSide side, EntityPlayer player) {
+		if(side.isClient()) {
+			if (mode == true) {
+				try {
+					InputSavestatesHandler.savestate(name);
+				} catch (SavestateException e) {
+					CommonProxy.logger.error(e.getMessage());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					InputSavestatesHandler.loadstate(name);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		
 	}
-
 	@Override
-	public void toBytes(ByteBuf buf) {
+	public void serialize(PacketBuffer buf) {
 		buf.writeInt(name.length());
 		buf.writeCharSequence(name, Charset.defaultCharset());
 		buf.writeBoolean(mode);
 	}
-	public String getName() {
-		return name;
-	}
-	
-	public boolean getMode() {
-		return mode;
-	}
-	
-	public static class InputSavestatesPacketHandler implements IMessageHandler<InputSavestatesPacket, IMessage> {
-
-		@Override
-		public IMessage onMessage(InputSavestatesPacket message, MessageContext ctx) {
-			if (ctx.side.isClient()) {
-				if (message.getMode() == true) {
-					try {
-						InputSavestatesHandler.savestate(message.getName());
-					} catch (SavestateException e) {
-						CommonProxy.logger.error(e.getMessage());
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				} else {
-					try {
-						InputSavestatesHandler.loadstate(message.getName());
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			return null;
-		}
+	@Override
+	public void deserialize(PacketBuffer buf) {
+		int length=buf.readInt();
+		name=(String) buf.readCharSequence(length, Charset.defaultCharset());
+		mode=buf.readBoolean();
 	}
 }
