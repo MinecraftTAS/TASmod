@@ -1,10 +1,10 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
+import com.minecrafttas.tasmod.networking.Packet;
+import com.minecrafttas.tasmod.networking.PacketSide;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 
 /**
  * Advanced game by 1 tick
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.relauncher.Side;
  * @author ScribbleLP
  *
  */
-public class AdvanceTickratePacket implements IMessage {
+public class AdvanceTickratePacket implements Packet {
 	/**
 	 * Advanced game by 1 tick
 	 */
@@ -20,30 +20,27 @@ public class AdvanceTickratePacket implements IMessage {
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf) {
-
+	public void handle(PacketSide side, EntityPlayer player) {
+		if (side.isServer()) {
+			if (player.canUseCommand(2, "tickrate")) {
+				if (TickrateChangerServer.ticksPerSecond == 0) {
+					TickrateChangerServer.advanceTick();
+				}
+			}
+		} else {
+			TickrateChangerClient.advanceClientTick(); // Using advanceTick() would create an endless loop
+		}
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf) {
-
+	public void serialize(PacketBuffer buf) {
+		
 	}
 
-	public static class AdvanceTickratePacketHandler implements IMessageHandler<AdvanceTickratePacket, IMessage> {
-
-		@Override
-		public IMessage onMessage(AdvanceTickratePacket message, MessageContext ctx) {
-			if (ctx.side == Side.SERVER) {
-				if (ctx.getServerHandler().player.canUseCommand(2, "tickrate")) {
-					if (TickrateChangerServer.ticksPerSecond == 0) {
-						TickrateChangerServer.advanceTick();
-					}
-				}
-			} else {
-				TickrateChangerClient.advanceClientTick(); // Using advanceTick() would create an endless loop
-			}
-			return null;
-		}
-
+	@Override
+	public void deserialize(PacketBuffer buf) {
+		
 	}
+
+
 }

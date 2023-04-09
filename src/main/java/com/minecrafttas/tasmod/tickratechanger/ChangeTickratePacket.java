@@ -1,11 +1,10 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
+import com.minecrafttas.tasmod.networking.Packet;
+import com.minecrafttas.tasmod.networking.PacketSide;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 
 /**
  * Changes the tickrate on the other side
@@ -13,7 +12,7 @@ import net.minecraftforge.fml.relauncher.Side;
  * @author ScribbleLP
  *
  */
-public class ChangeTickratePacket implements IMessage {
+public class ChangeTickratePacket implements Packet {
 
 	float tickrate;
 
@@ -30,32 +29,24 @@ public class ChangeTickratePacket implements IMessage {
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf) {
-		tickrate = buf.readFloat();
+	public void handle(PacketSide side, EntityPlayer player) {
+		if (side.isServer()) {
+			if (player.canUseCommand(2, "tickrate")) {
+				TickrateChangerServer.changeTickrate(tickrate);
+			}
+		} else {
+			TickrateChangerClient.changeClientTickrate(tickrate);
+		}
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf) {
+	public void serialize(PacketBuffer buf) {
 		buf.writeFloat(tickrate);
 	}
 
-	public static class ChangeTickratePacketHandler implements IMessageHandler<ChangeTickratePacket, IMessage> {
-
-		public ChangeTickratePacketHandler() {
-		}
-
-		@Override
-		public IMessage onMessage(ChangeTickratePacket message, MessageContext ctx) {
-			if (ctx.side == Side.SERVER) {
-				EntityPlayerMP player = ctx.getServerHandler().player;
-				if (player.canUseCommand(2, "tickrate")) {
-					TickrateChangerServer.changeTickrate(message.tickrate);
-				}
-			} else if (ctx.side == Side.CLIENT) {
-				TickrateChangerClient.changeClientTickrate(message.tickrate);
-			}
-			return null;
-		}
+	@Override
+	public void deserialize(PacketBuffer buf) {
+		tickrate = buf.readFloat();
 	}
 
 }

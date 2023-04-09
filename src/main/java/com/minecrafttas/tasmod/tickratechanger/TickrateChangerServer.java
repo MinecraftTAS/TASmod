@@ -2,7 +2,6 @@ package com.minecrafttas.tasmod.tickratechanger;
 
 import org.apache.logging.log4j.Logger;
 
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -74,7 +73,7 @@ public class TickrateChangerServer {
 	public static void changeClientTickrate(float tickrate, boolean log) {
 		if(log)
 			log("Changing the tickrate "+ tickrate + " to all clients");
-		CommonProxy.NETWORK.sendToAll(new ChangeTickratePacket(tickrate));
+		TASmod.packetServer.sendToAll(new ChangeTickratePacket(tickrate));
 	}
 
 	/**
@@ -157,7 +156,7 @@ public class TickrateChangerServer {
      * Sends a {@link AdvanceTickratePacket} to all clients
      */
     private static void advanceClientTick() {
-    	CommonProxy.NETWORK.sendToAll(new AdvanceTickratePacket());
+    	TASmod.packetServer.sendToAll(new AdvanceTickratePacket());
 	}
 
     /**
@@ -177,7 +176,7 @@ public class TickrateChangerServer {
 	public static void joinServer(EntityPlayerMP player) {
 		if(TASmod.getServerInstance().isDedicatedServer()) {
 			log("Sending the current tickrate ("+ticksPerSecond+") to " +player.getName());
-			CommonProxy.NETWORK.sendTo(new ChangeTickratePacket(ticksPerSecond), player);
+			TASmod.packetServer.sendTo(new ChangeTickratePacket(ticksPerSecond), player);
 		}
 	}
 	

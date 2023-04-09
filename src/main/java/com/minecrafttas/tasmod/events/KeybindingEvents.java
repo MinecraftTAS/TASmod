@@ -49,7 +49,7 @@ public class KeybindingEvents {
 
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(savestateLoadKey)) {
 
-			CommonProxy.NETWORK.sendToServer(new LoadstatePacket());
+			ClientProxy.packetClient.sendToServer(new LoadstatePacket());
 
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(bufferViewKey)) {
 			
