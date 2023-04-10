@@ -96,12 +96,13 @@ public abstract class MixinMinecraft {
 	@Inject(method = "shutdownMinecraftApplet", at = @At("HEAD"))
 	public void inject_shutdownMinecraftApplet(CallbackInfo ci) {
 		try {
-			if (ClientProxy.packetClient != null)
+			if (ClientProxy.packetClient != null) {
+				TickrateChangerClient.changeTickrate(20);
 				ClientProxy.packetClient.killClient();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		TickrateChangerClient.changeTickrate(20);
 	}
 	
 	// =====================================================================================================================================
