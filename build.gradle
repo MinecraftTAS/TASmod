@@ -16,7 +16,6 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
 version = "Alpha9-WIP"
@@ -45,7 +44,7 @@ minecraft {
 }
 repositories {
     mavenCentral()
-    maven { url = "https://maven.mgnet.work" }
+    maven { url = "https://maven.mgnet.work/main" }
     maven {
         name = 'sponge'
         url = 'https://repo.spongepowered.org/maven'

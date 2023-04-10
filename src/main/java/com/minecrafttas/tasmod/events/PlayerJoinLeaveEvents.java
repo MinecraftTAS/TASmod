@@ -47,10 +47,6 @@ public class PlayerJoinLeaveEvents {
 	@SideOnly(Side.CLIENT)
 	public static void firePlayerJoinedClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
 		TASmod.logger.info("Firing login events for {} on the CLIENT", player.getName());
-		ClientProxy.virtual.unpressNext();
-		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
-		TickrateChangerClient.joinServer();
-		ClientProxy.virtual.getContainer().printCredits();
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		
@@ -60,6 +56,11 @@ public class PlayerJoinLeaveEvents {
 			ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger, mc.getCurrentServerData().serverIP, 3111);
 		
 		ClientProxy.packetClient.sendToServer(new InitialSyncStatePacket(ClientProxy.virtual.getContainer().getState()));
+		
+		ClientProxy.virtual.unpressNext();
+		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
+		TickrateChangerClient.joinServer();
+		ClientProxy.virtual.getContainer().printCredits();
 	}
 	
 	/**
