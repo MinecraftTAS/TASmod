@@ -3,18 +3,16 @@ package com.minecrafttas.tasmod.savestates.server.playerloading;
 import java.io.IOException;
 
 import com.minecrafttas.tasmod.events.CameraInterpolationEvents;
+import com.minecrafttas.tasmod.networking.Packet;
+import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.GameType;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Reads the playerdata coming from the server and also applies motion, relative
@@ -23,7 +21,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author ScribbleLP
  *
  */
-public class SavestatePlayerLoadingPacket implements IMessage {
+public class SavestatePlayerLoadingPacket implements Packet {
 	
 	private NBTTagCompound compound;
 
@@ -34,42 +32,11 @@ public class SavestatePlayerLoadingPacket implements IMessage {
 		compound = nbttagcompound;
 	};
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		PacketBuffer buffi = new PacketBuffer(buf);
-		try {
-			compound = buffi.readCompoundTag();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 	@Override
-	public void toBytes(ByteBuf buf) {
-		PacketBuffer buffi = new PacketBuffer(buf);
-		buffi.writeCompoundTag(compound);
-	}
-
-	public NBTTagCompound getNbtTagCompound() {
-		return compound;
-	}
-
-	public static class SavestatePlayerLoadingPacketHandler implements IMessageHandler<SavestatePlayerLoadingPacket, IMessage> {
-
-		@Override
-		public IMessage onMessage(SavestatePlayerLoadingPacket message, MessageContext ctx) {
-			if (ctx.side.isClient()) {
-				Minecraft.getMinecraft().addScheduledTask(() -> {
-					workaround(message);
-				});
-			}
-			return null;
-		}
-
-		@SideOnly(Side.CLIENT)
-		private void workaround(SavestatePlayerLoadingPacket message) {
-			net.minecraft.client.entity.EntityPlayerSP player = Minecraft.getMinecraft().player;
-			NBTTagCompound compound = message.getNbtTagCompound();
+	public void handle(PacketSide side, EntityPlayer playerz) {
+		if(side.isClient()) {
+			EntityPlayerSP player = (EntityPlayerSP)playerz;
 
 			player.readFromNBT(compound);
 			NBTTagCompound motion = compound.getCompoundTag("clientMotion");
@@ -104,6 +71,20 @@ public class SavestatePlayerLoadingPacket implements IMessage {
 
 			SavestatesChunkControl.keepPlayerInLoadedEntityList(player);
 			SavestatePlayerLoading.wasLoading = true;
+		}
+	}
+
+	@Override
+	public void serialize(PacketBuffer buf) {
+		buf.writeCompoundTag(compound);
+	}
+
+	@Override
+	public void deserialize(PacketBuffer buf) {
+		try {
+			compound = buf.readCompoundTag();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

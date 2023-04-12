@@ -9,11 +9,12 @@ import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.tasmod.ClientProxy;
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.inputcontainer.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.inputcontainer.server.ContainerStateClient;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
+import com.minecrafttas.tasmod.networking.Packet;
+import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.util.ContainerSerialiser;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
@@ -22,14 +23,13 @@ import com.minecrafttas.tasmod.virtual.VirtualSubticks;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.mojang.realmsclient.util.Pair;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * A container where the inputs are stored.<br>
@@ -575,10 +575,16 @@ public class InputContainer {
 		float angleYaw = Float.parseFloat(section[3]);
 		float anglePitch = Float.parseFloat(section[4]);
 
-		CommonProxy.NETWORK.sendToServer(new TeleportPlayerPacket(x, y, z, angleYaw, anglePitch));
+		ClientProxy.packetClient.sendToServer(new TeleportPlayerPacket(x, y, z, angleYaw, anglePitch));
 	}
 
-	public static class TeleportPlayerPacket implements IMessage {
+	/**
+	 * Permissionless player teleporting packet
+	 * 
+	 * @author Scribble
+	 *
+	 */
+	public static class TeleportPlayerPacket implements Packet {
 
 		double x;
 		double y;
@@ -599,16 +605,20 @@ public class InputContainer {
 		}
 
 		@Override
-		public void fromBytes(ByteBuf buf) {
-			this.x = buf.readDouble();
-			this.y = buf.readDouble();
-			this.z = buf.readDouble();
-			this.angleYaw = buf.readFloat();
-			this.anglePitch = buf.readFloat();
+		public void handle(PacketSide side, EntityPlayer playerz) {
+			if (side.isServer()) {
+				EntityPlayerMP player = (EntityPlayerMP) playerz;
+				player.getServerWorld().addScheduledTask(() -> {
+					player.rotationPitch = anglePitch;
+					player.rotationYaw = angleYaw;
+
+					player.setPositionAndUpdate(x, y, z);
+				});
+			}
 		}
 
 		@Override
-		public void toBytes(ByteBuf buf) {
+		public void serialize(PacketBuffer buf) {
 			buf.writeDouble(x);
 			buf.writeDouble(y);
 			buf.writeDouble(z);
@@ -617,31 +627,17 @@ public class InputContainer {
 			buf.writeFloat(anglePitch);
 		}
 
-	}
-
-	/**
-	 * Permissionless player teleporting packet
-	 * 
-	 * @author ScribbleLP
-	 *
-	 */
-	public static class TeleportPlayerPacketHandler implements IMessageHandler<TeleportPlayerPacket, IMessage> {
-
 		@Override
-		public IMessage onMessage(TeleportPlayerPacket message, MessageContext ctx) {
-			if (ctx.side.isServer()) {
-				net.minecraft.entity.player.EntityPlayerMP player = ctx.getServerHandler().player;
-				ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-					player.rotationPitch = message.anglePitch;
-					player.rotationYaw = message.angleYaw;
-
-					player.setPositionAndUpdate(message.x, message.y, message.z);
-				});
-			}
-			return null;
+		public void deserialize(PacketBuffer buf) {
+			this.x = buf.readDouble();
+			this.y = buf.readDouble();
+			this.z = buf.readDouble();
+			this.angleYaw = buf.readFloat();
+			this.anglePitch = buf.readFloat();
 		}
 
 	}
+
 
 	// ==============================================================
 

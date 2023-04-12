@@ -9,7 +9,7 @@ import net.minecraft.network.PacketBuffer;
 /**
  * Advanced game by 1 tick
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class AdvanceTickratePacket implements Packet {

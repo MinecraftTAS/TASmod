@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.inputcontainer.TASstate;
 import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
@@ -54,7 +53,7 @@ public class CommandRestartAndPlay extends CommandBase{
 					e.printStackTrace();
 				}
 				TASmod.containerStateServer.setServerState(TASstate.PLAYBACK);
-				CommonProxy.NETWORK.sendToAll(new RestartAndPlayPacket(args[0]));
+				TASmod.packetServer.sendToAll(new RestartAndPlayPacket(args[0]));
 			}
 		} else {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));

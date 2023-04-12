@@ -19,8 +19,8 @@ import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.virtual.VirtualKey;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
-import com.minecrafttas.tasmod.virtual.VirtualSubticks;
 import com.minecrafttas.tasmod.virtual.VirtualMouse.PathNode;
+import com.minecrafttas.tasmod.virtual.VirtualSubticks;
 import com.mojang.realmsclient.util.Pair;
 
 /**

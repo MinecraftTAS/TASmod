@@ -19,8 +19,8 @@ public class FullRecordPacket implements Packet{
 		if(side.isClient()) {
 			OpenGuiEvents.stateWhenOpened = TASstate.RECORDING;
 			ClientProxy.virtual.getContainer().clear();
-			ClientProxy.tickSchedulerClient.add(()->{
-				Minecraft mc = Minecraft.getMinecraft();
+			Minecraft mc = Minecraft.getMinecraft();
+			mc.addScheduledTask(()->{
 				mc.world.sendQuittingDisconnectingPacket();
 				mc.loadWorld((WorldClient) null);
 				mc.displayGuiScreen(new GuiMainMenu());

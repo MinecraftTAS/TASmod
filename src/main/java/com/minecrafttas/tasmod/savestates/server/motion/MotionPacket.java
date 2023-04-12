@@ -8,6 +8,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 
+/**
+ * A packet containing the motion data of the player
+ * @author Scribble
+ *
+ */
 public class MotionPacket implements Packet {
 	private double x = 0;
 	private double y = 0;
@@ -21,6 +26,17 @@ public class MotionPacket implements Packet {
 	public MotionPacket() {
 	}
 
+	/**
+	 * Sends the players motion data to the server
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param moveForward
+	 * @param moveVertical
+	 * @param moveStrafe
+	 * @param isSprinting
+	 * @param jumpMovementVector
+	 */
 	public MotionPacket(double x, double y, double z, float moveForward, float moveVertical, float moveStrafe, boolean isSprinting, float jumpMovementVector) {
 		this.x = x;
 		this.y = y;

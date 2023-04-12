@@ -3,10 +3,8 @@ package com.minecrafttas.tasmod.savestates.server.playerloading;
 import java.util.List;
 import java.util.UUID;
 
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorWorld;
-import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket.SavestatePlayerLoadingPacketHandler;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -59,7 +57,7 @@ public class SavestatePlayerLoading {
 			
 			player.readFromNBT(nbttagcompound);
 			
-			CommonProxy.NETWORK.sendTo(new SavestatePlayerLoadingPacket(nbttagcompound), player);
+			TASmod.packetServer.sendTo(new SavestatePlayerLoadingPacket(nbttagcompound), player);
 		}
 	}
 	

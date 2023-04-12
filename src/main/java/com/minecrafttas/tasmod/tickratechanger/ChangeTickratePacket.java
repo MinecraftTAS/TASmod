@@ -9,7 +9,7 @@ import net.minecraft.network.PacketBuffer;
 /**
  * Changes the tickrate on the other side
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class ChangeTickratePacket implements Packet {

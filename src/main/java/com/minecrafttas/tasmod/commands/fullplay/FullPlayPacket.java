@@ -1,6 +1,5 @@
 package com.minecrafttas.tasmod.commands.fullplay;
 
-import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.inputcontainer.TASstate;
 import com.minecrafttas.tasmod.networking.Packet;
@@ -18,8 +17,8 @@ public class FullPlayPacket implements Packet {
 	public void handle(PacketSide side, EntityPlayer player) {
 		if(side.isClient()) {
 			OpenGuiEvents.stateWhenOpened = TASstate.PLAYBACK;
-			ClientProxy.tickSchedulerClient.add(()->{
-				Minecraft mc = Minecraft.getMinecraft();
+			Minecraft mc = Minecraft.getMinecraft();
+			mc.addScheduledTask(()->{
 				mc.world.sendQuittingDisconnectingPacket();
 				mc.loadWorld((WorldClient) null);
 				mc.displayGuiScreen(new GuiMainMenu());

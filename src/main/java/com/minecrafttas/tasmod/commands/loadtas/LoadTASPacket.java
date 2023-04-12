@@ -2,19 +2,21 @@ package com.minecrafttas.tasmod.commands.loadtas;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import com.minecrafttas.tasmod.ClientProxy;
-import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.Packet;
+import com.minecrafttas.tasmod.networking.PacketSide;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class LoadTASPacket implements IMessage{
+public class LoadTASPacket implements Packet{
 	private String name;
 	
 	public LoadTASPacket() {
@@ -23,46 +25,39 @@ public class LoadTASPacket implements IMessage{
 	public LoadTASPacket(String name) {
 		this.name=name;
 	}
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		int length = buf.readInt();
-		name = (String) buf.readCharSequence(length, Charset.defaultCharset());
 
+	@Override
+	public void handle(PacketSide side, EntityPlayer playerz) {
+		if (side.isServer()) {
+			EntityPlayerMP player = (EntityPlayerMP) playerz;
+			player.getServerWorld().addScheduledTask(() -> {
+				if (player.canUseCommand(2, "loadtas")) {
+					TASmod.packetServer.sendToAll(this);
+				}
+			});
+		} else {
+			Minecraft mc = Minecraft.getMinecraft();
+			mc.addScheduledTask(() -> {
+				try {
+					ClientProxy.virtual.loadInputs(name);
+				} catch (IOException e) {
+					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
+					return;
+				}
+				mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Loaded inputs from " + name + ".tas"));
+			});
+		}
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf) {
+	public void serialize(PacketBuffer buf) {
 		buf.writeInt(name.getBytes().length);
 		buf.writeCharSequence(name, Charset.defaultCharset());
 	}
 
-	public String getName() {
-		return name;
-	}
-	
-	public static class LoadTASPacketHandler implements IMessageHandler<LoadTASPacket, IMessage> {
-
-		@Override
-		public IMessage onMessage(LoadTASPacket message, MessageContext ctx) {
-			if (ctx.side.isServer()) {
-				ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-					if (ctx.getServerHandler().player.canUseCommand(2, "loadtas")) {
-						CommonProxy.NETWORK.sendToAll(message);
-					}
-				});
-			} else {
-				Minecraft.getMinecraft().addScheduledTask(() -> {
-					try {
-						ClientProxy.virtual.loadInputs(message.getName());
-					} catch (IOException e) {
-						Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
-						return;
-					}
-					Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Loaded inputs from " + message.getName() + ".tas"));
-				});
-			}
-			return null;
-		}
-
+	@Override
+	public void deserialize(PacketBuffer buf) {
+		int length = buf.readInt();
+		name = (String) buf.readCharSequence(length, StandardCharsets.UTF_8);
 	}
 }
