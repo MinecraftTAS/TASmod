@@ -8,6 +8,11 @@ import com.minecrafttas.tasmod.networking.PacketSide;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
+/**
+ * Packet for {@linkplain TickSyncServer}
+ * @author Scribble
+ *
+ */
 public class TickSyncPacket implements Packet {
 
 	protected UUID uuid;

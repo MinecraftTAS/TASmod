@@ -10,8 +10,19 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
+/**
+ * Requests the motion from the client
+ * @author Scribble
+ *
+ */
 public class RequestMotionPacket implements Packet {
 
+	/**
+	 * Requests the motion from the client
+	 */
+	public RequestMotionPacket() {
+	}
+	
 	@Override
 	public void handle(PacketSide side, EntityPlayer playerz) {
 		if(side.isClient()) {

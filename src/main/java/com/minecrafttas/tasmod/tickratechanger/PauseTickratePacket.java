@@ -9,7 +9,7 @@ import net.minecraft.network.PacketBuffer;
 /**
  * Sets the game to tickrate 0 and back
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class PauseTickratePacket implements Packet {

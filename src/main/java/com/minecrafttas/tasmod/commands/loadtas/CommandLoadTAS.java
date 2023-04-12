@@ -5,7 +5,7 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.TASmod;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
@@ -44,7 +44,7 @@ public class CommandLoadTAS extends CommandBase {
 						}
 						name=name.concat(args[i]+spacer);
 					}
-					CommonProxy.NETWORK.sendToAll(new LoadTASPacket(name));
+					TASmod.packetServer.sendToAll(new LoadTASPacket(name));
 				}
 			} else {
 				sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));

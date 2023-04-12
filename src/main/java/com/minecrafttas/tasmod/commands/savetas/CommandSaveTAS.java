@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.TASmod;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
@@ -52,7 +52,7 @@ public class CommandSaveTAS extends CommandBase {
 						}
 						name = name.concat(args[i] + spacer);
 					}
-					CommonProxy.NETWORK.sendToAll(new SaveTASPacket(name));
+					TASmod.packetServer.sendToAll(new SaveTASPacket(name));
 				}
 			} else {
 				sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));

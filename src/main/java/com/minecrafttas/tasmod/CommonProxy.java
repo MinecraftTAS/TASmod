@@ -4,16 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.tasmod.commands.clearinputs.ClearInputsPacket;
-import com.minecrafttas.tasmod.commands.clearinputs.ClearInputsPacket.ClearInputsPacketHandler;
 import com.minecrafttas.tasmod.commands.folder.FolderPacket;
 import com.minecrafttas.tasmod.commands.fullplay.FullPlayPacket;
 import com.minecrafttas.tasmod.commands.fullrecord.FullRecordPacket;
 import com.minecrafttas.tasmod.commands.loadtas.LoadTASPacket;
-import com.minecrafttas.tasmod.commands.loadtas.LoadTASPacket.LoadTASPacketHandler;
 import com.minecrafttas.tasmod.commands.restartandplay.RestartAndPlayPacket;
-import com.minecrafttas.tasmod.commands.restartandplay.RestartAndPlayPacket.RestartAndPlayPacketHandler;
 import com.minecrafttas.tasmod.commands.savetas.SaveTASPacket;
-import com.minecrafttas.tasmod.commands.savetas.SaveTASPacket.SaveTASPacketHandler;
 import com.minecrafttas.tasmod.inputcontainer.InputContainer;
 import com.minecrafttas.tasmod.inputcontainer.server.InitialSyncStatePacket;
 import com.minecrafttas.tasmod.inputcontainer.server.SyncStatePacket;
@@ -27,7 +23,6 @@ import com.minecrafttas.tasmod.savestates.server.SavestatePacket;
 import com.minecrafttas.tasmod.savestates.server.motion.MotionPacket;
 import com.minecrafttas.tasmod.savestates.server.motion.RequestMotionPacket;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket;
-import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket.SavestatePlayerLoadingPacketHandler;
 import com.minecrafttas.tasmod.tickratechanger.AdvanceTickratePacket;
 import com.minecrafttas.tasmod.tickratechanger.ChangeTickratePacket;
 import com.minecrafttas.tasmod.tickratechanger.PauseTickratePacket;
@@ -38,9 +33,7 @@ import com.minecrafttas.tasmod.util.TickScheduler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class CommonProxy {
 	public static SimpleNetworkWrapper NETWORK;
@@ -52,53 +45,51 @@ public class CommonProxy {
 		
 		TickrateChangerServer.logger = logger;
 		
-		NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("tasmod");
-		int i = -1;
-
-		// When loadstating, send the data of the client from server to client
-		NETWORK.registerMessage(SavestatePlayerLoadingPacketHandler.class, SavestatePlayerLoadingPacket.class, i++, Side.CLIENT);
-
-		// Trigger saving the inputs to file on the client
-		NETWORK.registerMessage(SaveTASPacketHandler.class, SaveTASPacket.class, i++, Side.CLIENT);
-		NETWORK.registerMessage(SaveTASPacketHandler.class, SaveTASPacket.class, i++, Side.SERVER);
-		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.CLIENT);
-		NETWORK.registerMessage(LoadTASPacketHandler.class, LoadTASPacket.class, i++, Side.SERVER);
-		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.CLIENT);
-		NETWORK.registerMessage(ClearInputsPacketHandler.class, ClearInputsPacket.class, i++, Side.SERVER);
-
-		// Misc
-		NETWORK.registerMessage(InputContainer.TeleportPlayerPacketHandler.class, InputContainer.TeleportPlayerPacket.class, i++, Side.SERVER);
-
-		// RestartAndPlay
-		NETWORK.registerMessage(RestartAndPlayPacketHandler.class, RestartAndPlayPacket.class, i++, Side.CLIENT);
 		
 		PacketSerializer.registerPacket(IdentificationPacket.class);
+		// Ticksync
+		PacketSerializer.registerPacket(TickSyncPacket.class);
+
 		
+		//Tickratechanger
 		PacketSerializer.registerPacket(ChangeTickratePacket.class);
 		PacketSerializer.registerPacket(PauseTickratePacket.class);
 		PacketSerializer.registerPacket(AdvanceTickratePacket.class);
 		
+		
+		// Savestates
+		PacketSerializer.registerPacket(SavestatePacket.class);
+		PacketSerializer.registerPacket(LoadstatePacket.class);
+		
+		PacketSerializer.registerPacket(InputSavestatesPacket.class);
+		PacketSerializer.registerPacket(SavestatePlayerLoadingPacket.class);
+		
 		PacketSerializer.registerPacket(RequestMotionPacket.class);
 		PacketSerializer.registerPacket(MotionPacket.class);
 		
-		PacketSerializer.registerPacket(TickSyncPacket.class);
-		
+		// KillTheRNG
 		PacketSerializer.registerPacket(KTRNGSeedPacket.class);
 		PacketSerializer.registerPacket(KTRNGStartSeedPacket.class);
 		
+		// Recording/Playback
 		PacketSerializer.registerPacket(SyncStatePacket.class);
 		PacketSerializer.registerPacket(InitialSyncStatePacket.class);
 		
-		PacketSerializer.registerPacket(InputSavestatesPacket.class);
-		
-		// Trigger savestates/loadstates on the client
-		PacketSerializer.registerPacket(SavestatePacket.class);
-		PacketSerializer.registerPacket(LoadstatePacket.class);
+		PacketSerializer.registerPacket(ClearInputsPacket.class);
 		
 		PacketSerializer.registerPacket(FullRecordPacket.class);
 		PacketSerializer.registerPacket(FullPlayPacket.class);
 		
+		PacketSerializer.registerPacket(RestartAndPlayPacket.class);
+		
+		// Storing
+		PacketSerializer.registerPacket(SaveTASPacket.class);
+		PacketSerializer.registerPacket(LoadTASPacket.class);
+
+		// Misc
+		PacketSerializer.registerPacket(InputContainer.TeleportPlayerPacket.class);
 		PacketSerializer.registerPacket(FolderPacket.class);
+		
 	}
 
 	public void init(FMLInitializationEvent ev) {

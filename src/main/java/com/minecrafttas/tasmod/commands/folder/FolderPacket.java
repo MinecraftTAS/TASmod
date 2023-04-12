@@ -12,6 +12,11 @@ public class FolderPacket implements Packet {
 	public FolderPacket() {
 	}
 	
+	/**
+	 * 0: Open savestates folder
+	 * 1: Open TASdir folder
+	 * @param command The folder to open
+	 */
 	public FolderPacket(int command) {
 		this.command=command;
 	}

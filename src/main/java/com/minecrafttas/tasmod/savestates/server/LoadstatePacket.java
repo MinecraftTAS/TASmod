@@ -6,7 +6,9 @@ import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -32,24 +34,29 @@ public class LoadstatePacket implements Packet {
 	}
 
 	@Override
-	public void handle(PacketSide side, EntityPlayer player) {
+	public void handle(PacketSide side, EntityPlayer playerz) {
 		if (side.isServer()) {
-			if (!player.canUseCommand(2, "tickrate")) {
-				player.sendMessage(new TextComponentString(TextFormatting.RED + "You don't have permission to do that"));
-				return;
-			}
-			try {
-				TASmod.savestateHandler.loadState(index, true);
-			} catch (LoadstateException e) {
-				player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getMessage()));
-			} catch (Exception e) {
-				player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getCause().toString()));
-				e.printStackTrace();
-			} finally {
-				TASmod.savestateHandler.state = SavestateState.NONE;
-			}
+			EntityPlayerMP player = (EntityPlayerMP) playerz;
+			player.getServerWorld().addScheduledTask(()->{
+				if (!player.canUseCommand(2, "tickrate")) {
+					player.sendMessage(new TextComponentString(TextFormatting.RED + "You don't have permission to do that"));
+					return;
+				}
+				try {
+					TASmod.savestateHandler.loadState(index, true);
+				} catch (LoadstateException e) {
+					player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getMessage()));
+				} catch (Exception e) {
+					player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getCause().toString()));
+					e.printStackTrace();
+				} finally {
+					TASmod.savestateHandler.state = SavestateState.NONE;
+				}
+			});
 		} else {
-			SavestatesChunkControl.unloadAllClientChunks();
+			Minecraft.getMinecraft().addScheduledTask(()->{
+				SavestatesChunkControl.unloadAllClientChunks();
+			});
 		}
 	}
 

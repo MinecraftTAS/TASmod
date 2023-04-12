@@ -8,6 +8,10 @@ import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
+/**
+ * Used to identify the socket. This enables the server to send packets to a specific player
+ * @author Scribble
+ */
 public class IdentificationPacket implements Packet {
 
 	private UUID uuid;

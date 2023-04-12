@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.commands.clearinputs;
 
-import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.TASmod;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -23,7 +23,7 @@ public class CommandClearInputs extends CommandBase{
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(sender instanceof EntityPlayer) {
-			CommonProxy.NETWORK.sendToAll(new ClearInputsPacket());
+			TASmod.packetServer.sendToAll(new ClearInputsPacket());
 		}
 	}
 	@Override

@@ -13,6 +13,7 @@ import com.minecrafttas.tasmod.util.TickScheduler.TickTask;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -38,9 +39,9 @@ public class SavestatePacket implements Packet {
 	}
 	
 	@Override
-	public void handle(PacketSide side, EntityPlayer player) {
+	public void handle(PacketSide side, EntityPlayer playerz) {
 		if(side.isServer()) {
-			
+			EntityPlayerMP player = (EntityPlayerMP) playerz;
 			TickTask task = () -> {
 				if (!player.canUseCommand(2, "savestate")) {
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"You don't have permission to do that"));
@@ -60,7 +61,9 @@ public class SavestatePacket implements Packet {
 			};
 			
 			if(TickrateChangerServer.ticksPerSecond == 0) {
-				task.runTask();
+				player.getServerWorld().addScheduledTask(()->{
+					task.runTask();
+				});
 				return;
 			}
 			CommonProxy.tickSchedulerServer.add(task);
