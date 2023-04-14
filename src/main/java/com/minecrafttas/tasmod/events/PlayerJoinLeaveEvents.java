@@ -61,6 +61,9 @@ public class PlayerJoinLeaveEvents {
 		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
 		TickrateChangerClient.joinServer();
 		ClientProxy.virtual.getContainer().printCredits();
+		
+		TASmod.ktrngHandler.setInitialSeed();
+		TASmod.ktrngHandler.setUpdating(true);
 	}
 	
 	/**
@@ -70,6 +73,7 @@ public class PlayerJoinLeaveEvents {
 	@SideOnly(Side.CLIENT)
 	public static void firePlayerLeaveClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
 		TASmod.logger.info("Firing logout events for {} on the CLIENT", player.getName());
+		TASmod.ktrngHandler.setUpdating(false);
 		try {
 			if(ClientProxy.packetClient!=null) {
 				ClientProxy.packetClient.killClient();

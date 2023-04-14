@@ -7,6 +7,7 @@ import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -19,6 +20,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class KillTheRNGHandler{
 	
 	private boolean isLoaded;
+	/**
+	 * Used clientside to stop updating the seed during the loading screen
+	 */
+	private boolean isUpdating;
 	
 	/**
 	 * Instantiates a KillTheRNGHandler instance
@@ -34,6 +39,7 @@ public class KillTheRNGHandler{
 			KillTheRNG.mode=SeedingModes.TickChange;
 			
 			KillTheRNG.annotations.register(new KTRNGMonitor());
+			isUpdating = false;
 		}else {
 			TASmod.logger.info("KillTheRNG doesn't appear to be loaded");
 		}
@@ -123,9 +129,28 @@ public class KillTheRNGHandler{
 		}
 	}
 	
+	public boolean isUpdating() {	//TODO Remove if it doesn't work
+		EntityPlayerSP player=Minecraft.getMinecraft().player;
+		
+		return player==null||player.addedToChunk;
+	}
+	
+	public void setUpdating(boolean update) {
+		this.isUpdating=update;
+	}
+	
 	@SideOnly(Side.CLIENT)
 	public void setInitialSeed() {
-		ClientProxy.packetClient.sendToServer(new KTRNGSeedPacket(getGlobalSeedClient()));	// TODO Every new player in multiplayer will currently send the initial seed, which is BAD
+		setInitialSeed(getGlobalSeedClient());
 	}
 
+	@SideOnly(Side.CLIENT)
+	public void setInitialSeed(long initialSeed) {
+		if(TASmod.getServerInstance() != null) {
+			TASmod.logger.info("Sending initial client seed: {}", initialSeed);
+			ClientProxy.packetClient.sendToServer(new KTRNGSeedPacket(initialSeed));	// TODO Every new player in multiplayer will currently send the initial seed, which is BAD
+		} else {
+			TASmod.ktrngHandler.setGlobalSeedClient(initialSeed);
+		}
+	}
 }
