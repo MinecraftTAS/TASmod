@@ -60,12 +60,13 @@ public class SavestatePacket implements Packet {
 				}
 			};
 			
-			if(TickrateChangerServer.ticksPerSecond == 0) {
+			if(TickrateChangerServer.ticksPerSecond == 0 || true) {
 				player.getServerWorld().addScheduledTask(()->{
 					task.runTask();
 				});
 				return;
 			}
+			//TODO Remove once it's confirmed that this still works
 			CommonProxy.tickSchedulerServer.add(task);
 		}
 		else {
@@ -79,13 +80,13 @@ public class SavestatePacket implements Packet {
 				}
 			};
 			
-			if(TickrateChangerClient.ticksPerSecond == 0) {
-				task.runTask();
+			if(TickrateChangerClient.ticksPerSecond == 0||true) {
+				Minecraft.getMinecraft().addScheduledTask(()->{
+					task.runTask();
+				});
 				return;
 			}
-			else {
-				ClientProxy.tickSchedulerClient.add(task);
-			}
+			ClientProxy.tickSchedulerClient.add(task);
 		}
 	}
 

@@ -157,7 +157,7 @@ public class InputContainer {
 				index = 0;
 				state = TASstate.PLAYBACK;
 				creditsPrinted=false;
-				TASmod.ktrngHandler.setGlobalSeedServer(startSeed);
+				TASmod.ktrngHandler.setInitialSeed(startSeed);
 //				TASmod.ktrngHandler.setTestSeed(startSeed); TODO Do monitoring again
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
@@ -348,7 +348,8 @@ public class InputContainer {
 	public void nextTick() {
 		/*Stop the playback while player is still loading*/
 		EntityPlayerSP player=Minecraft.getMinecraft().player;
-		if(player!=null&&!player.addedToChunk) {
+		
+		if(player!=null&&!player.addedToChunk) { //TODO #132&#143
 			pause(true);
 		}else {
 			pause(false);
