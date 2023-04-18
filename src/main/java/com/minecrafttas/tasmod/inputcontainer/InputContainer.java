@@ -351,6 +351,7 @@ public class InputContainer {
 		
 		if(player!=null&&!player.addedToChunk) { //TODO #132&#143
 			pause(true);
+			System.out.println("Paused"); //TODO REMOVE
 		}else {
 			pause(false);
 		}

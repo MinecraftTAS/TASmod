@@ -1,6 +1,7 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
 import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorTimer;
 
@@ -166,7 +167,7 @@ public class TickrateChangerClient {
 	}
 	
 	private static void log(String msg) {
-//		TASmod.logger.info(msg);
+		TASmod.logger.info(msg);
 	}
 
 }
