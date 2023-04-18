@@ -185,6 +185,6 @@ public class TickrateChangerServer {
 	 * @param msg 
 	 */
 	private static void log(String msg) {
-//		logger.info(msg);
+		logger.info(msg);
 	}
 }

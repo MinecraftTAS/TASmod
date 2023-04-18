@@ -59,11 +59,13 @@ public class PlayerJoinLeaveEvents {
 		
 		ClientProxy.virtual.unpressNext();
 		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
-		TickrateChangerClient.joinServer();
+//		TickrateChangerClient.joinServer(); //TODO Only the first player joining the server should be able to change the tickrate
 		ClientProxy.virtual.getContainer().printCredits();
 		
 		TASmod.ktrngHandler.setInitialSeed();
-		TASmod.ktrngHandler.setUpdating(true);
+		
+		TickrateChangerClient.pauseClientGame(true); //TODO THIS IS REALLY BAD REMOVE IT
+		TickrateChangerServer.pauseServerGame(true);
 	}
 	
 	/**
@@ -73,7 +75,6 @@ public class PlayerJoinLeaveEvents {
 	@SideOnly(Side.CLIENT)
 	public static void firePlayerLeaveClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
 		TASmod.logger.info("Firing logout events for {} on the CLIENT", player.getName());
-		TASmod.ktrngHandler.setUpdating(false);
 		try {
 			if(ClientProxy.packetClient!=null) {
 				ClientProxy.packetClient.killClient();

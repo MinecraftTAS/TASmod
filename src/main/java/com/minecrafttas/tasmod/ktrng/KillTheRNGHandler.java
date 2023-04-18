@@ -20,10 +20,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class KillTheRNGHandler{
 	
 	private boolean isLoaded;
-	/**
-	 * Used clientside to stop updating the seed during the loading screen
-	 */
-	private boolean isUpdating;
 	
 	/**
 	 * Instantiates a KillTheRNGHandler instance
@@ -39,7 +35,6 @@ public class KillTheRNGHandler{
 			KillTheRNG.mode=SeedingModes.TickChange;
 			
 			KillTheRNG.annotations.register(new KTRNGMonitor());
-			isUpdating = false;
 		}else {
 			TASmod.logger.info("KillTheRNG doesn't appear to be loaded");
 		}
@@ -133,10 +128,6 @@ public class KillTheRNGHandler{
 		EntityPlayerSP player=Minecraft.getMinecraft().player;
 		
 		return player==null||player.addedToChunk;
-	}
-	
-	public void setUpdating(boolean update) {
-		this.isUpdating=update;
 	}
 	
 	@SideOnly(Side.CLIENT)

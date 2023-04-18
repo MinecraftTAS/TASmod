@@ -79,8 +79,8 @@ public class LoadWorldEvents {
 				TASmod.logger.info("Finished loading screen on the client");
 				if (!waszero) {
 					if(TASmod.getServerInstance()!=null) {	//Check if a server is running and if it's an integrated server
-						TickrateChangerClient.pauseClientGame(false);
-						TickrateChangerServer.pauseServerGame(false);
+//						TickrateChangerClient.pauseClientGame(false); TODO Uncomment once everything is done
+//						TickrateChangerServer.pauseServerGame(false);
 					}
 				} else {
 					waszero = false;
