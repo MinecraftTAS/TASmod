@@ -3,6 +3,7 @@ package com.minecrafttas.tasmod.commands.recording;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 
 import net.minecraft.command.CommandBase;
@@ -43,6 +44,9 @@ public class CommandRecord extends CommandBase {
 		}
 		if (args.length < 1) {
 			TASmod.containerStateServer.toggleRecording();
+			CommonProxy.tickSchedulerServer.add(() ->{
+				TASmod.ktrngHandler.broadcastStartSeed();
+			});
 		} else if (args.length > 1) {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments. " + getUsage(sender)));
 		}
