@@ -23,6 +23,10 @@ public class LoadWorldEvents {
 	 */
 	public static void startLaunchServer() {
 		TASmod.logger.info("Starting the integrated server");
+		InputContainer container = ClientProxy.virtual.getContainer();
+		if(!container.isNothingPlaying() && !container.isPaused()) {
+			container.pause(true);
+		}
 		if (TickrateChangerClient.ticksPerSecond == 0 || TickrateChangerClient.advanceTick) {
 			waszero = true;
 		}
@@ -65,10 +69,6 @@ public class LoadWorldEvents {
 	 * When the client is done loading the world
 	 */
 	public static void doneLoadingClientWorld() {
-		InputContainer container = ClientProxy.virtual.getContainer();
-		if(!container.isNothingPlaying() && !container.isPaused()) {
-			container.pause(true);
-		}
 		TASmod.logger.info("Finished loading the world on the client");
 		if(TASmod.getServerInstance()!=null) { //Check if a server is running and if it's an integrated server
 			loadingScreenDelay = 1;

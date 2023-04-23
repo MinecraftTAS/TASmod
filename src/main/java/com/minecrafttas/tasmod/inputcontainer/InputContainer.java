@@ -46,7 +46,7 @@ import net.minecraft.util.text.TextFormatting;
  * Inputs are saved and loaded to/from file via the
  * {@linkplain ContainerSerialiser}
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class InputContainer {
@@ -349,9 +349,9 @@ public class InputContainer {
 		/*Stop the playback while player is still loading*/
 		EntityPlayerSP player=Minecraft.getMinecraft().player;
 		
-		if(player!=null&&player.addedToChunk) {
+		if(player!=null && player.addedToChunk) {
 			if(isPaused() && tempPause != TASstate.NONE) {
-				ContainerStateClient.setOrSend(tempPause);	// The recording is paused in LoadWorldEvents#doneLoadingClientWorld
+				ContainerStateClient.setOrSend(tempPause);	// The recording is paused in LoadWorldEvents#startLaunchServer
 				pause(false);
 			}
 		}
