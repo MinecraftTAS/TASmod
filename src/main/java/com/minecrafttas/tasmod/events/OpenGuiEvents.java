@@ -2,6 +2,7 @@ package com.minecrafttas.tasmod.events;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.inputcontainer.InputContainer;
 import com.minecrafttas.tasmod.inputcontainer.TASstate;
 import com.minecrafttas.tasmod.inputcontainer.server.ContainerStateClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
@@ -23,7 +24,12 @@ public class OpenGuiEvents {
 	 */
 	public static void openGuiMainMenu(GuiMainMenu guiMainMenu) {
 		if (stateWhenOpened != null) {
-			ClientProxy.virtual.getContainer().setTASState(stateWhenOpened);
+			InputContainer container = ClientProxy.virtual.getContainer();
+			if(stateWhenOpened == TASstate.RECORDING) {
+				long seed = TASmod.ktrngHandler.getGlobalSeedClient();
+				container.setStartSeed(seed);
+			}
+			container.setTASState(stateWhenOpened);
 			stateWhenOpened = null;
 		}
 		LoadWorldEvents.doneShuttingDown();
