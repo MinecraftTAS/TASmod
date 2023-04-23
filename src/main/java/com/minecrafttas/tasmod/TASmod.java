@@ -23,6 +23,7 @@ import com.minecrafttas.tasmod.savestates.server.SavestateCommand;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
 import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.tickratechanger.CommandTickrate;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.util.ModIncompatibleException;
 
 import net.minecraft.server.MinecraftServer;
@@ -136,6 +137,9 @@ public class TASmod {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		TickrateChangerServer.ticksPerSecond=0F;
+		TickrateChangerServer.tickrateSaved=20F;
 	}
 	
 	@EventHandler

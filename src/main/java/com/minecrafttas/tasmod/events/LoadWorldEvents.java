@@ -2,6 +2,7 @@ package com.minecrafttas.tasmod.events;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.inputcontainer.InputContainer;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 
@@ -64,6 +65,10 @@ public class LoadWorldEvents {
 	 * When the client is done loading the world
 	 */
 	public static void doneLoadingClientWorld() {
+		InputContainer container = ClientProxy.virtual.getContainer();
+		if(!container.isNothingPlaying() && !container.isPaused()) {
+			container.pause(true);
+		}
 		TASmod.logger.info("Finished loading the world on the client");
 		if(TASmod.getServerInstance()!=null) { //Check if a server is running and if it's an integrated server
 			loadingScreenDelay = 1;
@@ -77,15 +82,16 @@ public class LoadWorldEvents {
 		if (loadingScreenDelay > -1) {
 			if (loadingScreenDelay == 0) {
 				TASmod.logger.info("Finished loading screen on the client");
+				TickrateChangerClient.joinServer();
 				if (!waszero) {
 					if(TASmod.getServerInstance()!=null) {	//Check if a server is running and if it's an integrated server
-//						TickrateChangerClient.pauseClientGame(false); TODO Uncomment once everything is done
-//						TickrateChangerServer.pauseServerGame(false);
+						TickrateChangerClient.pauseClientGame(false);
+						TickrateChangerServer.pauseServerGame(false);
 					}
 				} else {
 					waszero = false;
 				}
-				isLoading=false;
+				isLoading = false;
 			}
 			loadingScreenDelay--;
 		}

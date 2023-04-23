@@ -7,7 +7,6 @@ import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.inputcontainer.server.InitialSyncStatePacket;
 import com.minecrafttas.tasmod.networking.TASmodNetworkClient;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.mojang.authlib.GameProfile;
 
@@ -64,8 +63,6 @@ public class PlayerJoinLeaveEvents {
 		
 		TASmod.ktrngHandler.setInitialSeed();
 		
-		TickrateChangerClient.pauseClientGame(true); //TODO THIS IS REALLY BAD REMOVE IT
-		TickrateChangerServer.pauseServerGame(true);
 	}
 	
 	/**

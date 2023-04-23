@@ -349,11 +349,11 @@ public class InputContainer {
 		/*Stop the playback while player is still loading*/
 		EntityPlayerSP player=Minecraft.getMinecraft().player;
 		
-		if(player!=null&&!player.addedToChunk) { //TODO #132&#143
-			pause(true);
-			System.out.println("Paused"); //TODO REMOVE
-		}else {
-			pause(false);
+		if(player!=null&&player.addedToChunk) {
+			if(isPaused() && tempPause != TASstate.NONE) {
+				ContainerStateClient.setOrSend(tempPause);	// The recording is paused in LoadWorldEvents#doneLoadingClientWorld
+				pause(false);
+			}
 		}
 		
 		/*Tick the next playback or recording*/

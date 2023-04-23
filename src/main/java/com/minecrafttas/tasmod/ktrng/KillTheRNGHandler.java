@@ -2,12 +2,12 @@ package com.minecrafttas.tasmod.ktrng;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.inputcontainer.TASstate;
 
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.SeedingModes;
 import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -111,7 +111,8 @@ public class KillTheRNGHandler{
 	 */
 	public void updateServer() {
 		if(isLoaded()) {
-			TASmod.packetServer.sendToAll(new KTRNGSeedPacket(advanceGlobalSeedServer()));
+			if(TASmod.containerStateServer.getState() != TASstate.PAUSED)
+				TASmod.packetServer.sendToAll(new KTRNGSeedPacket(advanceGlobalSeedServer()));
 		}
 	}
 	
@@ -122,12 +123,6 @@ public class KillTheRNGHandler{
 			long seed = getGlobalSeedServer();
 			TASmod.packetServer.sendToAll(new KTRNGStartSeedPacket(seed));
 		}
-	}
-	
-	public boolean isUpdating() {	//TODO Remove if it doesn't work
-		EntityPlayerSP player=Minecraft.getMinecraft().player;
-		
-		return player==null||player.addedToChunk;
 	}
 	
 	@SideOnly(Side.CLIENT)

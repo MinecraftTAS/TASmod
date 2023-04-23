@@ -1,15 +1,10 @@
 package com.minecrafttas.tasmod.savestates.server;
 
-import com.minecrafttas.tasmod.ClientProxy;
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
-import com.minecrafttas.tasmod.util.TickScheduler.TickTask;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,7 +37,7 @@ public class SavestatePacket implements Packet {
 	public void handle(PacketSide side, EntityPlayer playerz) {
 		if(side.isServer()) {
 			EntityPlayerMP player = (EntityPlayerMP) playerz;
-			TickTask task = () -> {
+			player.getServerWorld().addScheduledTask(()->{
 				if (!player.canUseCommand(2, "savestate")) {
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"You don't have permission to do that"));
 					return;
@@ -58,35 +53,18 @@ public class SavestatePacket implements Packet {
 				} finally {
 					TASmod.savestateHandler.state=SavestateState.NONE;
 				}
-			};
+			});
 			
-			if(TickrateChangerServer.ticksPerSecond == 0 || true) {
-				player.getServerWorld().addScheduledTask(()->{
-					task.runTask();
-				});
-				return;
-			}
-			//TODO Remove once it's confirmed that this still works
-			CommonProxy.tickSchedulerServer.add(task);
 		}
 		else {
-			
-			TickTask task = () -> {
+			Minecraft.getMinecraft().addScheduledTask(() -> {
 				Minecraft mc = Minecraft.getMinecraft();
-				if(!(mc.currentScreen instanceof GuiSavestateSavingScreen)) {
+				if (!(mc.currentScreen instanceof GuiSavestateSavingScreen)) {
 					mc.displayGuiScreen(new GuiSavestateSavingScreen());
-				}else {
+				} else {
 					mc.displayGuiScreen(null);
 				}
-			};
-			
-			if(TickrateChangerClient.ticksPerSecond == 0||true) {
-				Minecraft.getMinecraft().addScheduledTask(()->{
-					task.runTask();
-				});
-				return;
-			}
-			ClientProxy.tickSchedulerClient.add(task);
+			});
 		}
 	}
 

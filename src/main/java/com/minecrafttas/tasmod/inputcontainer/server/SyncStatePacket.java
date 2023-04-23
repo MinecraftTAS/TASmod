@@ -82,7 +82,7 @@ public class SyncStatePacket implements Packet {
 			};
 			
 			
-			if(state == TASstate.RECORDING || state == TASstate.PLAYBACK) {
+			if(state == TASstate.RECORDING || state == TASstate.PLAYBACK || state == TASstate.PAUSED) {
 				ClientProxy.tickSchedulerClient.add(task);	// Starts a recording in the next tick
 			} else {
 				ClientProxy.gameLoopSchedulerClient.add(task);	// Starts a recording in the next frame
