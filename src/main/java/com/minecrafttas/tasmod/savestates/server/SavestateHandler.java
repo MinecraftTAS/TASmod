@@ -539,7 +539,7 @@ public class SavestateHandler {
 		if(TASmod.ktrngHandler.isLoaded()) {
 			String seedString = datafile.get(DataValues.SEED);
 			if(seedString != null) {
-				TASmod.ktrngHandler.setGlobalSeedServer(Long.parseLong(seedString));
+				TASmod.ktrngHandler.sendGlobalSeedToServer(Long.parseLong(seedString));
 			} else {
 				logger.warn("KTRNG seed not loaded because it was not found in savestateData.txt!");
 			}

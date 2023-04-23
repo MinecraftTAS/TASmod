@@ -1,6 +1,5 @@
 package com.minecrafttas.tasmod.inputcontainer.server;
 
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.inputcontainer.TASstate;
 

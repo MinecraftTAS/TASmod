@@ -138,8 +138,10 @@ public class TASmod {
 			e.printStackTrace();
 		}
 		
-		TickrateChangerServer.ticksPerSecond=0F;
-		TickrateChangerServer.tickrateSaved=20F;
+		if(!serverInstance.isDedicatedServer()) {
+			TickrateChangerServer.ticksPerSecond=0F;
+			TickrateChangerServer.tickrateSaved=20F;
+		}
 	}
 	
 	@EventHandler

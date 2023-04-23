@@ -51,6 +51,7 @@ public class InfoGui extends Gui {
 //			new Gui().drawString(mc.fontRenderer, "Client Ticks: " + TickSync.getClienttickcounter(), 16, 110, 0xFFFFFF); // Current Pointer location
 //			
 //			new Gui().drawString(mc.fontRenderer, "EntitySeed: "+ EntityRandom.currentSeed, 16, 130, 0xFFFFFF); // Current Pointer location
+//			drawString(mc.fontRenderer, "RandomServer: "+ TASmod.ktrngHandler.getGlobalSeedServer(), 2, 130, 0xFFFFFF); // Current Pointer location
 //			
 //			EntityPlayerSP player=Minecraft.getMinecraft().player;
 
