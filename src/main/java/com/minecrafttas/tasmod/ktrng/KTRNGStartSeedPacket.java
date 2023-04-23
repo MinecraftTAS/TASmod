@@ -1,6 +1,8 @@
 package com.minecrafttas.tasmod.ktrng;
 
 import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 
@@ -30,6 +32,10 @@ public class KTRNGStartSeedPacket implements Packet{
 	public void handle(PacketSide side, EntityPlayer player) {
 		if(side.isClient()) {
 			ClientProxy.virtual.getContainer().setStartSeed(seed);
+		} else {
+			CommonProxy.tickSchedulerServer.add(()->{
+				TASmod.ktrngHandler.setGlobalSeedServer(seed);
+			});
 		}
 	}
 

@@ -6,8 +6,6 @@ import com.minecrafttas.tasmod.inputcontainer.TASstate;
 
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.SeedingModes;
-import de.scribble.lp.killtherng.networking.ChangeSeedPacket;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -84,15 +82,21 @@ public class KillTheRNGHandler{
 		}
 	}
 	
+	
+	public void setGlobalSeedServer(long seedIn) {
+		if (isLoaded()) {
+			KillTheRNG.commonRandom.setSeedAll(seedIn);
+		}
+	}
 	/**
 	 * Sends a packet to the server, setting the global seed
 	 * @param seedIn The seed on the server
 	 */
 	@SideOnly(Side.CLIENT)
-	public void setGlobalSeedServer(long seedIn) {
+	public void sendGlobalSeedToServer(long seedIn) {
 		if(isLoaded()) {
-			if(Minecraft.getMinecraft().getConnection()!=null)
-				KillTheRNG.NETWORK.sendToServer(new ChangeSeedPacket(seedIn));
+			if(ClientProxy.packetClient!=null)
+				ClientProxy.packetClient.sendToServer(new KTRNGSeedPacket(seedIn));
 			else
 				setGlobalSeedClient(seedIn);
 		}
@@ -132,9 +136,9 @@ public class KillTheRNGHandler{
 
 	@SideOnly(Side.CLIENT)
 	public void setInitialSeed(long initialSeed) {
-		if(TASmod.getServerInstance() != null) {
+		if(ClientProxy.packetClient != null) {
 			TASmod.logger.info("Sending initial client seed: {}", initialSeed);
-			ClientProxy.packetClient.sendToServer(new KTRNGSeedPacket(initialSeed));	// TODO Every new player in multiplayer will currently send the initial seed, which is BAD
+			ClientProxy.packetClient.sendToServer(new KTRNGStartSeedPacket(initialSeed));	// TODO Every new player in multiplayer will currently send the initial seed, which is BAD
 		} else {
 			TASmod.ktrngHandler.setGlobalSeedClient(initialSeed);
 		}
