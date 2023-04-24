@@ -12,6 +12,7 @@ import com.minecrafttas.tasmod.commands.fullplay.CommandFullPlay;
 import com.minecrafttas.tasmod.commands.fullrecord.CommandFullRecord;
 import com.minecrafttas.tasmod.commands.loadtas.CommandLoadTAS;
 import com.minecrafttas.tasmod.commands.playback.CommandPlay;
+import com.minecrafttas.tasmod.commands.playuntil.CommandPlayUntil;
 import com.minecrafttas.tasmod.commands.recording.CommandRecord;
 import com.minecrafttas.tasmod.commands.restartandplay.CommandRestartAndPlay;
 import com.minecrafttas.tasmod.commands.savetas.CommandSaveTAS;
@@ -121,6 +122,7 @@ public class TASmod {
 		ev.registerServerCommand(new CommandFullRecord());
 		ev.registerServerCommand(new CommandFullPlay());
 		ev.registerServerCommand(new CommandRestartAndPlay());
+		ev.registerServerCommand(new CommandPlayUntil());
 
 		// Save Loadstate Count
 		File savestateDirectory = new File(serverInstance.getDataDirectory() + File.separator + "saves" + File.separator + "savestates" + File.separator);
