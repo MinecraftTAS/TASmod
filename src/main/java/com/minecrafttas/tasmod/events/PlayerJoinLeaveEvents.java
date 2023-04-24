@@ -59,8 +59,6 @@ public class PlayerJoinLeaveEvents {
 		ClientProxy.virtual.unpressNext();
 		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
 //		TickrateChangerClient.joinServer(); //TODO Only the first player joining the server should be able to change the tickrate
-		ClientProxy.virtual.getContainer().printCredits();
-		
 		TASmod.ktrngHandler.setInitialSeed();
 		
 	}

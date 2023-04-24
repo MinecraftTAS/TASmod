@@ -8,6 +8,7 @@ import com.minecrafttas.tasmod.commands.folder.FolderPacket;
 import com.minecrafttas.tasmod.commands.fullplay.FullPlayPacket;
 import com.minecrafttas.tasmod.commands.fullrecord.FullRecordPacket;
 import com.minecrafttas.tasmod.commands.loadtas.LoadTASPacket;
+import com.minecrafttas.tasmod.commands.playuntil.PlayUntilPacket;
 import com.minecrafttas.tasmod.commands.restartandplay.RestartAndPlayPacket;
 import com.minecrafttas.tasmod.commands.savetas.SaveTASPacket;
 import com.minecrafttas.tasmod.inputcontainer.InputContainer;
@@ -89,6 +90,8 @@ public class CommonProxy {
 		// Misc
 		PacketSerializer.registerPacket(InputContainer.TeleportPlayerPacket.class);
 		PacketSerializer.registerPacket(FolderPacket.class);
+		
+		PacketSerializer.registerPacket(PlayUntilPacket.class);
 		
 	}
 

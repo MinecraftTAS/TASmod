@@ -15,6 +15,7 @@ import com.minecrafttas.tasmod.inputcontainer.server.ContainerStateClient;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.util.ContainerSerialiser;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
@@ -109,6 +110,8 @@ public class InputContainer {
 	// =====================================================================================================
 
 	private boolean creditsPrinted=false;
+
+	private Integer playUntil = null;
 	
 	/**
 	 * Starts or stops a recording/playback
@@ -161,7 +164,7 @@ public class InputContainer {
 //				TASmod.ktrngHandler.setTestSeed(startSeed); TODO Do monitoring again
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
-				if (Minecraft.getMinecraft().player != null) {
+				if (Minecraft.getMinecraft().player != null && startLocation.isEmpty()) {
 					startLocation = getStartLocation(Minecraft.getMinecraft().player);
 				}
 				state = TASstate.RECORDING;
@@ -353,6 +356,7 @@ public class InputContainer {
 			if(isPaused() && tempPause != TASstate.NONE) {
 				ContainerStateClient.setOrSend(tempPause);	// The recording is paused in LoadWorldEvents#startLaunchServer
 				pause(false);
+				printCredits();
 			}
 		}
 		
@@ -366,7 +370,11 @@ public class InputContainer {
 	
 	private void recordNextTick() {
 		index++;
-		inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
+		if(inputs.size()<=index) {
+			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
+		} else {
+			inputs.set(index, new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
+		}
 		dMonitor.recordMonitor(); // Capturing monitor values
 	}
 
@@ -377,6 +385,16 @@ public class InputContainer {
 		}
 		
 		index++;	// Increase the index and load the next inputs
+		
+		if(playUntil!=null && playUntil == index+1) {
+			TickrateChangerClient.pauseGame(true);
+			playUntil = null;
+			setTASState(TASstate.NONE);
+			for(long i = inputs.size()-1; i >= index+1; i--) {
+				inputs.remove(i);
+			}
+			setTASState(TASstate.RECORDING);
+		}
 		
 		/*Stop condition*/
 		if (index >= inputs.size()) {
@@ -391,7 +409,6 @@ public class InputContainer {
 			this.subticks = tickcontainer.getSubticks().clone();
 			// check for control bytes
 			ControlByteHandler.readCotrolByte(controlBytes.get(index));
-			
 		}
 	}
 	// =====================================================================================================
@@ -450,6 +467,7 @@ public class InputContainer {
 		controlBytes.clear();
 		comments.clear();
 		index = 0;
+		startLocation="";
 		dMonitor.getPos().clear();
 		clearCredits();
 	}
@@ -672,5 +690,9 @@ public class InputContainer {
 			formatString=format.toString();
 		
 		Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(formatString + msg));
+	}
+
+	public void setPlayUntil(int until) {
+		this.playUntil  = until;
 	}
 }
