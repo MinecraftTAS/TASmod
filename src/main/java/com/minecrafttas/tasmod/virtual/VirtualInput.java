@@ -537,13 +537,13 @@ public class VirtualInput {
 	// ================================Load/Save Inputs=====================================
 	
 	public void loadInputs(String filename) throws IOException {
-		setContainer(ClientProxy.serialiser.fromEntireFileV1(new File(ClientProxy.tasdirectory + "/" + filename + ".tas")));
+		setContainer(ClientProxy.serialiser.fromEntireFileV1(new File(ClientProxy.tasdirectory + "/" + filename + ".mctas")));
 		getContainer().fixTicks();
 	}
 	
 	public void saveInputs(String filename) throws IOException {
 		ClientProxy.createTASDir();
-		ClientProxy.serialiser.saveToFileV1(new File(ClientProxy.tasdirectory + "/" + filename + ".tas"), ClientProxy.virtual.getContainer());
+		ClientProxy.serialiser.saveToFileV1(new File(ClientProxy.tasdirectory + "/" + filename + ".mctas"), ClientProxy.virtual.getContainer());
 	}
 
 	// =====================================Debug===========================================

@@ -36,7 +36,7 @@ public class SaveTASPacket implements Packet {
 					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
 					return;
 				}
-				mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Saved inputs to " + name + ".tas"));
+				mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Saved inputs to " + name + ".mctas"));
 			});
 		} else {
 			EntityPlayerMP player = (EntityPlayerMP) playerz;

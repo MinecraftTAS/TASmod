@@ -371,8 +371,6 @@ public class PlaybackController {
 		}
 	}
 	
-	// 100, 99 101
-	
 	private void recordNextTick() {
 		index++;
 		if(inputs.size()<=index) {

@@ -101,7 +101,7 @@ public class PlaybackSerialiser {
 			throw new IOException("There are no inputs to save to a file");
 		}
 		FileThread fileThread = new FileThread(file, false);
-//		FileThread monitorThread= new FileThread(new File(file, "../"+file.getName().replace(".tas", "")+".mon"), false);
+//		FileThread monitorThread= new FileThread(new File(file, "../"+file.getName().replace(".mctas", "")+".mon"), false);
 
 		fileThread.start();
 //		monitorThread.start();
@@ -182,7 +182,7 @@ public class PlaybackSerialiser {
 
 		List<String> lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
 		
-		File monitorFile=new File(file, "../"+file.getName().replace(".tas", "")+".mon");
+		File monitorFile=new File(file, "../"+file.getName().replace(".mctas", "")+".mon");
 		
 		List<String> monitorLines=new ArrayList<>();
 		

@@ -45,7 +45,7 @@ public class InputSavestatesHandler {
 
 		savestateDirectory.mkdir();
 
-		File targetfile = new File(savestateDirectory, nameOfSavestate + ".tas");
+		File targetfile = new File(savestateDirectory, nameOfSavestate + ".mctas");
 
 		PlaybackController container = ClientProxy.virtual.getContainer();
 		if (container.isRecording()) {
@@ -72,7 +72,7 @@ public class InputSavestatesHandler {
 
 		savestateDirectory.mkdir();
 
-		File targetfile = new File(savestateDirectory, nameOfSavestate + ".tas");
+		File targetfile = new File(savestateDirectory, nameOfSavestate + ".mctas");
 
 		PlaybackController container = ClientProxy.virtual.getContainer();
 		if (!container.isNothingPlaying()) { // If the file exists and the container is recording or playing, load the clientSavestate

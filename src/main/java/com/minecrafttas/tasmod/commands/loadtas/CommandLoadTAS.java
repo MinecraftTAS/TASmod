@@ -72,11 +72,11 @@ public class CommandLoadTAS extends CommandBase {
 		File[] listOfFiles = folder.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
-				return pathname.getName().endsWith(".tas");
+				return pathname.getName().endsWith(".mctas");
 			}
 		});
 		for (int i = 0; i < listOfFiles.length; i++) {
-			tab.add(listOfFiles[i].getName().replaceAll("\\.tas", ""));
+			tab.add(listOfFiles[i].getName().replaceAll("\\.mctas", ""));
 		}
 		return tab;
 	}
