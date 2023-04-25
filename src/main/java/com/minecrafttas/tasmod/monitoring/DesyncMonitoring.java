@@ -3,7 +3,7 @@ package com.minecrafttas.tasmod.monitoring;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.minecrafttas.tasmod.inputcontainer.InputContainer;
+import com.minecrafttas.tasmod.playback.PlaybackController;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -11,7 +11,7 @@ import net.minecraft.util.text.TextFormatting;
 
 /**
  * Stores the players position during recording and compares it with the position during playback
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class DesyncMonitoring {
@@ -55,7 +55,7 @@ public class DesyncMonitoring {
 		return out;
 	}
 
-	public String getMonitoring(InputContainer inputContainer, EntityPlayerSP player) {
+	public String getMonitoring(PlaybackController inputContainer, EntityPlayerSP player) {
 		int index = inputContainer.index() - 1;
 		String position = get(index);
 

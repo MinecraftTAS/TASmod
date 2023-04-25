@@ -2,9 +2,9 @@ package com.minecrafttas.tasmod.commands.fullplay;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;

@@ -1,7 +1,7 @@
-package com.minecrafttas.tasmod.inputcontainer.server;
+package com.minecrafttas.tasmod.playback.server;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -20,13 +20,13 @@ import net.minecraft.server.MinecraftServer;
  * @author Scribble
  *
  */
-public class ContainerStateServer {
+public class TASstateServer {
 	
 	private TASstate state;
 
 	private boolean shouldChange = true;
 
-	public ContainerStateServer() {
+	public TASstateServer() {
 		state = TASstate.NONE;
 		shouldChange = true;
 	}

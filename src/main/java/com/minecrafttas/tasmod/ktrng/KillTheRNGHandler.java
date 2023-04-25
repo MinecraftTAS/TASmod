@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod.ktrng;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
 import de.scribble.lp.killtherng.KillTheRNG;
 import de.scribble.lp.killtherng.SeedingModes;

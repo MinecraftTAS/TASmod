@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.shield;
+package com.minecrafttas.tasmod.util;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;

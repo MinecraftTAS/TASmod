@@ -17,9 +17,9 @@ import com.minecrafttas.tasmod.commands.recording.CommandRecord;
 import com.minecrafttas.tasmod.commands.restartandplay.CommandRestartAndPlay;
 import com.minecrafttas.tasmod.commands.savetas.CommandSaveTAS;
 import com.minecrafttas.tasmod.commands.tutorial.CommandPlaybacktutorial;
-import com.minecrafttas.tasmod.inputcontainer.server.ContainerStateServer;
 import com.minecrafttas.tasmod.ktrng.KillTheRNGHandler;
 import com.minecrafttas.tasmod.networking.TASmodNetworkServer;
+import com.minecrafttas.tasmod.playback.server.TASstateServer;
 import com.minecrafttas.tasmod.savestates.server.SavestateCommand;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
 import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
@@ -58,7 +58,7 @@ public class TASmod {
 	
 	public static final Logger logger = LogManager.getLogger("TASMod");
 	
-	public static ContainerStateServer containerStateServer;
+	public static TASstateServer containerStateServer;
 	
 	public static SavestateHandler savestateHandler;
 	
@@ -108,7 +108,7 @@ public class TASmod {
 	@EventHandler
 	public void serverStart(FMLServerStartingEvent ev) {
 		serverInstance = ev.getServer();
-		containerStateServer=new ContainerStateServer();
+		containerStateServer=new TASstateServer();
 		// Command handling
 		ev.registerServerCommand(new CommandTickrate());
 		ev.registerServerCommand(new CommandRecord());

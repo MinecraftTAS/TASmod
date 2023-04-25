@@ -11,13 +11,13 @@ import com.minecrafttas.tasmod.commands.loadtas.LoadTASPacket;
 import com.minecrafttas.tasmod.commands.playuntil.PlayUntilPacket;
 import com.minecrafttas.tasmod.commands.restartandplay.RestartAndPlayPacket;
 import com.minecrafttas.tasmod.commands.savetas.SaveTASPacket;
-import com.minecrafttas.tasmod.inputcontainer.InputContainer;
-import com.minecrafttas.tasmod.inputcontainer.server.InitialSyncStatePacket;
-import com.minecrafttas.tasmod.inputcontainer.server.SyncStatePacket;
 import com.minecrafttas.tasmod.ktrng.KTRNGSeedPacket;
 import com.minecrafttas.tasmod.ktrng.KTRNGStartSeedPacket;
 import com.minecrafttas.tasmod.networking.IdentificationPacket;
 import com.minecrafttas.tasmod.networking.PacketSerializer;
+import com.minecrafttas.tasmod.playback.PlaybackController;
+import com.minecrafttas.tasmod.playback.server.InitialSyncStatePacket;
+import com.minecrafttas.tasmod.playback.server.SyncStatePacket;
 import com.minecrafttas.tasmod.savestates.client.InputSavestatesPacket;
 import com.minecrafttas.tasmod.savestates.server.LoadstatePacket;
 import com.minecrafttas.tasmod.savestates.server.SavestatePacket;
@@ -88,7 +88,7 @@ public class CommonProxy {
 		PacketSerializer.registerPacket(LoadTASPacket.class);
 
 		// Misc
-		PacketSerializer.registerPacket(InputContainer.TeleportPlayerPacket.class);
+		PacketSerializer.registerPacket(PlaybackController.TeleportPlayerPacket.class);
 		PacketSerializer.registerPacket(FolderPacket.class);
 		
 		PacketSerializer.registerPacket(PlayUntilPacket.class);

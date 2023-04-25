@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod.events;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.InputContainer;
+import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 
@@ -23,7 +23,7 @@ public class LoadWorldEvents {
 	 */
 	public static void startLaunchServer() {
 		TASmod.logger.info("Starting the integrated server");
-		InputContainer container = ClientProxy.virtual.getContainer();
+		PlaybackController container = ClientProxy.virtual.getContainer();
 		if(!container.isNothingPlaying() && !container.isPaused()) {
 			container.pause(true);
 		}

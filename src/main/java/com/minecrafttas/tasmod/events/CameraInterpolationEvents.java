@@ -1,9 +1,9 @@
 package com.minecrafttas.tasmod.events;
 
 import com.minecrafttas.tasmod.ClientProxy;
-import com.minecrafttas.tasmod.inputcontainer.TickInputContainer;
-import com.minecrafttas.tasmod.inputcontainer.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
+import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
+import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.MathHelper;

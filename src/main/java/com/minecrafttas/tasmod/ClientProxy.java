@@ -11,8 +11,8 @@ import com.minecrafttas.tasmod.events.KeybindingEvents;
 import com.minecrafttas.tasmod.events.PlayerJoinLeaveEvents;
 import com.minecrafttas.tasmod.gui.InfoHud;
 import com.minecrafttas.tasmod.networking.TASmodNetworkClient;
-import com.minecrafttas.tasmod.shield.ShieldDownloader;
-import com.minecrafttas.tasmod.util.ContainerSerialiser;
+import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
+import com.minecrafttas.tasmod.util.ShieldDownloader;
 import com.minecrafttas.tasmod.util.TickScheduler;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
@@ -37,7 +37,7 @@ public class ClientProxy extends CommonProxy {
 
 	public static VirtualInput virtual;
 
-	public static ContainerSerialiser serialiser = new ContainerSerialiser();
+	public static PlaybackSerialiser serialiser = new PlaybackSerialiser();
 
 	public static final String tasdirectory = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles";
 

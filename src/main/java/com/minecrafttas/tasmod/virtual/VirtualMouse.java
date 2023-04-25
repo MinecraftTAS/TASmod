@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-import com.minecrafttas.tasmod.util.ContainerSerialiser;
+import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 
 public class VirtualMouse implements Serializable {
 
@@ -333,7 +333,7 @@ public class VirtualMouse implements Serializable {
 				pathString = pathString.concat("[" + path.get(i).toString() + "]" + seperator);
 			}
 		}
-		return ContainerSerialiser.SectionsV1.MOUSE.getName()+":"+keyString + ";" + pathString;
+		return PlaybackSerialiser.SectionsV1.MOUSE.getName()+":"+keyString + ";" + pathString;
 	}
 	
 	public void setPath(List<PathNode> path) {

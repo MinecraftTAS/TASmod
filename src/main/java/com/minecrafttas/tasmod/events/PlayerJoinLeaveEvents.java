@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.server.InitialSyncStatePacket;
 import com.minecrafttas.tasmod.networking.TASmodNetworkClient;
+import com.minecrafttas.tasmod.playback.server.InitialSyncStatePacket;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.mojang.authlib.GameProfile;
 

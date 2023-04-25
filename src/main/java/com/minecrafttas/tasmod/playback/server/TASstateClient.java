@@ -1,11 +1,11 @@
-package com.minecrafttas.tasmod.inputcontainer.server;
+package com.minecrafttas.tasmod.playback.server;
 
 import com.minecrafttas.tasmod.ClientProxy;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
 import net.minecraft.client.Minecraft;
 
-public class ContainerStateClient {
+public class TASstateClient {
 	
 	public static void setStateClient(TASstate state) {
 		ClientProxy.virtual.getContainer().setTASState(state);

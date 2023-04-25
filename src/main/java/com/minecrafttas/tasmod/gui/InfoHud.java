@@ -14,10 +14,10 @@ import org.lwjgl.opengl.GL11;
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.CameraInterpolationEvents;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
-import com.minecrafttas.tasmod.inputcontainer.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorWorld;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.util.PlayerPositionCalculator;
 import com.minecrafttas.tasmod.util.TrajectoriesCalculator;
@@ -354,7 +354,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync";
-				return ClientProxy.virtual.getContainer().dMonitor.getMonitoring(ClientProxy.virtual.getContainer(), Minecraft.getMinecraft().player);
+				return ClientProxy.virtual.getContainer().desyncMonitor.getMonitoring(ClientProxy.virtual.getContainer(), Minecraft.getMinecraft().player);
 			}));
 			
 			title = "desyncstatusMotion";
@@ -362,7 +362,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Motion";
-				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().dMonitor;
+				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().desyncMonitor;
 				return dMonitor.getMx()+" "+ dMonitor.getMy()+" "+dMonitor.getMz();
 			}));
 			
@@ -371,7 +371,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Position";
-				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().dMonitor;
+				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().desyncMonitor;
 				return dMonitor.getX()+" "+ dMonitor.getY()+" "+dMonitor.getZ();
 			}));
 			

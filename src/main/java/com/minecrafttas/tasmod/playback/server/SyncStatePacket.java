@@ -1,11 +1,11 @@
-package com.minecrafttas.tasmod.inputcontainer.server;
+package com.minecrafttas.tasmod.playback.server;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.InputContainer;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
+import com.minecrafttas.tasmod.playback.PlaybackController;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.util.TickScheduler.TickTask;
 
 import net.minecraft.client.Minecraft;
@@ -71,7 +71,7 @@ public class SyncStatePacket implements Packet {
 			
 			TickTask task = ()->{
 				
-				InputContainer container = ClientProxy.virtual.getContainer();
+				PlaybackController container = ClientProxy.virtual.getContainer();
 				if (state != container.getState()) {
 					String chatMessage = container.setTASState(state, verbose);
 					if (!chatMessage.isEmpty()) {

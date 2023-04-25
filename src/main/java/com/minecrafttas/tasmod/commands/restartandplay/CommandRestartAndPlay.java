@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
 
 import net.minecraft.client.Minecraft;
