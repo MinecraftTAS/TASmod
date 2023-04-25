@@ -3,7 +3,7 @@
 
 name: Build and Upload to Discord
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -27,23 +27,9 @@ jobs:
       with:
         name: TASmod-Dev-Build
         path: build/libs
-
-  send-to-discord:
-    runs-on: ubuntu-latest
-    needs: build
-    if:
-      github.repository == 'MinecraftTAS/TASmod' && github.triggering_actor == 'ScribbleLP'
-    steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v3.0.2
-      with:
-        name: TASmod-Dev-Build
-
     - name: Send file to discord channel
       uses: sinshutu/upload-to-discord@master
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       with:
-        args: TASmod-*.jar
-
-    
+        args: build/libs/TASmod-*.jar
