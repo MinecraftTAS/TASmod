@@ -1,8 +1,8 @@
-package com.minecrafttas.tasmod.inputcontainer.server;
+package com.minecrafttas.tasmod.playback.server;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
 import com.minecrafttas.tasmod.networking.PacketSide;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;

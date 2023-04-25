@@ -9,10 +9,10 @@ import java.util.List;
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
-import com.minecrafttas.tasmod.inputcontainer.InputContainer;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
-import com.minecrafttas.tasmod.inputcontainer.TickInputContainer;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
+import com.minecrafttas.tasmod.playback.PlaybackController;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
 import com.minecrafttas.tasmod.util.PointerNormalizer;
 
 import net.minecraft.client.Minecraft;
@@ -89,7 +89,7 @@ public class VirtualInput {
 	 * The container where all inputs get stored during recording or stored and
 	 * ready to be played back
 	 */
-	private InputContainer container = new InputContainer();
+	private PlaybackController container = new PlaybackController();
 
 	// ===========================Keyboard=================================
 
@@ -419,7 +419,7 @@ public class VirtualInput {
 
 	// =====================================Container===========================================
 
-	public InputContainer getContainer() {
+	public PlaybackController getContainer() {
 		return container;
 	}
 
@@ -438,7 +438,7 @@ public class VirtualInput {
 	 * 
 	 * @param container to replace the current one
 	 */
-	public void setContainer(InputContainer container) {
+	public void setContainer(PlaybackController container) {
 		this.container = container;
 	}
 
@@ -448,11 +448,11 @@ public class VirtualInput {
 	 * Loads and preloads the inputs from the new InputContainer to
 	 * {@link #container}
 	 * 
-	 * Saving a savestate is done via {@linkplain com.minecrafttas.tasmod.util.ContainerSerialiser#saveToFileV1(File, InputContainer)} in {@linkplain com.minecrafttas.tasmod.savestates.client.InputSavestatesHandler#savestate(String)}
+	 * Saving a savestate is done via {@linkplain com.minecrafttas.tasmod.playback.PlaybackSerialiser#saveToFileV1(File, PlaybackController)} in {@linkplain com.minecrafttas.tasmod.savestates.client.InputSavestatesHandler#savestate(String)}
 	 * 
 	 * @param savestatecontainer The container that should be loaded.
 	 */
-	public void loadClientSavestate(InputContainer savestatecontainer) {
+	public void loadClientSavestate(PlaybackController savestatecontainer) {
 
 		if (container.isPlayingback()) {
 			preloadInput(container, savestatecontainer.size() - 1); // Preloading from the current container and
@@ -519,7 +519,7 @@ public class VirtualInput {
 	 * @param index     The index of the container from which the inputs should be
 	 *                  loaded
 	 */
-	private void preloadInput(InputContainer container, int index) {
+	private void preloadInput(PlaybackController container, int index) {
 		TickInputContainer tickcontainer = container.get(index);
 
 		if (tickcontainer != null) {

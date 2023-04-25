@@ -1,6 +1,7 @@
-package com.minecrafttas.tasmod.inputcontainer;
+package com.minecrafttas.tasmod.playback;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +11,12 @@ import org.lwjgl.opengl.Display;
 import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.controlbytes.ControlByteHandler;
-import com.minecrafttas.tasmod.inputcontainer.server.ContainerStateClient;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
+import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
+import com.minecrafttas.tasmod.playback.server.TASstateClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
-import com.minecrafttas.tasmod.util.ContainerSerialiser;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
@@ -33,30 +33,33 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
 /**
- * A container where the inputs are stored.<br>
+ * A controller where the inputs are stored.<br>
  * <br>
- * Filling this container is accomplished by setting the state to "recording"
+ * Filling this controller is accomplished by setting the state to "recording"
  * via {@linkplain #setRecording(boolean)},<br>
  * or by loading inputs from file.<br>
  * <br>
  * These inputs can be played back at any time by setting
  * {@linkplain #setPlayback(boolean)} to true. <br>
  * <br>
- * Information about the author etc. get stored in the input container too and
+ * Information about the author etc. get stored in the playback controller too and
  * will be printed out in chat when the player loads into a world <br>
  * Inputs are saved and loaded to/from file via the
- * {@linkplain ContainerSerialiser}
+ * {@linkplain PlaybackSerialiser}
  * 
  * @author Scribble
  *
  */
-public class InputContainer {
+public class PlaybackController {
 
 	/**
-	 * The current state of the container.
+	 * The current state of the controller.
 	 */
 	private TASstate state = TASstate.NONE;
 
+	/**
+	 * The state of the controller when the state is paused
+	 */
 	private TASstate tempPause = TASstate.NONE;
 	/**
 	 * The current index of the inputs
@@ -91,7 +94,7 @@ public class InputContainer {
 	 */
 	private Map<Integer, List<String>> comments = new HashMap<>();
 	
-	public DesyncMonitoring dMonitor = new DesyncMonitoring();
+	public DesyncMonitoring desyncMonitor = new DesyncMonitoring();
 	
 	// =====================================================================================================
 
@@ -354,7 +357,7 @@ public class InputContainer {
 		
 		if(player!=null && player.addedToChunk) {
 			if(isPaused() && tempPause != TASstate.NONE) {
-				ContainerStateClient.setOrSend(tempPause);	// The recording is paused in LoadWorldEvents#startLaunchServer
+				TASstateClient.setOrSend(tempPause);	// The recording is paused in LoadWorldEvents#startLaunchServer
 				pause(false);
 				printCredits();
 			}
@@ -368,14 +371,19 @@ public class InputContainer {
 		}
 	}
 	
+	// 100, 99 101
+	
 	private void recordNextTick() {
 		index++;
 		if(inputs.size()<=index) {
+			if(inputs.size()<index) {
+				TASmod.logger.warn("Index is {} inputs bigger than the container!", index-inputs.size());
+			}
 			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
 		} else {
 			inputs.set(index, new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
 		}
-		dMonitor.recordMonitor(); // Capturing monitor values
+		desyncMonitor.recordMonitor(); // Capturing monitor values
 	}
 
 	private void playbackNextTick() {
@@ -399,7 +407,7 @@ public class InputContainer {
 		/*Stop condition*/
 		if (index >= inputs.size()) {
 			unpressContainer();
-			ContainerStateClient.setOrSend(TASstate.NONE);
+			TASstateClient.setOrSend(TASstate.NONE);
 		}
 		/*Continue condition*/
 		else {
@@ -468,7 +476,7 @@ public class InputContainer {
 		comments.clear();
 		index = 0;
 		startLocation="";
-		dMonitor.getPos().clear();
+		desyncMonitor.getPos().clear();
 		clearCredits();
 	}
 	
@@ -694,5 +702,123 @@ public class InputContainer {
 
 	public void setPlayUntil(int until) {
 		this.playUntil  = until;
+	}
+	
+	// ==============================================================
+	
+	/**
+	 * Storage class which stores the keyboard, mouse and subticks of a given tick.
+	 * @author Scribble
+	 *
+	 */
+	public static class TickInputContainer implements Serializable {
+
+		private static final long serialVersionUID = -3420565284438152474L;
+
+		private int tick;
+
+		private VirtualKeyboard keyboard;
+
+		private VirtualMouse mouse;
+
+		private VirtualSubticks subticks;
+
+		public TickInputContainer(int tick, VirtualKeyboard keyboard, VirtualMouse mouse, VirtualSubticks subticks) {
+			this.tick = tick;
+			this.keyboard = keyboard;
+			this.mouse = mouse;
+			this.subticks = subticks;
+		}
+
+		public TickInputContainer(int tick) {
+			this.tick = tick;
+			this.keyboard = new VirtualKeyboard();
+			this.mouse = new VirtualMouse();
+			this.subticks = new VirtualSubticks(0, 0);
+		}
+
+		@Override
+		public String toString() {
+			return tick + "|" + keyboard.toString() + "|" + mouse.toString() + "|" + subticks.toString();
+		}
+
+		public VirtualKeyboard getKeyboard() {
+			return keyboard;
+		}
+
+		public VirtualMouse getMouse() {
+			return mouse;
+		}
+
+		public VirtualSubticks getSubticks() {
+			return subticks;
+		}
+
+		public int getTick() {
+			return tick;
+		}
+
+		public void setTick(int tick) {
+			this.tick = tick;
+		}
+		
+		@Override
+		public TickInputContainer clone() {
+			return new TickInputContainer(tick, keyboard, mouse, subticks);
+		}
+	}
+	
+	/**
+	 * State of the input recorder
+	 * @author Scribble
+	 *
+	 */
+	public static enum TASstate {
+		/**
+		 * The game records inputs to the {@link InputContainer}.
+		 */
+		RECORDING,
+		/**
+		 * The game plays back the inputs loaded in {@link InputContainer} and locks user interaction.
+		 */
+		PLAYBACK,
+		/**
+		 * The playback or recording is paused and may be resumed. Note that the game isn't paused, only the playback. Useful for debugging things.
+		 */
+		PAUSED,	// #124
+		/**
+		 * The game is neither recording, playing back or paused, is also set when aborting all mentioned states.
+		 */
+		NONE;
+		
+		public int getIndex() {
+			switch(this) {
+			case NONE:
+				return 0;
+			case PLAYBACK:
+				return 1;
+			case RECORDING:
+				return 2;
+			case PAUSED:
+				return 3;
+			default:
+				return 0;	
+			}
+		}
+		
+		public static TASstate fromIndex(int state) {
+			switch (state) {
+			case 0:
+				return NONE;
+			case 1:
+				return PLAYBACK;
+			case 2:
+				return RECORDING;
+			case 3:
+				return PAUSED;
+			default:
+				return NONE;
+			}
+		}
 	}
 }

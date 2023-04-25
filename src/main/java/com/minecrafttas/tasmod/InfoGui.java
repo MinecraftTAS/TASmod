@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod;
 
 import org.lwjgl.opengl.Display;
 
-import com.minecrafttas.tasmod.inputcontainer.controlbytes.ControlByteHandler;
+import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.Minecraft;

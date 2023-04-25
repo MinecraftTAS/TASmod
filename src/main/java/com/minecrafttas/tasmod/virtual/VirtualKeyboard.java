@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 
 import com.google.common.collect.Maps;
-import com.minecrafttas.tasmod.util.ContainerSerialiser;
+import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 
 public class VirtualKeyboard implements Serializable {
 
@@ -376,6 +376,6 @@ public class VirtualKeyboard implements Serializable {
 			charString = StringUtils.replace(charString, "\n", "\\n");
 		}
 		
-		return ContainerSerialiser.SectionsV1.KEYBOARD.getName()+":"+keyString + ";" + charString;
+		return PlaybackSerialiser.SectionsV1.KEYBOARD.getName()+":"+keyString + ";" + charString;
 	}
 }

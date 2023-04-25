@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.util;
+package com.minecrafttas.tasmod.playback;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,10 +12,10 @@ import org.apache.commons.io.FileUtils;
 
 import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.InputContainer;
-import com.minecrafttas.tasmod.inputcontainer.TickInputContainer;
-import com.minecrafttas.tasmod.inputcontainer.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
+import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
+import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
+import com.minecrafttas.tasmod.util.FileThread;
 import com.minecrafttas.tasmod.virtual.VirtualKey;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
@@ -24,7 +24,7 @@ import com.minecrafttas.tasmod.virtual.VirtualSubticks;
 import com.mojang.realmsclient.util.Pair;
 
 /**
- * Saves a given {@linkplain InputContainer} to a file. Is also able to read an input container from a file. <br>
+ * Saves a given {@linkplain PlaybackController} to a file. Is also able to read an input container from a file. <br>
  * <br>
  * I plan to be backwards compatible so all the save functions have a V1 in their name by the time of writing this<br>
  * <br>
@@ -35,7 +35,7 @@ import com.mojang.realmsclient.util.Pair;
  * @author ScribbleLP
  *
  */
-public class ContainerSerialiser {
+public class PlaybackSerialiser {
 	
 	/**
 	 * A list of sections to check for in the playback file
@@ -85,7 +85,7 @@ public class ContainerSerialiser {
 	 * @param container The container to save
 	 * @throws IOException When the input container is empty
 	 */
-	public void saveToFileV1(File file, InputContainer container) throws IOException {
+	public void saveToFileV1(File file, PlaybackController container) throws IOException {
 		saveToFileV1Until(file, container, -1);
 	}
 	
@@ -96,7 +96,7 @@ public class ContainerSerialiser {
 	 * @param index index until the inputs get saved
 	 * @throws IOException When the input container is empty
 	 */
-	public void saveToFileV1Until(File file, InputContainer container, int index) throws IOException{
+	public void saveToFileV1Until(File file, PlaybackController container, int index) throws IOException{
 		if (container.size() == 0) {
 			throw new IOException("There are no inputs to save to a file");
 		}
@@ -156,7 +156,7 @@ public class ContainerSerialiser {
 			
 			// Add a data line
 			TickInputContainer tick = ticks.get(i);
-			fileThread.addLine(tick.toString() + "~&\t\t\t\t//Monitoring:"+container.dMonitor.get(i)+"\n");
+			fileThread.addLine(tick.toString() + "~&\t\t\t\t//Monitoring:"+container.desyncMonitor.get(i)+"\n");
 		}
 		fileThread.close();
 	}
@@ -178,7 +178,7 @@ public class ContainerSerialiser {
 		return 0;
 	}
 
-	public InputContainer fromEntireFileV1(File file) throws IOException {
+	public PlaybackController fromEntireFileV1(File file) throws IOException {
 
 		List<String> lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
 		
@@ -193,7 +193,7 @@ public class ContainerSerialiser {
 		}
 		boolean oldmonfileLoaded=!monitorLines.isEmpty();
 
-		InputContainer container = new InputContainer();
+		PlaybackController container = new PlaybackController();
 
 		String author = "Insert author here";
 
@@ -287,7 +287,7 @@ public class ContainerSerialiser {
 		container.setStartLocation(startLocation);
 		container.setStartSeed(startSeed);
 		if(!monitorLines.isEmpty()) {
-			container.dMonitor.setPos(monitorLines);
+			container.desyncMonitor.setPos(monitorLines);
 		}
 		
 		//If an old monitoring file is loaded, save the file immediately to not loose any data.

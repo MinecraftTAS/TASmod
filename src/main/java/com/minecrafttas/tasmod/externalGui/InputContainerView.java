@@ -16,10 +16,11 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import com.minecrafttas.tasmod.inputcontainer.InputContainer;
-import com.minecrafttas.tasmod.inputcontainer.TickInputContainer;
+import com.minecrafttas.tasmod.playback.PlaybackController;
+import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 
+@Deprecated
 public class InputContainerView extends JFrame {
 
 	private static final long serialVersionUID = -1823965270972132025L;
@@ -113,7 +114,7 @@ public class InputContainerView extends JFrame {
 		if (model == null) {
 			return;
 		}
-		InputContainer container = input.getContainer();
+		PlaybackController container = input.getContainer();
 		if (container == null || container.isEmpty()) {
 			return;
 		}

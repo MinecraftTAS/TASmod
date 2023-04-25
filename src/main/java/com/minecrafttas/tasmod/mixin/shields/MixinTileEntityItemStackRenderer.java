@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.ClientProxy;
-import com.minecrafttas.tasmod.shield.ShieldDownloader;
+import com.minecrafttas.tasmod.util.ShieldDownloader;
 
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;

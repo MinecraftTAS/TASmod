@@ -6,8 +6,8 @@ import java.io.IOException;
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.InputContainer;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackController;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
@@ -47,7 +47,7 @@ public class InputSavestatesHandler {
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".tas");
 
-		InputContainer container = ClientProxy.virtual.getContainer();
+		PlaybackController container = ClientProxy.virtual.getContainer();
 		if (container.isRecording()) {
 			ClientProxy.serialiser.saveToFileV1(targetfile, container);	//If the container is recording, store it entirely
 		} else if(container.isPlayingback()){
@@ -74,7 +74,7 @@ public class InputSavestatesHandler {
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".tas");
 
-		InputContainer container = ClientProxy.virtual.getContainer();
+		PlaybackController container = ClientProxy.virtual.getContainer();
 		if (!container.isNothingPlaying()) { // If the file exists and the container is recording or playing, load the clientSavestate
 			if (targetfile.exists()) {
 				ClientProxy.virtual.loadClientSavestate(ClientProxy.serialiser.fromEntireFileV1(targetfile));

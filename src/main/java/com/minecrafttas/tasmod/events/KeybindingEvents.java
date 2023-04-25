@@ -5,8 +5,8 @@ import org.lwjgl.input.Keyboard;
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
-import com.minecrafttas.tasmod.inputcontainer.server.ContainerStateClient;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.playback.server.TASstateClient;
 import com.minecrafttas.tasmod.savestates.server.LoadstatePacket;
 import com.minecrafttas.tasmod.savestates.server.SavestatePacket;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
@@ -61,7 +61,7 @@ public class KeybindingEvents {
 			
 		} else if (VirtualKeybindings.isKeyDown(stopkey)) {
 			
-			ContainerStateClient.setOrSend(TASstate.NONE);
+			TASstateClient.setOrSend(TASstate.NONE);
 			
 		} else if (VirtualKeybindings.isKeyDown(tickratezeroKey)) {
 			

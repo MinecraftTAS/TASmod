@@ -2,9 +2,9 @@ package com.minecrafttas.tasmod.events;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.inputcontainer.InputContainer;
-import com.minecrafttas.tasmod.inputcontainer.TASstate;
-import com.minecrafttas.tasmod.inputcontainer.server.ContainerStateClient;
+import com.minecrafttas.tasmod.playback.PlaybackController;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.playback.server.TASstateClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 
 import net.minecraft.client.gui.GuiControls;
@@ -24,7 +24,7 @@ public class OpenGuiEvents {
 	 */
 	public static void openGuiMainMenu(GuiMainMenu guiMainMenu) {
 		if (stateWhenOpened != null) {
-			InputContainer container = ClientProxy.virtual.getContainer();
+			PlaybackController container = ClientProxy.virtual.getContainer();
 			if(stateWhenOpened == TASstate.RECORDING) {
 				long seed = TASmod.ktrngHandler.getGlobalSeedClient();
 				container.setStartSeed(seed);
@@ -54,7 +54,7 @@ public class OpenGuiEvents {
 		if (TickrateChangerClient.ticksPerSecond == 0 || TickrateChangerClient.advanceTick) {
 			TASmod.logger.info("Pausing game during GuiControls");
 			TickrateChangerClient.pauseGame(false);
-			ContainerStateClient.setOrSend(stateWhenOpened);
+			TASstateClient.setOrSend(stateWhenOpened);
 			waszero = true;
 		}
 	}
