@@ -94,7 +94,7 @@ public class PlaybackController {
 	 */
 	private Map<Integer, List<String>> comments = new HashMap<>();
 	
-	public DesyncMonitoring desyncMonitor = new DesyncMonitoring();
+	public DesyncMonitoring desyncMonitor = new DesyncMonitoring(this);
 	
 	// =====================================================================================================
 
@@ -381,7 +381,7 @@ public class PlaybackController {
 		} else {
 			inputs.set(index, new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
 		}
-		desyncMonitor.recordMonitor(); // Capturing monitor values
+		desyncMonitor.recordMonitor(index); // Capturing monitor values
 	}
 
 	private void playbackNextTick() {
@@ -415,6 +415,7 @@ public class PlaybackController {
 			this.subticks = tickcontainer.getSubticks().clone();
 			// check for control bytes
 			ControlByteHandler.readCotrolByte(controlBytes.get(index));
+			desyncMonitor.playMonitor(index);
 		}
 	}
 	// =====================================================================================================
@@ -474,7 +475,7 @@ public class PlaybackController {
 		comments.clear();
 		index = 0;
 		startLocation="";
-		desyncMonitor.getPos().clear();
+		desyncMonitor.clear();
 		clearCredits();
 	}
 	

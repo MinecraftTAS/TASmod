@@ -354,7 +354,8 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync";
-				return ClientProxy.virtual.getContainer().desyncMonitor.getMonitoring(ClientProxy.virtual.getContainer(), Minecraft.getMinecraft().player);
+				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().desyncMonitor;
+				return dMonitor.getStatus(Minecraft.getMinecraft().player);
 			}));
 			
 			title = "desyncstatusMotion";
@@ -363,7 +364,7 @@ public class InfoHud extends GuiScreen {
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Motion";
 				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().desyncMonitor;
-				return dMonitor.getMx()+" "+ dMonitor.getMy()+" "+dMonitor.getMz();
+				return dMonitor.getMotion();
 			}));
 			
 			title = "desyncstatusPos";
@@ -372,18 +373,27 @@ public class InfoHud extends GuiScreen {
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Position";
 				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().desyncMonitor;
-				return dMonitor.getX()+" "+ dMonitor.getY()+" "+dMonitor.getZ();
+				return dMonitor.getPos();
+			}));
+			
+			title = "desyncstatusIndex";
+			y += 14;
+			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+				if (Minecraft.getMinecraft().currentScreen == this) return "Desync TASfileIndex";
+				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().desyncMonitor;
+				return dMonitor.getIndex();
 			}));
 			
 			y += 14;
-			
 			if(TASmod.ktrngHandler.isLoaded()) {
-//				title = "ktrng_desync";
-//				if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-//				lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-//					if (Minecraft.getMinecraft().currentScreen == this) return "Desync KTRNG";
-//					return TASmod.ktrngHandler.getDesyncString();
-//				}));
+				title = "ktrng_desync";
+				if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+				lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+					if (Minecraft.getMinecraft().currentScreen == this) return "Desync KTRNG";
+					DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().desyncMonitor;
+					return dMonitor.getSeed();
+				}));
 			}
 
 			

@@ -155,8 +155,8 @@ public class PlaybackSerialiser {
 			}
 			
 			// Add a data line
-			TickInputContainer tick = ticks.get(i);
-			fileThread.addLine(tick.toString() + "~&\t\t\t\t//Monitoring:"+container.desyncMonitor.get(i)+"\n");
+			TickInputContainer tickInput = ticks.get(i);
+			fileThread.addLine(tickInput.toString() + "~&\t\t\t\t//Monitoring:"+container.desyncMonitor.get(i)+"\n");
 		}
 		fileThread.close();
 	}
@@ -193,7 +193,7 @@ public class PlaybackSerialiser {
 		}
 		boolean oldmonfileLoaded=!monitorLines.isEmpty();
 
-		PlaybackController container = new PlaybackController();
+		PlaybackController controller = new PlaybackController();
 
 		String author = "Insert author here";
 
@@ -210,13 +210,13 @@ public class PlaybackSerialiser {
 		long startSeed=TASmod.ktrngHandler.getGlobalSeedClient();
 
 		// Clear the current container before reading new data
-		container.clear();
+		controller.clear();
 
 		int linenumber = 0; //The current line number
 		
 		for (String line : lines) {
 			linenumber++;
-			int tickcount=(int) container.getInputs().size();
+			int tickcount=(int) controller.getInputs().size();
 			// Read out header
 			if (line.startsWith("#")) {
 				// Read author tag
@@ -245,14 +245,14 @@ public class PlaybackSerialiser {
 					continue;
 				String control = sections[0];
 				String[] params = sections[1].split(" ");
-				List<Pair<String, String[]>> cbytes = container.getControlBytes().getOrDefault(tickcount, new ArrayList<>());
+				List<Pair<String, String[]>> cbytes = controller.getControlBytes().getOrDefault(tickcount, new ArrayList<>());
 				cbytes.add(Pair.of(control, params));
-				container.getControlBytes().put(tickcount, cbytes);
+				controller.getControlBytes().put(tickcount, cbytes);
 			//Read comments
 			} else if (line.startsWith("//")) {
-				List<String> commentList = container.getComments().getOrDefault(tickcount, new ArrayList<>());
+				List<String> commentList = controller.getComments().getOrDefault(tickcount, new ArrayList<>());
 				commentList.add(line.replace("//", ""));
-				container.getComments().put(tickcount, commentList);
+				controller.getComments().put(tickcount, commentList);
 			//Read data
 			} else {
 				
@@ -270,7 +270,7 @@ public class PlaybackSerialiser {
 					throw new IOException("Error in line " + linenumber + ". Cannot read the line correctly");
 				}
 				
-				container.getInputs().add(new TickInputContainer(readTicks(sections[0], linenumber), readKeyboard(sections[1], linenumber), readMouse(sections[2], linenumber), readSubtick(sections[3], linenumber)));
+				controller.getInputs().add(new TickInputContainer(readTicks(sections[0], linenumber), readKeyboard(sections[1], linenumber), readMouse(sections[2], linenumber), readSubtick(sections[3], linenumber)));
 			
 				if(!oldmonfileLoaded) {
 					String[] commentData = commentPart.split("Monitoring:");
@@ -280,22 +280,22 @@ public class PlaybackSerialiser {
 				}
 			}
 		}
-		container.setAuthors(author);
-		container.setTitle(title);
-		container.setPlaytime(playtime);
-		container.setRerecords(rerecords);
-		container.setStartLocation(startLocation);
-		container.setStartSeed(startSeed);
+		controller.setAuthors(author);
+		controller.setTitle(title);
+		controller.setPlaytime(playtime);
+		controller.setRerecords(rerecords);
+		controller.setStartLocation(startLocation);
+		controller.setStartSeed(startSeed);
 		if(!monitorLines.isEmpty()) {
-			container.desyncMonitor.setPos(monitorLines);
+			controller.desyncMonitor = new DesyncMonitoring(controller, monitorLines);
 		}
 		
 		//If an old monitoring file is loaded, save the file immediately to not loose any data.
 		if(oldmonfileLoaded) {
-			saveToFileV1(file, container);
+			saveToFileV1(file, controller);
 		}
 		
-		return container;
+		return controller;
 	}
 
 	private int readTicks(String section, int linenumber) throws IOException {
