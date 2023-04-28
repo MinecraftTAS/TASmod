@@ -1,10 +1,15 @@
 package com.minecrafttas.tasmod.monitoring;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 
+import com.dselent.bigarraylist.BigArrayList;
+import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 
+import de.scribble.lp.killtherng.custom.CustomRandom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.text.TextFormatting;
@@ -15,200 +20,311 @@ import net.minecraft.util.text.TextFormatting;
  *
  */
 public class DesyncMonitoring {
-	private List<String> pos = new ArrayList<String>();
 	
-	private String lastDesync="";
+	private File tempDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles" + File.separator + "temp" + File.separator + "monitoring");
 	
-	private String x;
-	private String y;
-	private String z;
+	private BigArrayList<MonitorContainer> container = new BigArrayList<MonitorContainer>(tempDir.toString());
 	
-	private String Mx;
-	private String My;
-	private String Mz;
+	private MonitorContainer currentValues;
 	
-	public void recordMonitor() {
+	private PlaybackController controller;
+	
+	/**
+	 * Creates an empty desync monitor
+	 * @param playbackController 
+	 */
+	public DesyncMonitoring(PlaybackController playbackController) {
+		controller = playbackController;
+	}
+	
+	/**
+	 * Parses lines and fills the desync monitor
+	 * @param playbackController 
+	 * @param monitorLines
+	 */
+	public DesyncMonitoring(PlaybackController playbackController, List<String> monitorLines) throws IOException{
+		this(playbackController);
+		container = loadFromFile(monitorLines);
+	}
+	
+	public void recordMonitor(int index) {
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
-		if (player != null) {
-			pos.add(player.posX + " " + player.posY + " " + player.posZ + " " + player.motionX + " " + player.motionY + " " + player.motionZ);
-		}else {
-			pos.add(0 + " " + 0 + " " + 0 + " " + 0 + " " + 0 + " " + 0 + " " + 0);
+		MonitorContainer values = null;
+		if(player != null) {
+			values = new MonitorContainer(index, player.posX, player.posY, player.posZ, player.motionX, player.motionY, player.motionZ, TASmod.ktrngHandler.getGlobalSeedClient());
+		} else {
+			values = new MonitorContainer(index, 0D, 0D, 0D, 0D, 0D, 0D, 0L);
+		}
+		
+		if(container.size()<=index) {
+			container.add(values);
+		} else {
+			container.set(index, values);
 		}
 	}
-
-	public List<String> getPos() {
-		return pos;
+	
+	public void playMonitor(int index) {
+		currentValues = get(index);
 	}
-
-	public void setPos(List<String> pos) {
-		this.pos = pos;
-	}
-
-	public String get(int index) {
-		String out = "";
-
-		try {
-			out = pos.get(index);
-		} catch (IndexOutOfBoundsException e) {
-			return "";
+	
+	private BigArrayList<MonitorContainer> loadFromFile(List<String> monitorLines) throws IOException {
+		BigArrayList<MonitorContainer> out = new BigArrayList<MonitorContainer>(tempDir.toString());
+		int linenumber = 0;
+		for(String line : monitorLines) {
+			linenumber++;
+			String[] split = line.split(" ");
+			double x = 0;
+			double y = 0;
+			double z = 0;
+			double mx = 0;
+			double my = 0;
+			double mz = 0;
+			long seed = 0;
+			try {
+				x = Double.parseDouble(split[0]);
+				y = Double.parseDouble(split[1]);
+				z = Double.parseDouble(split[2]);
+				mx = Double.parseDouble(split[3]);
+				my = Double.parseDouble(split[4]);
+				mz = Double.parseDouble(split[5]);
+				seed = Long.parseLong(split[6]);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new IOException("Error in monitoring section in line "+ linenumber + ". Some value is not a number");
+			}
+			out.add(new MonitorContainer(linenumber, x, y, z, mx, my, mz, seed));
 		}
 		return out;
 	}
+	
+	public MonitorContainer get(int index) {
+		try {
+			return container.get(index);
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		}
+	}
+	
+	private String lastStatus = TextFormatting.GRAY + "Empty";
+	
+	public String getStatus(EntityPlayerSP player) {
+		if (!controller.isNothingPlaying()) {
+			if (currentValues != null) {
+				double[] playervalues = new double[6];
+				playervalues[0] = player.posX;
+				playervalues[1] = player.posY;
+				playervalues[2] = player.posZ;
+				playervalues[3] = player.motionX;
+				playervalues[4] = player.motionY;
+				playervalues[5] = player.motionZ;
+				DesyncStatus status = currentValues.getSeverity(controller.index(), playervalues, TASmod.ktrngHandler.getGlobalSeedClient());
+				lastStatus = status.getFormat() + status.getText();
+			} else {
+				lastStatus = TextFormatting.GRAY + "Empty";
+			}
+		}
+		return lastStatus;
+	}
+	
+	private String lastPos = "";
+	
+	public String getPos() {
+		if(currentValues!=null && !controller.isNothingPlaying()) {
+			EntityPlayerSP player = Minecraft.getMinecraft().player;
+			String[] values = new String[3];
+			values[0]=getFormattedString(player.posX-currentValues.values[0]);
+			values[1]=getFormattedString(player.posY-currentValues.values[1]);
+			values[2]=getFormattedString(player.posZ-currentValues.values[2]);
+			
+			String out = "";
+			for (String val : values) {
+				if(val !=null) {
+					out+=val+" ";
+				}
+			}
+			lastPos=out;
+		}
+		return lastPos;
+	}
+	
+	private String lastMotion = "";
+	
+	public String getMotion() {
+		if(currentValues!=null && !controller.isNothingPlaying()) {
+			EntityPlayerSP player = Minecraft.getMinecraft().player;
+			String[] values = new String[3];
+			values[0] = getFormattedString(player.motionX - currentValues.values[3]);
+			values[1] = getFormattedString(player.motionY - currentValues.values[4]);
+			values[2] = getFormattedString(player.motionZ - currentValues.values[5]);
 
-	public String getMonitoring(PlaybackController inputContainer, EntityPlayerSP player) {
-		int index = inputContainer.index() - 1;
-		String position = get(index);
+			String out = "";
+			for (String val : values) {
+				if (val != null) {
+					out+=val+" ";
+				}
+			}
+			lastMotion = out;
+		}
+		return lastMotion;
+	}
+	
+	private String lastSeed = "";
+	
+	public String getSeed() {
+		if(currentValues!=null && !controller.isNothingPlaying()) {
+			if(currentValues.seed == TASmod.ktrngHandler.getGlobalSeedClient()) {
+				lastSeed = "";
+			}
+			
+			if(TASmod.ktrngHandler.isLoaded()) {
+				lastSeed = DesyncStatus.SEED.format+""+ CustomRandom.distance(currentValues.seed, TASmod.ktrngHandler.getGlobalSeedClient());
+			}else {
+				lastSeed = DesyncStatus.SEED.format+"TAS was recorded with KillTheRNG";
+			}
+		}
+		return lastSeed;
+	}
+	
+	private String lastTick = "";
+	
+	public String getIndex() {
+		if(currentValues!=null && !controller.isNothingPlaying()) {
+			int indexDelta = currentValues.index - controller.index();
+			if (indexDelta == 0) {
+				lastTick = "";
+			}else {
+				lastTick = DesyncStatus.INDEX.format + Integer.toString(indexDelta);
+			}
+		}
+		return lastTick;
+	}
+	
+	private String getFormattedString(double delta) {
+		String out = "";
+		if(delta != 0D) {
+			DesyncStatus status = DesyncStatus.fromDelta(delta);
+			out = status.getFormat() + Double.toString(delta);
+		}
+		return out;
+	}
+	
+	public class MonitorContainer implements Serializable{
+		private static final long serialVersionUID = -3138791930493647885L;
+		
+		int index;
 
-		if (position.isEmpty()) {
-			clearDelta();
-			return TextFormatting.GRAY + "Empty";
+		double[] values = new double[6];
+		
+		long seed;
+		
+		
+		public MonitorContainer(int index, double posx, double posy, double posz, double velx, double vely, double velz, long seed) {
+			this.index = index;
+			this.values[0] = posx;
+			this.values[1] = posy;
+			this.values[2] = posz;
+			this.values[3] = velx;
+			this.values[4] = vely;
+			this.values[5] = velz;
+			this.seed = seed;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%s %s %s %s %s %s %s", values[0], values[1], values[2], values[3], values[4], values[5], seed);
 		}
 		
-		if(inputContainer.isNothingPlaying()) {
-			return lastDesync;
-		}
-		String[] split = position.split(" ");
-		double x = 0;
-		double y = 0;
-		double z = 0;
-		double mx = 0;
-		double my = 0;
-		double mz = 0;
-		try {
-			x = Double.parseDouble(split[0]);
-			y = Double.parseDouble(split[1]);
-			z = Double.parseDouble(split[2]);
-			mx = Double.parseDouble(split[3]);
-			my = Double.parseDouble(split[4]);
-			mz = Double.parseDouble(split[5]);
-		} catch (Exception e) {
-			return TextFormatting.DARK_PURPLE + "Error";
-		}
-
-		boolean isEqual = player.posX == x && player.posY == y && player.posZ == z && player.motionX == mx && player.motionY == my && player.motionZ == mz;
-
-		if (isEqual) {
-			this.x="";
-			this.y="";
-			this.z="";
-			Mx="";
-			My="";
-			Mz="";
-			lastDesync=TextFormatting.GREEN + "In sync";
-			return lastDesync;
-		} else {
-			double dx = 0D;
-			double dy = 0D;
-			double dz = 0D;
-			double dMx = 0D;
-			double dMy = 0D;
-			double dMz = 0D;
-
-			dx = player.posX - x;
-			dy = player.posY - y;
-			dz = player.posZ - z;
-
-			dMx = player.motionX - mx;
-			dMy = player.motionY - my;
-			dMz = player.motionZ - mz;
-
-			boolean isWarning = Math.abs(dx) < 0.00001 && Math.abs(dy) < 0.00001 && Math.abs(dz) < 0.00001 && Math.abs(dMx) < 0.00001 && Math.abs(dMy) < 0.00001 && Math.abs(dMz) < 0.00001;
-
-			if (dx != 0D) {
-				TextFormatting format=desyncColor(dx);
-				this.x=format+" X: " + dx;
-			}else {
-				this.x="";
-			}
-			if (dy != 0D) {
-				TextFormatting format=desyncColor(dy);
-				this.y=format+" Y: " + dy;
-			}else {
-				this.y="";
-			}
-			if (dz != 0D) {
-				TextFormatting format=desyncColor(dz);
-				this.z=format+" Z: " + dz;
-			}else {
-				this.z="";
-			}
-			if (dMx != 0D) {
-				TextFormatting format=desyncColor(dMx);
-				this.Mx=format+" MotionX: " + dMx;
-			}else {
-				this.Mx="";
-			}
-			if (dMy != 0D) {
-				TextFormatting format=desyncColor(dMy);
-				this.My=format+" MotionY: " + dMy;
-			}else {
-				this.My="";
-			}
-			if (dMz != 0D) {
-				TextFormatting format=desyncColor(dMz);
-				this.Mz=format+" MotionZ: " + dMz;
-			}else {
-				this.Mz="";
+		public DesyncStatus getSeverity(int index, double[] playerValues, long seed) {
+			
+			if(this.index != index) {
+				return DesyncStatus.INDEX;
 			}
 			
-			if (isWarning) {
-				lastDesync = TextFormatting.YELLOW + "Slight desync ";
-				return lastDesync;
+			if(this.seed != seed) {
+				return DesyncStatus.SEED;
 			}
 			
-			boolean isModerate = Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01 && Math.abs(dz) < 0.01 && Math.abs(dMx) < 0.01 && Math.abs(dMy) < 0.01 && Math.abs(dMz) < 0.01;
+			DesyncStatus out = null;
 			
-			if (isModerate) {
-				lastDesync = TextFormatting.RED + "Moderate desync ";
-				return lastDesync;
+			for (int i = 0; i < values.length; i++) {
+				double delta = 0;
+				try {
+					delta = playerValues[i] - values[i];
+				} catch (Exception e) {
+					return DesyncStatus.ERROR;
+				}
+				DesyncStatus status = DesyncStatus.fromDelta(delta);
+				if(status.getSeverity()>out.getSeverity()) {
+					out = status;
+				}
 			}
 			
-			lastDesync = TextFormatting.DARK_RED + "Total desync ";
-			return lastDesync;
+			return out;
 		}
 	}
 	
-	private TextFormatting desyncColor(double val) {
-		val=Math.abs(val);
-		if(val>0&&val<0.00001) {
-			return TextFormatting.YELLOW;
-		}else if(val>0.00001&&val<0.01){
-			return TextFormatting.RED;
-		}else {
-			return TextFormatting.DARK_RED;
+	public enum DesyncStatus {
+		EQUAL(0, TextFormatting.GREEN, "In sync", 0D),
+		WARNING(1, TextFormatting.YELLOW, "Slight desync", 0.00001D),
+		MODERATE(2, TextFormatting.RED, "Moderate desync", 0.01D),
+		TOTAL(3, TextFormatting.DARK_RED, "Total desync"),
+		SEED(3, TextFormatting.DARK_PURPLE, "RNG Seed desync"),
+		INDEX(3, TextFormatting.GRAY, "Index desync"),
+		ERROR(3, TextFormatting.DARK_PURPLE, "ERROR");
+		
+		private Double tolerance;
+		private int severity;
+		private String text;
+		private TextFormatting format;
+		
+		private DesyncStatus(int severity, TextFormatting color, String text) {
+			this.severity = severity;
+			this.format = color;
+			this.text = text;
+			tolerance = null;
+		}
+		
+		private DesyncStatus(int severity, TextFormatting color, String text, double tolerance) {
+			this(severity, color, text);
+			this.tolerance=tolerance;
+		}
+		
+		public static DesyncStatus fromDelta(double delta) {
+			DesyncStatus out = TOTAL;
+			for(DesyncStatus status : values()) {
+				if(status.tolerance == null) {
+					return status;
+				}
+				if(Math.abs(delta)<status.tolerance) {
+					break;
+				}
+				if(Math.abs(delta)>=status.tolerance) {
+					out = status;
+				}
+			}
+			return out;
+		}
+		
+		public TextFormatting getFormat() {
+			return format;
+		}
+		
+		public int getSeverity() {
+			return severity;
+		}
+		
+		public String getText() {
+			return text;
 		}
 	}
-	
-	public String getX() {
-		return x;
-	}
 
-	public String getY() {
-		return y;
-	}
-
-	public String getZ() {
-		return z;
-	}
-
-	public String getMx() {
-		return Mx;
-	}
-
-	public String getMy() {
-		return My;
-	}
-
-	public String getMz() {
-		return Mz;
-	}
-	
-	private void clearDelta(){
-		x="";
-		y="";
-		z="";
-		Mx="";
-		My="";
-		Mz="";
+	public void clear() {
+		currentValues=null;
+		container = new BigArrayList<MonitorContainer>(tempDir.toString());
+		lastStatus = TextFormatting.GRAY+"Empty";
+		lastTick = "";
+		lastPos = "";
+		lastMotion = "";
+		lastSeed = "";
 	}
 }
