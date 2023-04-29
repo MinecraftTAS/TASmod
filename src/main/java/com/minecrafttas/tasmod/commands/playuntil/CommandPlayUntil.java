@@ -6,6 +6,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
 
 public class CommandPlayUntil extends CommandBase{
 
@@ -29,6 +30,9 @@ public class CommandPlayUntil extends CommandBase{
 				throw new CommandException("{} is not a number", args[0]);
 			}
 			TASmod.packetServer.sendToAll(new PlayUntilPacket(i));
+		}
+		else {
+			sender.sendMessage(new TextComponentString("Stops the next playback one tick before the specified tick and lets you record from there:\n\n/playuntil 10, runs the playback until tick 9 and will record from there. Useful when you can't savestate"));
 		}
 	}
 

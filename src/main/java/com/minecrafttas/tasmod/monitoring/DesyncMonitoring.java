@@ -47,6 +47,14 @@ public class DesyncMonitoring {
 		container = loadFromFile(monitorLines);
 	}
 	
+	public void recordNull(int index) {
+		if(container.size()<=index) {
+			container.add(new MonitorContainer(index));
+		} else {
+			container.set(index, new MonitorContainer(index));
+		}
+	}
+	
 	public void recordMonitor(int index) {
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		MonitorContainer values = null;
@@ -64,7 +72,7 @@ public class DesyncMonitoring {
 	}
 	
 	public void playMonitor(int index) {
-		currentValues = get(index);
+		currentValues = get(index-1);
 	}
 	
 	private BigArrayList<MonitorContainer> loadFromFile(List<String> monitorLines) throws IOException {
@@ -177,7 +185,7 @@ public class DesyncMonitoring {
 			} else {
 				if(TASmod.ktrngHandler.isLoaded()) {
 					long distance = CustomRandom.distance(currentValues.seed, TASmod.ktrngHandler.getGlobalSeedClient());
-					if(distance == -1L) {
+					if(distance == 0L) {
 						lastSeed = "";
 					} else {
 						lastSeed = DesyncStatus.SEED.format+Long.toString(distance);
@@ -191,24 +199,13 @@ public class DesyncMonitoring {
 		return lastSeed;
 	}
 	
-	private String lastTick = "";
-	
-	public String getIndex() {
-		if(currentValues!=null && !controller.isNothingPlaying()) {
-			int indexDelta = currentValues.index - controller.index();
-			if (indexDelta == 0) {
-				lastTick = "";
-			}else {
-				lastTick = DesyncStatus.INDEX.format + Integer.toString(indexDelta);
-			}
-		}
-		return lastTick;
-	}
-	
 	private String getFormattedString(double delta) {
 		String out = "";
 		if(delta != 0D) {
 			DesyncStatus status = DesyncStatus.fromDelta(delta);
+			if(status == DesyncStatus.EQUAL) {
+				return "";
+			}
 			out = status.getFormat() + Double.toString(delta);
 		}
 		return out;
@@ -235,6 +232,10 @@ public class DesyncMonitoring {
 			this.seed = seed;
 		}
 
+		public MonitorContainer(int index) {
+			this(index, 0, 0, 0, 0, 0, 0, 0);
+		}
+
 		@Override
 		public String toString() {
 			return String.format("%s %s %s %s %s %s %s", values[0], values[1], values[2], values[3], values[4], values[5], seed);
@@ -242,13 +243,9 @@ public class DesyncMonitoring {
 		
 		public DesyncStatus getSeverity(int index, double[] playerValues, long seed) {
 			
-			if(this.index != index) {
-				return DesyncStatus.INDEX;
-			}
-			
 			if(this.seed != seed) {
 				if(TASmod.ktrngHandler.isLoaded()) {
-					if(CustomRandom.distance(this.seed, seed)!=-1) {
+					if(CustomRandom.distance(this.seed, seed)!=1) {
 						return DesyncStatus.SEED;
 					}
 				} else {
@@ -281,7 +278,6 @@ public class DesyncMonitoring {
 		MODERATE(2, TextFormatting.RED, "Moderate desync", 0.01D),
 		TOTAL(3, TextFormatting.DARK_RED, "Total desync"),
 		SEED(3, TextFormatting.DARK_PURPLE, "RNG Seed desync"),
-		INDEX(3, TextFormatting.GRAY, "Index desync"),
 		ERROR(3, TextFormatting.DARK_PURPLE, "ERROR");
 		
 		private Double tolerance;
@@ -334,7 +330,6 @@ public class DesyncMonitoring {
 		currentValues=null;
 		container = new BigArrayList<MonitorContainer>(tempDir.toString());
 		lastStatus = TextFormatting.GRAY+"Empty";
-		lastTick = "";
 		lastPos = "";
 		lastMotion = "";
 		lastSeed = "";

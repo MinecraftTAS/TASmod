@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.ktrng;
 
+import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;

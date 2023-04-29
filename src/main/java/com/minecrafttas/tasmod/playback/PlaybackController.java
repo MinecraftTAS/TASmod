@@ -164,11 +164,15 @@ public class PlaybackController {
 				state = TASstate.PLAYBACK;
 				creditsPrinted=false;
 				TASmod.ktrngHandler.setInitialSeed(startSeed);
-//				TASmod.ktrngHandler.setTestSeed(startSeed); TODO Do monitoring again
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
 				if (Minecraft.getMinecraft().player != null && startLocation.isEmpty()) {
 					startLocation = getStartLocation(Minecraft.getMinecraft().player);
+				}
+				if(this.inputs.isEmpty()) {
+					inputs.add(new TickInputContainer(index));
+					desyncMonitor.recordNull(index);
+//					desyncMonitor.recordNull(index+1);
 				}
 				state = TASstate.RECORDING;
 				return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
@@ -392,18 +396,20 @@ public class PlaybackController {
 		
 		index++;	// Increase the index and load the next inputs
 		
-		if(playUntil!=null && playUntil == index+1) {
+		if(playUntil!=null && playUntil == index) {
 			TickrateChangerClient.pauseGame(true);
 			playUntil = null;
-			setTASState(TASstate.NONE);
-			for(long i = inputs.size()-1; i >= index+1; i--) {
+			TASstateClient.setOrSend(TASstate.NONE);
+			for(long i = inputs.size()-1; i >= index; i--) {
 				inputs.remove(i);
 			}
-			setTASState(TASstate.RECORDING);
+			index--;
+			TASstateClient.setOrSend(TASstate.RECORDING);
+			return;
 		}
 		
 		/*Stop condition*/
-		if (index >= inputs.size()) {
+		if (index == inputs.size()) {
 			unpressContainer();
 			TASstateClient.setOrSend(TASstate.NONE);
 		}
@@ -415,8 +421,8 @@ public class PlaybackController {
 			this.subticks = tickcontainer.getSubticks().clone();
 			// check for control bytes
 			ControlByteHandler.readCotrolByte(controlBytes.get(index));
-			desyncMonitor.playMonitor(index);
 		}
+		desyncMonitor.playMonitor(index);
 	}
 	// =====================================================================================================
 	// Methods to manipulate inputs
