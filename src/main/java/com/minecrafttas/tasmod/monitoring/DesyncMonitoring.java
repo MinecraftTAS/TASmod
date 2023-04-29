@@ -174,13 +174,19 @@ public class DesyncMonitoring {
 		if(currentValues!=null && !controller.isNothingPlaying()) {
 			if(currentValues.seed == TASmod.ktrngHandler.getGlobalSeedClient()) {
 				lastSeed = "";
+			} else {
+				if(TASmod.ktrngHandler.isLoaded()) {
+					long distance = CustomRandom.distance(currentValues.seed, TASmod.ktrngHandler.getGlobalSeedClient());
+					if(distance == -1L) {
+						lastSeed = "";
+					} else {
+						lastSeed = DesyncStatus.SEED.format+Long.toString(distance);
+					}
+				} else {
+					lastSeed = DesyncStatus.SEED.format+"TAS was recorded with KillTheRNG";
+				}
 			}
 			
-			if(TASmod.ktrngHandler.isLoaded()) {
-				lastSeed = DesyncStatus.SEED.format+""+ CustomRandom.distance(currentValues.seed, TASmod.ktrngHandler.getGlobalSeedClient());
-			}else {
-				lastSeed = DesyncStatus.SEED.format+"TAS was recorded with KillTheRNG";
-			}
 		}
 		return lastSeed;
 	}
@@ -241,7 +247,13 @@ public class DesyncMonitoring {
 			}
 			
 			if(this.seed != seed) {
-				return DesyncStatus.SEED;
+				if(TASmod.ktrngHandler.isLoaded()) {
+					if(CustomRandom.distance(this.seed, seed)!=-1) {
+						return DesyncStatus.SEED;
+					}
+				} else {
+					return DesyncStatus.SEED;
+				}
 			}
 			
 			DesyncStatus out = null;
@@ -254,7 +266,7 @@ public class DesyncMonitoring {
 					return DesyncStatus.ERROR;
 				}
 				DesyncStatus status = DesyncStatus.fromDelta(delta);
-				if(status.getSeverity()>out.getSeverity()) {
+				if(out==null || status.getSeverity() > out.getSeverity()) {
 					out = status;
 				}
 			}
