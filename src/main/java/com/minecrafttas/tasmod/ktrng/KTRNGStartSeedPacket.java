@@ -33,9 +33,7 @@ public class KTRNGStartSeedPacket implements Packet{
 		if(side.isClient()) {
 			ClientProxy.virtual.getContainer().setStartSeed(seed);
 		} else {
-			CommonProxy.tickSchedulerServer.add(()->{
-				TASmod.ktrngHandler.setGlobalSeedServer(seed);
-			});
+			TASmod.ktrngHandler.setGlobalSeedServer(seed);
 		}
 	}
 
