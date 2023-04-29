@@ -6,6 +6,7 @@ import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.util.TickScheduler.TickTask;
 
 import net.minecraft.client.Minecraft;
@@ -82,7 +83,7 @@ public class SyncStatePacket implements Packet {
 			};
 			
 			
-			if(state == TASstate.RECORDING || state == TASstate.PLAYBACK) {
+			if((state == TASstate.RECORDING || state == TASstate.PLAYBACK) && TickrateChangerClient.ticksPerSecond != 0) {
 				ClientProxy.tickSchedulerClient.add(task);	// Starts a recording in the next tick
 			} else {
 				ClientProxy.gameLoopSchedulerClient.add(task);	// Starts a recording in the next frame
