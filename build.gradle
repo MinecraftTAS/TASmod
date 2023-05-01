@@ -18,8 +18,8 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 
 
-version = "Alpha9-WIP"
-group = "com.minecrafttas.tasmod" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+version = "Alpha9"
+group = "com.minecrafttas" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "TASmod-1.12.2"
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
