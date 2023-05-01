@@ -377,15 +377,13 @@ public class InfoHud extends GuiScreen {
 			}));
 			
 			y += 14;
-			if(TASmod.ktrngHandler.isLoaded()) {
-				title = "ktrng_desync";
-				if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-				lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-					if (Minecraft.getMinecraft().currentScreen == this) return "Desync KTRNG";
-					DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().desyncMonitor;
-					return dMonitor.getSeed();
-				}));
-			}
+			title = "ktrng_desync";
+			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+				if (Minecraft.getMinecraft().currentScreen == this) return "Desync KTRNG";
+				DesyncMonitoring dMonitor=ClientProxy.virtual.getContainer().desyncMonitor;
+				return dMonitor.getSeed();
+			}));
 
 			
 		} catch (Exception e) {
