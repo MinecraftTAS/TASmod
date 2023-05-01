@@ -6,10 +6,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.dselent.bigarraylist.BigArrayList;
+import com.minecrafttas.killtherng.custom.CustomRandom;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 
-import de.scribble.lp.killtherng.custom.CustomRandom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.text.TextFormatting;

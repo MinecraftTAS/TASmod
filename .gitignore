@@ -19,6 +19,6 @@ build
 
 # other
 eclipse
-run/*
-!run/mods/
+run/
 logs/
+gradle.properties

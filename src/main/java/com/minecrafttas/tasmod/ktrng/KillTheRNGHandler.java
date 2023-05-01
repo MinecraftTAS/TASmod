@@ -1,11 +1,11 @@
 package com.minecrafttas.tasmod.ktrng;
 
+import com.minecrafttas.killtherng.KillTheRNG;
+import com.minecrafttas.killtherng.SeedingModes;
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
-import de.scribble.lp.killtherng.KillTheRNG;
-import de.scribble.lp.killtherng.SeedingModes;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 

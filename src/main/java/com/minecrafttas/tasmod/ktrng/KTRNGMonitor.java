@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.ktrng;
 
-import de.scribble.lp.killtherng.custom.EventAnnotations.CaptureRandomness;
+import com.minecrafttas.killtherng.custom.EventAnnotations.CaptureRandomness;
 
 public class KTRNGMonitor {
 	
