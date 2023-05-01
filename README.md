@@ -55,7 +55,7 @@ This mod can record and play back
 <kbd>F9</kbd> - While in tickrate 0, advance the tick by 1. By holding keyboardkeys, you can make inputs while tickadvancing.
 
 ## Multiplayer support
-<p style="color: red; font-size: 1.3em"><b>Important:</b> This is <b>NOT</b> a clientside mod, a server side installation is required a.k.a This doesn't work on Hypixel, 2b2t etc. These servers will <b>NEVER</b> be supported.</p>
+**Important:** This is **NOT** a clientside mod, a server side installation is required a.k.a This doesn't work on Hypixel, 2b2t etc. These servers will **NEVER** be supported.
 
 Record TASes with friends! Needs operator permissions to run tasmod related commands.  
 /savestate can be used to manage savestates.
