@@ -194,7 +194,6 @@ public class DesyncMonitoring {
 					lastSeed = DesyncStatus.SEED.format+"TAS was recorded with KillTheRNG";
 				}
 			}
-			
 		}
 		return lastSeed;
 	}
