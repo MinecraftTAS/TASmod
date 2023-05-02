@@ -19,5 +19,5 @@ build
 
 # other
 eclipse
-run
+run/
 logs/

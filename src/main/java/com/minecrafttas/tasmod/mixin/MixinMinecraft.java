@@ -1,0 +1,238 @@
+package com.minecrafttas.tasmod.mixin;
+
+import java.io.IOException;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.duck.GuiScreenDuck;
+import com.minecrafttas.tasmod.duck.SubtickDuck;
+import com.minecrafttas.tasmod.events.LoadWorldEvents;
+import com.minecrafttas.tasmod.events.TickEvents;
+import com.minecrafttas.tasmod.externalGui.InputContainerView;
+import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
+import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
+import com.minecrafttas.tasmod.ticksync.TickSyncClient;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.util.Timer;
+
+@Mixin(Minecraft.class)
+public abstract class MixinMinecraft {
+
+
+	// =====================================================================================================================================
+
+	@Shadow
+	private GuiScreen currentScreen;
+	
+	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
+	public void injectRunGameLoop(CallbackInfo ci) {
+		
+		TickEvents.onRender();
+		
+		LoadWorldEvents.doneWithLoadingScreen();
+		
+		ClientProxy.gameLoopSchedulerClient.runAllTasks();
+		
+		if(((Minecraft) (Object) this).player != null) {
+			ClientProxy.hud.tick();
+		}
+		
+		while (Keyboard.next()) {
+			ClientProxy.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
+		}
+		while (Mouse.next()) {
+			if(this.currentScreen == null) {
+				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.ticksPerSecond==0);
+			} else {
+				GuiScreenDuck screen = (GuiScreenDuck) currentScreen;
+				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.ticksPerSecond==0);
+			}
+		}
+	}
+
+	// =====================================================================================================================================
+
+	@Shadow
+	private EntityRenderer entityRenderer;
+	@Shadow
+	private boolean isGamePaused;
+	@Shadow
+	private float renderPartialTicksPaused;
+	@Shadow
+	private Timer timer;
+
+	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;runTick()V"))
+	public void redirectRunTick(Minecraft mc) {
+		ClientProxy.virtual.updateContainer();
+		if (TickrateChangerClient.ticksPerSecond != 0) {
+			((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
+		}
+		this.runTick();
+		ClientProxy.tickSchedulerClient.runAllTasks();
+		if (TickrateChangerClient.advanceTick) {
+			TickrateChangerClient.advanceTick = false;
+			TickrateChangerClient.changeClientTickrate(0F);
+		}
+		TickSyncClient.clientPostTick((Minecraft)(Object)this);
+	}
+
+	@Shadow
+	public abstract void runTick();
+
+	@Inject(method = "shutdownMinecraftApplet", at = @At("HEAD"))
+	public void inject_shutdownMinecraftApplet(CallbackInfo ci) {
+		try {
+			if (ClientProxy.packetClient != null) {
+				TickrateChangerClient.changeTickrate(20);
+				ClientProxy.packetClient.killClient();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// =====================================================================================================================================
+
+	@Inject(method = "runTick", at = @At(value = "HEAD"))
+	public void injectRunTick(CallbackInfo ci) throws IOException {
+		
+		InputContainerView.update(ClientProxy.virtual);
+		if (SavestatePlayerLoading.wasLoading) {
+			SavestatePlayerLoading.wasLoading = false;
+			
+			if(Minecraft.getMinecraft().player!=null) { 		//The player can be null when loading a savestate and quitting to the main menu
+				SavestateHandler.playerLoadSavestateEventClient();
+			}
+		}
+	}
+
+	// =====================================================================================================================================
+
+	@Inject(method = "runTickKeyboard", at = @At(value = "HEAD"))
+	public void injectRunTickKeyboard(CallbackInfo ci) {
+		ClientProxy.virtual.updateCurrentKeyboard();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z", remap = false))
+	public boolean redirectKeyboardNext() {
+		return ClientProxy.virtual.nextKeyboardEvent();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
+	public int redirectKeyboardGetEventKey() {
+		return ClientProxy.virtual.getEventKeyboardKey();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
+	public char redirectKeyboardGetEventCharacter() {
+		return ClientProxy.virtual.getEventKeyboardCharacter();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
+	public boolean redirectIsKeyDown(int keyCode) {
+		return ClientProxy.virtual.isKeyDown(keyCode);
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
+	public boolean redirectGetEventState() {
+		return ClientProxy.virtual.getEventKeyboardState();
+	}
+
+	// =====================================================================================================================================
+
+	@Inject(method = "runTickMouse", at = @At(value = "HEAD"))
+	public void injectRunTickMouse(CallbackInfo ci) {
+		ClientProxy.virtual.updateCurrentMouseEvents();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z", remap = false))
+	public boolean redirectMouseNext() {
+		return ClientProxy.virtual.nextMouseEvent();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
+	public int redirectMouseGetEventButton() {
+		
+//		if(!VirtualKeybindings.isKeyCodeAlwaysBlocked(ClientProxy.virtual.getEventMouseKey()-100)) {
+//			TASmod.ktrngHandler.nextPlayerInput(); // Advance ktrng seed on player input
+//		}
+		return ClientProxy.virtual.getEventMouseKey() + 100;
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", remap = false))
+	public boolean redirectGetEventButtonState() {
+		return ClientProxy.virtual.getEventMouseState();
+	}
+
+	// =====================================================================================================================================
+
+	@ModifyConstant(method = "runTickMouse", constant = @Constant(longValue = 200L))
+	public long fixMouseWheel(long twohundredLong) {
+		return (long) Math.max(4000F / TickrateChangerClient.ticksPerSecond, 200L);
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I", remap = false))
+	public int redirectGetEventDWheel() {
+		return ClientProxy.virtual.getEventMouseScrollWheel();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
+	public int redirectGetEventKeyDPK() {
+		return ClientProxy.virtual.getEventKeyboardKey();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
+	public char redirectGetEventCharacterDPK() {
+		return ClientProxy.virtual.getEventKeyboardCharacter();
+	}
+
+	// =====================================================================================================================================
+
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
+	public boolean redirectGetEventKeyStateDPK() {
+		return ClientProxy.virtual.getEventKeyboardState();
+	}
+
+	// =====================================================================================================================================
+	
+	@Inject(method = "runTick", at = @At(value = "RETURN"))
+	public void injectRunTickReturn(CallbackInfo ci) {
+		ClientProxy.virtual.getContainer().nextTick();
+	}
+}
