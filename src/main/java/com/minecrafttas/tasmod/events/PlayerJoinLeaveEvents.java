@@ -2,6 +2,8 @@ package com.minecrafttas.tasmod.events;
 
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.util.regex.Pattern;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
@@ -42,17 +44,28 @@ public class PlayerJoinLeaveEvents {
 	/**
 	 * Executes when the player joins the server on the client side
 	 * @param player The singleplayer player
+	 * @throws ConnectException 
 	 */
 	@SideOnly(Side.CLIENT)
-	public static void firePlayerJoinedClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
+	public static void firePlayerJoinedClientSide(net.minecraft.client.entity.EntityPlayerSP player) throws ConnectException {
 		TASmod.logger.info("Firing login events for {} on the CLIENT", player.getName());
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		
 		if(mc.isIntegratedServerRunning())
 			ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger);
-		else
-			ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger, mc.getCurrentServerData().serverIP, 3111);
+		else {
+			String full = mc.getCurrentServerData().serverIP;
+			String[] fullsplit = full.split(":");
+			if(fullsplit.length == 1) {
+				ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger, full, 3111);
+			} else if(fullsplit.length == 2){
+				String ip = fullsplit[0];
+				ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger, ip, 3111);
+			} else {
+				throw new ConnectException("Something went wrong while connecting. The ip seems to be wrong");
+			}
+		}
 		
 		ClientProxy.packetClient.sendToServer(new InitialSyncStatePacket(ClientProxy.virtual.getContainer().getState()));
 		
