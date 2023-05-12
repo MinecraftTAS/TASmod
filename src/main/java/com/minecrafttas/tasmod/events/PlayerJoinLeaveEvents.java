@@ -3,7 +3,6 @@ package com.minecrafttas.tasmod.events;
 
 import java.io.IOException;
 import java.net.ConnectException;
-import java.util.regex.Pattern;
 
 import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
