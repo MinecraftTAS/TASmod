@@ -1,77 +1,75 @@
+// Setup plugin classpath
 buildscript {
     repositories {
-        maven { url = "https://sizableshrimp.me/maven" }
         maven { url = "https://maven.minecraftforge.net" }
         maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
         classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
     }
 }
-plugins {
-    id 'com.github.johnrengelman.shadow' version '2.0.4'
-    id 'java'
-}
+
+// Apply plugins
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'eclipse'
 
+// Set basic properties
+version = project.version
+group = project.group
+archivesBaseName = project.artifact
 
-version = "Alpha9"
-group = "com.minecrafttas" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "TASmod-1.12.2"
+// Compile for java 8
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
-sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
-
+// Configure forge
 minecraft {
-    version = "1.12.2-14.23.5.2847"
-    runDir = "run"
+	version = forge_version
+	runDir = "run"
+	mappings = mappings_version
     
-    mappings = "snapshot_20171003"
-    makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    replace '${version}':project.version,'${mcversion}':project.minecraft.version
     clientRunArgs += "--mixin mixins.tasmod.json --tweakClass org.spongepowered.asm.launch.MixinTweaker"
     serverRunArgs += "--mixin mixins.tasmod.json --tweakClass org.spongepowered.asm.launch.MixinTweaker"
 }
 
+// Dependency repositories
 repositories {
     mavenCentral()
+    maven { url = "https://jitpack.io" }
     maven { url = "https://maven.mgnet.work/main" }
-    maven { url 'https://jitpack.io' }
-    maven {
-        name = 'sponge'
-        url = 'https://repo.spongepowered.org/maven'
-    }
+    maven { url = 'https://repo.spongepowered.org/maven' }
 }
 
+// Dependency configurations
 configurations {
-    downloadMod{
+    downloadMod {
     	transitive = false
     }
+    embed
+    compile.extendsFrom(embed)
 }
 
+// Dependencies
 dependencies {
-    compile('org.spongepowered:mixin:0.8.2') {
-        exclude module: 'launchwrapper'
-        exclude module: 'guava'
-        exclude module: 'gson'
+	// tasmod dependencies (exported with jar)
+    embed group: 'com.dselent', name: 'bigarraylist', version: '1.0'
+    embed('org.spongepowered:mixin:0.8.2') {
+    	exclude module: 'launchwrapper'
+    	exclude module: 'log4j-core'
         exclude module: 'commons-io'
-        exclude module: 'log4j-core'
+        exclude module: 'gson'
+        exclude module: 'guava'
     }
-    compile 'org.msgpack:msgpack-core:0.8.16'
-    compile 'org.msgpack:jackson-dataformat-msgpack:0.8.16'
-    //compile files('libs/KillTheRNG-1.12.2-2.0-WIP-deobf.jar')
-    compile 'com.minecrafttas:killtherng:2.0-SNAPSHOT'
-    //compile files('libs/BigArrayList-1.3.jar')
-    compile 'com.dselent:bigarraylist:1.0'
     
+    // tasmod dependencies (only for compilation)
+    compileOnly group: 'com.minecrafttas', name: 'killtherng', version: '2.0-SNAPSHOT'
+    
+    // tasmod mod dependencies (only for ide)
     downloadMod 'com.minecrafttas:killtherng-full:2.0-SNAPSHOT'
 }
 
+// Task for downloading KillTheRng
 task downloadKTRNG(type: Copy) {
 	group 'tasmod'
 	description 'Downloads KillTheRNG to the run/mods/ folder of the project'
@@ -79,61 +77,46 @@ task downloadKTRNG(type: Copy) {
     into 'run/mods/'
 }
 
-jar {
-    manifest {
-        attributes 'FMLAT': 'tasmod_at.cfg',
-                   'FMLCorePluginContainsFMLMod':'true',
-                   'MixinConfigs':'mixins.tasmod.json',
-                   'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-                   'ForceLoadAsMod': 'true'
-    }
-}
-
+// Update values from mcmod.info
 processResources {
     inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+    inputs.property "mcversion", minecraft_version
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+
+        expand 'mod_id': id, 'mod_url': url, 'mod_name': name, 'mod_version': project.version,
+                'mcversion': minecraft_version, 'mod_description': description,
+                'mod_authors': authors, 'mod_credits': credits
     }
+
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
 }
 
-shadowJar {
-	archiveName = "${archivesBaseName}-${version}-shadow.jar"
-    mainSpec.sourcePaths.clear()
+// Configure jar file
+jar {
+	archiveName = "${archivesBaseName}-${version}"
 
-    dependsOn reobfJar
+	// pack embedded stuff
+	from {
+        configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "LICENSE.txt", "META-INF/MANIFSET.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
+    }
 
-    configurations = [project.configurations.compile]
-    relocate 'org.msgpack', 'com.minecrafttas.tasmod.repack.org.msgpack'
-    relocate 'com.fasterxml', 'com.minecrafttas.tasmod.repack.com.fasterxml'
-    classifier "shadow"
-    exclude 'dummyThing'
-    exclude 'com/minecrafttas/killtherng/', 'assets/killtherng/', 'mixins.killtherng.json', 'mixins.killtherng.refmap.json', 'kaptainwutax/', 'com/seedfinding/'
-
-    afterEvaluate {
-        from zipTree(reobfJar.jar)
+	// configure manifest
+    manifest {
+        attributes 'MixinConfigs':'mixins.tasmod.json',
+                   'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+                   'ForceLoadAsMod': 'true'
     }
     
-    //Rename delete the mixinless version and rename the shadow jar
-    doLast {
-    	delete("${buildDir}/libs/${archivesBaseName}-${version}.jar")
-    	ant.move(file:"build/libs/${archivesBaseName}-${version}-shadow.jar", tofile:"build/libs/${archivesBaseName}-${version}.jar")
-    }
+    
 }
 
-artifacts {
-    archives shadowJar
-}
-
+// Configure mixin
 mixin {
-    // Specify "notch" or "searge" here
-    defaultObfuscationEnv searge
-    add sourceSets.main, "mixins.tasmod.refmap.json"
+    add sourceSets.main, mixin_refmap
 }
