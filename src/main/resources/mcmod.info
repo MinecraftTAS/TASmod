@@ -1,7 +1,7 @@
 [
 {
   "modid": "${mod_id}",
-  "name": "${mod_name}",
+  "name": "${name}",
   "description": "${mod_description}",
   "version": "${mod_version}",
   "mcversion": "${mcversion}",
