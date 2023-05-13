@@ -63,10 +63,10 @@ dependencies {
     }
     
     // tasmod dependencies (only for compilation)
-    compileOnly group: 'com.minecrafttas', name: 'killtherng', version: '2.0-SNAPSHOT'
+    compileOnly group: 'com.minecrafttas', name: 'killtherng', version: '2.0'
     
     // tasmod mod dependencies (only for ide)
-    downloadMod 'com.minecrafttas:killtherng-full:2.0-SNAPSHOT'
+    downloadMod 'com.minecrafttas:killtherng-full:2.0'
 }
 
 // Task for downloading KillTheRng
