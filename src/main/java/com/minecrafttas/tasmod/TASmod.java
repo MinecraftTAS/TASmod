@@ -51,7 +51,7 @@ public class TASmod {
 	@SidedProxy(serverSide = "com.minecrafttas.tasmod.CommonProxy", clientSide = "com.minecrafttas.tasmod.ClientProxy")
 	public static CommonProxy proxy;
 
-	public static final String VERSION = "${version}";
+	public static final String VERSION = "${mod_version}";
 	public static final String MCVERSION = "${mcversion}";
 
 	private static MinecraftServer serverInstance;

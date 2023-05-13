@@ -85,13 +85,24 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
 
-        expand 'mod_id': id, 'mod_url': url, 'mod_name': name, 'mod_version': project.version,
-                'mcversion': minecraft_version, 'mod_description': description,
-                'mod_authors': authors, 'mod_credits': credits
+        expand 'mod_id': project.mod_id, 'mod_url': project.mod_url, 'name': project.mod_name, 'mod_version': project.version,
+                'mcversion': project.minecraft_version, 'mod_description': project.mod_description,
+                'mod_authors': project.mod_authors, 'mod_credits': project.mod_credits
     }
+    
+    from(sourceSets.main.java.srcDirs) {
+        include 'TASmod.java'
+
+        expand 'mod_version': project.version, 'mcversion': project.minecraft_version
+    }
+    
 
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+    
+    from(sourceSets.main.java.srcDirs) {
+        exclude 'TASmod.java'
     }
 }
 
