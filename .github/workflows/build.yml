@@ -21,7 +21,7 @@ jobs:
       with:
         gradle-version: 4.10.3
     - name: Build TASmod with Gradle
-      run: gradle shadowJar
+      run: gradle build
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
