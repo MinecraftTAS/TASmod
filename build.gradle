@@ -97,7 +97,7 @@ processResources {
 
 // Configure jar file
 jar {
-	archiveName = "${archivesBaseName}-${version}"
+	archiveName = "${archivesBaseName}-${version}.jar"
 
 	// pack embedded stuff
 	from {
