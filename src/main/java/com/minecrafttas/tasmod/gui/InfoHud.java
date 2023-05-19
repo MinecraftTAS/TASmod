@@ -114,7 +114,7 @@ public class InfoHud extends GuiScreen {
 		yOffset = -1;
 	}
 	
-	@Override protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+	@Override protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if (mouseButton == 1) {
 			identify(mouseX, mouseY);
 			if (currentlyDraggedIndex != -1) {
@@ -262,13 +262,13 @@ public class InfoHud extends GuiScreen {
 				}));
 			}
 			
-			title = "facing";
-			y += 14;
-			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-				if (Minecraft.getMinecraft().currentScreen == this) return "Facing";
-				return String.format("%.2f %.2f", CameraInterpolationEvents.rotationYaw, CameraInterpolationEvents.rotationPitch);
-			}));
+//			title = "facing";
+//			y += 14;
+//			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+//			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+//				if (Minecraft.getMinecraft().currentScreen == this) return "Facing";
+//				return String.format("%.2f %.2f", CameraInterpolationEvents.rotationYaw, CameraInterpolationEvents.rotationPitch);
+//			}));
 			
 			title = "cticks";
 			y += 14;

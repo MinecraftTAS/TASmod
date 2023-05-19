@@ -1,0 +1,15 @@
+// configure plugin management
+pluginManagement {
+    // add repositories for plugins
+    repositories {
+        // add mgnetwork repository
+        maven { url = 'https://maven.mgnet.work/main' }
+    
+        // add fabric repository
+        maven { url = 'https://maven.fabricmc.net/' }
+        
+        // add other main repositories
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}

@@ -11,10 +11,10 @@ import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Creating savestates of the inputs on the client<br>
@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * 
  * @author ScribbleLP
  */
-@SideOnly(Side.CLIENT)
+@Environment(EnvType.CLIENT)
 public class InputSavestatesHandler {
 
 	private final static File savestateDirectory = new File(ClientProxy.tasdirectory + File.separator + "savestates");

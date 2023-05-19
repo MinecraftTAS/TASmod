@@ -4,8 +4,8 @@ import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 /**
  * Hooks into client on server tick loops
@@ -22,7 +22,7 @@ public class TickEvents {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public static void onClientTick() {
 		TASmod.ktrngHandler.updateClient();
 	}

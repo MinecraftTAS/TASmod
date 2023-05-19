@@ -15,7 +15,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.common.DimensionManager;
 
 public class SavestatePlayerLoading {
 	
@@ -26,13 +25,12 @@ public class SavestatePlayerLoading {
 	 * 
 	 * Side: Server
 	 */
-	public static void loadAndSendMotionToPlayer() {
+	public static void loadAndSendMotionToPlayer(MinecraftServer server) {
 		
-		MinecraftServer server=TASmod.getServerInstance();
 		List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
 		PlayerList list=server.getPlayerList();
 		
-		WorldServer[] worlds=DimensionManager.getWorlds();
+		WorldServer[] worlds=server.worlds;
 		for (WorldServer world : worlds) {
 			WorldInfo info=world.getSaveHandler().loadWorldInfo();
 			((AccessorWorld) world).worldInfo(info);
@@ -41,7 +39,7 @@ public class SavestatePlayerLoading {
 			
 			int dimensionPrev=player.dimension;
 			
-			NBTTagCompound nbttagcompound = server.getPlayerList().getPlayerNBT(player);
+			NBTTagCompound nbttagcompound = server.getPlayerList().readPlayerDataFromFile(player);
 			
 			int dimensionNow=0;
 			if (nbttagcompound.hasKey("Dimension"))
@@ -50,7 +48,7 @@ public class SavestatePlayerLoading {
             }
 			
 			if(dimensionNow!=dimensionPrev) {
-				list.transferPlayerToDimension(player, dimensionNow, new NoPortalTeleporter());
+				list.changePlayerDimension(player, dimensionNow);
 			}else {
 				((AccessorWorld) player.getServerWorld()).unloadedEntityList().remove(player);
 			}

@@ -17,10 +17,10 @@ import com.minecrafttas.tasmod.savestates.server.SavestateState;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.NetworkSystem;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer {
@@ -127,7 +127,7 @@ public abstract class MixinMinecraftServer {
 		}
 	}
 
-	@SideOnly(Side.SERVER)
+	@Environment(EnvType.CLIENT)
 	private void runPendingCommands() {
 		if ((MinecraftServer) (Object) this instanceof net.minecraft.server.dedicated.DedicatedServer) {
 			net.minecraft.server.dedicated.DedicatedServer server = (net.minecraft.server.dedicated.DedicatedServer) (MinecraftServer) (Object) this;

@@ -10,6 +10,8 @@ import com.minecrafttas.tasmod.mixin.accessors.AccessorWorldServer;
 import com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderClient;
 import com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderServer;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,10 +22,6 @@ import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Various methods to unload/reload chunks and make loadless savestates possible
  * @author ScribbleLP
@@ -36,7 +34,7 @@ public class SavestatesChunkControl {
 	 * Side: Client
 	 * @see MixinChunkProviderClient#unloadAllChunks()
 	 */
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public static void unloadAllClientChunks() {
 		Minecraft mc = Minecraft.getMinecraft();
 		
@@ -51,11 +49,9 @@ public class SavestatesChunkControl {
 	 * Side: Server
 	 * @see MixinChunkProviderServer#unloadAllChunks()
 	 */
-	public static void unloadAllServerChunks() {
-		//Forge
-		WorldServer[] worlds=DimensionManager.getWorlds();
+	public static void unloadAllServerChunks(MinecraftServer server) {
 		//Vanilla
-		//WorldServer[] worlds=FMLCommonHandler.instance().getMinecraftServerInstance().worlds;
+		WorldServer[] worlds=server.worlds;
 		
 		for (WorldServer world:worlds) {
 			ChunkProviderServer chunkProvider=world.getChunkProvider();
@@ -71,14 +67,11 @@ public class SavestatesChunkControl {
 	 * Side: Server
 	 * @see #addPlayersToChunkMap()
 	 */
-	public static void disconnectPlayersFromChunkMap() {
-		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+	public static void disconnectPlayersFromChunkMap(MinecraftServer server) {
 		List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
-		//Forge
-		WorldServer[] worlds=DimensionManager.getWorlds();
 		//Vanilla
-		//WorldServer[] worlds=server.worlds;
-		for (WorldServer world:worlds) {
+		WorldServer[] worlds=server.worlds;
+		for (WorldServer world : worlds) {
 			for (EntityPlayerMP player : players) {
 				world.getPlayerChunkMap().removePlayer(player);
 			}
@@ -91,32 +84,25 @@ public class SavestatesChunkControl {
 	 * Side: Server
 	 * @see #disconnectPlayersFromChunkMap()
 	 */
-	public static void addPlayersToChunkMap() {
-		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+	public static void addPlayersToChunkMap(MinecraftServer server) {
 		List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
 		//Vanilla
-		//WorldServer[] worlds=server.worlds;
-//		for (EntityPlayerMP player : players) {
-//			switch (player.dimension) {
-//			case -1:
-//				worlds[1].getPlayerChunkMap().addPlayer(player);
-//				worlds[1].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
-//				break;
-//			case 0:
-//				worlds[0].getPlayerChunkMap().addPlayer(player);
-//				worlds[0].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
-//				break;
-//			case 1:
-//				worlds[2].getPlayerChunkMap().addPlayer(player);
-//				worlds[2].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
-//				break;
-//			}
-//		}
-		//Forge
+		WorldServer[] worlds=server.worlds;
 		for (EntityPlayerMP player : players) {
-			WorldServer world=DimensionManager.getWorld(player.dimension);
-			world.getPlayerChunkMap().addPlayer(player);
-			world.getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
+			switch (player.dimension) {
+			case -1:
+				worlds[1].getPlayerChunkMap().addPlayer(player);
+				worlds[1].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
+				break;
+			case 0:
+				worlds[0].getPlayerChunkMap().addPlayer(player);
+				worlds[0].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
+				break;
+			case 1:
+				worlds[2].getPlayerChunkMap().addPlayer(player);
+				worlds[2].getChunkProvider().provideChunk((int)player.posX >> 4, (int)player.posZ >> 4);
+				break;
+			}
 		}
 	}
 	/**
@@ -124,12 +110,9 @@ public class SavestatesChunkControl {
 	 * <br>
 	 * Side: Server
 	 */
-	public static void flushSaveHandler() {
-		//Forge
-		WorldServer[] worlds=DimensionManager.getWorlds();
+	public static void flushSaveHandler(MinecraftServer server) {
 		//Vanilla
-		//MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-		//WorldServer[] worlds=server.worlds;
+		WorldServer[] worlds=server.worlds;
 		for(WorldServer world : worlds) {
 			world.getSaveHandler().flush();
 		}
@@ -149,12 +132,8 @@ public class SavestatesChunkControl {
 	 * <br>
 	 * Side: Server
 	 */
-	public static void updateSessionLock() {
-		//Forge
-		WorldServer[] worlds=DimensionManager.getWorlds();
-		//Vanilla
-		//MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-		//WorldServer[] worlds=server.worlds;
+	public static void updateSessionLock(MinecraftServer server) {
+		WorldServer[] worlds=server.worlds;
 		for(WorldServer world : worlds) {
 			((AccessorSaveHandler) world.getSaveHandler()).invokeSetSessionLock();
 		}
@@ -171,7 +150,7 @@ public class SavestatesChunkControl {
 	 * <br>
 	 * Side: Client
 	 */
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public static void keepPlayerInLoadedEntityList(net.minecraft.entity.player.EntityPlayer player) {
 		((AccessorWorld) Minecraft.getMinecraft().world).unloadedEntityList().remove(player);
 	}
@@ -190,8 +169,8 @@ public class SavestatesChunkControl {
 	 * <br>
 	 * Side: Client
 	 */
-	@SideOnly(Side.CLIENT)
-	public static void addPlayerToClientChunk(net.minecraft.entity.player.EntityPlayer player) {
+	@Environment(EnvType.CLIENT)
+	public static void addPlayerToClientChunk(EntityPlayer player) {
 		int i = MathHelper.floor(player.posX / 16.0D);
 		int j = MathHelper.floor(player.posZ / 16.0D);
 		Chunk chunk = Minecraft.getMinecraft().world.getChunkFromChunkCoords(i, j);
@@ -209,7 +188,7 @@ public class SavestatesChunkControl {
 	 * 
 	 * Side: Server
 	 */
-	public static void addPlayerToServerChunk(net.minecraft.entity.player.EntityPlayerMP player) {
+	public static void addPlayerToServerChunk(EntityPlayerMP player) {
 		int i = MathHelper.floor(player.posX / 16.0D);
 		int j = MathHelper.floor(player.posZ / 16.0D);
 		WorldServer world = player.getServerWorld();

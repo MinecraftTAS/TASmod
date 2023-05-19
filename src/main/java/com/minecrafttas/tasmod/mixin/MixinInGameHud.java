@@ -7,12 +7,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.GuiIngameForge;
 
-@Mixin(GuiIngameForge.class)
+@Mixin(GuiIngame.class)
 public abstract class MixinInGameHud {
 	
 	ResourceLocation potion = new ResourceLocation("tasmod:textures/potion.png");
@@ -21,7 +21,7 @@ public abstract class MixinInGameHud {
 	 * Renders the potion into the gui
 	 * @param ci
 	 */
-	@Inject(method="renderExperience", at=@At(value="HEAD"), remap = false)
+	@Inject(method="renderExpBar", at=@At(value="HEAD"), remap = false)
 	public void mixinRenderExperienceBar(CallbackInfo ci) {
 		ScaledResolution scaledresolution = new ScaledResolution(Minecraft.getMinecraft());
 		Minecraft.getMinecraft().getTextureManager().bindTexture(potion);

@@ -18,7 +18,6 @@ import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.util.math.MathHelper;
 
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer implements SubtickDuck {
@@ -63,9 +62,9 @@ public class MixinEntityRenderer implements SubtickDuck {
 			// Comment this out to disable interpolation, also comment out @SubscribeEvent
 			// in CameraInterpolationEvents
 			if (this.mc.currentScreen == null) {
-				CameraInterpolationEvents.rotationYaw = ((float) ((double) CameraInterpolationEvents.rotationYaw + (double) mc.mouseHelper.deltaX * f1 * 0.15D));
-				CameraInterpolationEvents.rotationPitch = (float) ((double) CameraInterpolationEvents.rotationPitch - (double) mc.mouseHelper.deltaY * f1 * 0.15D);
-				CameraInterpolationEvents.rotationPitch = MathHelper.clamp(CameraInterpolationEvents.rotationPitch, -90.0F, 90.0F);
+//				CameraInterpolationEvents.rotationYaw = ((float) ((double) CameraInterpolationEvents.rotationYaw + (double) mc.mouseHelper.deltaX * f1 * 0.15D));
+//				CameraInterpolationEvents.rotationPitch = (float) ((double) CameraInterpolationEvents.rotationPitch - (double) mc.mouseHelper.deltaY * f1 * 0.15D);
+//				CameraInterpolationEvents.rotationPitch = MathHelper.clamp(CameraInterpolationEvents.rotationPitch, -90.0F, 90.0F);
 			}
 		}
 	}
@@ -119,8 +118,8 @@ public class MixinEntityRenderer implements SubtickDuck {
 			ClientProxy.virtual.updateSubtick(mc.player.rotationPitch, mc.player.rotationYaw);
 			mc.player.rotationPitch = ClientProxy.virtual.getSubtickPitch();
 			mc.player.rotationYaw = ClientProxy.virtual.getSubtickYaw();
-			CameraInterpolationEvents.rotationPitch = mc.player.rotationPitch;
-			CameraInterpolationEvents.rotationYaw = 180f + mc.player.rotationYaw;
+//			CameraInterpolationEvents.rotationPitch = mc.player.rotationPitch;
+//			CameraInterpolationEvents.rotationYaw = 180f + mc.player.rotationYaw;
 		}
 	}
 }

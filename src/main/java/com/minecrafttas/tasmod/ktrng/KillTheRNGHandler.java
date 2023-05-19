@@ -6,8 +6,8 @@ import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 /**
  * Easy access to the KillTheRNG library without littering the rest of the code
@@ -63,7 +63,7 @@ public class KillTheRNGHandler{
 	/**
 	 * @return The global seed of the client
 	 */
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public long getGlobalSeedClient() {
 		if(isLoaded()) 
 			return KillTheRNG.clientRandom.GlobalClient.getSeed();
@@ -75,7 +75,7 @@ public class KillTheRNGHandler{
 	 * Set the global seed on the client
 	 * @param seedIn The seed on the client
 	 */
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public void setGlobalSeedClient(long seedIn) {
 		if (isLoaded()) {
 			KillTheRNG.clientRandom.setSeedAll(seedIn);
@@ -92,7 +92,7 @@ public class KillTheRNGHandler{
 	 * Sends a packet to the server, setting the global seed
 	 * @param seedIn The seed on the server
 	 */
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public void sendGlobalSeedToServer(long seedIn) {
 		if(isLoaded()) {
 			if(ClientProxy.packetClient!=null)
@@ -106,7 +106,7 @@ public class KillTheRNGHandler{
 	/**
 	 * Executed every tick.
 	 */
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public void updateClient() {
 	}
 	
@@ -129,12 +129,12 @@ public class KillTheRNGHandler{
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public void setInitialSeed() {
 		setInitialSeed(getGlobalSeedClient());
 	}
 
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public void setInitialSeed(long initialSeed) {
 		if(ClientProxy.packetClient != null) {
 			TASmod.logger.info("Sending initial client seed: {}", initialSeed);
