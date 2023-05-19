@@ -103,29 +103,6 @@ public class PointerNormalizer {
 		}
 	}
 	
-	public static void resize(int width, int height) {
-		double temp=(double)width/height;
-		int newHeight=Minecraft.getMinecraft().displayHeight;
-		int newWidth=(int)(temp*newHeight);
-		
-		try {
-			Display.setDisplayMode(new DisplayMode(newWidth, newHeight));
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
-		
-		Minecraft.getMinecraft().displayHeight=newHeight;
-		Minecraft.getMinecraft().displayWidth=newWidth;
-		
-		
-		Minecraft.getMinecraft().resize(newWidth, newHeight);
-		Display.setResizable(false);
-		Display.setResizable(true);
-		Minecraft.getMinecraft().updateDisplay();
-	}
-	
-	
-
 	/*
 	 * Here lies 10 hours of work for something I didn't even use. This code
 	 * normalizes the pointers coordinates and scales it depending on the screen

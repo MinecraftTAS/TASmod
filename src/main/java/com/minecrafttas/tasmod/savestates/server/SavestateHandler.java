@@ -27,6 +27,8 @@ import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -36,9 +38,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Creates and loads savestates on both client and server without closing the
@@ -295,9 +294,9 @@ public class SavestateHandler {
 		TASmod.packetServer.sendToAll(new LoadstatePacket());
 
 		// Unload chunks on the server
-		SavestatesChunkControl.disconnectPlayersFromChunkMap();
-		SavestatesChunkControl.unloadAllServerChunks();
-		SavestatesChunkControl.flushSaveHandler();
+		SavestatesChunkControl.disconnectPlayersFromChunkMap(server);
+		SavestatesChunkControl.unloadAllServerChunks(server);
+		SavestatesChunkControl.flushSaveHandler(server);
 
 		// Delete and copy directories
 		FileUtils.deleteDirectory(currentfolder);
@@ -307,11 +306,11 @@ public class SavestateHandler {
 		loadSavestateDataFile();
 
 		// Update the player and the client
-		SavestatePlayerLoading.loadAndSendMotionToPlayer();
+		SavestatePlayerLoading.loadAndSendMotionToPlayer(server);
 		// Update the session.lock file so minecraft behaves and saves the world
-		SavestatesChunkControl.updateSessionLock();
+		SavestatesChunkControl.updateSessionLock(server);
 		// Load the chunks and send them to the client
-		SavestatesChunkControl.addPlayersToChunkMap();
+		SavestatesChunkControl.addPlayersToChunkMap(server);
 
 		// Enable level saving again
 		for (WorldServer world : server.worlds) {
@@ -331,7 +330,7 @@ public class SavestateHandler {
 			SavestatesChunkControl.addPlayerToServerChunk(player);
 		});
 		
-		WorldServer[] worlds = DimensionManager.getWorlds();
+		WorldServer[] worlds = server.worlds;
 
 		for (WorldServer world : worlds) {
 			world.tick();
@@ -603,14 +602,14 @@ public class SavestateHandler {
 	public static void playerLoadSavestateEventServer() {
 		PlayerList playerList = TASmod.getServerInstance().getPlayerList();
 		for (EntityPlayerMP player : playerList.getPlayers()) {
-			NBTTagCompound nbttagcompound = playerList.getPlayerNBT(player);
+			NBTTagCompound nbttagcompound = playerList.readPlayerDataFromFile(player);
 			SavestatePlayerLoading.reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
 		}
 		// Updating redstone component timers to the new world time (#136)
 		SavestatesChunkControl.updateWorldServerTickListEntries();
 	}
 
-	@SideOnly(Side.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public static void playerLoadSavestateEventClient() {
 		SavestatesChunkControl.addPlayerToClientChunk(Minecraft.getMinecraft().player);
 	}

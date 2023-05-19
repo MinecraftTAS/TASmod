@@ -1,8 +1,5 @@
 package com.minecrafttas.tasmod.savestates.server.playerloading;
 
-import java.io.IOException;
-
-import com.minecrafttas.tasmod.events.CameraInterpolationEvents;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
@@ -18,7 +15,7 @@ import net.minecraft.world.GameType;
  * Reads the playerdata coming from the server and also applies motion, relative
  * motion and other things from the player
  * 
- * @author ScribbleLP
+ * @author Scribble
  *
  */
 public class SavestatePlayerLoadingPacket implements Packet {
@@ -66,8 +63,8 @@ public class SavestatePlayerLoadingPacket implements Packet {
 			Minecraft.getMinecraft().playerController.setGameType(type);
 
 			// #?? Player rotation does not change when loading a savestate
-			CameraInterpolationEvents.rotationPitch = player.rotationPitch;
-			CameraInterpolationEvents.rotationYaw = player.rotationYaw + 180f;
+//			CameraInterpolationEvents.rotationPitch = player.rotationPitch;
+//			CameraInterpolationEvents.rotationYaw = player.rotationYaw + 180f;
 
 			SavestatesChunkControl.keepPlayerInLoadedEntityList(player);
 			SavestatePlayerLoading.wasLoading = true;
@@ -81,11 +78,7 @@ public class SavestatePlayerLoadingPacket implements Packet {
 
 	@Override
 	public void deserialize(PacketBuffer buf) {
-		try {
-			compound = buf.readCompoundTag();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		compound = buf.readCompoundTag();
 	}
 
 }

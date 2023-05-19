@@ -1,19 +1,8 @@
-// Setup plugin classpath
-buildscript {
-    repositories {
-        maven { url = "https://maven.minecraftforge.net" }
-        maven { url = "https://repo.spongepowered.org/maven" }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
-    }
+plugins {
+	// loom plugin
+    id 'fabric-loom' version "${loom_version}"
 }
 
-// Apply plugins
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'eclipse'
 
 // Set basic properties
 version = project.version
@@ -23,19 +12,10 @@ archivesBaseName = project.artifact
 // Compile for java 8
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
-// Configure forge
-minecraft {
-	version = forge_version
-	runDir = "run"
-	mappings = mappings_version
-    
-    clientRunArgs += "--mixin mixins.tasmod.json --tweakClass org.spongepowered.asm.launch.MixinTweaker"
-    serverRunArgs += "--mixin mixins.tasmod.json --tweakClass org.spongepowered.asm.launch.MixinTweaker"
-}
-
 // Dependency repositories
 repositories {
     mavenCentral()
+    maven { url = 'https://raw.githubusercontent.com/BleachDev/cursed-mappings/main/' }
     maven { url = "https://jitpack.io" }
     maven { url = "https://maven.mgnet.work/main" }
     maven { url = 'https://repo.spongepowered.org/maven' }
@@ -47,20 +27,22 @@ configurations {
     	transitive = false
     }
     embed
-    compile.extendsFrom(embed)
+    implementation.extendsFrom(embed)
 }
 
 // Dependencies
 dependencies {
 	// tasmod dependencies (exported with jar)
     embed group: 'com.dselent', name: 'bigarraylist', version: '1.0'
-    embed('org.spongepowered:mixin:0.8.2') {
-    	exclude module: 'launchwrapper'
-    	exclude module: 'log4j-core'
-        exclude module: 'commons-io'
-        exclude module: 'gson'
-        exclude module: 'guava'
-    }
+    
+    // add mojang mappings
+    mappings "net.legacyfabric:yarn:1.12.2+build.mcp"
+    
+    // add fabric loader
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // add minecraft dependency
+    minecraft "com.mojang:minecraft:1.12.2"
     
     // tasmod dependencies (only for compilation)
     compileOnly group: 'com.minecrafttas', name: 'killtherng', version: '2.0'
@@ -83,7 +65,7 @@ processResources {
     inputs.property "mcversion", minecraft_version
 
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+        include 'fabric.mod.json'
 
         expand 'mod_id': project.mod_id, 'mod_url': project.mod_url, 'name': project.mod_name, 'mod_version': project.version,
                 'mcversion': project.minecraft_version, 'mod_description': project.mod_description,
@@ -91,13 +73,13 @@ processResources {
     }
 
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+        exclude 'fabric.mod.json'
     }
 }
 
 // Configure jar file
 jar {
-	archiveName = "${archivesBaseName}-${version}.jar"
+	archivesBaseName = "${archivesBaseName}-${version}"
 
 	// pack embedded stuff
 	from {
@@ -105,18 +87,4 @@ jar {
     } {
         exclude "LICENSE.txt", "META-INF/MANIFSET.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
     }
-
-	// configure manifest
-    manifest {
-        attributes 'MixinConfigs':'mixins.tasmod.json',
-                   'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-                   'ForceLoadAsMod': 'true'
-    }
-    
-    
-}
-
-// Configure mixin
-mixin {
-    add sourceSets.main, mixin_refmap
 }
