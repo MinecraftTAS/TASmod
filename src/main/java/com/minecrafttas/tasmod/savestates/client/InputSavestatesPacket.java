@@ -3,7 +3,7 @@ package com.minecrafttas.tasmod.savestates.client;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
@@ -34,7 +34,7 @@ public class InputSavestatesPacket implements Packet{
 				try {
 					InputSavestatesHandler.savestate(name);
 				} catch (SavestateException e) {
-					CommonProxy.logger.error(e.getMessage());
+					TASmod.logger.error(e.getMessage());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

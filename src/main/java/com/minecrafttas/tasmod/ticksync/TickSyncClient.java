@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod.ticksync;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.Minecraft;
 
@@ -35,10 +35,10 @@ public class TickSyncClient {
 	 * @param mc Instance of Minecraft
 	 */
 	public static void clientPostTick(Minecraft mc) {
-		if (mc.player == null && ClientProxy.packetClient==null) {
+		if (mc.player == null && TASmodClient.packetClient==null) {
 			return;
 		}
-		ClientProxy.packetClient.sendToServer(new TickSyncPacket(mc.player.getGameProfile().getId()));
+		TASmodClient.packetClient.sendToServer(new TickSyncPacket(mc.player.getGameProfile().getId()));
 	}
 	
 }

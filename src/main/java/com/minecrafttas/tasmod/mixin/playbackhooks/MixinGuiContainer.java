@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.settings.KeyBinding;
@@ -13,12 +13,12 @@ import net.minecraft.client.settings.KeyBinding;
 public class MixinGuiContainer {
 	@Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", ordinal = 0, remap = false))
 	private boolean redirectIsKeyDown(int i) {
-		return ClientProxy.virtual.isKeyDown(i);
+		return TASmodClient.virtual.isKeyDown(i);
 	}
 
 	@Redirect(method = "mouseReleased", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", ordinal = 0, remap = false))
 	private boolean redirectIsKeyDown2(int i) {
-		return ClientProxy.virtual.isKeyDown(i);
+		return TASmodClient.virtual.isKeyDown(i);
 	}
 
 //	@Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/settings/KeyBinding;isActiveAndMatches(I)Z", remap = false)) //TODO Fix if #67 occurs

@@ -11,9 +11,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.duck.SubtickDuck;
-import com.minecrafttas.tasmod.events.CameraInterpolationEvents;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 
 import net.minecraft.client.Minecraft;
@@ -55,7 +54,7 @@ public class MixinEntityRenderer implements SubtickDuck {
 			dX = 0;
 			dY = 0;
 		}
-		if (ClientProxy.virtual.getContainer().isPlayingback()) {
+		if (TASmodClient.virtual.getContainer().isPlayingback()) {
 			dX = 0;
 			dY = 0;
 		} else {
@@ -115,9 +114,9 @@ public class MixinEntityRenderer implements SubtickDuck {
 				smoothCamPitch = 0.0F;
 				mc.player.turn(f2, f3 * (float) i);
 			}
-			ClientProxy.virtual.updateSubtick(mc.player.rotationPitch, mc.player.rotationYaw);
-			mc.player.rotationPitch = ClientProxy.virtual.getSubtickPitch();
-			mc.player.rotationYaw = ClientProxy.virtual.getSubtickYaw();
+			TASmodClient.virtual.updateSubtick(mc.player.rotationPitch, mc.player.rotationYaw);
+			mc.player.rotationPitch = TASmodClient.virtual.getSubtickPitch();
+			mc.player.rotationYaw = TASmodClient.virtual.getSubtickYaw();
 //			CameraInterpolationEvents.rotationPitch = mc.player.rotationPitch;
 //			CameraInterpolationEvents.rotationYaw = 180f + mc.player.rotationYaw;
 		}

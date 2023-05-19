@@ -2,14 +2,12 @@ package com.minecrafttas.tasmod.commands.restartandplay;
 
 import java.nio.charset.Charset;
 
-import com.minecrafttas.tasmod.ClientProxy;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class RestartAndPlayPacket implements Packet{
 	private String name;
@@ -30,9 +28,9 @@ public class RestartAndPlayPacket implements Packet{
 				e.printStackTrace();
 			}
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-				ClientProxy.config.get("General", "fileToLoad", "").set(name);
-				ClientProxy.config.save();
-				FMLCommonHandler.instance().exitJava(0, false);
+//				TASmodClient.config.get("General", "fileToLoad", "").set(name);
+//				TASmodClient.config.save();
+				System.exit(0);
 			});
 		}
 	}

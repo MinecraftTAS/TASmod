@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "tasmod",
+	"version": "${mod_version}",
+	"name": "Tool-Assisted Speedrun Mod",
+	"description": "${mod_description}",
+	"authors": [
+		"Scribble", 
+		"Pancake"
+	],
+	"contributors": [ 
+		"tr7zw",
+		"cittyinthecloud"
+	],
+	"contact": {
+		"homepage": "${mod_url}",
+		"sources": "https://github.com/MinecraftTAS/TASmod",
+		"issues": "https://github.com/MinecraftTAS/TASmod/issues",
+		"email": "scribble@minecrafttas.com"
+	},
+
+	"license": "GPLv3",
+	"icon": "assets/tasmod/textures/potion.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.minecrafttas.tasmod.TASmod"
+		],
+		"client": [ 
+			"com.minecrafttas.tasmod.TASmodClient"
+		]
+	},
+	"mixins": [
+		"tasmod.mixin.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.11",
+		"minecraft": "*",
+		"java": ">=8"
+	}
+}

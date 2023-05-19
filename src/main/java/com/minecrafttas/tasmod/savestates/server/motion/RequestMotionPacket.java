@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.savestates.server.motion;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
@@ -31,7 +31,7 @@ public class RequestMotionPacket implements Packet {
 				if (!(Minecraft.getMinecraft().currentScreen instanceof GuiSavestateSavingScreen)) {
 					Minecraft.getMinecraft().displayGuiScreen(new GuiSavestateSavingScreen());
 				}
-				ClientProxy.packetClient.sendToServer(new MotionPacket(player.motionX, player.motionY, player.motionZ, player.moveForward, player.moveVertical, player.moveStrafing, player.isSprinting(), player.jumpMovementFactor));
+				TASmodClient.packetClient.sendToServer(new MotionPacket(player.motionX, player.motionY, player.motionZ, player.moveForward, player.moveVertical, player.moveStrafing, player.isSprinting(), player.jumpMovementFactor));
 			}
 		}
 		

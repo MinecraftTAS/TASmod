@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
@@ -39,7 +39,7 @@ public class LoadTASPacket implements Packet{
 			Minecraft mc = Minecraft.getMinecraft();
 			mc.addScheduledTask(() -> {
 				try {
-					ClientProxy.virtual.loadInputs(name);
+					TASmodClient.virtual.loadInputs(name);
 				} catch (IOException e) {
 					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
 					return;

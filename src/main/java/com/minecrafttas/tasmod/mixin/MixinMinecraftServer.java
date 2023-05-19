@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
 import com.minecrafttas.tasmod.savestates.server.SavestateState;
@@ -80,7 +79,7 @@ public abstract class MixinMinecraftServer {
 
 			TASmod.ktrngHandler.updateServer();
 			this.tick();
-			CommonProxy.tickSchedulerServer.runAllTasks();
+			TASmod.tickSchedulerServer.runAllTasks();
 			
 			if (TickrateChangerServer.advanceTick) {
 				TickrateChangerServer.changeServerTickrate(0F);
@@ -127,7 +126,7 @@ public abstract class MixinMinecraftServer {
 		}
 	}
 
-	@Environment(EnvType.CLIENT)
+	@Environment(EnvType.SERVER)
 	private void runPendingCommands() {
 		if ((MinecraftServer) (Object) this instanceof net.minecraft.server.dedicated.DedicatedServer) {
 			net.minecraft.server.dedicated.DedicatedServer server = (net.minecraft.server.dedicated.DedicatedServer) (MinecraftServer) (Object) this;

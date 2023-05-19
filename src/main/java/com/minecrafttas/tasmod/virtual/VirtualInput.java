@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
@@ -537,13 +537,13 @@ public class VirtualInput {
 	// ================================Load/Save Inputs=====================================
 	
 	public void loadInputs(String filename) throws IOException {
-		setContainer(ClientProxy.serialiser.fromEntireFileV1(new File(ClientProxy.tasdirectory + "/" + filename + ".mctas")));
+		setContainer(TASmodClient.serialiser.fromEntireFileV1(new File(TASmodClient.tasdirectory + "/" + filename + ".mctas")));
 		getContainer().fixTicks();
 	}
 	
 	public void saveInputs(String filename) throws IOException {
-		ClientProxy.createTASDir();
-		ClientProxy.serialiser.saveToFileV1(new File(ClientProxy.tasdirectory + "/" + filename + ".mctas"), ClientProxy.virtual.getContainer());
+		TASmodClient.createTASDir();
+		TASmodClient.serialiser.saveToFileV1(new File(TASmodClient.tasdirectory + "/" + filename + ".mctas"), TASmodClient.virtual.getContainer());
 	}
 
 	// =====================================Debug===========================================

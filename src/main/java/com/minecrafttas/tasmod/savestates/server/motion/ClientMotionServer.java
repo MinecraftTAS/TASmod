@@ -3,7 +3,6 @@ package com.minecrafttas.tasmod.savestates.server.motion;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-import com.minecrafttas.tasmod.CommonProxy;
 import com.minecrafttas.tasmod.TASmod;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -29,11 +28,11 @@ public class ClientMotionServer {
 				e.printStackTrace();
 			}
 			if(i % 30 == 1) {
-				CommonProxy.logger.info("Resending motion packet");
+				TASmod.logger.info("Resending motion packet");
 				TASmod.packetServer.sendToAll(new RequestMotionPacket());
 			}
 			if (i == 1000) {
-				CommonProxy.logger.warn("Client motion timed out!");
+				TASmod.logger.warn("Client motion timed out!");
 				break;
 			}
 

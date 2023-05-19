@@ -8,7 +8,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import com.google.common.collect.Maps;
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
@@ -58,7 +58,7 @@ public class VirtualKeybindings {
 		if (isKeyCodeAlwaysBlocked(keycode)) {
 			down = keycode >= 0 ? Keyboard.isKeyDown(keycode) : Mouse.isButtonDown(keycode + 100);
 		} else {
-			down = ClientProxy.virtual.willKeyBeDown(keycode);
+			down = TASmodClient.virtual.willKeyBeDown(keycode);
 		}
 
 		if (down) {

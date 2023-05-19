@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.duck.GuiScreenDuck;
 import com.minecrafttas.tasmod.duck.SubtickDuck;
 import com.minecrafttas.tasmod.events.LoadWorldEvents;
@@ -45,21 +45,21 @@ public abstract class MixinMinecraft {
 		
 		LoadWorldEvents.doneWithLoadingScreen();
 		
-		ClientProxy.gameLoopSchedulerClient.runAllTasks();
+		TASmodClient.gameLoopSchedulerClient.runAllTasks();
 		
 		if(((Minecraft) (Object) this).player != null) {
-			ClientProxy.hud.tick();
+			TASmodClient.hud.tick();
 		}
 		
 		while (Keyboard.next()) {
-			ClientProxy.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
+			TASmodClient.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
 		while (Mouse.next()) {
 			if(this.currentScreen == null) {
-				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.ticksPerSecond==0);
+				TASmodClient.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.ticksPerSecond==0);
 			} else {
 				GuiScreenDuck screen = (GuiScreenDuck) currentScreen;
-				ClientProxy.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.ticksPerSecond==0);
+				TASmodClient.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.ticksPerSecond==0);
 			}
 		}
 	}
@@ -77,12 +77,12 @@ public abstract class MixinMinecraft {
 
 	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;runTick()V"))
 	public void redirectRunTick(Minecraft mc) {
-		ClientProxy.virtual.updateContainer();
+		TASmodClient.virtual.updateContainer();
 		if (TickrateChangerClient.ticksPerSecond != 0) {
 			((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 		}
 		this.runTick();
-		ClientProxy.tickSchedulerClient.runAllTasks();
+		TASmodClient.tickSchedulerClient.runAllTasks();
 		if (TickrateChangerClient.advanceTick) {
 			TickrateChangerClient.advanceTick = false;
 			TickrateChangerClient.changeClientTickrate(0F);
@@ -96,9 +96,9 @@ public abstract class MixinMinecraft {
 	@Inject(method = "shutdownMinecraftApplet", at = @At("HEAD"))
 	public void inject_shutdownMinecraftApplet(CallbackInfo ci) {
 		try {
-			if (ClientProxy.packetClient != null) {
+			if (TASmodClient.packetClient != null) {
 				TickrateChangerClient.changeTickrate(20);
-				ClientProxy.packetClient.killClient();
+				TASmodClient.packetClient.killClient();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -110,7 +110,7 @@ public abstract class MixinMinecraft {
 	@Inject(method = "runTick", at = @At(value = "HEAD"))
 	public void injectRunTick(CallbackInfo ci) throws IOException {
 		
-		InputContainerView.update(ClientProxy.virtual);
+		InputContainerView.update(TASmodClient.virtual);
 		if (SavestatePlayerLoading.wasLoading) {
 			SavestatePlayerLoading.wasLoading = false;
 			
@@ -124,56 +124,56 @@ public abstract class MixinMinecraft {
 
 	@Inject(method = "runTickKeyboard", at = @At(value = "HEAD"))
 	public void injectRunTickKeyboard(CallbackInfo ci) {
-		ClientProxy.virtual.updateCurrentKeyboard();
+		TASmodClient.virtual.updateCurrentKeyboard();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z", remap = false))
 	public boolean redirectKeyboardNext() {
-		return ClientProxy.virtual.nextKeyboardEvent();
+		return TASmodClient.virtual.nextKeyboardEvent();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int redirectKeyboardGetEventKey() {
-		return ClientProxy.virtual.getEventKeyboardKey();
+		return TASmodClient.virtual.getEventKeyboardKey();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
 	public char redirectKeyboardGetEventCharacter() {
-		return ClientProxy.virtual.getEventKeyboardCharacter();
+		return TASmodClient.virtual.getEventKeyboardCharacter();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
 	public boolean redirectIsKeyDown(int keyCode) {
-		return ClientProxy.virtual.isKeyDown(keyCode);
+		return TASmodClient.virtual.isKeyDown(keyCode);
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
 	public boolean redirectGetEventState() {
-		return ClientProxy.virtual.getEventKeyboardState();
+		return TASmodClient.virtual.getEventKeyboardState();
 	}
 
 	// =====================================================================================================================================
 
 	@Inject(method = "runTickMouse", at = @At(value = "HEAD"))
 	public void injectRunTickMouse(CallbackInfo ci) {
-		ClientProxy.virtual.updateCurrentMouseEvents();
+		TASmodClient.virtual.updateCurrentMouseEvents();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z", remap = false))
 	public boolean redirectMouseNext() {
-		return ClientProxy.virtual.nextMouseEvent();
+		return TASmodClient.virtual.nextMouseEvent();
 	}
 
 	// =====================================================================================================================================
@@ -184,14 +184,14 @@ public abstract class MixinMinecraft {
 //		if(!VirtualKeybindings.isKeyCodeAlwaysBlocked(ClientProxy.virtual.getEventMouseKey()-100)) {
 //			TASmod.ktrngHandler.nextPlayerInput(); // Advance ktrng seed on player input
 //		}
-		return ClientProxy.virtual.getEventMouseKey() + 100;
+		return TASmodClient.virtual.getEventMouseKey() + 100;
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", remap = false))
 	public boolean redirectGetEventButtonState() {
-		return ClientProxy.virtual.getEventMouseState();
+		return TASmodClient.virtual.getEventMouseState();
 	}
 
 	// =====================================================================================================================================
@@ -205,34 +205,34 @@ public abstract class MixinMinecraft {
 
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I", remap = false))
 	public int redirectGetEventDWheel() {
-		return ClientProxy.virtual.getEventMouseScrollWheel();
+		return TASmodClient.virtual.getEventMouseScrollWheel();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int redirectGetEventKeyDPK() {
-		return ClientProxy.virtual.getEventKeyboardKey();
+		return TASmodClient.virtual.getEventKeyboardKey();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
 	public char redirectGetEventCharacterDPK() {
-		return ClientProxy.virtual.getEventKeyboardCharacter();
+		return TASmodClient.virtual.getEventKeyboardCharacter();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
 	public boolean redirectGetEventKeyStateDPK() {
-		return ClientProxy.virtual.getEventKeyboardState();
+		return TASmodClient.virtual.getEventKeyboardState();
 	}
 
 	// =====================================================================================================================================
 	
 	@Inject(method = "runTick", at = @At(value = "RETURN"))
 	public void injectRunTickReturn(CallbackInfo ci) {
-		ClientProxy.virtual.getContainer().nextTick();
+		TASmodClient.virtual.getContainer().nextTick();
 	}
 }

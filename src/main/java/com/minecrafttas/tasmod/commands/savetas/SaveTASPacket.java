@@ -3,7 +3,7 @@ package com.minecrafttas.tasmod.commands.savetas;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
@@ -31,7 +31,7 @@ public class SaveTASPacket implements Packet {
 			Minecraft mc = Minecraft.getMinecraft();
 			mc.addScheduledTask(() -> {
 				try {
-					ClientProxy.virtual.saveInputs(name);
+					TASmodClient.virtual.saveInputs(name);
 				} catch (IOException e) {
 					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
 					return;

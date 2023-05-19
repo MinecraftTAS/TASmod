@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod.ktrng;
 
 import com.minecrafttas.killtherng.KillTheRNG;
 import com.minecrafttas.killtherng.SeedingModes;
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
@@ -95,8 +95,8 @@ public class KillTheRNGHandler{
 	@Environment(EnvType.CLIENT)
 	public void sendGlobalSeedToServer(long seedIn) {
 		if(isLoaded()) {
-			if(ClientProxy.packetClient!=null)
-				ClientProxy.packetClient.sendToServer(new KTRNGSeedPacket(seedIn));
+			if(TASmodClient.packetClient!=null)
+				TASmodClient.packetClient.sendToServer(new KTRNGSeedPacket(seedIn));
 			else
 				setGlobalSeedClient(seedIn);
 		}
@@ -136,9 +136,9 @@ public class KillTheRNGHandler{
 
 	@Environment(EnvType.CLIENT)
 	public void setInitialSeed(long initialSeed) {
-		if(ClientProxy.packetClient != null) {
+		if(TASmodClient.packetClient != null) {
 			TASmod.logger.info("Sending initial client seed: {}", initialSeed);
-			ClientProxy.packetClient.sendToServer(new KTRNGStartSeedPacket(initialSeed));	// TODO Every new player in multiplayer will currently send the initial seed, which is BAD
+			TASmodClient.packetClient.sendToServer(new KTRNGStartSeedPacket(initialSeed));	// TODO Every new player in multiplayer will currently send the initial seed, which is BAD
 		} else {
 			TASmod.ktrngHandler.setGlobalSeedClient(initialSeed);
 		}

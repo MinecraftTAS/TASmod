@@ -171,9 +171,9 @@ public class SavestateHandler {
 
 		// Wait for the chunkloader to save the game
 		for (WorldServer world : server.worlds) {
-			AnvilChunkLoader chunkloader = (AnvilChunkLoader) world.getChunkProvider().chunkLoader;
-			while (chunkloader.getPendingSaveCount() > 0) {
-			}
+//			AnvilChunkLoader chunkloader = (AnvilChunkLoader) world.getChunkProvider().chunkLoader;
+//			while (chunkloader.getPendingSaveCount() > 0) {
+//			}
 		}
 
 		saveSavestateDataFile(false);

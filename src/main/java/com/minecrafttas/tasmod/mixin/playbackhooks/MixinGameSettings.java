@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
@@ -14,11 +14,11 @@ public class MixinGameSettings {
 
 	@Redirect(method = "isKeyDown", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;isButtonDown(I)Z", remap = false))
 	private static boolean redirectIsKeyDown1(int i, KeyBinding key) {
-		return ClientProxy.virtual.isKeyDown(i + 100);
+		return TASmodClient.virtual.isKeyDown(i + 100);
 	}
 
 	@Redirect(method = "isKeyDown", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
 	private static boolean redirectIsKeyDown2(int i, KeyBinding key) {
-		return ClientProxy.virtual.isKeyDown(i);
+		return TASmodClient.virtual.isKeyDown(i);
 	}
 }
