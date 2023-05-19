@@ -2,8 +2,8 @@ package com.minecrafttas.tasmod.events;
 
 import org.lwjgl.input.Keyboard;
 
-import com.minecrafttas.tasmod.ClientProxy;
-import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.playback.server.TASstateClient;
@@ -45,11 +45,11 @@ public class KeybindingEvents {
 		
 		if (VirtualKeybindings.isKeyDownExceptTextfield(savestateSaveKey)) {
 
-			ClientProxy.packetClient.sendToServer(new SavestatePacket());
+			TASmodClient.packetClient.sendToServer(new SavestatePacket());
 
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(savestateLoadKey)) {
 
-			ClientProxy.packetClient.sendToServer(new LoadstatePacket());
+			TASmodClient.packetClient.sendToServer(new LoadstatePacket());
 
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(bufferViewKey)) {
 			
@@ -57,7 +57,7 @@ public class KeybindingEvents {
 			
 		} else if (VirtualKeybindings.isKeyDownExceptTextfield(infoGuiKey)) {
 			
-			Minecraft.getMinecraft().displayGuiScreen(ClientProxy.hud);
+			Minecraft.getMinecraft().displayGuiScreen(TASmodClient.hud);
 			
 		} else if (VirtualKeybindings.isKeyDown(stopkey)) {
 			
@@ -73,7 +73,7 @@ public class KeybindingEvents {
 			
 		} else if (VirtualKeybindings.isKeyDown(testingKey)) {
 			
-			CommonProxy.tickSchedulerServer.add(() -> {
+			TASmod.tickSchedulerServer.add(() -> {
 				try {
 					Thread.sleep(1000L);
 				} catch (InterruptedException e) {

@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.commands.fullrecord;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
@@ -18,9 +18,9 @@ public class FullRecordPacket implements Packet{
 	public void handle(PacketSide side, EntityPlayer player) {
 		if(side.isClient()) {
 			OpenGuiEvents.stateWhenOpened = TASstate.RECORDING;
-			ClientProxy.virtual.getContainer().clear();
+			TASmodClient.virtual.getContainer().clear();
 			Minecraft mc = Minecraft.getMinecraft();
-			ClientProxy.tickSchedulerClient.add(()->{
+			TASmodClient.tickSchedulerClient.add(()->{
 				mc.world.sendQuittingDisconnectingPacket();
 				mc.loadWorld((WorldClient) null);
 				mc.displayGuiScreen(new GuiMainMenu());

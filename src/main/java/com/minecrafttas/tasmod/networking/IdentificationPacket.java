@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod.networking;
 
 import java.util.UUID;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,7 +29,7 @@ public class IdentificationPacket implements Packet {
 		if (side.isServer()) {
 			TickSyncServer.onPacket(this.uuid);
 		} else {
-			ClientProxy.packetClient.setReady();
+			TASmodClient.packetClient.setReady();
 		}
 	}
 

@@ -1,6 +1,7 @@
 plugins {
 	// loom plugin
-    id 'fabric-loom' version "${loom_version}"
+    id 'fabric-loom' version "1.2-SNAPSHOT"
+    id 'legacy-looming' version "1.2-SNAPSHOT"
 }
 
 
@@ -59,27 +60,21 @@ task downloadKTRNG(type: Copy) {
     into 'run/mods/'
 }
 
-// Update values from mcmod.info
 processResources {
     inputs.property "version", project.version
     inputs.property "mcversion", minecraft_version
 
-    from(sourceSets.main.resources.srcDirs) {
-        include 'fabric.mod.json'
+    filesMatching("fabric.mod.json") {
+        //include 'fabric.mod.json'
 
         expand 'mod_id': project.mod_id, 'mod_url': project.mod_url, 'name': project.mod_name, 'mod_version': project.version,
-                'mcversion': project.minecraft_version, 'mod_description': project.mod_description,
-                'mod_authors': project.mod_authors, 'mod_credits': project.mod_credits
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'fabric.mod.json'
+                'mcversion': project.minecraft_version, 'mod_description': project.mod_description
     }
 }
 
 // Configure jar file
 jar {
-	archivesBaseName = "${archivesBaseName}-${version}"
+	archivesBaseName = "${archivesBaseName}"
 
 	// pack embedded stuff
 	from {

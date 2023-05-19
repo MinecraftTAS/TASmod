@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.playback.server;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
@@ -72,7 +72,7 @@ public class SyncStatePacket implements Packet {
 			
 			TickTask task = ()->{
 				
-				PlaybackController container = ClientProxy.virtual.getContainer();
+				PlaybackController container = TASmodClient.virtual.getContainer();
 				if (state != container.getState()) {
 					String chatMessage = container.setTASState(state, verbose);
 					if (!chatMessage.isEmpty()) {
@@ -84,9 +84,9 @@ public class SyncStatePacket implements Packet {
 			
 			
 			if((state == TASstate.RECORDING || state == TASstate.PLAYBACK) && TickrateChangerClient.ticksPerSecond != 0) {
-				ClientProxy.tickSchedulerClient.add(task);	// Starts a recording in the next tick
+				TASmodClient.tickSchedulerClient.add(task);	// Starts a recording in the next tick
 			} else {
-				ClientProxy.gameLoopSchedulerClient.add(task);	// Starts a recording in the next frame
+				TASmodClient.gameLoopSchedulerClient.add(task);	// Starts a recording in the next frame
 			}
 		}
 	}

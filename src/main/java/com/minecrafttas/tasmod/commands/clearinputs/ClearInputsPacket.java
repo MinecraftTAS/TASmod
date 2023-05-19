@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.commands.clearinputs;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
@@ -23,7 +23,7 @@ public class ClearInputsPacket implements Packet{
 			});
 		} else {
 			Minecraft.getMinecraft().addScheduledTask(()->{
-				ClientProxy.virtual.getContainer().clear();
+				TASmodClient.virtual.getContainer().clear();
 			});
 		}
 		

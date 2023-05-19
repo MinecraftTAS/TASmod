@@ -15,7 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.logging.log4j.Logger;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -86,7 +86,7 @@ public class TASmodNetworkClient {
 			} catch (Exception exception) {
 				logger.error("Custom TASmod client was unexpectedly shutdown {}", exception);
 				exception.printStackTrace();
-				ClientProxy.gameLoopSchedulerClient.add(()->{
+				TASmodClient.gameLoopSchedulerClient.add(()->{
 					throw new RuntimeException("TASmod networking was shut down. The real errors are above");
 				});
 			}

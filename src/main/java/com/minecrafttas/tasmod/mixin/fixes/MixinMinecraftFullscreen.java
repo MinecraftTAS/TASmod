@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
@@ -20,6 +20,6 @@ public class MixinMinecraftFullscreen {
 	@Inject(method = "toggleFullscreen", at = @At("RETURN"))
 	public void inject_toggleFullscreen(CallbackInfo ci) {
 		int keyF11=this.gameSettings.keyBindFullscreen.getKeyCode();
-		ClientProxy.virtual.getNextKeyboard().get(keyF11).setPressed(false);
+		TASmodClient.virtual.getNextKeyboard().get(keyF11).setPressed(false);
 	}
 }

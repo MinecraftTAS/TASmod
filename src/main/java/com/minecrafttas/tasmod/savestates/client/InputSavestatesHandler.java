@@ -3,8 +3,7 @@ package com.minecrafttas.tasmod.savestates.client;
 import java.io.File;
 import java.io.IOException;
 
-import com.minecrafttas.tasmod.ClientProxy;
-import com.minecrafttas.tasmod.CommonProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
@@ -25,7 +24,7 @@ import net.minecraft.util.text.TextComponentString;
 @Environment(EnvType.CLIENT)
 public class InputSavestatesHandler {
 
-	private final static File savestateDirectory = new File(ClientProxy.tasdirectory + File.separator + "savestates");
+	private final static File savestateDirectory = new File(TASmodClient.tasdirectory + File.separator + "savestates");
 
 	/**
 	 * Makes a copy of the recording that is currently running. Gets triggered when
@@ -39,7 +38,7 @@ public class InputSavestatesHandler {
 	public static void savestate(String nameOfSavestate) throws SavestateException, IOException {
 
 		if (nameOfSavestate.isEmpty()) {
-			CommonProxy.logger.error("No recording savestate loaded since the name of savestate is empty");
+			TASmod.logger.error("No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
 
@@ -47,11 +46,11 @@ public class InputSavestatesHandler {
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".mctas");
 
-		PlaybackController container = ClientProxy.virtual.getContainer();
+		PlaybackController container = TASmodClient.virtual.getContainer();
 		if (container.isRecording()) {
-			ClientProxy.serialiser.saveToFileV1(targetfile, container);	//If the container is recording, store it entirely
+			TASmodClient.serialiser.saveToFileV1(targetfile, container);	//If the container is recording, store it entirely
 		} else if(container.isPlayingback()){
-			ClientProxy.serialiser.saveToFileV1Until(targetfile, container, container.index()); //If the container is playing, store it until the current index
+			TASmodClient.serialiser.saveToFileV1Until(targetfile, container, container.index()); //If the container is playing, store it until the current index
 		}
 	}
 
@@ -66,7 +65,7 @@ public class InputSavestatesHandler {
 	public static void loadstate(String nameOfSavestate) throws IOException {
 
 		if (nameOfSavestate.isEmpty()) {
-			CommonProxy.logger.error("No recording savestate loaded since the name of savestate is empty");
+			TASmod.logger.error("No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
 
@@ -74,12 +73,12 @@ public class InputSavestatesHandler {
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".mctas");
 
-		PlaybackController container = ClientProxy.virtual.getContainer();
+		PlaybackController container = TASmodClient.virtual.getContainer();
 		if (!container.isNothingPlaying()) { // If the file exists and the container is recording or playing, load the clientSavestate
 			if (targetfile.exists()) {
-				ClientProxy.virtual.loadClientSavestate(ClientProxy.serialiser.fromEntireFileV1(targetfile));
+				TASmodClient.virtual.loadClientSavestate(TASmodClient.serialiser.fromEntireFileV1(targetfile));
 			} else {
-				ClientProxy.virtual.getContainer().setTASState(TASstate.NONE, false);
+				TASmodClient.virtual.getContainer().setTASState(TASstate.NONE, false);
 				Minecraft.getMinecraft().player.sendMessage(new TextComponentString(ChatFormatting.YELLOW
 						+ "Inputs could not be loaded for this savestate, since the file doesn't exist. Stopping!"));
 				TASmod.logger.warn("Inputs could not be loaded for this savestate, since the file doesn't exist.");

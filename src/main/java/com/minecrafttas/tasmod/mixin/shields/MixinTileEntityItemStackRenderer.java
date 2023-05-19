@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
 
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -23,12 +23,12 @@ public class MixinTileEntityItemStackRenderer {
 			// Dev Texture
 			if (entity.getHeldItemMainhand() != null && entity.getHeldItemMainhand().equals(shield)) {
 				if (!entity.getName().matches("Player[0-9]{1,4}")) {
-					manager.bindTexture(ClientProxy.shieldDownloader.getResourceLocation(entity));
+					manager.bindTexture(TASmodClient.shieldDownloader.getResourceLocation(entity));
 				}
 				return;
 			} else if (entity.getHeldItemOffhand() != null && entity.getHeldItemOffhand().equals(shield)) {
 				if (!entity.getName().matches("Player[0-9]{1,4}")) {
-					manager.bindTexture(ClientProxy.shieldDownloader.getResourceLocation(entity));
+					manager.bindTexture(TASmodClient.shieldDownloader.getResourceLocation(entity));
 				}
 				return;
 			}

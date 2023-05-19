@@ -8,6 +8,8 @@ pluginManagement {
         // add fabric repository
         maven { url = 'https://maven.fabricmc.net/' }
         
+        maven { url = 'https://repo.legacyfabric.net/repository/legacyfabric/' }
+        
         // add other main repositories
         mavenCentral()
         gradlePluginPortal()

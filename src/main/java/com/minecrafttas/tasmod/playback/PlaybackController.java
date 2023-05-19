@@ -9,7 +9,7 @@ import java.util.Map;
 import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.networking.Packet;
@@ -192,7 +192,7 @@ public class PlaybackController {
 				tempPause = TASstate.RECORDING;
 				return verbose ? TextFormatting.GREEN + "Pausing a recording" : "";
 			case NONE:
-				ClientProxy.virtual.unpressEverything();
+				TASmodClient.virtual.unpressEverything();
 				state = TASstate.NONE;
 				return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
 			}
@@ -205,11 +205,11 @@ public class PlaybackController {
 			case PAUSED:
 				state = TASstate.PAUSED;
 				tempPause = TASstate.PLAYBACK;
-				ClientProxy.virtual.unpressEverything();
+				TASmodClient.virtual.unpressEverything();
 				return verbose ? TextFormatting.GREEN + "Pausing a playback" : "";
 			case NONE:
 				Minecraft.getMinecraft().gameSettings.chatLinks = true;
-				ClientProxy.virtual.unpressEverything();
+				TASmodClient.virtual.unpressEverything();
 				state = TASstate.NONE;
 				return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";
 			}
@@ -608,7 +608,7 @@ public class PlaybackController {
 		float angleYaw = Float.parseFloat(section[3]);
 		float anglePitch = Float.parseFloat(section[4]);
 
-		ClientProxy.packetClient.sendToServer(new TeleportPlayerPacket(x, y, z, angleYaw, anglePitch));
+		TASmodClient.packetClient.sendToServer(new TeleportPlayerPacket(x, y, z, angleYaw, anglePitch));
 	}
 
 	/**

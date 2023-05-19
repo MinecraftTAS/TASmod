@@ -4,7 +4,7 @@ package com.minecrafttas.tasmod.events;
 import java.io.IOException;
 import java.net.ConnectException;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.TASmodNetworkClient;
 import com.minecrafttas.tasmod.playback.server.InitialSyncStatePacket;
@@ -50,24 +50,24 @@ public class PlayerJoinLeaveEvents {
 		Minecraft mc = Minecraft.getMinecraft();
 		
 		if(mc.isIntegratedServerRunning())
-			ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger);
+			TASmodClient.packetClient = new TASmodNetworkClient(TASmod.logger);
 		else {
 			String full = mc.getCurrentServerData().serverIP;
 			String[] fullsplit = full.split(":");
 			if(fullsplit.length == 1) {
-				ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger, full, 3111);
+				TASmodClient.packetClient = new TASmodNetworkClient(TASmod.logger, full, 3111);
 			} else if(fullsplit.length == 2){
 				String ip = fullsplit[0];
-				ClientProxy.packetClient = new TASmodNetworkClient(TASmod.logger, ip, 3111);
+				TASmodClient.packetClient = new TASmodNetworkClient(TASmod.logger, ip, 3111);
 			} else {
 				throw new ConnectException("Something went wrong while connecting. The ip seems to be wrong");
 			}
 		}
 		
-		ClientProxy.packetClient.sendToServer(new InitialSyncStatePacket(ClientProxy.virtual.getContainer().getState()));
+		TASmodClient.packetClient.sendToServer(new InitialSyncStatePacket(TASmodClient.virtual.getContainer().getState()));
 		
-		ClientProxy.virtual.unpressNext();
-		ClientProxy.shieldDownloader.onPlayerJoin(player.getGameProfile());
+		TASmodClient.virtual.unpressNext();
+		TASmodClient.shieldDownloader.onPlayerJoin(player.getGameProfile());
 //		TickrateChangerClient.joinServer(); //TODO Only the first player joining the server should be able to change the tickrate
 		TASmod.ktrngHandler.setInitialSeed();
 		
@@ -81,9 +81,9 @@ public class PlayerJoinLeaveEvents {
 	public static void firePlayerLeaveClientSide(net.minecraft.client.entity.EntityPlayerSP player) {
 		TASmod.logger.info("Firing logout events for {} on the CLIENT", player.getName());
 		try {
-			if(ClientProxy.packetClient!=null) {
-				ClientProxy.packetClient.killClient();
-				ClientProxy.packetClient=null;
+			if(TASmodClient.packetClient!=null) {
+				TASmodClient.packetClient.killClient();
+				TASmodClient.packetClient=null;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -96,6 +96,6 @@ public class PlayerJoinLeaveEvents {
 	 */
 	public static void fireOtherPlayerJoinedClientSide(GameProfile profile) {
 		TASmod.logger.info("Firing other login events for {} on the CLIENT", profile.getName());
-		ClientProxy.shieldDownloader.onPlayerJoin(profile);
+		TASmodClient.shieldDownloader.onPlayerJoin(profile);
 	}
 }

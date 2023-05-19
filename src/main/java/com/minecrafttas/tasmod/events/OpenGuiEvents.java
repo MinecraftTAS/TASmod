@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
@@ -24,7 +24,7 @@ public class OpenGuiEvents {
 	 */
 	public static void openGuiMainMenu(GuiMainMenu guiMainMenu) {
 		if (stateWhenOpened != null) {
-			PlaybackController container = ClientProxy.virtual.getContainer();
+			PlaybackController container = TASmodClient.virtual.getContainer();
 			if(stateWhenOpened == TASstate.RECORDING) {
 				long seed = TASmod.ktrngHandler.getGlobalSeedClient();
 				container.setStartSeed(seed);

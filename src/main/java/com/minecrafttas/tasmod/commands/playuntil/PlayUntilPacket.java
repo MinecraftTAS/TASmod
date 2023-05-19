@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.commands.playuntil;
 
-import com.minecrafttas.tasmod.ClientProxy;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 
@@ -21,7 +21,7 @@ public class PlayUntilPacket implements Packet {
 	@Override
 	public void handle(PacketSide side, EntityPlayer player) {
 		if(side.isClient()) {
-			ClientProxy.virtual.getContainer().setPlayUntil(until);
+			TASmodClient.virtual.getContainer().setPlayUntil(until);
 		}
 	}
 
