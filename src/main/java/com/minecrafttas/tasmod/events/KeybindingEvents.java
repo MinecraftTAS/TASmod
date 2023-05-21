@@ -39,8 +39,6 @@ public class KeybindingEvents {
 	
 	public static KeyBinding bufferViewKey = new KeyBinding("Buffer View", Keyboard.KEY_NUMPAD0, "TASmod");
 	
-	public static KeyBinding ktrngKey = null;
-	
 	public static void fireKeybindingsEvent() {
 		
 		if (VirtualKeybindings.isKeyDownExceptTextfield(savestateSaveKey)) {
@@ -80,8 +78,6 @@ public class KeybindingEvents {
 					e.printStackTrace();
 				}
 			});
-			
-		} else if (ktrngKey!=null && VirtualKeybindings.isKeyDown(ktrngKey)) {
 			
 		}
 	}
