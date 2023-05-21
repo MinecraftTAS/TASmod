@@ -31,7 +31,8 @@
 		]
 	},
 	"mixins": [
-		"tasmod.mixin.json"
+		"tasmod.mixin.json",
+		"common.mixin.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.14.11",
