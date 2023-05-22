@@ -6,6 +6,7 @@ import java.io.File;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.minecrafttas.common.Configuration;
@@ -15,13 +16,18 @@ class TestConfiguration {
 
 	private static Configuration config;
 	
-	private static final File configPath = new File("./src/test/resources/config.xml");
+	private static final File configPath = new File("./config.xml");
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		config = new Configuration("Test config", configPath);
 	}
 
+	@BeforeEach
+	void resetOptions() throws Exception {
+		config.reset(ConfigOptions.FileToOpen);
+	}
+	
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
 		configPath.delete();
