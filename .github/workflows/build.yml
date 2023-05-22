@@ -27,7 +27,7 @@ jobs:
       if: always()
       with:
         name: TestResult
-        path: build/test/*.xml
+        path: build/test-results/test/*.xml
     - name: Upload TASmod-Dev-Build
       uses: actions/upload-artifact@v3
       with:
