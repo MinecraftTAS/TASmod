@@ -2,7 +2,9 @@ package com.minecrafttas.tasmod;
 
 import java.io.File;
 
+import com.minecrafttas.common.Configuration;
 import com.minecrafttas.common.KeybindRegistry;
+import com.minecrafttas.common.Configuration.ConfigOptions;
 import com.minecrafttas.common.events.EventListener;
 import com.minecrafttas.common.events.client.EventClientInit;
 import com.minecrafttas.tasmod.events.KeybindingEvents;
@@ -41,6 +43,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit {
 	
 	public static TickScheduler tickSchedulerClient = new TickScheduler();
 	
+	public static Configuration config;
+	
 	public static void createTASDir() {
 		File tasDir=new File(tasdirectory);
 		if(!tasDir.exists()) {
@@ -60,10 +64,19 @@ public class TASmodClient implements ClientModInitializer, EventClientInit {
 		EventListener.register(this);
 		isDevEnvironment = FabricLoaderImpl.INSTANCE.isDevelopmentEnvironment();
 		
-//		if(fileOnStart.isEmpty()) {
-//			fileOnStart=null;
-//		}
-		virtual=new VirtualInput(null);
+		Minecraft mc = Minecraft.getMinecraft();
+		config = new Configuration("TASmod configuration", new File(mc.mcDataDir, "config/tasmod.cfg"));
+		
+		String fileOnStart = config.get(ConfigOptions.FileToOpen);
+		
+		if (fileOnStart.isEmpty()) {
+			fileOnStart = null;
+		} else {
+			config.reset(ConfigOptions.FileToOpen);
+		}
+		
+		virtual=new VirtualInput(fileOnStart);
+
 		
 		hud = new InfoHud();
 		shieldDownloader = new ShieldDownloader();
@@ -72,6 +85,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit {
 
 	@Override
 	public void onClientInit(Minecraft mc) {
+		
 		KeybindRegistry.registerKeyBinding(KeybindingEvents.tickratezeroKey);
 		KeybindRegistry.registerKeyBinding(KeybindingEvents.tickAdvance);
 		KeybindRegistry.registerKeyBinding(KeybindingEvents.stopkey);
