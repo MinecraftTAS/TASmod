@@ -97,6 +97,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 		
 		hud = new InfoHud();
+		EventListener.register(hud);
+		
 		shieldDownloader = new ShieldDownloader();
 		EventListener.register(shieldDownloader);
 		

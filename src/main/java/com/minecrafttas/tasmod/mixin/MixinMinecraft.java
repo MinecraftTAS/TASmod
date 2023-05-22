@@ -40,10 +40,6 @@ public abstract class MixinMinecraft {
 		
 		TASmodClient.gameLoopSchedulerClient.runAllTasks();
 		
-		if(((Minecraft) (Object) this).player != null) {
-			TASmodClient.hud.tick();
-		}
-		
 		while (Keyboard.next()) {
 			TASmodClient.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}

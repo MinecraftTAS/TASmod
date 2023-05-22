@@ -9,10 +9,14 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+import com.minecrafttas.common.events.client.EventClientTick;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.events.client.EventDrawHotbar;
+import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorWorld;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
@@ -22,6 +26,7 @@ import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.math.Vec3d;
 
 /**
@@ -29,7 +34,7 @@ import net.minecraft.util.math.Vec3d;
  * any everything can be customized
  * @author Pancake
  */
-public class InfoHud extends GuiScreen {
+public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotbar{
 	
 	public static class InfoLabel {
 		public String displayName;
@@ -192,8 +197,11 @@ public class InfoHud extends GuiScreen {
 	/**
 	 * Updates every tick
 	 */
-	public void tick() {
-		if (checkInit()) return;
+	@Override
+	public void onClientTick(Minecraft mc) {
+		if(mc.player!=null) {
+			if (checkInit()) return;
+		}
 	}
 	
 	public boolean checkInit() {
@@ -259,13 +267,13 @@ public class InfoHud extends GuiScreen {
 				}));
 			}
 			
-//			title = "facing";
-//			y += 14;
-//			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-//			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-//				if (Minecraft.getMinecraft().currentScreen == this) return "Facing";
-//				return String.format("%.2f %.2f", CameraInterpolationEvents.rotationYaw, CameraInterpolationEvents.rotationPitch);
-//			}));
+			title = "facing";
+			y += 14;
+			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+				if (Minecraft.getMinecraft().currentScreen == this) return "Facing";
+				return String.format("%.2f %.2f", InterpolationHandler.rotationYaw, InterpolationHandler.rotationPitch);
+			}));
 			
 			title = "cticks";
 			y += 14;
@@ -382,6 +390,21 @@ public class InfoHud extends GuiScreen {
 				return dMonitor.getSeed();
 			}));
 
+			y += 14;
+			title = "playback_index";
+			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+				if (Minecraft.getMinecraft().currentScreen == this) return "PlaybackIndex";
+				return Integer.toString(TASmodClient.virtual.getContainer().index());
+			}));
+			
+			y += 14;
+			title = "keystrokes";
+			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+				if (Minecraft.getMinecraft().currentScreen == this) return "Keystrokes";
+				return keystrokes();
+			}));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -392,7 +415,8 @@ public class InfoHud extends GuiScreen {
 	/**
 	 * Render the Info Hud only
 	 */
-	public void drawHud() {
+	@Override
+	public void onDrawHotbar() {
 		// render custom info box if control byte is set
 		if (!ControlByteHandler.hideInfoBox && TASmodClient.virtual.getContainer().isPlayingback())
 			drawRectWithText(ControlByteHandler.text, 10, 10, true);
@@ -422,6 +446,8 @@ public class InfoHud extends GuiScreen {
 				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Hold Shift to snap to grid", width-ypos, xpos, 0x60FF00);
 			}
 		}
+		ScaledResolution scaled = new ScaledResolution(Minecraft.getMinecraft());
+		drawCenteredString(Minecraft.getMinecraft().fontRenderer, "TASmod is still in development! Major issues may arise!", scaled.getScaledWidth() / 2, scaled.getScaledHeight() - 50, 0xFF8400);
 	}
 	
 	/**
@@ -431,6 +457,30 @@ public class InfoHud extends GuiScreen {
 		if (rect) drawRect(x, y, x + Minecraft.getMinecraft().fontRenderer.getStringWidth(text) + 4, y + 14, 0x80000000);
 		Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(text, x + 2, y + 3, 0xFFFFFF);
 		GL11.glEnable(3042 /*GL_BLEND*/);
+	}
+	
+	private String keystrokes() {
+		if (Display.isActive()) {
+			String out1 = ""+ChatFormatting.WHITE;
+			for (String mouse : TASmodClient.virtual.getCurrentMousePresses()) {
+				out1 = out1.concat(mouse + " ");
+			}
+			out1=out1.concat(""+ChatFormatting.GREEN);
+			for (String mouse : TASmodClient.virtual.getNextMousePresses()) {
+				out1 = out1.concat(mouse + " ");
+			}
+			
+			String out2 = ""+ChatFormatting.WHITE;
+			for (String key : TASmodClient.virtual.getCurrentKeyboardPresses()) {
+				out2 = out2.concat(key + " ");
+			}
+			out2=out2.concat(""+ChatFormatting.GREEN);
+			for (String key : TASmodClient.virtual.getNextKeyboardPresses()) {
+				out2 = out2.concat(key + " ");
+			}
+			return out1+out2;
+		}
+		return "";
 	}
 	
 }
