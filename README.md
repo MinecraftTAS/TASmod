@@ -4,9 +4,7 @@ Is able to capture inputs and play them back, by pretending to be a keyboard.
 
 To reduce complexity, all aspects of RNG-Manipulation have been externalized to a repository called [KillTheRNG](https://github.com/MinecraftTAS/KillTheRNG). It is now available as an optional dependency and a [standalone mod](https://maven.mgnet.work/#/main/com/minecrafttas/killtherng-full)
 
-This mod is currently only for Forge 1.12.2 and will update/downgrade once 1.12.2 works properly  
-
-> **New:** There are plans now to switch to Legacy-fabric, for downgrading, see [#101](https://github.com/MinecraftTAS/TASmod/issues/101).
+This mod is currently only for Fabric 1.12.2.
 
 # Credits  
 Author of the original mod: [tr7zw](https://github.com/tr7zw/MC-TASmod)  
