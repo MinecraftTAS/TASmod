@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.util;
+package com.minecrafttas.tasmod.handlers;
 
 import org.lwjgl.input.Keyboard;
 

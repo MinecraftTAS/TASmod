@@ -11,12 +11,13 @@ import com.minecrafttas.common.events.client.EventClientInit;
 import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
 import com.minecrafttas.common.events.client.player.EventPlayerLeaveClientSide;
 import com.minecrafttas.tasmod.gui.InfoHud;
+import com.minecrafttas.tasmod.handlers.InterpolationHandler;
+import com.minecrafttas.tasmod.handlers.KeybindingHandler;
+import com.minecrafttas.tasmod.handlers.LoadingScreenHandler;
 import com.minecrafttas.tasmod.networking.TASmodNetworkClient;
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 import com.minecrafttas.tasmod.playback.server.InitialSyncStatePacket;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
-import com.minecrafttas.tasmod.util.KeybindingHandler;
-import com.minecrafttas.tasmod.util.LoadingScreenHandler;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
 import com.minecrafttas.tasmod.util.TickScheduler;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
@@ -58,6 +59,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	
 	public static KeybindingHandler keybindingHandler;
 	
+	public static InterpolationHandler interpolation = new InterpolationHandler();
+	
 	public static void createTASDir() {
 		File tasDir=new File(tasdirectory);
 		if(!tasDir.exists()) {
@@ -98,17 +101,16 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		EventListener.register(shieldDownloader);
 		
 		loadingScreenHandler = new LoadingScreenHandler();
-		
 		EventListener.register(loadingScreenHandler);
 		
 		keybindingHandler = new KeybindingHandler();
-		
 		EventListener.register(keybindingHandler);
+		
+		EventListener.register(interpolation);
 	}
 
 	@Override
 	public void onClientInit(Minecraft mc) {
-		
 		
 		KeybindRegistry.registerKeyBinding(keybindingHandler.tickratezeroKey);
 		KeybindRegistry.registerKeyBinding(keybindingHandler.tickAdvance);

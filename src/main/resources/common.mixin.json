@@ -12,6 +12,7 @@
     	"MixinKeyBinding",
     	"MixinMinecraft",
     	"MixinNetHandlerPlayClient",
-    	"MixinWorldClient"
+    	"MixinWorldClient",
+    	"MixinEntityRenderer"
 	]
 }
