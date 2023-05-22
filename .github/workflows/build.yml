@@ -22,8 +22,14 @@ jobs:
         gradle-version: 8.1.1
     - name: Build TASmod with Gradle
       run: gradle build
-    - name: Upload artifact
+    - name: Upload Test Report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: TestResult
+        path: build/test/*.xml
+    - name: Upload TASmod-Dev-Build
       uses: actions/upload-artifact@v3
       with:
         name: TASmod-Dev-Build
-        path: build/libs    
+        path: build/libs
