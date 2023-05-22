@@ -2,9 +2,12 @@ package com.minecrafttas.tasmod.tickratechanger;
 
 import org.apache.logging.log4j.Logger;
 
+import com.minecrafttas.common.events.server.EventServerStop;
+import com.minecrafttas.common.events.server.player.EventPlayerJoinedServerSide;
 import com.minecrafttas.tasmod.TASmod;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 
 /**
  * Controls the tickrate on the server side
@@ -20,33 +23,38 @@ import net.minecraft.entity.player.EntityPlayerMP;
  * @author Scribble
  *
  */
-public class TickrateChangerServer {
+public class TickrateChangerServer implements EventServerStop, EventPlayerJoinedServerSide{
 	
 	/**
 	 * The current tickrate of the client
 	 */
-	public static float ticksPerSecond=20F;
+	public float ticksPerSecond=20F;
 	
 	/**
 	 * How long the server should sleep
 	 */
-	public static long millisecondsPerTick=50L;
+	public long millisecondsPerTick=50L;
 	
 	/**
 	 * The tickrate before {@link #ticksPerSecond} was changed to 0, used to toggle
 	 * pausing
 	 */
-	public static float tickrateSaved=20F;
+	public float tickrateSaved=20F;
 	
 	/**
 	 * True if the tickrate is 20 and the server should advance 1 tick
 	 */
-	public static boolean advanceTick=false;
+	public boolean advanceTick=false;
 	
 	/**
 	 * The logger used for logging. Has to be set seperately
 	 */
-	public static Logger logger;
+	public Logger logger;
+	
+	
+	public TickrateChangerServer(Logger logger) {
+		this.logger = logger;
+	}
 	
 	/**
 	 * Changes both client and server tickrates.
@@ -55,12 +63,12 @@ public class TickrateChangerServer {
 	 * 
 	 * @param tickrate The new tickrate of client and server
 	 */
-	public static void changeTickrate(float tickrate) {
+	public void changeTickrate(float tickrate) {
 		changeClientTickrate(tickrate);
 		changeServerTickrate(tickrate);
 	}
 	
-	public static void changeClientTickrate(float tickrate) {
+	public void changeClientTickrate(float tickrate) {
 		changeClientTickrate(tickrate, false);
 	}
 	
@@ -70,7 +78,7 @@ public class TickrateChangerServer {
 	 * @param tickrate The new tickrate of the client
 	 * @param log If a message should logged
 	 */
-	public static void changeClientTickrate(float tickrate, boolean log) {
+	public void changeClientTickrate(float tickrate, boolean log) {
 		if(log)
 			log("Changing the tickrate "+ tickrate + " to all clients");
 		TASmod.packetServer.sendToAll(new ChangeTickratePacket(tickrate));
@@ -81,7 +89,7 @@ public class TickrateChangerServer {
 	 * 
 	 * @param tickrate The new tickrate of the server
 	 */
-	public static void changeServerTickrate(float tickrate) {
+	public void changeServerTickrate(float tickrate) {
 		changeServerTickrate(tickrate, true);
 	}
 	
@@ -91,7 +99,7 @@ public class TickrateChangerServer {
 	 * @param tickrate The new tickrate of the server
 	 * @param log If a message should logged
 	 */
-	public static void changeServerTickrate(float tickrate, boolean log) {
+	public void changeServerTickrate(float tickrate, boolean log) {
         if(tickrate>0) {
         	millisecondsPerTick = (long)(1000L / tickrate);
         }else if(tickrate==0) {
@@ -108,7 +116,7 @@ public class TickrateChangerServer {
 	/**
 	 * Toggles between tickrate 0 and tickrate > 0
 	 */
-	public static void togglePause() {
+	public void togglePause() {
     	if(ticksPerSecond>0) {
 			changeTickrate(0);
     	}
@@ -121,7 +129,7 @@ public class TickrateChangerServer {
 	 * Enables tickrate 0
 	 * @param pause True if the game should be paused, false if unpause
 	 */
-	public static void pauseGame(boolean pause) {
+	public void pauseGame(boolean pause) {
 		if(pause) {
 			changeTickrate(0);
     	}
@@ -135,7 +143,7 @@ public class TickrateChangerServer {
 	 * Pauses the game without sending a command to the clients
 	 * @param pause The state of the server
 	 */
-	public static void pauseServerGame(boolean pause) {
+	public void pauseServerGame(boolean pause) {
 		if(pause) {
 			changeServerTickrate(0F);
 		}else {
@@ -147,7 +155,7 @@ public class TickrateChangerServer {
 	/**
 	 * Advances the game by 1 tick.
 	 */
-    public static void advanceTick() {
+    public void advanceTick() {
     	advanceServerTick();
     	advanceClientTick();
     }
@@ -162,7 +170,7 @@ public class TickrateChangerServer {
     /**
      * Advances the server by 1 tick
      */
-	private static void advanceServerTick() {
+	private void advanceServerTick() {
 		if(ticksPerSecond==0) {
     		advanceTick=true;
     		changeServerTickrate(tickrateSaved);
@@ -173,7 +181,8 @@ public class TickrateChangerServer {
      * Fired when a player joined the server
      * @param player The player that joins the server
      */
-	public static void joinServer(EntityPlayerMP player) {
+	@Override
+	public void onPlayerJoinedServerSide(EntityPlayerMP player) {
 		if(TASmod.getServerInstance().isDedicatedServer()) {
 			log("Sending the current tickrate ("+ticksPerSecond+") to " +player.getName());
 			TASmod.packetServer.sendTo(new ChangeTickratePacket(ticksPerSecond), player);
@@ -184,7 +193,14 @@ public class TickrateChangerServer {
 	 * The message to log
 	 * @param msg 
 	 */
-	private static void log(String msg) {
+	private void log(String msg) {
 		logger.info(msg);
+	}
+
+	@Override
+	public void onServerStop(MinecraftServer server) {
+		if (ticksPerSecond == 0 || advanceTick) {
+			pauseGame(false);
+		}
 	}
 }

@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
 import com.minecrafttas.tasmod.savestates.server.SavestateState;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 
 import net.fabricmc.api.EnvType;
@@ -28,7 +27,7 @@ public abstract class MixinMinecraftServer {
 
 	@ModifyConstant(method = "run", constant = @Constant(longValue = 50L))
 	public long modifyMSPT(long fiftyLong) {
-		return TickrateChangerServer.millisecondsPerTick;
+		return TASmod.tickratechanger.millisecondsPerTick;
 	}
 
 	// =====================================================================================================================================
@@ -69,7 +68,7 @@ public abstract class MixinMinecraftServer {
 		
 		/*	The server should tick if:
 		 *	(shouldTick in ticksync is true OR there are no players connected to the custom server) AND the tickrate is not zero. That or advance tick is true*/
-		if( (TickSyncServer.shouldTick() && TickrateChangerServer.ticksPerSecond != 0) || TickrateChangerServer.advanceTick) {
+		if( (TickSyncServer.shouldTick() && TASmod.tickratechanger.ticksPerSecond != 0) || TASmod.tickratechanger.advanceTick) {
 			long timeBeforeTick = System.currentTimeMillis();
 			
 			if (TASmod.savestateHandler.state == SavestateState.WASLOADING) {
@@ -77,13 +76,12 @@ public abstract class MixinMinecraftServer {
 				SavestateHandler.playerLoadSavestateEventServer();
 			}
 
-			TASmod.ktrngHandler.updateServer();
 			this.tick();
 			TASmod.tickSchedulerServer.runAllTasks();
 			
-			if (TickrateChangerServer.advanceTick) {
-				TickrateChangerServer.changeServerTickrate(0F);
-				TickrateChangerServer.advanceTick = false;
+			if (TASmod.tickratechanger.advanceTick) {
+				TASmod.tickratechanger.changeServerTickrate(0F);
+				TASmod.tickratechanger.advanceTick = false;
 			}
 			TickSyncServer.serverPostTick();
 			
@@ -92,12 +90,12 @@ public abstract class MixinMinecraftServer {
 			// ==================================================
 			
 			try {
-				Thread.sleep(Math.max(1L, TickrateChangerServer.millisecondsPerTick - tickDuration));
+				Thread.sleep(Math.max(1L, TASmod.tickratechanger.millisecondsPerTick - tickDuration));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		} else { // This is when the server should not tick... This is to ensure network tick stuff is working
-			if(TickrateChangerServer.ticksPerSecond == 0) {
+			if(TASmod.tickratechanger.ticksPerSecond == 0) {
 				faketick++;
 				if (faketick >= 50) {
 					faketick = 0;
@@ -136,13 +134,4 @@ public abstract class MixinMinecraftServer {
 
 	// =====================================================================================================================================
 
-
-//	@ModifyVariable(method = "run", at = @At(value = "STORE"), index = 5, ordinal = 2)
-	public long limitLag(long j) {
-		if(j>=TickrateChangerServer.millisecondsPerTick*5){
-			return TickrateChangerServer.millisecondsPerTick;
-		}
-		return j;
-	}
-	
 }

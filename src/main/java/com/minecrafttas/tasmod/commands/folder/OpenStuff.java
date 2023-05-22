@@ -4,8 +4,8 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 
-import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 
 public class OpenStuff {
 

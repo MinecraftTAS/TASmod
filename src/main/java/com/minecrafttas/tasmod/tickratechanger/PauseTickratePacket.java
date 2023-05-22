@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 
@@ -40,7 +42,7 @@ public class PauseTickratePacket implements Packet {
 	/**
 	 * Can be {@link State#PAUSE}, {@link State#UNPAUSE} or {@link State#TOGGLE}
 	 * 
-	 * @author ScribbleLP
+	 * @author Scribble
 	 *
 	 */
 	public enum State {
@@ -85,20 +87,20 @@ public class PauseTickratePacket implements Packet {
 			if (player.canUseCommand(2, "tickrate")) {
 				State state = getState();
 				if (state == State.PAUSE)
-					TickrateChangerServer.pauseGame(true);
+					TASmod.tickratechanger.pauseGame(true);
 				else if (state == State.UNPAUSE)
-					TickrateChangerServer.pauseGame(false);
+					TASmod.tickratechanger.pauseGame(false);
 				else if (state == State.TOGGLE)
-					TickrateChangerServer.togglePause();
+					TASmod.tickratechanger.togglePause();
 			}
 		} else if (side.isClient()) {
 			State state = getState();
 			if (state == State.PAUSE)
-				TickrateChangerClient.pauseClientGame(true);
+				TASmodClient.tickratechanger.pauseClientGame(true);
 			else if (state == State.UNPAUSE)
-				TickrateChangerClient.pauseClientGame(false);
+				TASmodClient.tickratechanger.pauseClientGame(false);
 			else if (state == State.TOGGLE)
-				TickrateChangerClient.togglePauseClient();
+				TASmodClient.tickratechanger.togglePauseClient();
 		}
 	}
 

@@ -3,12 +3,13 @@ package com.minecrafttas.common.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.minecrafttas.common.events.client.EventClientGameLoop;
 import com.minecrafttas.common.events.client.EventClientInit;
 import com.minecrafttas.common.events.client.EventClientTick;
 import com.minecrafttas.common.events.client.EventDoneLoadingWorld;
-import com.minecrafttas.common.events.client.EventGameLoop;
 import com.minecrafttas.common.events.client.EventLaunchIntegratedServer;
 import com.minecrafttas.common.events.client.EventOpenGui;
 
@@ -25,7 +26,7 @@ public class MixinMinecraft {
 	
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void inject_runGameLoop(CallbackInfo ci) {
-		EventGameLoop.fireOnRunGameLoop((Minecraft)(Object)this);
+		EventClientGameLoop.fireOnClientGameLoop((Minecraft)(Object)this);
 	}
 	
 	@Inject(method = "runTick", at = @At("HEAD"))
@@ -43,9 +44,9 @@ public class MixinMinecraft {
 		EventDoneLoadingWorld.fireOnDoneLoadingWorld();
 	}
 	
-	
-	@Inject(method = "displayGuiScreen", at = @At("HEAD"))
-	public void inject_displayGuiScreen(GuiScreen guiScreen, CallbackInfo ci) {
-		EventOpenGui.fireOpenGuiEvent(guiScreen);
+	@ModifyVariable(method = "displayGuiScreen", at = @At(value = "STORE"))
+	public GuiScreen inject_displayGuiScreen(GuiScreen guiScreen) {
+		guiScreen = EventOpenGui.fireOpenGuiEvent(guiScreen);
+		return guiScreen;
 	}
 }

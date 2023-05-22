@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 
@@ -23,12 +25,12 @@ public class AdvanceTickratePacket implements Packet {
 	public void handle(PacketSide side, EntityPlayer player) {
 		if (side.isServer()) {
 			if (player.canUseCommand(2, "tickrate")) {
-				if (TickrateChangerServer.ticksPerSecond == 0) {
-					TickrateChangerServer.advanceTick();
+				if (TASmod.tickratechanger.ticksPerSecond == 0) {
+					TASmod.tickratechanger.advanceTick();
 				}
 			}
 		} else {
-			TickrateChangerClient.advanceClientTick(); // Using advanceTick() would create an endless loop
+			TASmodClient.tickratechanger.advanceClientTick(); // Using advanceTick() would create an endless loop
 		}
 	}
 

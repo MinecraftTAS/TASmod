@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 
@@ -32,10 +34,10 @@ public class ChangeTickratePacket implements Packet {
 	public void handle(PacketSide side, EntityPlayer player) {
 		if (side.isServer()) {
 			if (player.canUseCommand(2, "tickrate")) {
-				TickrateChangerServer.changeTickrate(tickrate);
+				TASmod.tickratechanger.changeTickrate(tickrate);
 			}
 		} else {
-			TickrateChangerClient.changeClientTickrate(tickrate);
+			TASmodClient.tickratechanger.changeClientTickrate(tickrate);
 		}
 	}
 

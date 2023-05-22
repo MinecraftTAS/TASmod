@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.minecrafttas.common.events.server.EventServerGameLoop;
 import com.minecrafttas.common.events.server.EventServerInit;
 import com.minecrafttas.common.events.server.EventServerStop;
 import com.minecrafttas.common.events.server.EventServerTick;
@@ -28,5 +29,10 @@ public class MixinMinecraftServer {
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void inject_tick(CallbackInfo ci) {
 		EventServerTick.fireOnServerTick((MinecraftServer)(Object)this);
+	}
+	
+//	@Inject(method = "run", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;serverRunning:Z", shift = Shift.AFTER))
+	public void inject_run(CallbackInfo ci) {
+		EventServerGameLoop.fireOnServerGameLoop((MinecraftServer)(Object)this);
 	}
 }

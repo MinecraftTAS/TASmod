@@ -1,9 +1,11 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
-import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.common.events.client.EventClientGameLoop;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorTimer;
+import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 
 import net.minecraft.client.Minecraft;
 
@@ -12,36 +14,44 @@ import net.minecraft.client.Minecraft;
  * @author Scribble
  *
  */
-public class TickrateChangerClient {
+public class TickrateChangerClient implements EventClientGameLoop{
 	/**
 	 * The current tickrate of the client
 	 */
-	public static float ticksPerSecond = 20f;
+	public float ticksPerSecond;
 
 	/**
 	 * The tickrate before {@link #ticksPerSecond} was changed to 0, used to toggle
 	 * pausing
 	 */
-	public static float tickrateSaved = 20F;
+	public float tickrateSaved = 20F;
 	
 	/**
 	 * True if the tickrate is 20 and the client should advance 1 tick
 	 */
-	public static boolean advanceTick = false;
+	public boolean advanceTick = false;
 	
-	public static long millisecondsPerTick = 50L;
+	public long millisecondsPerTick = 50L;
 
+	public TickrateChangerClient() {
+		this(20f);
+	}
+	
+	public TickrateChangerClient(float initialTickrate) {
+		ticksPerSecond = initialTickrate;
+	}
+	
 	/**
 	 * Changes both client and server tickrates
 	 * 
 	 * @param tickrate The new tickrate of client and server
 	 */
-	public static void changeTickrate(float tickrate) {
+	public void changeTickrate(float tickrate) {
 		changeClientTickrate(tickrate);
 		changeServerTickrate(tickrate);
 	}
 	
-	public static void changeClientTickrate(float tickrate) {
+	public void changeClientTickrate(float tickrate) {
 		changeClientTickrate(tickrate, true);
 	}
 
@@ -52,7 +62,7 @@ public class TickrateChangerClient {
 	 * 
 	 * @param tickrate The new tickrate of the client
 	 */
-	public static void changeClientTickrate(float tickrate, boolean log) {
+	public void changeClientTickrate(float tickrate, boolean log) {
 		if (tickrate < 0) {
 			return;
 		}
@@ -78,7 +88,7 @@ public class TickrateChangerClient {
 	 * 
 	 * @param tickrate
 	 */
-	public static void changeServerTickrate(float tickrate) {
+	public void changeServerTickrate(float tickrate) {
 		if (tickrate < 0) {
 			return;
 		}
@@ -88,7 +98,7 @@ public class TickrateChangerClient {
 	/**
 	 * Toggles between tickrate 0 and tickrate > 0
 	 */
-	public static void togglePause() {
+	public void togglePause() {
 		if (Minecraft.getMinecraft().world != null) {
 			TASmodClient.packetClient.sendToServer(new PauseTickratePacket());
 		} else {
@@ -99,7 +109,7 @@ public class TickrateChangerClient {
 	/**
 	 * Pauses and unpauses the client, used in main menus
 	 */
-	public static void togglePauseClient() {
+	public void togglePauseClient() {
 		if (ticksPerSecond > 0) {
 			tickrateSaved = ticksPerSecond;
 			pauseClientGame(true);
@@ -113,7 +123,7 @@ public class TickrateChangerClient {
 	 * 
 	 * @param pause True if the game should be paused, false if unpause
 	 */
-	public static void pauseGame(boolean pause) {
+	public void pauseGame(boolean pause) {
 		if (pause) {
 			changeTickrate(0F);
 		} else {
@@ -126,7 +136,7 @@ public class TickrateChangerClient {
 	 * Pauses the game without sending a command to the server
 	 * @param pause The state of the client
 	 */
-	public static void pauseClientGame(boolean pause) {
+	public void pauseClientGame(boolean pause) {
 		if(pause) {
 			changeClientTickrate(0F);
 		}else {
@@ -137,7 +147,7 @@ public class TickrateChangerClient {
 	/**
 	 * Advances the game by 1 tick. Sends a {@link AdvanceTickratePacket} to the server or calls {@link #advanceClientTick()} if the world is null
 	 */
-	public static void advanceTick() {
+	public void advanceTick() {
 		if (Minecraft.getMinecraft().world != null) {
 			advanceServerTick();
 		} else {
@@ -148,26 +158,33 @@ public class TickrateChangerClient {
 	/**
 	 * Sends a {@link AdvanceTickratePacket} to the server to advance the server
 	 */
-	public static void advanceServerTick() {
+	public void advanceServerTick() {
 		TASmodClient.packetClient.sendToServer(new AdvanceTickratePacket());
 	}
 	
 	/**
 	 * Advances the game by 1 tick. Doesn't send a packet to the server
 	 */
-	public static void advanceClientTick() {
+	public void advanceClientTick() {
 		if (ticksPerSecond == 0) {
 			advanceTick = true;
 			changeClientTickrate(tickrateSaved);
 		}
 	}
 	
-	public static void joinServer() {
+	public void joinServer() {
 		changeServerTickrate(ticksPerSecond);
 	}
 	
 	private static void log(String msg) {
 		TASmod.logger.info(msg);
+	}
+
+	@Override
+	public void onRunClientGameLoop(Minecraft mc) {
+		if (TASmodClient.packetClient != null && TASmodClient.packetClient.isClosed()) { // If the server died, but the client has not left the world
+			TickSyncClient.shouldTick.set(true);
+		}
 	}
 
 }

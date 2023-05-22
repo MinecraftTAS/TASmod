@@ -3,6 +3,7 @@ package com.minecrafttas.tasmod.tickratechanger;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.minecrafttas.tasmod.TASmod;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -39,7 +40,7 @@ public class CommandTickrate extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if (args.length == 0) {
-			sender.sendMessage(new TextComponentString("Current tickrate: " + TickrateChangerServer.ticksPerSecond));
+			sender.sendMessage(new TextComponentString("Current tickrate: " + TASmod.tickratechanger.ticksPerSecond));
 			return;
 		}
 		float tickrate;
@@ -48,7 +49,7 @@ public class CommandTickrate extends CommandBase {
 		} catch (NumberFormatException e) {
 			throw new CommandException("Invalid tickrate: " + args[0], new Object[] {});
 		}
-		TickrateChangerServer.changeTickrate(tickrate);
+		TASmod.tickratechanger.changeTickrate(tickrate);
 	}
 
 }

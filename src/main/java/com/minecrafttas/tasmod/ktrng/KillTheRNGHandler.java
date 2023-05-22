@@ -1,13 +1,17 @@
 package com.minecrafttas.tasmod.ktrng;
 
+import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
+import com.minecrafttas.common.events.server.EventServerTick;
 import com.minecrafttas.killtherng.KillTheRNG;
 import com.minecrafttas.killtherng.SeedingModes;
-import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.server.MinecraftServer;
 
 /**
  * Easy access to the KillTheRNG library without littering the rest of the code
@@ -15,7 +19,7 @@ import net.fabricmc.api.Environment;
  * @author Scribble
  *
  */
-public class KillTheRNGHandler{
+public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClientSide{
 	
 	private boolean isLoaded;
 	
@@ -104,16 +108,10 @@ public class KillTheRNGHandler{
 	//=================================================TASmod integration
 	
 	/**
-	 * Executed every tick.
-	 */
-	@Environment(EnvType.CLIENT)
-	public void updateClient() {
-	}
-	
-	/**
 	 * Executed every tick on the server
 	 */
-	public void updateServer() {
+	@Override
+	public void onServerTick(MinecraftServer server) {
 		if(isLoaded()) {
 			if(TASmod.containerStateServer.getState() != TASstate.PAUSED)
 				TASmod.packetServer.sendToAll(new KTRNGSeedPacket(advanceGlobalSeedServer()));
@@ -130,11 +128,6 @@ public class KillTheRNGHandler{
 	}
 	
 	@Environment(EnvType.CLIENT)
-	public void setInitialSeed() {
-		setInitialSeed(getGlobalSeedClient());
-	}
-
-	@Environment(EnvType.CLIENT)
 	public void setInitialSeed(long initialSeed) {
 		if(TASmodClient.packetClient != null) {
 			TASmod.logger.info("Sending initial client seed: {}", initialSeed);
@@ -143,4 +136,12 @@ public class KillTheRNGHandler{
 			TASmod.ktrngHandler.setGlobalSeedClient(initialSeed);
 		}
 	}
+
+	@Override
+	@Environment(EnvType.CLIENT)
+	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
+		setInitialSeed(getGlobalSeedClient());
+	}
+	
+	
 }

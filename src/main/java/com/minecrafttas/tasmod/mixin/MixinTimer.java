@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 
 import net.minecraft.client.Minecraft;
@@ -49,8 +49,8 @@ public class MixinTimer {
 			if (TickSyncClient.shouldTick.compareAndSet(true, false)) {
 				this.elapsedTicks++;
 				this.lastTickDuration = newGameLoop - this.millisLastTick;
-				if(TickrateChangerClient.advanceTick) {
-					lastTickDuration = TickrateChangerClient.millisecondsPerTick;	// Keep the lastTick duration steady during tickadvance, since it grows larger the longer you wait in tickrate 0
+				if(TASmodClient.tickratechanger.advanceTick) {
+					lastTickDuration = TASmodClient.tickratechanger.millisecondsPerTick;	// Keep the lastTick duration steady during tickadvance, since it grows larger the longer you wait in tickrate 0
 				}
 				this.millisLastTick = newGameLoop; // Update millisLastTick
 				this.renderPartialTicks = 0; // Reset after the tick

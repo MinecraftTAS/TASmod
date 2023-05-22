@@ -1,11 +1,9 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.playback.PlaybackController;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.playback.server.TASstateClient;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 
 import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.gui.GuiIngameMenu;
@@ -23,16 +21,6 @@ public class OpenGuiEvents {
 	 * @param guiMainMenu The menu that was opened
 	 */
 	public static void openGuiMainMenu(GuiMainMenu guiMainMenu) {
-		if (stateWhenOpened != null) {
-			PlaybackController container = TASmodClient.virtual.getContainer();
-			if(stateWhenOpened == TASstate.RECORDING) {
-				long seed = TASmod.ktrngHandler.getGlobalSeedClient();
-				container.setStartSeed(seed);
-			}
-			container.setTASState(stateWhenOpened);
-			stateWhenOpened = null;
-		}
-		LoadWorldEvents.doneShuttingDown();
 	}
 
 	/**
@@ -51,9 +39,9 @@ public class OpenGuiEvents {
 	 * @param guiControls The gui that was opened
 	 */
 	public static void openGuiControls(GuiControls guiControls) {
-		if (TickrateChangerClient.ticksPerSecond == 0 || TickrateChangerClient.advanceTick) {
+		if (TASmodClient.tickratechanger.ticksPerSecond == 0 || TASmodClient.tickratechanger.advanceTick) {
 			TASmod.logger.info("Pausing game during GuiControls");
-			TickrateChangerClient.pauseGame(false);
+			TASmodClient.tickratechanger.pauseGame(false);
 			TASstateClient.setOrSend(stateWhenOpened);
 			waszero = true;
 		}
@@ -68,7 +56,7 @@ public class OpenGuiEvents {
 		if (waszero) {
 			TASmod.logger.info("Unpausing the game again");
 			waszero = false;
-			TickrateChangerClient.pauseGame(true);
+			TASmodClient.tickratechanger.pauseGame(true);
 		}
 	}
 

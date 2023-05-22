@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import com.minecrafttas.common.CommandRegistry;
 import com.minecrafttas.common.events.EventListener;
 import com.minecrafttas.common.events.server.EventServerInit;
+import com.minecrafttas.common.events.server.EventServerStop;
 import com.minecrafttas.tasmod.commands.clearinputs.ClearInputsPacket;
 import com.minecrafttas.tasmod.commands.clearinputs.CommandClearInputs;
 import com.minecrafttas.tasmod.commands.folder.CommandFolder;
@@ -64,7 +65,7 @@ import net.minecraft.server.MinecraftServer;
  * @author Scribble
  *
  */
-public class TASmod implements ModInitializer, EventServerInit{
+public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 
 	private static MinecraftServer serverInstance;
 	
@@ -77,6 +78,8 @@ public class TASmod implements ModInitializer, EventServerInit{
 	public static KillTheRNGHandler ktrngHandler;
 	
 	public static TASmodNetworkServer packetServer;
+	
+	public static TickrateChangerServer tickratechanger;
 	
 	public static final TickScheduler tickSchedulerServer = new TickScheduler();
 
@@ -116,16 +119,17 @@ public class TASmod implements ModInitializer, EventServerInit{
 		}
 		
 		if(!server.isDedicatedServer()) {
-			TickrateChangerServer.ticksPerSecond=0F;
-			TickrateChangerServer.tickrateSaved=20F;
+			TASmod.tickratechanger.ticksPerSecond=0F;
+			TASmod.tickratechanger.tickrateSaved=20F;
 		}
 	}
 	
-	public void serverStop(MinecraftServer server) {
+	@Override
+	public void onServerStop(MinecraftServer server) {
 		serverInstance=null;
 		packetServer.close();
 	}
-
+	
 	public static MinecraftServer getServerInstance() {
 		return serverInstance;
 	}
@@ -133,12 +137,16 @@ public class TASmod implements ModInitializer, EventServerInit{
 	@Override
 	public void onInitialize() {
 		logger.info("Initializing TASmod");
-		logger.info("Testing connection with KillTheRNG");
-		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
-		
 		EventListener.register(this);
 		
-		TickrateChangerServer.logger = logger;
+		logger.info("Testing connection with KillTheRNG");
+		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
+		EventListener.register(ktrngHandler);
+		
+		tickratechanger = new TickrateChangerServer(logger);
+		EventListener.register(tickratechanger);
+		
+		
 		PacketSerializer.registerPacket(IdentificationPacket.class);
 		// Ticksync
 		PacketSerializer.registerPacket(TickSyncPacket.class);
@@ -186,5 +194,6 @@ public class TASmod implements ModInitializer, EventServerInit{
 		PacketSerializer.registerPacket(PlayUntilPacket.class);
 		
 	}
+
 
 }
