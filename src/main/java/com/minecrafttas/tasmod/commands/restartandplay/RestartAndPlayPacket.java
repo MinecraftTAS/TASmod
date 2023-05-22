@@ -2,6 +2,8 @@ package com.minecrafttas.tasmod.commands.restartandplay;
 
 import java.nio.charset.Charset;
 
+import com.minecrafttas.common.Configuration.ConfigOptions;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 
@@ -28,8 +30,7 @@ public class RestartAndPlayPacket implements Packet{
 				e.printStackTrace();
 			}
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-//				TASmodClient.config.get("General", "fileToLoad", "").set(name);
-//				TASmodClient.config.save();
+				TASmodClient.config.set(ConfigOptions.FileToOpen, name);
 				System.exit(0);
 			});
 		}
