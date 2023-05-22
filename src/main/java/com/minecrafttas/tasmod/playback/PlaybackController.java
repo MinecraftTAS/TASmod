@@ -476,6 +476,13 @@ public class PlaybackController implements EventOpenGui{
 		}
 		return tickcontainer;
 	}
+	
+	/**
+	 * @return The {@link TickInputContainer} at the current index
+	 */
+	public TickInputContainer get() {
+		return get(index);
+	}
 
 	public void clear() {
 		inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");

@@ -13,9 +13,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.duck.SubtickDuck;
+import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.util.math.MathHelper;
 
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer implements SubtickDuck {
@@ -58,11 +60,11 @@ public class MixinEntityRenderer implements SubtickDuck {
 			dY = 0;
 		} else {
 			// Comment this out to disable interpolation, also comment out @SubscribeEvent
-			// in CameraInterpolationEvents
+			// in InterpolationEvents
 			if (this.mc.currentScreen == null) {
-//				CameraInterpolationEvents.rotationYaw = ((float) ((double) CameraInterpolationEvents.rotationYaw + (double) mc.mouseHelper.deltaX * f1 * 0.15D));
-//				CameraInterpolationEvents.rotationPitch = (float) ((double) CameraInterpolationEvents.rotationPitch - (double) mc.mouseHelper.deltaY * f1 * 0.15D);
-//				CameraInterpolationEvents.rotationPitch = MathHelper.clamp(CameraInterpolationEvents.rotationPitch, -90.0F, 90.0F);
+				InterpolationHandler.rotationYaw = ((float) ((double) InterpolationHandler.rotationYaw + (double) mc.mouseHelper.deltaX * f1 * 0.15D));
+				InterpolationHandler.rotationPitch = (float) ((double) InterpolationHandler.rotationPitch - (double) mc.mouseHelper.deltaY * f1 * 0.15D);
+				InterpolationHandler.rotationPitch = MathHelper.clamp(InterpolationHandler.rotationPitch, -90.0F, 90.0F);
 			}
 		}
 	}
@@ -116,8 +118,8 @@ public class MixinEntityRenderer implements SubtickDuck {
 			TASmodClient.virtual.updateSubtick(mc.player.rotationPitch, mc.player.rotationYaw);
 			mc.player.rotationPitch = TASmodClient.virtual.getSubtickPitch();
 			mc.player.rotationYaw = TASmodClient.virtual.getSubtickYaw();
-//			CameraInterpolationEvents.rotationPitch = mc.player.rotationPitch;
-//			CameraInterpolationEvents.rotationYaw = 180f + mc.player.rotationYaw;
+			InterpolationHandler.rotationPitch = mc.player.rotationPitch;
+			InterpolationHandler.rotationYaw = 180f + mc.player.rotationYaw;
 		}
 	}
 }
