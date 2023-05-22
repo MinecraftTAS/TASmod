@@ -17,7 +17,6 @@ import com.minecrafttas.tasmod.mixin.accessors.AccessorWorld;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.util.TrajectoriesCalculator;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
@@ -214,7 +213,7 @@ public class InfoHud extends GuiScreen {
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Tickrate";
-				return String.format("Tickrate: %s", TickrateChangerClient.ticksPerSecond);
+				return String.format("Tickrate: %s", TASmodClient.tickratechanger.ticksPerSecond);
 			}));
 			
 			title = "position";

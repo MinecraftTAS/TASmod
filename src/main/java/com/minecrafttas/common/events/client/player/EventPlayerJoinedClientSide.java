@@ -7,13 +7,13 @@ import net.minecraft.client.entity.EntityPlayerSP;
 
 public interface EventPlayerJoinedClientSide extends EventBase {
 
-	public void onPlayerLeaveClientSide(EntityPlayerSP player);
+	public void onPlayerJoinedClientSide(EntityPlayerSP player);
 	
 	public static void firePlayerJoinedClientSide(EntityPlayerSP player) {
 		for (EventBase eventListener : EventListener.getEventListeners()) {
 			if(eventListener instanceof EventPlayerJoinedClientSide) {
 				EventPlayerJoinedClientSide event = (EventPlayerJoinedClientSide) eventListener;
-				event.onPlayerLeaveClientSide(player);
+				event.onPlayerJoinedClientSide(player);
 			}
 		}
 	}

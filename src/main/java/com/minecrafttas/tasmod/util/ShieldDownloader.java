@@ -17,9 +17,12 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 import com.google.common.collect.Maps;
+import com.minecrafttas.common.events.client.player.EventOtherPlayerJoinedClientSide;
+import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.IImageBuffer;
 import net.minecraft.client.renderer.ThreadDownloadImageData;
 import net.minecraft.client.renderer.texture.ITextureObject;
@@ -27,7 +30,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 
-public class ShieldDownloader {
+public class ShieldDownloader implements EventPlayerJoinedClientSide, EventOtherPlayerJoinedClientSide{
 	private final ResourceLocation bottleshield = new ResourceLocation("tasmod:textures/shields/bottleshield.png");
 	private final String defaultshield = "bottleshield";
 	private final String cacheLocation = "tasmod/shields/";
@@ -47,7 +50,16 @@ public class ShieldDownloader {
 	}
 
 	// ====================Downloading=====================
-
+	@Override
+	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
+		onPlayerJoin(player.getGameProfile());
+	}
+	
+	@Override
+	public void onOtherPlayerJoinedClientSide(GameProfile profile) {
+		onPlayerJoin(profile);
+	}
+	
 	public void onPlayerJoin(GameProfile profile) {
 		String uuid = profile.getId().toString();
 		loadTexture(uuid);

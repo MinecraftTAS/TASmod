@@ -1,7 +1,8 @@
-package com.minecrafttas.tasmod.events;
+package com.minecrafttas.tasmod.util;
 
 import org.lwjgl.input.Keyboard;
 
+import com.minecrafttas.common.events.client.EventClientGameLoop;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
@@ -9,7 +10,6 @@ import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.playback.server.TASstateClient;
 import com.minecrafttas.tasmod.savestates.server.LoadstatePacket;
 import com.minecrafttas.tasmod.savestates.server.SavestatePacket;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 
 import net.minecraft.client.Minecraft;
@@ -21,25 +21,26 @@ import net.minecraft.client.settings.KeyBinding;
  * @author Scribble
  *
  */
-public class KeybindingEvents {
+public class KeybindingHandler implements EventClientGameLoop {
 
-	public static KeyBinding tickratezeroKey = new KeyBinding("Tickrate 0 Key", Keyboard.KEY_F8, "TASmod");
+	public KeyBinding tickratezeroKey = new KeyBinding("Tickrate 0 Key", Keyboard.KEY_F8, "TASmod");
 
-	public static KeyBinding tickAdvance = new KeyBinding("Advance Tick", Keyboard.KEY_F9, "TASmod");
+	public KeyBinding tickAdvance = new KeyBinding("Advance Tick", Keyboard.KEY_F9, "TASmod");
 
-	public static KeyBinding stopkey = new KeyBinding("Recording/Playback Stop", Keyboard.KEY_F10, "TASmod");
+	public KeyBinding stopkey = new KeyBinding("Recording/Playback Stop", Keyboard.KEY_F10, "TASmod");
 
-	public static KeyBinding savestateSaveKey = new KeyBinding("Create Savestate", Keyboard.KEY_J, "TASmod");
+	public KeyBinding savestateSaveKey = new KeyBinding("Create Savestate", Keyboard.KEY_J, "TASmod");
 
-	public static KeyBinding savestateLoadKey = new KeyBinding("Load Latest Savestate", Keyboard.KEY_K, "TASmod");
+	public KeyBinding savestateLoadKey = new KeyBinding("Load Latest Savestate", Keyboard.KEY_K, "TASmod");
 
-	public static KeyBinding testingKey = new KeyBinding("Various Testing", Keyboard.KEY_F12, "TASmod");
+	public KeyBinding testingKey = new KeyBinding("Various Testing", Keyboard.KEY_F12, "TASmod");
 
-	public static KeyBinding infoGuiKey = new KeyBinding("Open InfoGui Editor", Keyboard.KEY_F6, "TASmod");
+	public KeyBinding infoGuiKey = new KeyBinding("Open InfoGui Editor", Keyboard.KEY_F6, "TASmod");
 	
-	public static KeyBinding bufferViewKey = new KeyBinding("Buffer View", Keyboard.KEY_NUMPAD0, "TASmod");
+	public KeyBinding bufferViewKey = new KeyBinding("Buffer View", Keyboard.KEY_NUMPAD0, "TASmod");
 	
-	public static void fireKeybindingsEvent() {
+	@Override
+	public void onRunClientGameLoop(Minecraft mc) {
 		
 		if (VirtualKeybindings.isKeyDownExceptTextfield(savestateSaveKey)) {
 
@@ -63,11 +64,11 @@ public class KeybindingEvents {
 			
 		} else if (VirtualKeybindings.isKeyDown(tickratezeroKey)) {
 			
-			TickrateChangerClient.togglePause();
+			TASmodClient.tickratechanger.togglePause();
 			
 		} else if (VirtualKeybindings.isKeyDown(tickAdvance)) {
 			
-			TickrateChangerClient.advanceTick();
+			TASmodClient.tickratechanger.advanceTick();
 			
 		} else if (VirtualKeybindings.isKeyDown(testingKey)) {
 			
@@ -81,4 +82,5 @@ public class KeybindingEvents {
 			
 		}
 	}
+
 }

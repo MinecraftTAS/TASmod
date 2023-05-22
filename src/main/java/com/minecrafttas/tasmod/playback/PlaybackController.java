@@ -9,14 +9,14 @@ import java.util.Map;
 import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
-import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.common.events.client.EventOpenGui;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.playback.server.TASstateClient;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
@@ -26,6 +26,8 @@ import com.mojang.realmsclient.util.Pair;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -50,7 +52,7 @@ import net.minecraft.util.text.TextFormatting;
  * @author Scribble
  *
  */
-public class PlaybackController {
+public class PlaybackController implements EventOpenGui{
 
 	/**
 	 * The current state of the controller.
@@ -397,7 +399,7 @@ public class PlaybackController {
 		index++;	// Increase the index and load the next inputs
 		
 		if(playUntil!=null && playUntil == index) {
-			TickrateChangerClient.pauseGame(true);
+			TASmodClient.tickratechanger.pauseGame(true);
 			playUntil = null;
 			TASstateClient.setOrSend(TASstate.NONE);
 			for(long i = inputs.size()-1; i >= index; i--) {
@@ -825,5 +827,27 @@ public class PlaybackController {
 				return NONE;
 			}
 		}
+	}
+
+	private TASstate stateWhenOpened;
+	
+	public void setStateWhenOpened(TASstate state) {
+		stateWhenOpened = state;
+	}
+	
+	@Override
+	public GuiScreen onOpenGui(GuiScreen gui) {
+		if(gui instanceof GuiMainMenu) {
+			if (stateWhenOpened != null) {
+				PlaybackController container = TASmodClient.virtual.getContainer();
+				if(stateWhenOpened == TASstate.RECORDING) {
+					long seed = TASmod.ktrngHandler.getGlobalSeedClient();
+					container.setStartSeed(seed);
+				}
+				container.setTASState(stateWhenOpened);
+				stateWhenOpened = null;
+			}
+		}
+		return gui;
 	}
 }

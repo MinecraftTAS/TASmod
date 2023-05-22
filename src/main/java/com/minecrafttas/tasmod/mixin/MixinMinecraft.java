@@ -16,12 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.duck.GuiScreenDuck;
 import com.minecrafttas.tasmod.duck.SubtickDuck;
-import com.minecrafttas.tasmod.events.LoadWorldEvents;
-import com.minecrafttas.tasmod.events.TickEvents;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 
 import net.minecraft.client.Minecraft;
@@ -41,10 +38,6 @@ public abstract class MixinMinecraft {
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void injectRunGameLoop(CallbackInfo ci) {
 		
-		TickEvents.onRender();
-		
-		LoadWorldEvents.doneWithLoadingScreen();
-		
 		TASmodClient.gameLoopSchedulerClient.runAllTasks();
 		
 		if(((Minecraft) (Object) this).player != null) {
@@ -56,10 +49,10 @@ public abstract class MixinMinecraft {
 		}
 		while (Mouse.next()) {
 			if(this.currentScreen == null) {
-				TASmodClient.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TickrateChangerClient.ticksPerSecond==0);
+				TASmodClient.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TASmodClient.tickratechanger.ticksPerSecond==0);
 			} else {
 				GuiScreenDuck screen = (GuiScreenDuck) currentScreen;
-				TASmodClient.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TickrateChangerClient.ticksPerSecond==0);
+				TASmodClient.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TASmodClient.tickratechanger.ticksPerSecond==0);
 			}
 		}
 	}
@@ -78,14 +71,14 @@ public abstract class MixinMinecraft {
 	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;runTick()V"))
 	public void redirectRunTick(Minecraft mc) {
 		TASmodClient.virtual.updateContainer();
-		if (TickrateChangerClient.ticksPerSecond != 0) {
+		if (TASmodClient.tickratechanger.ticksPerSecond != 0) {
 			((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 		}
 		this.runTick();
 		TASmodClient.tickSchedulerClient.runAllTasks();
-		if (TickrateChangerClient.advanceTick) {
-			TickrateChangerClient.advanceTick = false;
-			TickrateChangerClient.changeClientTickrate(0F);
+		if (TASmodClient.tickratechanger.advanceTick) {
+			TASmodClient.tickratechanger.advanceTick = false;
+			TASmodClient.tickratechanger.changeClientTickrate(0F);
 		}
 		TickSyncClient.clientPostTick((Minecraft)(Object)this);
 	}
@@ -97,7 +90,7 @@ public abstract class MixinMinecraft {
 	public void inject_shutdownMinecraftApplet(CallbackInfo ci) {
 		try {
 			if (TASmodClient.packetClient != null) {
-				TickrateChangerClient.changeTickrate(20);
+				TASmodClient.tickratechanger.changeTickrate(20);
 				TASmodClient.packetClient.killClient();
 			}
 		} catch (Exception e) {
@@ -198,7 +191,7 @@ public abstract class MixinMinecraft {
 
 	@ModifyConstant(method = "runTickMouse", constant = @Constant(longValue = 200L))
 	public long fixMouseWheel(long twohundredLong) {
-		return (long) Math.max(4000F / TickrateChangerClient.ticksPerSecond, 200L);
+		return (long) Math.max(4000F / TASmodClient.tickratechanger.ticksPerSecond, 200L);
 	}
 
 	// =====================================================================================================================================

@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
 import com.minecrafttas.tasmod.playback.PlaybackController;
@@ -16,6 +17,7 @@ import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
 import com.minecrafttas.tasmod.util.PointerNormalizer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 
 /**
  * One of the core classes of this mod <br>
@@ -83,7 +85,7 @@ import net.minecraft.client.Minecraft;
  * @author Scribble
  *
  */
-public class VirtualInput {
+public class VirtualInput implements EventPlayerJoinedClientSide{
 
 	/**
 	 * The container where all inputs get stored during recording or stored and
@@ -598,5 +600,10 @@ public class VirtualInput {
 			main.add(new InputEvent(tick.getTick(), keyboardEventsList, mouseEventsList, tick.getSubticks()));
 		}
 		return main;
+	}
+
+	@Override
+	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
+		unpressNext();
 	}
 }

@@ -14,10 +14,10 @@
         "savestates.MixinChunkProviderServer",
         "savestates.MixinEntityPlayerMP",
         "savestates.MixinNetHandlerPlayServer",
+        "savestates.AccessorChunkLoader",
+        "savestates.AccessorAnvilChunkLoader",
         
         //Events
-        "events.MixinPlayerList",
-        "events.MixinMinecraftServer",
         
         //Fixing forge and vanilla stuff
         "fixes.MixinDragonFightManager",
@@ -51,13 +51,8 @@
 		"fixes.MixinMinecraftFullscreen",
 		
 		//Join and leave game event on the client
-		"events.MixinNetHandlerPlayClient",
-		"events.MixinWorldClient",
 		"events.MixinGuiMainMenu",
-		"events.MixinGuiIngameMenu",
 		"events.MixinGuiControls",
-		"events.MixinMinecraft",
-		"events.MixinIntegratedServer",
 		
 		//Playbackhooks
 		"playbackhooks.MixinGameSettings",

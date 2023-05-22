@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.duck.SubtickDuck;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -70,7 +69,7 @@ public class MixinEntityRenderer implements SubtickDuck {
 
 	@Redirect(at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;inGameHasFocus:Z", opcode = Opcodes.GETFIELD, ordinal = 1), method = "updateCameraAndRender")
 	public boolean stopVanilla(Minecraft mc) {
-		if (TickrateChangerClient.ticksPerSecond != 0) {
+		if (TASmodClient.tickratechanger.ticksPerSecond != 0) {
 			return false;
 		} else {
 			return mc.inGameHasFocus;

@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.common.events.server.player.EventPlayerJoinedServerSide;
 import com.minecrafttas.common.events.server.player.EventPlayerLeaveServerSide;
-import com.minecrafttas.tasmod.events.PlayerJoinLeaveEvents;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetworkManager;

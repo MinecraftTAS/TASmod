@@ -14,7 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.events.SavestateEvents;
+import com.minecrafttas.tasmod.mixin.savestates.AccessorAnvilChunkLoader;
+import com.minecrafttas.tasmod.mixin.savestates.AccessorChunkLoader;
 import com.minecrafttas.tasmod.savestates.client.InputSavestatesPacket;
 import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
@@ -25,7 +26,6 @@ import com.minecrafttas.tasmod.savestates.server.files.SavestateDataFile.DataVal
 import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -123,7 +123,7 @@ public class SavestateHandler {
 		createSavestateDirectory();
 
 		// Enable tickrate 0
-		TickrateChangerServer.pauseGame(true);
+		TASmod.tickratechanger.pauseGame(true);
 
 		// Update the server variable
 		server = TASmod.getServerInstance();
@@ -150,7 +150,7 @@ public class SavestateHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(indexToSave);
 		
-		SavestateEvents.triggerSavestateEvent(targetfolder);
+//		SavestateEvents.triggerSavestateEvent(targetfolder); TODO
 
 		if (targetfolder.exists()) {
 			logger.warn("WARNING! Overwriting the savestate with the index {}", indexToSave);
@@ -171,9 +171,10 @@ public class SavestateHandler {
 
 		// Wait for the chunkloader to save the game
 		for (WorldServer world : server.worlds) {
-//			AnvilChunkLoader chunkloader = (AnvilChunkLoader) world.getChunkProvider().chunkLoader;
-//			while (chunkloader.getPendingSaveCount() > 0) {
-//			}
+			AnvilChunkLoader chunkloader = (AnvilChunkLoader) ((AccessorChunkLoader)world.getChunkProvider()).getChunkLoader();
+			
+			while (((AccessorAnvilChunkLoader)chunkloader).getChunksToSave().size() > 0) {
+			}
 		}
 
 		saveSavestateDataFile(false);
@@ -193,7 +194,7 @@ public class SavestateHandler {
 		TASmod.packetServer.sendToAll(new SavestatePacket());
 
 		if (!tickrate0) {
-			TickrateChangerServer.pauseGame(false);
+			TASmod.tickratechanger.pauseGame(false);
 		}
 
 		// Unlock savestating
@@ -252,7 +253,7 @@ public class SavestateHandler {
 		createSavestateDirectory();
 
 		// Enable tickrate 0
-		TickrateChangerServer.pauseGame(true);
+		TASmod.tickratechanger.pauseGame(true);
 
 		// Update the server instance
 		server = TASmod.getServerInstance();
@@ -272,7 +273,7 @@ public class SavestateHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(indexToLoad);
 
-		SavestateEvents.triggerLoadstateEvent(targetfolder);
+//		SavestateEvents.triggerLoadstateEvent(targetfolder); TODO
 		
 		/*
 		 * Prevents loading an InputSavestate when loading index 0 (Index 0 is the
@@ -337,7 +338,7 @@ public class SavestateHandler {
 		}
 
 		if (!tickrate0) {
-			TickrateChangerServer.pauseGame(false);
+			TASmod.tickratechanger.pauseGame(false);
 		}
 
 		// Unlock loadstating

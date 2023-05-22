@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import com.minecrafttas.tasmod.events.LoadWorldEvents;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -25,8 +25,8 @@ public class MixinNetworkManager {
 	 */
 	@Redirect(method = "processReceivedPackets", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ITickable;update()V"))
 	public void redirect_processReceivedPackets(ITickable manager) {
-		if (TickrateChangerServer.ticksPerSecond == 0) {
-			if (!(packetListener instanceof NetHandlerPlayServer) || LoadWorldEvents.isLoading()) {
+		if (TASmod.tickratechanger.ticksPerSecond == 0) {
+			if (!(packetListener instanceof NetHandlerPlayServer) || TASmodClient.loadingScreenHandler.isLoading()) {
 				manager.update();
 			}
 		} else {

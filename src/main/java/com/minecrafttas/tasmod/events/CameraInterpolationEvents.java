@@ -1,13 +1,5 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
-import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
-import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.MathHelper;
-
 public class CameraInterpolationEvents {
 	
 //	public static float rotationPitch = 0f;
