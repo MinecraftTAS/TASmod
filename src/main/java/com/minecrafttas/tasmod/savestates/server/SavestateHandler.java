@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.events.server.EventLoadstate;
+import com.minecrafttas.tasmod.events.server.EventSavestate;
 import com.minecrafttas.tasmod.mixin.savestates.AccessorAnvilChunkLoader;
 import com.minecrafttas.tasmod.mixin.savestates.AccessorChunkLoader;
 import com.minecrafttas.tasmod.savestates.client.InputSavestatesPacket;
@@ -150,7 +152,7 @@ public class SavestateHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(indexToSave);
 		
-//		SavestateEvents.triggerSavestateEvent(targetfolder); TODO
+		EventSavestate.fireSavestateEvent(indexToSave, targetfolder, currentfolder);
 
 		if (targetfolder.exists()) {
 			logger.warn("WARNING! Overwriting the savestate with the index {}", indexToSave);
@@ -273,7 +275,7 @@ public class SavestateHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(indexToLoad);
 
-//		SavestateEvents.triggerLoadstateEvent(targetfolder); TODO
+		EventLoadstate.fireSavestateEvent(indexToLoad, targetfolder, currentfolder);
 		
 		/*
 		 * Prevents loading an InputSavestate when loading index 0 (Index 0 is the
