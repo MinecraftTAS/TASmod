@@ -26,8 +26,6 @@ public class MixinNetHandlerPlayClient {
 		EventPlayerJoinedClientSide.firePlayerJoinedClientSide(gameController.player);
 	}
 
-	//Github Workflows can't process this for some reason...
-	
 	@Inject(method = "handlePlayerListItem", at = @At(value = "HEAD"))
 	public void otherClientJoinServerEvent(SPacketPlayerListItem packet, CallbackInfo ci) {
 		for (int i = 0; i < packet.getEntries().size(); i++) {

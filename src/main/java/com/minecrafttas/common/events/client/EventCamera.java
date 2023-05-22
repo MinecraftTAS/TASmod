@@ -12,7 +12,7 @@ public interface EventCamera extends EventBase{
 			if(eventListener instanceof EventCamera) {
 				EventCamera event = (EventCamera) eventListener;
 				CameraData data = event.onCameraEvent(dataIn);
-				if(data.equals(dataIn)) {
+				if(!data.equals(dataIn)) {
 					return data;
 				}
 			}
