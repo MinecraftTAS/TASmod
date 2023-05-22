@@ -50,6 +50,8 @@ dependencies {
     
     // tasmod mod dependencies (only for ide)
     downloadMod 'com.minecrafttas:killtherng-full:2.0'
+    
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
 }
 
 // Task for downloading KillTheRng
