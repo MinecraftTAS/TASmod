@@ -1,6 +1,7 @@
-package com.minecrafttas.tasmod.util;
+package com.minecrafttas.tasmod.handlers;
 
 import com.minecrafttas.common.events.client.EventClientGameLoop;
+import com.minecrafttas.common.events.client.EventDoneLoadingWorld;
 import com.minecrafttas.common.events.client.EventLaunchIntegratedServer;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
@@ -13,7 +14,7 @@ import net.minecraft.client.Minecraft;
  * @author Scribble
  *
  */
-public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventClientGameLoop{
+public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventClientGameLoop, EventDoneLoadingWorld{
 	
 	
 	private boolean waszero;
@@ -53,8 +54,15 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 		}
 	}
 	
+	@Override
+	public void onDoneLoadingWorld() {
+		if(TASmod.getServerInstance()!=null) { //Check if a server is running and if it's an integrated server
+			loadingScreenDelay = 1;
+		}
+	}
+	
 	public boolean isLoading() {
 		return isLoading;
 	}
-	
+
 }
