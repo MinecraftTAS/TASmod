@@ -12,3 +12,5 @@ accessible field net/minecraft/world/World worldInfo Lnet/minecraft/world/storag
 accessible field net/minecraft/world/WorldServer pendingTickListEntriesHashSet Ljava/util/Set;
 
 accessible method net/minecraft/world/storage/SaveHandler setSessionLock ()V
+
+accessible field net/minecraft/client/settings/KeyBinding CATEGORY_ORDER Ljava/util/Map;
