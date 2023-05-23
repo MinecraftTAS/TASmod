@@ -13,8 +13,19 @@ group = project.group
 // compile for java 8
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
+<<<<<<< HEAD
 // set access widener
 loom.accessWidenerPath = file('src/main/resources/tasmod.accesswidener')
+=======
+loom {
+	accessWidenerPath = file('src/main/resources/tasmod.accesswidener')
+	log4jConfigs.from(file('src/main/resources/log4j.xml'))
+	
+	mixin {
+		defaultRefmapName = "tasmod.refmap.json"
+	}
+}
+>>>>>>> 7f37d08 (Added custom log4j config)
 
 // dependency repositories
 repositories {

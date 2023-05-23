@@ -2,6 +2,7 @@
     "required": true,
     "minVersion": "0.8.5",
     "package": "com.minecrafttas.common.mixin",
+    "refmap": "tasmod.refmap.json",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
         "MixinMinecraftServer",
