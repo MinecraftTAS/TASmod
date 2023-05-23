@@ -2,6 +2,9 @@ package com.minecrafttas.tasmod;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import org.lwjgl.input.Keyboard;
 
@@ -28,11 +31,13 @@ import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
 import com.minecrafttas.tasmod.util.TickScheduler;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
+import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.settings.KeyBinding;
 
 public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventPlayerLeaveClientSide{
 
@@ -111,7 +116,13 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		loadingScreenHandler = new LoadingScreenHandler();
 		EventListener.register(loadingScreenHandler);
 		
-		keybindManager = new KeybindManager();
+		keybindManager = new KeybindManager() {
+			
+			protected boolean isKeyDown(KeyBinding i) {
+				return VirtualKeybindings.isKeyDownExceptTextfield(i);
+			};
+			
+		};
 		EventListener.register(keybindManager);
 		
 		EventListener.register(interpolation);
@@ -120,14 +131,15 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	@Override
 	public void onClientInit(Minecraft mc) {
 		// initialize keybindings
-		keybindManager.registerKeybind(new Keybind("Tickrate 0 Key", "TASmod", Keyboard.KEY_F8, () -> TASmodClient.tickratechanger.togglePause()));
-		keybindManager.registerKeybind(new Keybind("Advance Tick", "TASmod", Keyboard.KEY_F9, () -> TASmodClient.tickratechanger.advanceTick()));
-		keybindManager.registerKeybind(new Keybind("Recording/Playback Stop", "TASmod", Keyboard.KEY_F10, () -> TASstateClient.setOrSend(TASstate.NONE)));
-		keybindManager.registerKeybind(new Keybind("Create Savestate", "TASmod", Keyboard.KEY_J, () -> TASmodClient.packetClient.sendToServer(new SavestatePacket())));
-		keybindManager.registerKeybind(new Keybind("Load Latest Savestate", "TASmod", Keyboard.KEY_K, () -> TASmodClient.packetClient.sendToServer(new LoadstatePacket())));
-		keybindManager.registerKeybind(new Keybind("Open InfoGui Editor", "TASmod", Keyboard.KEY_F6, () -> Minecraft.getMinecraft().displayGuiScreen(TASmodClient.hud)));
-		keybindManager.registerKeybind(new Keybind("Buffer View", "TASmod", Keyboard.KEY_NUMPAD0, () -> InputContainerView.startBufferView()));
-		keybindManager.registerKeybind(new Keybind("Various Testing", "TASmod", Keyboard.KEY_F12, () -> {
+		List<KeyBinding> blockedKeybindings = new ArrayList<>();
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Tickrate 0 Key", "TASmod", Keyboard.KEY_F8, () -> TASmodClient.tickratechanger.togglePause())));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Advance Tick", "TASmod", Keyboard.KEY_F9, () -> TASmodClient.tickratechanger.advanceTick())));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Recording/Playback Stop", "TASmod", Keyboard.KEY_F10, () -> TASstateClient.setOrSend(TASstate.NONE))));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Create Savestate", "TASmod", Keyboard.KEY_J, () -> TASmodClient.packetClient.sendToServer(new SavestatePacket()))));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Load Latest Savestate", "TASmod", Keyboard.KEY_K, () -> TASmodClient.packetClient.sendToServer(new LoadstatePacket()))));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Open InfoGui Editor", "TASmod", Keyboard.KEY_F6, () -> Minecraft.getMinecraft().displayGuiScreen(TASmodClient.hud))));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Buffer View", "TASmod", Keyboard.KEY_NUMPAD0, () -> InputContainerView.startBufferView())));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing", "TASmod", Keyboard.KEY_F12, () -> {
 			TASmod.tickSchedulerServer.add(() -> {
 				try {
 					Thread.sleep(1000L);
@@ -135,8 +147,9 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 					e.printStackTrace();
 				}
 			});
-		}));
-
+		})));
+		blockedKeybindings.forEach(VirtualKeybindings::registerBlockedKeyBinding);
+		
 		createTASDir();
 		createSavestatesDir();
 	}

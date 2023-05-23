@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.minecrafttas.common.events.client.EventClientGameLoop;
-import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
@@ -15,7 +14,7 @@ import net.minecraft.client.settings.KeyBinding;
 /**
  * Keybind manager
  */
-public class KeybindManager implements EventClientGameLoop  {
+public abstract class KeybindManager implements EventClientGameLoop  {
 
 	public static class Keybind {
 		
@@ -53,21 +52,20 @@ public class KeybindManager implements EventClientGameLoop  {
 	@Override
 	public void onRunClientGameLoop(Minecraft mc) {
 		for (Keybind keybind : this.keybindings)
-			if (VirtualKeybindings.isKeyDownExceptTextfield(keybind.keyBinding))
+			if (this.isKeyDown(keybind.keyBinding))
 				keybind.onKeyDown.run();
 	}
 
+	protected abstract boolean isKeyDown(KeyBinding i);
+	
 	/**
 	 * Register new keybind
 	 * @param keybind Keybind
 	 */
-	public void registerKeybind(Keybind keybind) {
+	public KeyBinding registerKeybind(Keybind keybind) {
 		this.keybindings.add(keybind);
 		KeyBinding keyBinding = keybind.keyBinding;
 		
-		// block keybinding from virtual keybindings
-		VirtualKeybindings.registerBlockedKeyBinding(keyBinding);
-
 		// add category
 		GameSettings options = Minecraft.getMinecraft().gameSettings;
 		if (!KeyBinding.CATEGORY_ORDER.containsKey(keybind.category))
@@ -75,6 +73,7 @@ public class KeybindManager implements EventClientGameLoop  {
 		
 		// add keybinding
 		options.keyBindings = ArrayUtils.add(options.keyBindings, keyBinding);
+		return keyBinding;
 	}
 	
 }
