@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.duck.GuiScreenDuck;
+import com.minecrafttas.tasmod.util.Ducks.GuiScreenDuck;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

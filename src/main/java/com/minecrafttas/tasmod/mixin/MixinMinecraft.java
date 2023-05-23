@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.duck.GuiScreenDuck;
-import com.minecrafttas.tasmod.duck.SubtickDuck;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
+import com.minecrafttas.tasmod.util.Ducks.GuiScreenDuck;
+import com.minecrafttas.tasmod.util.Ducks.SubtickDuck;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
