@@ -23,13 +23,6 @@
         "fixes.MixinDragonFightManager",
         "fixes.MixinNetworkManager",
         
-        //Accessors
-        "accessors.AccessorEntity",
-        "accessors.AccessorMinecraftServer",
-        "accessors.AccessorSaveHandler",
-        "accessors.AccessorWorld",
-        "accessors.AccessorWorldServer"
-        
     ],
     "client": [
         //General
@@ -69,9 +62,5 @@
 		//Shields
 		"shields.MixinRenderItem",
 		"shields.MixinTileEntityItemStackRenderer",
-		
-		//Accessors
-		"accessors.AccessorRunStuff",
-		"accessors.AccessorTimer"
 	]
 }

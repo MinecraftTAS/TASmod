@@ -3,9 +3,9 @@ package com.minecrafttas.tasmod.savestates.server.chunkloading;
 import java.util.List;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.duck.ChunkProviderDuck;
 import com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderClient;
 import com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderServer;
+import com.minecrafttas.tasmod.util.Ducks.ChunkProviderDuck;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
