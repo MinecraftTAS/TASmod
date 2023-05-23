@@ -1,23 +1,22 @@
 plugins {
 	// loom plugin
-    id 'fabric-loom' version "1.2-SNAPSHOT"
-    id 'legacy-looming' version "1.2-SNAPSHOT"
+    id 'fabric-loom' version "${loom_version}"
+    // legacy looming (loom plugin improvements)
+    id 'legacy-looming' version "${loom_version}"
 }
 
 
-// Set basic properties
+// set basic properties
 version = project.version
 group = project.group
-archivesBaseName = project.artifact
 
-// Compile for java 8
-//sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+// compile for java 8
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
-loom {
-	accessWidenerPath = file('src/main/resources/tasmod.accesswidener')
-}
+// set access widener
+loom.accessWidenerPath = file('src/main/resources/tasmod.accesswidener')
 
-// Dependency repositories
+// dependency repositories
 repositories {
     mavenCentral()
     maven { url = 'https://raw.githubusercontent.com/BleachDev/cursed-mappings/main/' }
@@ -26,88 +25,54 @@ repositories {
     maven { url = 'https://repo.spongepowered.org/maven' }
 }
 
-// Dependency configurations
+// dependency configurations
 configurations {
-    downloadMod {
-    	transitive = false
-    }
-    embed
+	// non-transitive download mod dependency
+    downloadMod.transitive = false
+    // embed dependency included in build
     implementation.extendsFrom(embed)
 }
 
-// Dependencies
+// dependencies
 dependencies {
-	// tasmod dependencies (exported with jar)
+    // tasmod dependencies
     embed group: 'com.dselent', name: 'bigarraylist', version: '1.0'
-    
-    // add mojang mappings
-    mappings "net.legacyfabric:yarn:1.12.2+build.mcp"
-    
-    // add fabric loader
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-    // add minecraft dependency
-    minecraft "com.mojang:minecraft:1.12.2"
-    
-    // tasmod dependencies (only for compilation)
     compileOnly group: 'com.minecrafttas', name: 'killtherng', version: '2.0'
-    
-    // tasmod mod dependencies (only for ide)
-    downloadMod 'com.minecrafttas:killtherng-full:2.0'
-    
+    downloadMod group: 'com.minecrafttas', name: 'killtherng-full', version: '2.0' // for downloadKTRNG task
+
+	// loom dependencies
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.legacyfabric:yarn:${project.minecraft_version}+build.mcp"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
 }
 
-// Task for downloading KillTheRng
+// task for downloading KillTheRng
 task downloadKTRNG(type: Copy) {
 	group 'tasmod'
-	description 'Downloads KillTheRNG to the run/mods/ folder of the project'
+	description 'Download KillTheRNG to the run/mods/ folder of the project'
     from configurations.downloadMod
     into 'run/mods/'
 }
 
+// process fabric mod json
 processResources {
     inputs.property "version", project.version
-    inputs.property "mcversion", minecraft_version
+    inputs.property "mcversion", project.minecraft_version
 
     filesMatching("fabric.mod.json") {
-        //include 'fabric.mod.json'
-
-        expand 'mod_id': project.mod_id, 'mod_url': project.mod_url, 'name': project.mod_name, 'mod_version': project.version,
-                'mcversion': project.minecraft_version, 'mod_description': project.mod_description
+        expand 'mod_url': project.mod_url, 'name': project.mod_name, 'mod_version': project.version, 'mod_description': project.mod_description, 'mod_sources': project.mod_sources, 'mod_email': project.mod_email
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = "UTF-8"
-	if (JavaVersion.current().isJava9Compatible()) it.options.release = 8
-
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
-}
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
-// Configure jar file
+// configure jar file
 jar {
-	archivesBaseName = "${archivesBaseName}"
+	archivesBaseName = project.artifact
 
 	// pack embedded stuff
 	from {
-        configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
+		configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
     } {
         exclude "LICENSE.txt", "META-INF/MANIFSET.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
     }
-}
-
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
-}
-
-tasks.named('test', Test) {
-    useJUnitPlatform()
-
-	testLogging {
-		events "passed", "skipped", "failed"
-	}
 }

@@ -2,21 +2,15 @@
 	"schemaVersion": 1,
 	"id": "tasmod",
 	"version": "${mod_version}",
-	"name": "Tool-Assisted Speedrun Mod",
+	"name": "${name}",
 	"description": "${mod_description}",
-	"authors": [
-		"Scribble", 
-		"Pancake"
-	],
-	"contributors": [ 
-		"tr7zw",
-		"cittyinthecloud"
-	],
+	"authors": ["Scribble", "Pancake"],
+	"contributors": ["tr7zw", "cittyinthecloud"],
 	"contact": {
 		"homepage": "${mod_url}",
-		"sources": "https://github.com/MinecraftTAS/TASmod",
-		"issues": "https://github.com/MinecraftTAS/TASmod/issues",
-		"email": "scribble@minecrafttas.com"
+		"sources": "${mod_sources}",
+		"issues": "${mod_sources}/issues",
+		"email": "${mod_email}"
 	},
 
 	"license": "GPLv3",
@@ -36,8 +30,8 @@
 		"common.mixin.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.14.11",
-		"minecraft": "*",
+		"fabricloader": ">=0.14.19",
+		"minecraft": "1.12.2",
 		"java": ">=8"
 	}
 }
