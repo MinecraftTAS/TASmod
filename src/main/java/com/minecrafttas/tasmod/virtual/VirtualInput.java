@@ -10,7 +10,6 @@ import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
@@ -529,9 +528,9 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 			nextKeyboard = tickcontainer.getKeyboard().clone();
 			nextMouse = tickcontainer.getMouse().clone();
 
-			((AccessorRunStuff) Minecraft.getMinecraft()).runTickKeyboardAccessor(); // Letting mouse and keyboard tick once to load inputs into the
+			 Minecraft.getMinecraft().runTickKeyboard(); // Letting mouse and keyboard tick once to load inputs into the
 																						// "currentKeyboard"
-			((AccessorRunStuff) Minecraft.getMinecraft()).runTickMouseAccessor();
+			 Minecraft.getMinecraft().runTickMouse();
 		} else {
 			TASmod.logger.warn("Can't preload inputs, specified inputs are null!");
 		}

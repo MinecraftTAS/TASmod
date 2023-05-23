@@ -2,7 +2,6 @@ package com.minecrafttas.tasmod.handlers;
 
 import com.minecrafttas.common.events.client.EventCamera;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
 import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 
@@ -26,8 +25,8 @@ public class InterpolationHandler implements EventCamera{
 			if (input == null) return dataIn;
 			float nextPitch = input.getSubticks().getPitch();
 			float nextYaw = input.getSubticks().getYaw();
-			dataIn.pitch = (float) MathHelper.clampedLerp(rotationPitch, nextPitch, ((AccessorRunStuff) Minecraft.getMinecraft()).timer().renderPartialTicks);
-			dataIn.yaw = (float) MathHelper.clampedLerp(rotationYaw, nextYaw+180, ((AccessorRunStuff) Minecraft.getMinecraft()).timer().renderPartialTicks);
+			dataIn.pitch = (float) MathHelper.clampedLerp(rotationPitch, nextPitch, Minecraft.getMinecraft().timer.renderPartialTicks);
+			dataIn.yaw = (float) MathHelper.clampedLerp(rotationYaw, nextYaw+180, Minecraft.getMinecraft().timer.renderPartialTicks);
 		} else {
 			dataIn.pitch = rotationPitch;
 			dataIn.yaw = rotationYaw;

@@ -1,0 +1,14 @@
+accessWidener v1 named
+
+accessible field net/minecraft/client/Minecraft timer Lnet/minecraft/util/Timer;
+accessible method net/minecraft/client/Minecraft runTickKeyboard ()V
+accessible method net/minecraft/client/Minecraft runTickMouse ()V
+
+accessible field net/minecraft/util/Timer tickLength F
+
+accessible field net/minecraft/world/World unloadedEntityList Ljava/util/List;
+accessible field net/minecraft/world/World worldInfo Lnet/minecraft/world/storage/WorldInfo;
+
+accessible field net/minecraft/world/WorldServer pendingTickListEntriesHashSet Ljava/util/Set;
+
+accessible method net/minecraft/world/storage/SaveHandler setSessionLock ()V

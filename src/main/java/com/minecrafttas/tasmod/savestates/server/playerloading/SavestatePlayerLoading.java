@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorWorld;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,7 +31,7 @@ public class SavestatePlayerLoading {
 		WorldServer[] worlds=server.worlds;
 		for (WorldServer world : worlds) {
 			WorldInfo info=world.getSaveHandler().loadWorldInfo();
-			((AccessorWorld) world).worldInfo(info);
+			world.worldInfo = info;
 		}
 		for(EntityPlayerMP player : players) {
 			
@@ -50,7 +48,7 @@ public class SavestatePlayerLoading {
 			if(dimensionNow!=dimensionPrev) {
 				list.changePlayerDimension(player, dimensionNow);
 			}else {
-				((AccessorWorld) player.getServerWorld()).unloadedEntityList().remove(player);
+				player.getServerWorld().unloadedEntityList.remove(player);
 			}
 			
 			player.readFromNBT(nbttagcompound);
