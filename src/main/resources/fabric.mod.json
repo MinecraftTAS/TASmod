@@ -20,6 +20,7 @@
 	},
 
 	"license": "GPLv3",
+	"accessWidener": "tasmod.accesswidener",
 	"icon": "assets/tasmod/textures/potion.png",
 	"environment": "*",
 	"entrypoints": {

@@ -17,7 +17,6 @@ import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.client.EventDrawHotbar;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorWorld;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
@@ -253,7 +252,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Worldseed";
-				return "World Seed: " + ((AccessorWorld) Minecraft.getMinecraft().world).worldInfo().getSeed();
+				return "World Seed: " + Minecraft.getMinecraft().world.getWorldInfo().getSeed();
 			}));
 			
 			y += 14;

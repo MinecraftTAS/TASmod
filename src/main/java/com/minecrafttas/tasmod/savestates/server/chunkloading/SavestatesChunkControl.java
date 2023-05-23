@@ -4,9 +4,6 @@ import java.util.List;
 
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.duck.ChunkProviderDuck;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorSaveHandler;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorWorld;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorWorldServer;
 import com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderClient;
 import com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderServer;
 
@@ -22,6 +19,7 @@ import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.storage.SaveHandler;
 /**
  * Various methods to unload/reload chunks and make loadless savestates possible
  * @author ScribbleLP
@@ -135,7 +133,7 @@ public class SavestatesChunkControl {
 	public static void updateSessionLock(MinecraftServer server) {
 		WorldServer[] worlds=server.worlds;
 		for(WorldServer world : worlds) {
-			((AccessorSaveHandler) world.getSaveHandler()).invokeSetSessionLock();
+			((SaveHandler) world.getSaveHandler()).setSessionLock();
 		}
 	}
 	/**
@@ -152,7 +150,7 @@ public class SavestatesChunkControl {
 	 */
 	@Environment(EnvType.CLIENT)
 	public static void keepPlayerInLoadedEntityList(net.minecraft.entity.player.EntityPlayer player) {
-		((AccessorWorld) Minecraft.getMinecraft().world).unloadedEntityList().remove(player);
+		Minecraft.getMinecraft().world.unloadedEntityList.remove(player);
 	}
 	
 	/**
@@ -207,10 +205,7 @@ public class SavestatesChunkControl {
 	public static void updateWorldServerTickListEntries() {
 		MinecraftServer server=TASmod.getServerInstance();
 		for (WorldServer world : server.worlds) {
-			AccessorWorldServer acworld=(AccessorWorldServer) world;
-			
-            for (NextTickListEntry nextticklistentry : acworld.getTickListEntries())
-            {
+            for (NextTickListEntry nextticklistentry : world.pendingTickListEntriesHashSet) {
             	nextticklistentry.setScheduledTime(world.getTotalWorldTime());
             }
 		}

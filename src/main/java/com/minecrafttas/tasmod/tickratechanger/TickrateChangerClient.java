@@ -3,8 +3,6 @@ package com.minecrafttas.tasmod.tickratechanger;
 import com.minecrafttas.common.events.client.EventClientGameLoop;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorRunStuff;
-import com.minecrafttas.tasmod.mixin.accessors.AccessorTimer;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 
 import net.minecraft.client.Minecraft;
@@ -69,13 +67,13 @@ public class TickrateChangerClient implements EventClientGameLoop{
 		Minecraft mc = Minecraft.getMinecraft();
 		if (tickrate > 0) {
 			millisecondsPerTick = (long) (1000F / tickrate);
-			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(millisecondsPerTick);
+			mc.timer.tickLength = millisecondsPerTick;
 			
 		} else if (tickrate == 0F) {
 			if (ticksPerSecond != 0) {
 				tickrateSaved = ticksPerSecond;
 			}
-			((AccessorTimer) ((AccessorRunStuff) mc).timer()).tickLength(Float.MAX_VALUE);
+			mc.timer.tickLength = Float.MAX_VALUE;
 		}
 		ticksPerSecond = tickrate;
 		if(log)
