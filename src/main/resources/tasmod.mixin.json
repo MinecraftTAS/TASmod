@@ -2,6 +2,7 @@
     "required": true,
     "minVersion": "0.8.5",
     "package": "com.minecrafttas.tasmod.mixin",
+    "refmap": "tasmod.refmap.json",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
     
@@ -20,7 +21,7 @@
         
         //Fixing forge and vanilla stuff
         "fixes.MixinDragonFightManager",
-        "fixes.MixinNetworkManager",
+        "fixes.MixinNetworkManager"
         
     ],
     "client": [
@@ -60,6 +61,6 @@
 		
 		//Shields
 		"shields.MixinRenderItem",
-		"shields.MixinTileEntityItemStackRenderer",
+		"shields.MixinTileEntityItemStackRenderer"
 	]
 }

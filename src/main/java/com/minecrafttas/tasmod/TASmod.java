@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import com.minecrafttas.common.CommandRegistry;
 import com.minecrafttas.common.events.EventListener;
@@ -69,7 +71,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 
 	private static MinecraftServer serverInstance;
 	
-	public static final Logger logger = LogManager.getLogger("TASMod");
+	public static final Logger logger = LogManager.getLogger("TASmod");
 	
 	public static TASstateServer containerStateServer;
 	
@@ -134,12 +136,14 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		return serverInstance;
 	}
 
+	private final Marker TEST_MARKER = MarkerManager.getMarker("INIT");
+	
 	@Override
 	public void onInitialize() {
 		logger.info("Initializing TASmod");
 		EventListener.register(this);
 		
-		logger.info("Testing connection with KillTheRNG");
+		logger.info(TEST_MARKER, "Testing connection with KillTheRNG");
 		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
 		EventListener.register(ktrngHandler);
 		
@@ -194,6 +198,4 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		PacketSerializer.registerPacket(PlayUntilPacket.class);
 		
 	}
-
-
 }
