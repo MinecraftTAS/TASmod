@@ -3,25 +3,31 @@ package com.minecrafttas.tasmod;
 import java.io.File;
 import java.io.IOException;
 
+import org.lwjgl.input.Keyboard;
+
 import com.minecrafttas.common.Configuration;
 import com.minecrafttas.common.Configuration.ConfigOptions;
-import com.minecrafttas.common.KeybindRegistry;
+import com.minecrafttas.common.KeybindManager;
+import com.minecrafttas.common.KeybindManager.Keybind;
 import com.minecrafttas.common.events.EventListener;
 import com.minecrafttas.common.events.client.EventClientInit;
 import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
 import com.minecrafttas.common.events.client.player.EventPlayerLeaveClientSide;
+import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.gui.InfoHud;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
-import com.minecrafttas.tasmod.handlers.KeybindingHandler;
 import com.minecrafttas.tasmod.handlers.LoadingScreenHandler;
 import com.minecrafttas.tasmod.networking.TASmodNetworkClient;
+import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 import com.minecrafttas.tasmod.playback.server.InitialSyncStatePacket;
+import com.minecrafttas.tasmod.playback.server.TASstateClient;
+import com.minecrafttas.tasmod.savestates.server.LoadstatePacket;
+import com.minecrafttas.tasmod.savestates.server.SavestatePacket;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
 import com.minecrafttas.tasmod.util.TickScheduler;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
-import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
@@ -57,7 +63,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	
 	public static LoadingScreenHandler loadingScreenHandler;
 	
-	public static KeybindingHandler keybindingHandler;
+	public static KeybindManager keybindManager;
 	
 	public static InterpolationHandler interpolation = new InterpolationHandler();
 	
@@ -105,32 +111,31 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		loadingScreenHandler = new LoadingScreenHandler();
 		EventListener.register(loadingScreenHandler);
 		
-		keybindingHandler = new KeybindingHandler();
-		EventListener.register(keybindingHandler);
+		keybindManager = new KeybindManager();
+		EventListener.register(keybindManager);
 		
 		EventListener.register(interpolation);
 	}
 
 	@Override
 	public void onClientInit(Minecraft mc) {
-		
-		KeybindRegistry.registerKeyBinding(keybindingHandler.tickratezeroKey);
-		KeybindRegistry.registerKeyBinding(keybindingHandler.tickAdvance);
-		KeybindRegistry.registerKeyBinding(keybindingHandler.stopkey);
-		KeybindRegistry.registerKeyBinding(keybindingHandler.savestateSaveKey);
-		KeybindRegistry.registerKeyBinding(keybindingHandler.savestateLoadKey);
-		KeybindRegistry.registerKeyBinding(keybindingHandler.testingKey);
-		KeybindRegistry.registerKeyBinding(keybindingHandler.infoGuiKey);
-		KeybindRegistry.registerKeyBinding(keybindingHandler.bufferViewKey);
-		
-		VirtualKeybindings.registerBlockedKeyBinding(keybindingHandler.tickratezeroKey);
-		VirtualKeybindings.registerBlockedKeyBinding(keybindingHandler.tickAdvance);
-		VirtualKeybindings.registerBlockedKeyBinding(keybindingHandler.stopkey);
-		VirtualKeybindings.registerBlockedKeyBinding(keybindingHandler.savestateSaveKey);
-		VirtualKeybindings.registerBlockedKeyBinding(keybindingHandler.savestateLoadKey);
-		VirtualKeybindings.registerBlockedKeyBinding(keybindingHandler.testingKey);
-		VirtualKeybindings.registerBlockedKeyBinding(keybindingHandler.infoGuiKey);
-		VirtualKeybindings.registerBlockedKeyBinding(keybindingHandler.bufferViewKey);
+		// initialize keybindings
+		keybindManager.registerKeybind(new Keybind("Tickrate 0 Key", "TASmod", Keyboard.KEY_F8, () -> TASmodClient.tickratechanger.togglePause()));
+		keybindManager.registerKeybind(new Keybind("Advance Tick", "TASmod", Keyboard.KEY_F9, () -> TASmodClient.tickratechanger.advanceTick()));
+		keybindManager.registerKeybind(new Keybind("Recording/Playback Stop", "TASmod", Keyboard.KEY_F10, () -> TASstateClient.setOrSend(TASstate.NONE)));
+		keybindManager.registerKeybind(new Keybind("Create Savestate", "TASmod", Keyboard.KEY_J, () -> TASmodClient.packetClient.sendToServer(new SavestatePacket())));
+		keybindManager.registerKeybind(new Keybind("Load Latest Savestate", "TASmod", Keyboard.KEY_K, () -> TASmodClient.packetClient.sendToServer(new LoadstatePacket())));
+		keybindManager.registerKeybind(new Keybind("Open InfoGui Editor", "TASmod", Keyboard.KEY_F6, () -> Minecraft.getMinecraft().displayGuiScreen(TASmodClient.hud)));
+		keybindManager.registerKeybind(new Keybind("Buffer View", "TASmod", Keyboard.KEY_NUMPAD0, () -> InputContainerView.startBufferView()));
+		keybindManager.registerKeybind(new Keybind("Various Testing", "TASmod", Keyboard.KEY_F12, () -> {
+			TASmod.tickSchedulerServer.add(() -> {
+				try {
+					Thread.sleep(1000L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			});
+		}));
 
 		createTASDir();
 		createSavestatesDir();

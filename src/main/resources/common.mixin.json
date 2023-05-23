@@ -9,7 +9,6 @@
         "MixinPlayerList"
     ],
     "client": [
-    	"MixinKeyBinding",
     	"MixinMinecraft",
     	"MixinNetHandlerPlayClient",
     	"MixinWorldClient",
