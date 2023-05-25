@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.savestates.server.SavestateState;
+import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;

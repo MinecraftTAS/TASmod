@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 
@@ -16,6 +17,7 @@ public class ClientMotionServer {
 	}
 
 	public static void requestMotionFromClient() {
+		TASmod.logger.trace(LoggerMarkers.Savestate, "Request motion from client");
 		motion.clear();
 		TASmod.packetServer.sendToAll(new RequestMotionPacket());
 
@@ -28,11 +30,11 @@ public class ClientMotionServer {
 				e.printStackTrace();
 			}
 			if(i % 30 == 1) {
-				TASmod.logger.info("Resending motion packet");
+				TASmod.logger.debug(LoggerMarkers.Savestate, "Resending motion packet");
 				TASmod.packetServer.sendToAll(new RequestMotionPacket());
 			}
 			if (i == 1000) {
-				TASmod.logger.warn("Client motion timed out!");
+				TASmod.logger.warn(LoggerMarkers.Savestate, "Client motion timed out!");
 				break;
 			}
 

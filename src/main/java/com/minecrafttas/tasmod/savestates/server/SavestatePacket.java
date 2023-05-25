@@ -4,6 +4,7 @@ import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
+import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
 
 import net.minecraft.client.Minecraft;

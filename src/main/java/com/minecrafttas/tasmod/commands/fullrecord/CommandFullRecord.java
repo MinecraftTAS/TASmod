@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod.commands.fullrecord;
 
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
-import com.minecrafttas.tasmod.savestates.server.SavestateState;
+import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
 
 import net.minecraft.command.CommandBase;

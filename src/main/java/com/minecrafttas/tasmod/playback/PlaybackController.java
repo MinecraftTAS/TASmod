@@ -17,6 +17,7 @@ import com.minecrafttas.tasmod.networking.Packet;
 import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.playback.server.TASstateClient;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
@@ -152,6 +153,7 @@ public class PlaybackController implements EventOpenGui{
 		} else if (state == TASstate.NONE) { // If the container is currently doing nothing
 			switch (stateIn) {
 			case PLAYBACK:
+				TASmod.logger.debug(LoggerMarkers.Playback, "Starting playback");
 				if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
 					try {
 						tpPlayer(startLocation);
@@ -168,13 +170,13 @@ public class PlaybackController implements EventOpenGui{
 				TASmod.ktrngHandler.setInitialSeed(startSeed);
 				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
 			case RECORDING:
+				TASmod.logger.debug(LoggerMarkers.Playback, "Starting recording");
 				if (Minecraft.getMinecraft().player != null && startLocation.isEmpty()) {
 					startLocation = getStartLocation(Minecraft.getMinecraft().player);
 				}
 				if(this.inputs.isEmpty()) {
 					inputs.add(new TickInputContainer(index));
 					desyncMonitor.recordNull(index);
-//					desyncMonitor.recordNull(index+1);
 				}
 				state = TASstate.RECORDING;
 				return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
@@ -190,10 +192,12 @@ public class PlaybackController implements EventOpenGui{
 			case RECORDING:
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Recording)";
 			case PAUSED:
+				TASmod.logger.debug(LoggerMarkers.Playback, "Pausing a recording");
 				state = TASstate.PAUSED;
 				tempPause = TASstate.RECORDING;
 				return verbose ? TextFormatting.GREEN + "Pausing a recording" : "";
 			case NONE:
+				TASmod.logger.debug(LoggerMarkers.Playback, "Stopping a recording");
 				TASmodClient.virtual.unpressEverything();
 				state = TASstate.NONE;
 				return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
@@ -205,11 +209,13 @@ public class PlaybackController implements EventOpenGui{
 			case RECORDING:
 				return verbose ? TextFormatting.RED + "A playback is currently running. Please stop the playback first before starting a recording" : "";
 			case PAUSED:
+				TASmod.logger.debug(LoggerMarkers.Playback, "Pausing a playback");
 				state = TASstate.PAUSED;
 				tempPause = TASstate.PLAYBACK;
 				TASmodClient.virtual.unpressEverything();
 				return verbose ? TextFormatting.GREEN + "Pausing a playback" : "";
 			case NONE:
+				TASmod.logger.debug(LoggerMarkers.Playback, "Stopping a playback");
 				Minecraft.getMinecraft().gameSettings.chatLinks = true;
 				TASmodClient.virtual.unpressEverything();
 				state = TASstate.NONE;
@@ -218,16 +224,19 @@ public class PlaybackController implements EventOpenGui{
 		} else if (state == TASstate.PAUSED) {
 			switch (stateIn) {
 			case PLAYBACK:
+				TASmod.logger.debug(LoggerMarkers.Playback, "Resuming a playback");
 				state=TASstate.PLAYBACK;
 				tempPause=TASstate.NONE;
 				return verbose ? TextFormatting.GREEN + "Resuming a playback" : "";
 			case RECORDING:
+				TASmod.logger.debug(LoggerMarkers.Playback, "Resuming a recording");
 				state=TASstate.RECORDING;
 				tempPause=TASstate.NONE;
 				return verbose ? TextFormatting.GREEN + "Resuming a recording" : "";
 			case PAUSED:
 				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Paused)";
 			case NONE:
+				TASmod.logger.debug(LoggerMarkers.Playback, "Aborting pausing");
 				state=TASstate.NONE;
 				TASstate statey=tempPause;
 				tempPause=TASstate.NONE;
@@ -255,6 +264,7 @@ public class PlaybackController implements EventOpenGui{
 	 * @param pause True, if it should be paused
 	 */
 	public void pause(boolean pause) {
+		TASmod.logger.trace(LoggerMarkers.Playback, "Pausing {}", pause);
 		if(pause) {
 			if(state!=TASstate.NONE) {
 				setTASState(TASstate.PAUSED, false);
@@ -393,11 +403,13 @@ public class PlaybackController implements EventOpenGui{
 	private void playbackNextTick() {
 		
 		if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe, secondly as potential exploit protection
+			TASmod.logger.info(LoggerMarkers.Playback, "Stopping a {} since the user tabbed out of the game", state);
 			setTASState(TASstate.NONE);
 		}
 		
 		index++;	// Increase the index and load the next inputs
 		
+		/*Playuntil logic*/
 		if(playUntil!=null && playUntil == index) {
 			TASmodClient.tickratechanger.pauseGame(true);
 			playUntil = null;
@@ -485,6 +497,7 @@ public class PlaybackController implements EventOpenGui{
 	}
 
 	public void clear() {
+		TASmod.logger.debug(LoggerMarkers.Playback, "Clearing playback controller");
 		inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 		controlBytes.clear();
 		comments.clear();
@@ -585,6 +598,7 @@ public class PlaybackController implements EventOpenGui{
 	 * @param startLocation The start location of the TAS
 	 */
 	public void setStartLocation(String startLocation) {
+		TASmod.logger.debug(LoggerMarkers.Playback, "Setting start location");
 		this.startLocation = startLocation;
 	}
 
@@ -595,6 +609,7 @@ public class PlaybackController implements EventOpenGui{
 	 * @return The start location from the player
 	 */
 	private String getStartLocation(EntityPlayerSP player) {
+		TASmod.logger.debug(LoggerMarkers.Playback, "Retrieving player start location");
 		String pos = player.posX + "," + player.posY + "," + player.posZ;
 		String pitch = Float.toString(player.rotationPitch);
 		String yaw = Float.toString(player.rotationYaw);
@@ -609,6 +624,7 @@ public class PlaybackController implements EventOpenGui{
 	 * @throws NumberFormatException If the location can't be parsed
 	 */
 	private void tpPlayer(String startLocation) throws NumberFormatException {
+		TASmod.logger.debug(LoggerMarkers.Playback, "Teleporting the player to the start location");
 		String[] section = startLocation.split(",");
 		double x = Double.parseDouble(section[0]);
 		double y = Double.parseDouble(section[1]);
@@ -687,6 +703,7 @@ public class PlaybackController implements EventOpenGui{
 	 * Clears {@link #keyboard} and {@link #mouse}
 	 */
 	public void unpressContainer() {
+		TASmod.logger.trace(LoggerMarkers.Playback, "Unpressing container");
 		keyboard.clear();
 		mouse.clear();
 	}
@@ -694,6 +711,7 @@ public class PlaybackController implements EventOpenGui{
 	// ==============================================================
 
 	public void printCredits() {
+		TASmod.logger.trace(LoggerMarkers.Playback, "Printing credits");
 		if (state == TASstate.PLAYBACK&&!creditsPrinted) {
 			creditsPrinted=true;
 			printMessage(title, ChatFormatting.GOLD);
@@ -839,6 +857,7 @@ public class PlaybackController implements EventOpenGui{
 	private TASstate stateWhenOpened;
 	
 	public void setStateWhenOpened(TASstate state) {
+		TASmod.logger.trace(LoggerMarkers.Playback, "Set state when opened to {}", state);
 		stateWhenOpened = state;
 	}
 	

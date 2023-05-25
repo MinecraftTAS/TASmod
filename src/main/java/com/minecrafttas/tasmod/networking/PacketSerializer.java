@@ -67,15 +67,16 @@ public class PacketSerializer {
 	}
 	
 	public static void registerPacket(Class<? extends Packet> packet) {
+		TASmod.logger.trace("Registering packet {}", packet.getClass().getSimpleName());
 		if(REGISTRY.contains(packet)) {
-			TASmod.logger.warn("Trying to register packet which already exists: "+packet.getClass().getSimpleName());
+			TASmod.logger.warn("Trying to register packet which already exists: {}", packet.getClass().getSimpleName());
 		}
 		REGISTRY.add(packet);
 	}
 
 	public static void unregisterPacket(Class<? extends Packet> packet) {
 		if(REGISTRY.contains(packet)) {
-			TASmod.logger.warn("Trying to unregister packet which doesn't exist in the registry: "+packet.getClass().getSimpleName());
+			TASmod.logger.warn("Trying to unregister packet which doesn't exist in the registry: {}", packet.getClass().getSimpleName());
 		}
 		REGISTRY.remove(packet);
 	}

@@ -173,7 +173,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 				String ip = fullsplit[0];
 				TASmodClient.packetClient = new TASmodNetworkClient(TASmod.logger, ip, 3111);
 			} else {
-				System.err.println("Something went wrong while connecting. The ip seems to be wrong");
+				TASmod.logger.error("Something went wrong while connecting. The ip seems to be wrong");
 			}
 		}
 		

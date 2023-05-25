@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import com.minecrafttas.common.events.server.EventServerStop;
 import com.minecrafttas.common.events.server.player.EventPlayerJoinedServerSide;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -194,7 +195,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 	 * @param msg 
 	 */
 	private void log(String msg) {
-		logger.info(msg);
+		logger.debug(LoggerMarkers.Tickrate, msg);
 	}
 
 	@Override

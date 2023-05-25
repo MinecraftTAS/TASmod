@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.events.server.EventCompleteLoadstate;
 import com.minecrafttas.tasmod.events.server.EventLoadstate;
 import com.minecrafttas.tasmod.events.server.EventSavestate;
 import com.minecrafttas.tasmod.mixin.savestates.AccessorAnvilChunkLoader;
@@ -28,6 +29,7 @@ import com.minecrafttas.tasmod.savestates.server.files.SavestateDataFile.DataVal
 import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -52,7 +54,7 @@ import net.minecraft.world.chunk.storage.AnvilChunkLoader;
  * @author ScribbleLP
  *
  */
-public class SavestateHandler {
+public class SavestateHandler implements EventCompleteLoadstate{
 
 	private MinecraftServer server;
 	private File savestateDirectory;
@@ -112,6 +114,12 @@ public class SavestateHandler {
 	 * @throws IOException
 	 */
 	public void saveState(int savestateIndex, boolean tickrate0, boolean changeIndex) throws SavestateException, IOException {
+		if(logger.isTraceEnabled()) {
+			logger.trace(LoggerMarkers.Savestate, "SAVING a savestate with index {}, tickrate0 is {} and changeIndex is {}", savestateIndex, tickrate0, changeIndex);
+		} else {
+			logger.debug(LoggerMarkers.Savestate, "Creating new savestate");
+		}
+		
 		if (state == SavestateState.SAVING) {
 			throw new SavestateException("A savestating operation is already being carried out");
 		}
@@ -144,8 +152,14 @@ public class SavestateHandler {
 		int indexToSave=savestateIndex;
 		if (savestateIndex < 0) {
 			indexToSave=currentIndex + 1; // If the savestateIndex <= 0, create a savestate at currentIndex+1
-		} 
-		setCurrentIndex(indexToSave, changeIndex);
+		}
+		
+		// Update current index
+		if(changeIndex) {
+			setCurrentIndex(indexToSave);
+		} else {
+			logger.warn(LoggerMarkers.Savestate, "Keeping the savestate index at {}", currentIndex);
+		}
 
 		// Get the current and target directory for copying
 		String worldname = server.getFolderName();
@@ -155,7 +169,7 @@ public class SavestateHandler {
 		EventSavestate.fireSavestateEvent(indexToSave, targetfolder, currentfolder);
 
 		if (targetfolder.exists()) {
-			logger.warn("WARNING! Overwriting the savestate with the index {}", indexToSave);
+			logger.warn(LoggerMarkers.Savestate, "WARNING! Overwriting the savestate with the index {}", indexToSave);
 			FileUtils.deleteDirectory(targetfolder);
 		}
 
@@ -242,6 +256,12 @@ public class SavestateHandler {
 	 * @throws IOException
 	 */
 	public void loadState(int savestateIndex, boolean tickrate0, boolean changeIndex) throws LoadstateException, IOException {
+		if(logger.isTraceEnabled()) {
+			logger.trace(LoggerMarkers.Savestate, "LOADING a savestate with index {}, tickrate0 is {} and changeIndex is {}", savestateIndex, tickrate0, changeIndex);
+		} else {
+			logger.debug(LoggerMarkers.Savestate, "Loading a savestate");
+		}
+		
 		if (state == SavestateState.SAVING) {
 			throw new LoadstateException("A savestating operation is already being carried out");
 		}
@@ -265,7 +285,12 @@ public class SavestateHandler {
 		int indexToLoad = savestateIndex < 0 ? currentIndex : savestateIndex;
 
 		if (getSavestateFile(indexToLoad).exists()) {
-			setCurrentIndex(indexToLoad, changeIndex);
+			// Updating current index
+			if(changeIndex) {
+				setCurrentIndex(indexToLoad);
+			} else {
+				logger.warn(LoggerMarkers.Savestate, "Keeping the savestate index at {}", currentIndex);
+			}
 		} else {
 			throw new LoadstateException("Savestate " + indexToLoad + " doesn't exist");
 		}
@@ -275,7 +300,7 @@ public class SavestateHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(indexToLoad);
 
-		EventLoadstate.fireSavestateEvent(indexToLoad, targetfolder, currentfolder);
+		EventLoadstate.fireLoadstateEvent(indexToLoad, targetfolder, currentfolder);
 		
 		/*
 		 * Prevents loading an InputSavestate when loading index 0 (Index 0 is the
@@ -352,6 +377,7 @@ public class SavestateHandler {
 	 * savestates
 	 */
 	private void createSavestateDirectory() {
+		logger.trace(LoggerMarkers.Savestate, "Creating savestate directory");
 		if (!server.isDedicatedServer()) {
 			savestateDirectory = new File(server.getDataDirectory() + File.separator + "saves" + File.separator + "savestates" + File.separator);
 		} else {
@@ -362,7 +388,11 @@ public class SavestateHandler {
 		}
 	}
 
+	/**
+	 * Refreshes the current savestate list and loads all indizes into {@link #indexList}
+	 */
 	private void refresh() {
+		logger.trace(LoggerMarkers.Savestate, "Refreshing savestate list");
 		indexList.clear();
 		File[] files = savestateDirectory.listFiles(new FileFilter() {
 
@@ -420,6 +450,7 @@ public class SavestateHandler {
 	 * @throws SavestateDeleteException
 	 */
 	public void deleteSavestate(int index) throws SavestateDeleteException {
+		logger.warn(LoggerMarkers.Savestate, "Deleting savestate {}", index);
 		if (state == SavestateState.SAVING) {
 			throw new SavestateDeleteException("A savestating operation is already being carried out");
 		}
@@ -445,7 +476,7 @@ public class SavestateHandler {
 		}
 		refresh();
 		if (!indexList.contains(currentIndex)) {
-			setCurrentIndex(latestIndex, true);
+			setCurrentIndex(latestIndex);
 		}
 		// Send a notification that the savestate has been deleted
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + index + " deleted"));
@@ -459,6 +490,7 @@ public class SavestateHandler {
 	 * @throws SavestateDeleteException
 	 */
 	public void deleteSavestate(int from, int to) throws SavestateDeleteException {
+		logger.warn(LoggerMarkers.Savestate, "Deleting multiple savestates from {} to {}", from, to);
 		if (state == SavestateState.SAVING) {
 			throw new SavestateDeleteException("A savestating operation is already being carried out");
 		}
@@ -498,6 +530,7 @@ public class SavestateHandler {
 	 * @param legacy If the data file should only store the index, since it comes from a legacy file format
 	 */
 	private void saveSavestateDataFile(boolean legacy) {
+		logger.trace(LoggerMarkers.Savestate, "Saving savestate data file");
 		File tasmodDir = new File(savestateDirectory, "../" + server.getFolderName() + "/tasmod/");
 		if (!tasmodDir.exists()) {
 			tasmodDir.mkdir();
@@ -527,6 +560,7 @@ public class SavestateHandler {
 	 * This loads everything except the index, since that is loaded when the world is loaded
 	 */
 	private void loadSavestateDataFile() {
+		logger.trace(LoggerMarkers.Savestate, "Loading savestate data file");
 		File tasmodDir = new File(savestateDirectory, "../" + server.getFolderName() + "/tasmod/");
 		File savestateDat = new File(tasmodDir, "savestateData.txt");
 		
@@ -555,6 +589,7 @@ public class SavestateHandler {
 	 * This ensures that the server knows the current index when loading the world
 	 */
 	public void loadCurrentIndexFromFile() {
+		logger.trace(LoggerMarkers.Savestate, "Loading current index from file");
 		int index = -1;
 		File tasmodDir = new File(savestateDirectory, "../" + server.getFolderName() + "/tasmod/");
 		if (!tasmodDir.exists()) {
@@ -564,7 +599,7 @@ public class SavestateHandler {
 		File savestateDat = new File(tasmodDir, "savestate.data");
 		if(savestateDat.exists()) {
 			index = legacyIndexFile(savestateDat);
-			setCurrentIndex(index, true);
+			setCurrentIndex(index);
 			saveSavestateDataFile(true);
 			savestateDat.delete();
 			return;
@@ -577,32 +612,26 @@ public class SavestateHandler {
 			
 			index = Integer.parseInt(file.get(DataValues.INDEX));
 			
-			setCurrentIndex(index, true);
+			setCurrentIndex(index);
 		}
 	}
 	
-	private void setCurrentIndex(int index, boolean changeIndex) {
-		if(changeIndex) {
-			if (index < 0) {
-				currentIndex = latestIndex;
-			} else {
-				currentIndex = index;
-			}
-			logger.info("Setting the savestate index to {}", currentIndex);
+	private void setCurrentIndex(int index) {
+		if (index < 0) {
+			currentIndex = latestIndex;
 		} else {
-			logger.warn("Keeping the savestate index at {}", currentIndex);
+			currentIndex = index;
 		}
+		logger.debug(LoggerMarkers.Savestate, "Setting the savestate index to {}", currentIndex);
 	}
 
 	public int getCurrentIndex() {
 		return currentIndex;
 	}
 
-	/**
-	 * Event, that gets executed after a loadstate operation was carried out, get's
-	 * called on the server side
-	 */
-	public static void playerLoadSavestateEventServer() {
+	@Override
+	public void onLoadstateComplete() {
+		TASmod.logger.trace(LoggerMarkers.Event, "Running loadstate complete event");
 		PlayerList playerList = TASmod.getServerInstance().getPlayerList();
 		for (EntityPlayerMP player : playerList.getPlayers()) {
 			NBTTagCompound nbttagcompound = playerList.readPlayerDataFromFile(player);
@@ -638,4 +667,12 @@ public class SavestateHandler {
 		}
 		return index;
 	}
+	
+	public static enum SavestateState {
+		SAVING,
+		LOADING,
+		WASLOADING,
+		NONE
+	}
+
 }
