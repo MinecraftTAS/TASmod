@@ -4,6 +4,7 @@ import com.minecrafttas.common.events.client.EventClientGameLoop;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.client.Minecraft;
 
@@ -175,7 +176,7 @@ public class TickrateChangerClient implements EventClientGameLoop{
 	}
 	
 	private static void log(String msg) {
-		TASmod.logger.info(msg);
+		TASmod.logger.debug(LoggerMarkers.Tickrate, msg);
 	}
 
 	@Override

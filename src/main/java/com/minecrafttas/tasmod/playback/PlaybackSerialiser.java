@@ -16,6 +16,7 @@ import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.util.FileThread;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.virtual.VirtualKey;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
@@ -97,6 +98,7 @@ public class PlaybackSerialiser {
 	 * @throws IOException When the input container is empty
 	 */
 	public void saveToFileV1Until(File file, PlaybackController container, int index) throws IOException{
+		TASmod.logger.debug(LoggerMarkers.Playback, "Saving playback controller to file {}", file);
 		if (container.size() == 0) {
 			throw new IOException("There are no inputs to save to a file");
 		}
@@ -162,6 +164,7 @@ public class PlaybackSerialiser {
 	}
 
 	public int getFileVersion(File file) throws IOException {
+		TASmod.logger.trace(LoggerMarkers.Playback, "Retrieving file version from {}", file);
 		List<String> lines = FileUtils.readLines(file, Charset.defaultCharset());
 		for (String line : lines) {
 			if (line.contains("Version")) {
@@ -179,7 +182,7 @@ public class PlaybackSerialiser {
 	}
 
 	public PlaybackController fromEntireFileV1(File file) throws IOException {
-
+		TASmod.logger.debug(LoggerMarkers.Playback, "Loading playback controller to file {}", file);
 		List<String> lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
 		
 		File monitorFile=new File(file, "../"+file.getName().replace(".mctas", "")+".mon");

@@ -55,6 +55,7 @@ import com.minecrafttas.tasmod.tickratechanger.CommandTickrate;
 import com.minecrafttas.tasmod.tickratechanger.PauseTickratePacket;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncPacket;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.TickScheduler;
 
 import net.fabricmc.api.ModInitializer;
@@ -136,14 +137,12 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		return serverInstance;
 	}
 
-	private final Marker TEST_MARKER = MarkerManager.getMarker("INIT");
-	
 	@Override
 	public void onInitialize() {
 		logger.info("Initializing TASmod");
 		EventListener.register(this);
 		
-		logger.info(TEST_MARKER, "Testing connection with KillTheRNG");
+		logger.info("Testing connection with KillTheRNG");
 		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
 		EventListener.register(ktrngHandler);
 		

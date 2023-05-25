@@ -48,7 +48,7 @@ public class Configuration {
 			e.printStackTrace();
 			return null;
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("No config file found: "+file);
 			return null;
 		} catch (IOException e) {
 			e.printStackTrace();

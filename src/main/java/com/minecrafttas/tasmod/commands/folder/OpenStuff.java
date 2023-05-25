@@ -16,7 +16,7 @@ public class OpenStuff {
 				file.mkdir();
 			Desktop.getDesktop().open(file);
 		} catch (IOException e) {
-			TASmod.logger.fatal("Something went wrong while opening ", file.getPath());
+			TASmod.logger.error("Something went wrong while opening ", file.getPath());
 			e.printStackTrace();
 		}
 	}
@@ -28,7 +28,7 @@ public class OpenStuff {
 				file.mkdir();
 			Desktop.getDesktop().open(file);
 		} catch (IOException e) {
-			TASmod.logger.fatal("Something went wrong while opening ", file.getPath());
+			TASmod.logger.error("Something went wrong while opening ", file.getPath());
 			e.printStackTrace();
 		}
 	}
