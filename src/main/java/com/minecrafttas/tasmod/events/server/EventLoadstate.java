@@ -16,9 +16,9 @@ public interface EventLoadstate extends EventBase {
 	
 	/**
 	 * Fired when loading a savestate, before the savestate folder is copied
-	 * @param index
-	 * @param target
-	 * @param current
+	 * @param index The savestate index for this loadstate
+	 * @param target Target folder, where the savestate is copied to
+	 * @param current The current folder that will be copied from
 	 */
 	public void onLoadstateEvent(int index, File target, File current);
 	
