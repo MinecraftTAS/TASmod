@@ -23,5 +23,8 @@
 		<Logger level="${sys:tasmod.log.level:-info}" name="TASmod" additivity="false">
 			<AppenderRef ref="SysOut2" level="${sys:tasmod.log.level:-info}"/>
 		</Logger>
+		<Logger level="${sys:common.log.level:-info}" name="Common" additivity="false">
+			<AppenderRef ref="SysOut2" level="${sys:common.log.level:-info}"/>
+		</Logger>
 	</Loggers>
 </Configuration>

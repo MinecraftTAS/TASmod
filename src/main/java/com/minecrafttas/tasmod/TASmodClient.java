@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.lwjgl.input.Keyboard;
 
@@ -12,10 +11,10 @@ import com.minecrafttas.common.Configuration;
 import com.minecrafttas.common.Configuration.ConfigOptions;
 import com.minecrafttas.common.KeybindManager;
 import com.minecrafttas.common.KeybindManager.Keybind;
+import com.minecrafttas.common.events.EventClient.EventClientInit;
+import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
+import com.minecrafttas.common.events.EventClient.EventPlayerLeaveClientSide;
 import com.minecrafttas.common.events.EventListener;
-import com.minecrafttas.common.events.client.EventClientInit;
-import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
-import com.minecrafttas.common.events.client.player.EventPlayerLeaveClientSide;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.gui.InfoHud;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;

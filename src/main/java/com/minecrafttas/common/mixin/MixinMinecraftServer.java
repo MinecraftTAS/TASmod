@@ -6,10 +6,10 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.common.events.server.EventServerGameLoop;
-import com.minecrafttas.common.events.server.EventServerInit;
-import com.minecrafttas.common.events.server.EventServerStop;
-import com.minecrafttas.common.events.server.EventServerTick;
+import com.minecrafttas.common.events.EventServer.EventServerGameLoop;
+import com.minecrafttas.common.events.EventServer.EventServerInit;
+import com.minecrafttas.common.events.EventServer.EventServerStop;
+import com.minecrafttas.common.events.EventServer.EventServerTick;
 
 import net.minecraft.server.MinecraftServer;
 

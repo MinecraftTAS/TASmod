@@ -1,7 +1,7 @@
 package com.minecrafttas.tasmod.ktrng;
 
-import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
-import com.minecrafttas.common.events.server.EventServerTick;
+import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
+import com.minecrafttas.common.events.EventServer.EventServerTick;
 import com.minecrafttas.killtherng.KillTheRNG;
 import com.minecrafttas.killtherng.SeedingModes;
 import com.minecrafttas.tasmod.TASmod;

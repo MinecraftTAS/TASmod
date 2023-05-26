@@ -5,13 +5,11 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 import com.minecrafttas.common.CommandRegistry;
 import com.minecrafttas.common.events.EventListener;
-import com.minecrafttas.common.events.server.EventServerInit;
-import com.minecrafttas.common.events.server.EventServerStop;
+import com.minecrafttas.common.events.EventServer.EventServerInit;
+import com.minecrafttas.common.events.EventServer.EventServerStop;
 import com.minecrafttas.tasmod.commands.clearinputs.ClearInputsPacket;
 import com.minecrafttas.tasmod.commands.clearinputs.CommandClearInputs;
 import com.minecrafttas.tasmod.commands.folder.CommandFolder;
@@ -55,7 +53,6 @@ import com.minecrafttas.tasmod.tickratechanger.CommandTickrate;
 import com.minecrafttas.tasmod.tickratechanger.PauseTickratePacket;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncPacket;
-import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.TickScheduler;
 
 import net.fabricmc.api.ModInitializer;

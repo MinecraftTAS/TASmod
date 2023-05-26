@@ -19,4 +19,8 @@ public class EventListener {
 	public static ArrayList<EventBase> getEventListeners(){
 		return EVENTLISTENER_REGISTRY;
 	}
+	
+	public static interface EventBase {
+
+	}
 }

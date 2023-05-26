@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.common.events.client.player.EventPlayerLeaveClientSide;
+import com.minecrafttas.common.events.EventClient.EventPlayerLeaveClientSide;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
