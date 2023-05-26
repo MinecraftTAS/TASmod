@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL11;
 import com.minecrafttas.common.events.EventClient.EventClientTick;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.events.client.EventDrawHotbar;
+import com.minecrafttas.tasmod.events.EventClient.EventDrawHotbar;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
