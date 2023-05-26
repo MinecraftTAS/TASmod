@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.tasmod.events.client.EventDrawHotbar;
+import com.minecrafttas.tasmod.events.EventClient.EventDrawHotbar;
 
 import net.minecraft.client.gui.GuiIngame;
 

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.events.server.EventCompleteLoadstate;
+import com.minecrafttas.tasmod.events.EventServer.EventCompleteLoadstate;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 

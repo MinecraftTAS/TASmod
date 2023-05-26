@@ -14,9 +14,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.events.server.EventCompleteLoadstate;
-import com.minecrafttas.tasmod.events.server.EventLoadstate;
-import com.minecrafttas.tasmod.events.server.EventSavestate;
+import com.minecrafttas.tasmod.events.EventServer.EventCompleteLoadstate;
+import com.minecrafttas.tasmod.events.EventServer.EventLoadstate;
+import com.minecrafttas.tasmod.events.EventServer.EventSavestate;
 import com.minecrafttas.tasmod.mixin.savestates.AccessorAnvilChunkLoader;
 import com.minecrafttas.tasmod.mixin.savestates.AccessorChunkLoader;
 import com.minecrafttas.tasmod.savestates.client.InputSavestatesPacket;
