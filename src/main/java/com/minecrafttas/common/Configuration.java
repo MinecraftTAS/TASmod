@@ -45,13 +45,13 @@ public class Configuration {
 			newProp.loadFromXML(fis);
 			fis.close();
 		} catch (InvalidPropertiesFormatException e) {
-			e.printStackTrace();
+			Common.LOGGER.error("The config file could not be read", e);
 			return null;
 		} catch (FileNotFoundException e) {
-			System.out.println("No config file found: "+file);
+			Common.LOGGER.warn("No config file found: {}", file);
 			return null;
 		} catch (IOException e) {
-			e.printStackTrace();
+			Common.LOGGER.error("An error occured while reading the config", e);
 			return null;
 		}
 		return newProp;
