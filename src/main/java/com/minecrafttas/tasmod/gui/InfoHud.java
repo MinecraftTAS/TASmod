@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import com.minecrafttas.common.events.client.EventClientTick;
+import com.minecrafttas.common.events.EventClient.EventClientTick;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.client.EventDrawHotbar;

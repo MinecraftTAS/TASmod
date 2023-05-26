@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
-import com.minecrafttas.common.events.client.EventClientGameLoop;
+import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;

@@ -9,7 +9,7 @@ import java.util.Map;
 import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
-import com.minecrafttas.common.events.client.EventOpenGui;
+import com.minecrafttas.common.events.EventClient.EventOpenGui;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;

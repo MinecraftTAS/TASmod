@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.common.events.client.player.EventOtherPlayerJoinedClientSide;
-import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
+import com.minecrafttas.common.events.EventClient.EventOtherPlayerJoinedClientSide;
+import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;

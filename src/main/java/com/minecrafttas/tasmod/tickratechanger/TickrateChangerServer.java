@@ -2,8 +2,8 @@ package com.minecrafttas.tasmod.tickratechanger;
 
 import org.apache.logging.log4j.Logger;
 
-import com.minecrafttas.common.events.server.EventServerStop;
-import com.minecrafttas.common.events.server.player.EventPlayerJoinedServerSide;
+import com.minecrafttas.common.events.EventServer.EventPlayerJoinedServerSide;
+import com.minecrafttas.common.events.EventServer.EventServerStop;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 

@@ -1,7 +1,7 @@
 package com.minecrafttas.tasmod.events.client;
 
-import com.minecrafttas.common.events.EventBase;
 import com.minecrafttas.common.events.EventListener;
+import com.minecrafttas.common.events.EventListener.EventBase;
 
 public interface EventDrawHotbar extends EventBase{
 	

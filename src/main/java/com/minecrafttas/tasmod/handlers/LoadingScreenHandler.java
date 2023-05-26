@@ -1,8 +1,8 @@
 package com.minecrafttas.tasmod.handlers;
 
-import com.minecrafttas.common.events.client.EventClientGameLoop;
-import com.minecrafttas.common.events.client.EventDoneLoadingWorld;
-import com.minecrafttas.common.events.client.EventLaunchIntegratedServer;
+import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
+import com.minecrafttas.common.events.EventClient.EventDoneLoadingWorld;
+import com.minecrafttas.common.events.EventClient.EventLaunchIntegratedServer;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackController;

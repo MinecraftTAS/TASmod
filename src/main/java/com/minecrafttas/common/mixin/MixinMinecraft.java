@@ -6,12 +6,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.common.events.client.EventClientGameLoop;
-import com.minecrafttas.common.events.client.EventClientInit;
-import com.minecrafttas.common.events.client.EventClientTick;
-import com.minecrafttas.common.events.client.EventDoneLoadingWorld;
-import com.minecrafttas.common.events.client.EventLaunchIntegratedServer;
-import com.minecrafttas.common.events.client.EventOpenGui;
+import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
+import com.minecrafttas.common.events.EventClient.EventClientInit;
+import com.minecrafttas.common.events.EventClient.EventClientTick;
+import com.minecrafttas.common.events.EventClient.EventDoneLoadingWorld;
+import com.minecrafttas.common.events.EventClient.EventLaunchIntegratedServer;
+import com.minecrafttas.common.events.EventClient.EventOpenGui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

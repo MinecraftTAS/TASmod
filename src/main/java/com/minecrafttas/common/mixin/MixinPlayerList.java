@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.common.events.server.player.EventPlayerJoinedServerSide;
-import com.minecrafttas.common.events.server.player.EventPlayerLeaveServerSide;
+import com.minecrafttas.common.events.EventServer.EventPlayerJoinedServerSide;
+import com.minecrafttas.common.events.EventServer.EventPlayerLeaveServerSide;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetworkManager;

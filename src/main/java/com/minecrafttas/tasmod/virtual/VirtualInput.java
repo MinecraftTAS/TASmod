@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.minecrafttas.common.events.client.player.EventPlayerJoinedClientSide;
+import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;

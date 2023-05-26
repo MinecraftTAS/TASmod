@@ -4,8 +4,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import com.minecrafttas.common.events.client.EventCamera;
-import com.minecrafttas.common.events.client.EventCamera.CameraData;
+import com.minecrafttas.common.events.EventClient.EventCamera;
+import com.minecrafttas.common.events.EventClient.EventCamera.CameraData;
 
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;

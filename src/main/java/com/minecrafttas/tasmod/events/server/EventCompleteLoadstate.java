@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.events.server;
 
-import com.minecrafttas.common.events.EventBase;
+import com.minecrafttas.common.events.EventListener.EventBase;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.TASmodEventListener;
 import com.minecrafttas.tasmod.util.LoggerMarkers;

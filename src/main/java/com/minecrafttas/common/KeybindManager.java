@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.minecrafttas.common.events.client.EventClientGameLoop;
+import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
