@@ -7,101 +7,97 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.concurrent.Future;
 
-import lombok.RequiredArgsConstructor;
-import lombok.var;
-
-@RequiredArgsConstructor
 public class Client {
 
-	private final String host;
-	private final int port;
-
 	private AsynchronousSocketChannel socket;
-	private ByteBuffer writePacketHeader;
+	private ByteBuffer writeBuffer;
+	private ByteBuffer readBuffer;
+	private Future<Integer> future;
 	
-	public static void main(String[] args) throws Exception {
-		Client c = new Client("127.0.0.1", 5555);
-		c.connect();
-		c.write(ByteBuffer.allocate(4));
+	/**
+	 * Create and connect socket
+	 * @param host Host
+	 * @param port Port
+	 * @throws Exception Unable to connect
+	 */
+	public Client(String host, int port) throws Exception {
+		LOGGER.info("Connecting tasmod server to {}:{}", host, port);
+		this.socket = AsynchronousSocketChannel.open();
+		this.socket.connect(new InetSocketAddress(host, port)).get();
+		this.createHandlers();
+		LOGGER.info("Connected to tasmod server");
 	}
 	
 	/**
-	 * Try to connect socket
-	 * @throws Exception Unable to connect
+	 * Fork existing socket
+	 * @param socket Socket
 	 */
-	public void connect() throws Exception {
-		if (this.isAlive()) {
-			LOGGER.warn("Tried to connect alive socket");
-			return;
-		}
-		
-		// create connection
-		LOGGER.info("Connecting tasmod server to {}:{}", this.host, this.port);
-		this.socket = AsynchronousSocketChannel.open();
-		this.socket.connect(new InetSocketAddress(this.host, this.port)).get();
-		
+	public Client(AsynchronousSocketChannel socket) {		
+		this.socket = socket;
+		this.createHandlers();
+	}
+	
+	/**
+	 * Create read/write buffers and handlers for socket
+	 */
+	private void createHandlers() {
 		// create buffers
-		this.writePacketHeader = ByteBuffer.allocate(4);
-		var readPacketHeader = ByteBuffer.allocate(4);
-		
+		this.writeBuffer = ByteBuffer.allocate(1024*1024);
+		this.readBuffer = ByteBuffer.allocate(1024*1024);
+
 		// create input handler
-		this.socket.read(readPacketHeader, null, new CompletionHandler<Integer, Object>() {
+		this.readBuffer.limit(4);
+		this.socket.read(this.readBuffer, null, new CompletionHandler<Integer, Object>() {
 
 			@Override
 			public void completed(Integer result, Object attachment) {
 				try {
-					ByteBuffer data = ByteBuffer.allocate(readPacketHeader.getInt());
-					socket.read(data).get();
+					// read rest of packet
+					readBuffer.flip();
+					int lim = readBuffer.getInt();
+					readBuffer.clear().limit(lim);
+					socket.read(readBuffer).get();
 
-					data.position(0);
-					handle(data);
-					
-					socket.read(readPacketHeader, null, this); // read packet header again
+					// handle packet
+					readBuffer.position(0);
+					handle(readBuffer);
+
+					// read packet header again
+					readBuffer.clear().limit(4);
+					socket.read(readBuffer, null, this);
 				} catch (Throwable exc) {
-					LOGGER.error("Unable to read packet from server {}", exc);
+					LOGGER.error("Unable to read packet {}", exc);
 				}
 			}
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
-				LOGGER.error("Unable to read packet from server {}", exc);
+				LOGGER.error("Unable to read packet {}", exc);
 			}
-			
+
 		});
-		
-		LOGGER.info("Connected to tasmod server");
 	}
 	
 	/**
 	 * Write packet to server
 	 * @param buf Packet
+	 * @throws Exception Networking exception
 	 */
-	public void write(ByteBuffer buf) {
-		this.writePacketHeader.clear();
-		this.writePacketHeader.putInt(buf.capacity());
-		this.socket.write(this.writePacketHeader, null, new CompletionHandler<Integer, Object>() {
-
-			@Override
-			public void completed(Integer result, Object attachment) {
-				try {
-					buf.position(0);
-					socket.write(buf).get();
-				} catch (Throwable exc) {
-					LOGGER.error("Unable to send packet to server {}", exc);
-				}
-			}
-
-			@Override
-			public void failed(Throwable exc, Object attachment) {
-				LOGGER.error("Unable to send packet to server {}", exc);
-			}
-			
-		});
-	}
-	
-	private void handle(ByteBuffer buf) {
-		System.out.println("hello buf, " + buf.getDouble());
+	public void write(ByteBuffer buf) throws Exception {
+		// wait for previous buffer to send
+		if (this.future != null && !this.future.isDone())
+			this.future.get();
+		
+		// prepare buffer
+		this.writeBuffer.clear();
+		this.writeBuffer.putInt(buf.capacity());
+		this.writeBuffer.put((ByteBuffer) buf.position(0));
+		this.writeBuffer.flip();
+		
+		// send buffer async
+		this.future = this.socket.write(this.writeBuffer);
 	}
 	
 	/**
@@ -109,7 +105,7 @@ public class Client {
 	 * @throws IOException Unable to close
 	 */
 	public void close() throws IOException {
-		if (!this.isAlive()) {
+		if (this.socket == null || !this.socket.isOpen()) {
 			LOGGER.warn("Tried to close dead socket");
 			return;
 		}
@@ -117,8 +113,8 @@ public class Client {
 		this.socket.close();
 	}
 	
-	public boolean isAlive() {
-		return this.socket != null && this.socket.isOpen();
+	private void handle(ByteBuffer buf) {
+		System.out.println("hello buf, " + buf.getDouble());
 	}
 	
 }
