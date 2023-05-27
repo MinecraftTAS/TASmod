@@ -69,7 +69,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 
 	private static MinecraftServer serverInstance;
 	
-	public static final Logger logger = LogManager.getLogger("TASmod");
+	public static final Logger LOGGER = LogManager.getLogger("TASmod");
 	
 	public static TASstateServer containerStateServer;
 	
@@ -110,10 +110,10 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 			e.printStackTrace();
 		}
 		
-		savestateHandler=new SavestateHandler(server, logger);
+		savestateHandler=new SavestateHandler(server, LOGGER);
 		
 		try {
-			packetServer = new TASmodNetworkServer(logger);
+			packetServer = new TASmodNetworkServer(LOGGER);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -136,14 +136,14 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 
 	@Override
 	public void onInitialize() {
-		logger.info("Initializing TASmod");
+		LOGGER.info("Initializing TASmod");
 		EventListener.register(this);
 		
-		logger.info("Testing connection with KillTheRNG");
+		LOGGER.info("Testing connection with KillTheRNG");
 		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
 		EventListener.register(ktrngHandler);
 		
-		tickratechanger = new TickrateChangerServer(logger);
+		tickratechanger = new TickrateChangerServer(LOGGER);
 		EventListener.register(tickratechanger);
 		
 		

@@ -40,7 +40,7 @@ public class OpenGuiEvents {
 	 */
 	public static void openGuiControls(GuiControls guiControls) {
 		if (TASmodClient.tickratechanger.ticksPerSecond == 0 || TASmodClient.tickratechanger.advanceTick) {
-			TASmod.logger.info("Pausing game during GuiControls");
+			TASmod.LOGGER.info("Pausing game during GuiControls");
 			TASmodClient.tickratechanger.pauseGame(false);
 			TASstateClient.setOrSend(stateWhenOpened);
 			waszero = true;
@@ -54,7 +54,7 @@ public class OpenGuiEvents {
 	 */
 	public static void closeGuiControls(GuiControls guiControls) {
 		if (waszero) {
-			TASmod.logger.info("Unpausing the game again");
+			TASmod.LOGGER.info("Unpausing the game again");
 			waszero = false;
 			TASmodClient.tickratechanger.pauseGame(true);
 		}

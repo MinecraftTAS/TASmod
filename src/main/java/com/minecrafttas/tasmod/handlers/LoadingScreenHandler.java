@@ -24,7 +24,7 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 
 	@Override
 	public void onLaunchIntegratedServer() {
-		TASmod.logger.debug(LoggerMarkers.Event, "Starting the integrated server");
+		TASmod.LOGGER.debug(LoggerMarkers.Event, "Starting the integrated server");
 		PlaybackController container = TASmodClient.virtual.getContainer();
 		if(!container.isNothingPlaying() && !container.isPaused()) {
 			container.pause(true);
@@ -39,7 +39,7 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 	public void onRunClientGameLoop(Minecraft mc) {
 		if (loadingScreenDelay > -1) {
 			if (loadingScreenDelay == 0) {
-				TASmod.logger.debug(LoggerMarkers.Event, "Finished loading screen on the client");
+				TASmod.LOGGER.debug(LoggerMarkers.Event, "Finished loading screen on the client");
 				TASmodClient.tickratechanger.joinServer();
 				if (!waszero) {
 					if(TASmod.getServerInstance()!=null) {	//Check if a server is running and if it's an integrated server
@@ -58,7 +58,7 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 	@Override
 	public void onDoneLoadingWorld() {
 		if(TASmod.getServerInstance()!=null) { //Check if a server is running and if it's an integrated server
-			TASmod.logger.debug(LoggerMarkers.Event, "Finished loading the world on the client");
+			TASmod.LOGGER.debug(LoggerMarkers.Event, "Finished loading the world on the client");
 			loadingScreenDelay = 1;
 		}
 	}

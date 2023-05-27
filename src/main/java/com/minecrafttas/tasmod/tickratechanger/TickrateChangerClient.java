@@ -176,7 +176,7 @@ public class TickrateChangerClient implements EventClientGameLoop{
 	}
 	
 	private static void log(String msg) {
-		TASmod.logger.debug(LoggerMarkers.Tickrate, msg);
+		TASmod.LOGGER.debug(LoggerMarkers.Tickrate, msg);
 	}
 
 	@Override

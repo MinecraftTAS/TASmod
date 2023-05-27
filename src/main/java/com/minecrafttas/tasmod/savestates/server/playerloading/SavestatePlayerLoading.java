@@ -101,7 +101,7 @@ public class SavestatePlayerLoading {
 
                 if (!playerIn.isRiding())
                 {
-                    TASmod.logger.warn("Couldn't reattach entity to player");
+                    TASmod.LOGGER.warn("Couldn't reattach entity to player");
                     worldserver.removeEntityDangerously(entity1);
 
                     for (Entity entity2 : entity1.getRecursivePassengers())

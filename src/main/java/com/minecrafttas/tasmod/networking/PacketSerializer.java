@@ -35,7 +35,7 @@ public class PacketSerializer {
 		}
 		
 		if(packet == null) {
-			TASmod.logger.warn("Unregistered packet received! Packet Id: " + packetId);
+			TASmod.LOGGER.warn("Unregistered packet received! Packet Id: " + packetId);
 			return null;
 		}
 		
@@ -56,7 +56,7 @@ public class PacketSerializer {
 		int packetID = REGISTRY.indexOf(packet.getClass());
 		
 		if(packetID == -1) {
-			TASmod.logger.warn("Unregistered packet was trying to be serialized! Packet Class: " + packet.getClass().getSimpleName());
+			TASmod.LOGGER.warn("Unregistered packet was trying to be serialized! Packet Class: " + packet.getClass().getSimpleName());
 			return null;
 		}
 		
@@ -67,16 +67,16 @@ public class PacketSerializer {
 	}
 	
 	public static void registerPacket(Class<? extends Packet> packet) {
-		TASmod.logger.trace("Registering packet {}", packet.getClass().getSimpleName());
+		TASmod.LOGGER.trace("Registering packet {}", packet.getClass().getSimpleName());
 		if(REGISTRY.contains(packet)) {
-			TASmod.logger.warn("Trying to register packet which already exists: {}", packet.getClass().getSimpleName());
+			TASmod.LOGGER.warn("Trying to register packet which already exists: {}", packet.getClass().getSimpleName());
 		}
 		REGISTRY.add(packet);
 	}
 
 	public static void unregisterPacket(Class<? extends Packet> packet) {
 		if(REGISTRY.contains(packet)) {
-			TASmod.logger.warn("Trying to unregister packet which doesn't exist in the registry: {}", packet.getClass().getSimpleName());
+			TASmod.LOGGER.warn("Trying to unregister packet which doesn't exist in the registry: {}", packet.getClass().getSimpleName());
 		}
 		REGISTRY.remove(packet);
 	}

@@ -35,7 +35,7 @@ public class SavestatesChunkControl {
 	 */
 	@Environment(EnvType.CLIENT)
 	public static void unloadAllClientChunks() {
-		TASmod.logger.trace(LoggerMarkers.Savestate, "Unloading All Client Chunks");
+		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Unloading All Client Chunks");
 		Minecraft mc = Minecraft.getMinecraft();
 		
 		ChunkProviderClient chunkProvider=mc.world.getChunkProvider();
@@ -50,7 +50,7 @@ public class SavestatesChunkControl {
 	 * @see MixinChunkProviderServer#unloadAllChunks()
 	 */
 	public static void unloadAllServerChunks(MinecraftServer server) {
-		TASmod.logger.trace(LoggerMarkers.Savestate, "Unloading all server chunks");
+		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Unloading all server chunks");
 		//Vanilla
 		WorldServer[] worlds=server.worlds;
 		
@@ -74,7 +74,7 @@ public class SavestatesChunkControl {
 		WorldServer[] worlds=server.worlds;
 		for (WorldServer world : worlds) {
 			for (EntityPlayerMP player : players) {
-				TASmod.logger.trace(LoggerMarkers.Savestate, "Disconnect player {} from the chunk map", player.getName());
+				TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Disconnect player {} from the chunk map", player.getName());
 				world.getPlayerChunkMap().removePlayer(player);
 			}
 		}
@@ -91,7 +91,7 @@ public class SavestatesChunkControl {
 		//Vanilla
 		WorldServer[] worlds=server.worlds;
 		for (EntityPlayerMP player : players) {
-			TASmod.logger.trace(LoggerMarkers.Savestate, "Add player {} to the chunk map", player.getName());
+			TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to the chunk map", player.getName());
 			switch (player.dimension) {
 			case -1:
 				worlds[1].getPlayerChunkMap().addPlayer(player);
@@ -114,7 +114,7 @@ public class SavestatesChunkControl {
 	 * Side: Server
 	 */
 	public static void flushSaveHandler(MinecraftServer server) {
-		TASmod.logger.trace(LoggerMarkers.Savestate, "Flush the save handler");
+		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Flush the save handler");
 		//Vanilla
 		WorldServer[] worlds=server.worlds;
 		for(WorldServer world : worlds) {
@@ -137,7 +137,7 @@ public class SavestatesChunkControl {
 	 * Side: Server
 	 */
 	public static void updateSessionLock(MinecraftServer server) {
-		TASmod.logger.trace(LoggerMarkers.Savestate, "Update the session lock");
+		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Update the session lock");
 		WorldServer[] worlds=server.worlds;
 		for(WorldServer world : worlds) {
 			((SaveHandler) world.getSaveHandler()).setSessionLock();
@@ -157,7 +157,7 @@ public class SavestatesChunkControl {
 	 */
 	@Environment(EnvType.CLIENT)
 	public static void keepPlayerInLoadedEntityList(net.minecraft.entity.player.EntityPlayer player) {
-		TASmod.logger.trace(LoggerMarkers.Savestate, "Keep player {} in loaded entity list", player.getName());
+		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Keep player {} in loaded entity list", player.getName());
 		Minecraft.getMinecraft().world.unloadedEntityList.remove(player);
 	}
 	
@@ -177,7 +177,7 @@ public class SavestatesChunkControl {
 	 */
 	@Environment(EnvType.CLIENT)
 	public static void addPlayerToClientChunk(EntityPlayer player) {
-		TASmod.logger.trace(LoggerMarkers.Savestate, "Add player {} to loaded entity list", player.getName());
+		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to loaded entity list", player.getName());
 		int i = MathHelper.floor(player.posX / 16.0D);
 		int j = MathHelper.floor(player.posZ / 16.0D);
 		Chunk chunk = Minecraft.getMinecraft().world.getChunkFromChunkCoords(i, j);
@@ -196,7 +196,7 @@ public class SavestatesChunkControl {
 	 * Side: Server
 	 */
 	public static void addPlayerToServerChunk(EntityPlayerMP player) {
-		TASmod.logger.trace(LoggerMarkers.Savestate, "Add player {} to server chunk", player.getName());
+		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to server chunk", player.getName());
 		int i = MathHelper.floor(player.posX / 16.0D);
 		int j = MathHelper.floor(player.posZ / 16.0D);
 		WorldServer world = player.getServerWorld();
@@ -213,7 +213,7 @@ public class SavestatesChunkControl {
 	 * Updates ticklist entries to the current world time, allowing them to not be stuck in a pressed state #136
 	 */
 	public static void updateWorldServerTickListEntries() {
-		TASmod.logger.trace(LoggerMarkers.Savestate, "Update server tick list entries");
+		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Update server tick list entries");
 		MinecraftServer server=TASmod.getServerInstance();
 		for (WorldServer world : server.worlds) {
             for (NextTickListEntry nextticklistentry : world.pendingTickListEntriesHashSet) {

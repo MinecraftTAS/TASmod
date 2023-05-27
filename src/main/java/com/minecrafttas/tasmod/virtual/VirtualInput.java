@@ -132,7 +132,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 				loadInputs(fileToLoad);
 				OpenGuiEvents.stateWhenOpened = TASstate.PLAYBACK;
 			} catch (IOException e) {
-				TASmod.logger.error("Cannot load inputs from the start of the TAS: {}", e.getMessage());
+				TASmod.LOGGER.error("Cannot load inputs from the start of the TAS: {}", e.getMessage());
 			}
 		}
 	}
@@ -532,7 +532,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 																						// "currentKeyboard"
 			 Minecraft.getMinecraft().runTickMouse();
 		} else {
-			TASmod.logger.warn("Can't preload inputs, specified inputs are null!");
+			TASmod.LOGGER.warn("Can't preload inputs, specified inputs are null!");
 		}
 	}
 	// ================================Load/Save Inputs=====================================

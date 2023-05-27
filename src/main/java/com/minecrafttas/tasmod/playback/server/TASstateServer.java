@@ -69,7 +69,7 @@ public class TASstateServer {
 				return;
 			}
 			this.state = stateIn;
-			TASmod.logger.info(String.format("Set the server state to %s", stateIn.toString()));
+			TASmod.LOGGER.info(String.format("Set the server state to %s", stateIn.toString()));
 		}
 	}
 	

@@ -631,7 +631,7 @@ public class SavestateHandler implements EventCompleteLoadstate{
 
 	@Override
 	public void onLoadstateComplete() {
-		TASmod.logger.trace(LoggerMarkers.Event, "Running loadstate complete event");
+		TASmod.LOGGER.trace(LoggerMarkers.Event, "Running loadstate complete event");
 		PlayerList playerList = TASmod.getServerInstance().getPlayerList();
 		for (EntityPlayerMP player : playerList.getPlayers()) {
 			NBTTagCompound nbttagcompound = playerList.readPlayerDataFromFile(player);
