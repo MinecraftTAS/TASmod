@@ -162,17 +162,17 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		Minecraft mc = Minecraft.getMinecraft();
 		
 		if(mc.isIntegratedServerRunning())
-			TASmodClient.packetClient = new TASmodNetworkClient(TASmod.logger);
+			TASmodClient.packetClient = new TASmodNetworkClient(TASmod.LOGGER);
 		else {
 			String full = mc.getCurrentServerData().serverIP;
 			String[] fullsplit = full.split(":");
 			if(fullsplit.length == 1) {
-				TASmodClient.packetClient = new TASmodNetworkClient(TASmod.logger, full, 3111);
+				TASmodClient.packetClient = new TASmodNetworkClient(TASmod.LOGGER, full, 3111);
 			} else if(fullsplit.length == 2){
 				String ip = fullsplit[0];
-				TASmodClient.packetClient = new TASmodNetworkClient(TASmod.logger, ip, 3111);
+				TASmodClient.packetClient = new TASmodNetworkClient(TASmod.LOGGER, ip, 3111);
 			} else {
-				TASmod.logger.error("Something went wrong while connecting. The ip seems to be wrong");
+				TASmod.LOGGER.error("Something went wrong while connecting. The ip seems to be wrong");
 			}
 		}
 		

@@ -34,7 +34,7 @@ public class InputSavestatesPacket implements Packet{
 				try {
 					InputSavestatesHandler.savestate(name);
 				} catch (SavestateException e) {
-					TASmod.logger.error(e.getMessage());
+					TASmod.LOGGER.error(e.getMessage());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

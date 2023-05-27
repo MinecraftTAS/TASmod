@@ -42,6 +42,10 @@ configurations {
 
 // dependencies
 dependencies {
+	// annotation processor
+	compileOnly 'org.projectlombok:lombok:1.18.28'
+	annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
     // tasmod dependencies
     embed group: 'com.dselent', name: 'bigarraylist', version: '1.0'
     compileOnly group: 'com.minecrafttas', name: 'killtherng', version: '2.0'

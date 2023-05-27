@@ -17,7 +17,7 @@ public class ClientMotionServer {
 	}
 
 	public static void requestMotionFromClient() {
-		TASmod.logger.trace(LoggerMarkers.Savestate, "Request motion from client");
+		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Request motion from client");
 		motion.clear();
 		TASmod.packetServer.sendToAll(new RequestMotionPacket());
 
@@ -30,11 +30,11 @@ public class ClientMotionServer {
 				e.printStackTrace();
 			}
 			if(i % 30 == 1) {
-				TASmod.logger.debug(LoggerMarkers.Savestate, "Resending motion packet");
+				TASmod.LOGGER.debug(LoggerMarkers.Savestate, "Resending motion packet");
 				TASmod.packetServer.sendToAll(new RequestMotionPacket());
 			}
 			if (i == 1000) {
-				TASmod.logger.warn(LoggerMarkers.Savestate, "Client motion timed out!");
+				TASmod.LOGGER.warn(LoggerMarkers.Savestate, "Client motion timed out!");
 				break;
 			}
 

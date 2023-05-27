@@ -37,9 +37,9 @@ public class InputSavestatesHandler {
 	 * @throws IOException
 	 */
 	public static void savestate(String nameOfSavestate) throws SavestateException, IOException {
-		TASmod.logger.debug(LoggerMarkers.Savestate, "Saving client savestate {}", nameOfSavestate);
+		TASmod.LOGGER.debug(LoggerMarkers.Savestate, "Saving client savestate {}", nameOfSavestate);
 		if (nameOfSavestate.isEmpty()) {
-			TASmod.logger.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
+			TASmod.LOGGER.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
 
@@ -64,9 +64,9 @@ public class InputSavestatesHandler {
 	 * @throws IOException
 	 */
 	public static void loadstate(String nameOfSavestate) throws IOException {
-		TASmod.logger.debug(LoggerMarkers.Savestate, "Loading client savestate {}", nameOfSavestate);
+		TASmod.LOGGER.debug(LoggerMarkers.Savestate, "Loading client savestate {}", nameOfSavestate);
 		if (nameOfSavestate.isEmpty()) {
-			TASmod.logger.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
+			TASmod.LOGGER.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
 
@@ -82,7 +82,7 @@ public class InputSavestatesHandler {
 				TASmodClient.virtual.getContainer().setTASState(TASstate.NONE, false);
 				Minecraft.getMinecraft().player.sendMessage(new TextComponentString(ChatFormatting.YELLOW
 						+ "Inputs could not be loaded for this savestate, since the file doesn't exist. Stopping!"));
-				TASmod.logger.warn(LoggerMarkers.Savestate, "Inputs could not be loaded for this savestate, since the file doesn't exist.");
+				TASmod.LOGGER.warn(LoggerMarkers.Savestate, "Inputs could not be loaded for this savestate, since the file doesn't exist.");
 			}
 		}
 	}
