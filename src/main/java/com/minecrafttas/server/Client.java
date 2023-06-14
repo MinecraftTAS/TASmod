@@ -7,14 +7,22 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
+
+import lombok.var;
 
 public class Client {
-
+	
 	private AsynchronousSocketChannel socket;
 	private ByteBuffer writeBuffer;
 	private ByteBuffer readBuffer;
 	private Future<Integer> future;
+	private Map<Integer, Consumer<ByteBuffer>> handlers = new HashMap<>();
+	private UUID id;
 	
 	/**
 	 * Create and connect socket
@@ -27,6 +35,7 @@ public class Client {
 		this.socket = AsynchronousSocketChannel.open();
 		this.socket.connect(new InetSocketAddress(host, port)).get();
 		this.createHandlers();
+		this.registerClientsidePacketHandlers();
 		LOGGER.info("Connected to tasmod server");
 	}
 	
@@ -34,9 +43,10 @@ public class Client {
 	 * Fork existing socket
 	 * @param socket Socket
 	 */
-	public Client(AsynchronousSocketChannel socket) {		
+	public Client(AsynchronousSocketChannel socket) {
 		this.socket = socket;
 		this.createHandlers();
+		this.registerServersidePacketHandlers();
 	}
 	
 	/**
@@ -113,8 +123,41 @@ public class Client {
 		this.socket.close();
 	}
 	
-	private void handle(ByteBuffer buf) {
-		System.out.println("hello buf, " + buf.getDouble());
+	/**
+	 * Register packet handlers for packets received on the client
+	 */
+	private void registerClientsidePacketHandlers() {
+		
 	}
 	
+	/**
+	 * Register packet handlers for packets received on the server
+	 */
+	private void registerServersidePacketHandlers() {
+		this.handlers.put(1, buf -> {
+			this.id = new UUID(buf.getLong(), buf.getLong());
+			LOGGER.info("Client authenticated: " + this.id);
+		});
+	}
+	
+	/**
+	 * Sends then authentication packet to the server
+	 * @param id Unique ID
+	 * @throws Exception Unable to send packet
+	 */
+	public void authenticate(UUID id) throws Exception {
+		ByteBuffer buf = ByteBuffer.allocate(4+8+8);
+		buf.putInt(1);
+		buf.putLong(id.getMostSignificantBits());
+		buf.putLong(id.getLeastSignificantBits());
+		this.write(buf);
+	}
+	
+	private void handle(ByteBuffer buf) {
+		var id = buf.getInt();
+		this.handlers.getOrDefault(id, _buf -> {
+			LOGGER.error("Received invalid packet: {}", id);
+		}).accept(buf);
+	}
+
 }
