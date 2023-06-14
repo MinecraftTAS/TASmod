@@ -11,11 +11,14 @@ import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
 import lombok.var;
 
 public class Server {
 	
 	private AsynchronousServerSocketChannel socket;
+	
+	@Getter
 	private List<Client> clients;
 	
 	/**

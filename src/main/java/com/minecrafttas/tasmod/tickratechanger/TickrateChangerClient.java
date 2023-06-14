@@ -1,9 +1,11 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
+import java.nio.ByteBuffer;
+
 import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.ticksync.TickSyncClient;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.client.Minecraft;
@@ -91,7 +93,13 @@ public class TickrateChangerClient implements EventClientGameLoop{
 		if (tickrate < 0) {
 			return;
 		}
-		TASmodClient.packetClient.sendToServer(new ChangeTickratePacket(tickrate));
+		
+		try {
+			// packet 4: request tickrate change
+			TASmodClient.client.write(ByteBuffer.allocate(8).putInt(4).putFloat(tickrate));
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+		}
 	}
 
 	/**
@@ -99,7 +107,12 @@ public class TickrateChangerClient implements EventClientGameLoop{
 	 */
 	public void togglePause() {
 		if (Minecraft.getMinecraft().world != null) {
-			TASmodClient.packetClient.sendToServer(new PauseTickratePacket());
+			try {
+				// packet 6: toggle tickrate zero
+				TASmodClient.client.write(ByteBuffer.allocateDirect(6).putInt(6).putShort(State.TOGGLE.toShort()));
+			} catch (Exception e) {
+				TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+			}
 		} else {
 			togglePauseClient();
 		}
@@ -158,7 +171,12 @@ public class TickrateChangerClient implements EventClientGameLoop{
 	 * Sends a {@link AdvanceTickratePacket} to the server to advance the server
 	 */
 	public void advanceServerTick() {
-		TASmodClient.packetClient.sendToServer(new AdvanceTickratePacket());
+		try {
+			// packet 7: request tick advance
+			TASmodClient.client.write(ByteBuffer.allocate(4).putInt(7));
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+		}
 	}
 	
 	/**
@@ -181,9 +199,7 @@ public class TickrateChangerClient implements EventClientGameLoop{
 
 	@Override
 	public void onRunClientGameLoop(Minecraft mc) {
-		if (TASmodClient.packetClient != null && TASmodClient.packetClient.isClosed()) { // If the server died, but the client has not left the world
-			TickSyncClient.shouldTick.set(true);
-		}
+		
 	}
 
 }

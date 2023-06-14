@@ -1,10 +1,14 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
+import java.nio.ByteBuffer;
+
 import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.common.events.EventServer.EventPlayerJoinedServerSide;
 import com.minecrafttas.common.events.EventServer.EventServerStop;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.tickratechanger.PauseTickratePacket.State;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -82,7 +86,13 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 	public void changeClientTickrate(float tickrate, boolean log) {
 		if(log)
 			log("Changing the tickrate "+ tickrate + " to all clients");
-		TASmod.packetServer.sendToAll(new ChangeTickratePacket(tickrate));
+		
+		try {
+			// packet 5: send new tickrate to clients
+			TASmod.server.writeAll(ByteBuffer.allocate(8).putInt(5).putFloat(tickrate));
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+		}
 	}
 
 	/**
@@ -204,4 +214,41 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 			pauseGame(false);
 		}
 	}
+	
+	public static enum State {
+		/**
+		 * Set's the game to tickrate 0
+		 */
+		PAUSE((short) 1),
+		/**
+		 * Set's the game to "tickrate saved"
+		 */
+		UNPAUSE((short) 2),
+		/**
+		 * Toggles between {@link #PAUSE} and {@link #UNPAUSE}
+		 */
+		TOGGLE((short) 0);
+
+		private short id;
+
+		State(short i) {
+			id = i;
+		}
+
+		public short toShort() {
+			return id;
+		}
+
+		public static State fromShort(short i) {
+			switch (i) {
+			case 1:
+				return PAUSE;
+			case 2:
+				return UNPAUSE;
+			default:
+				return TOGGLE;
+			}
+		}
+	}
+	
 }

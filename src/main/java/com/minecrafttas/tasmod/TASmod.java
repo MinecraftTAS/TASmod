@@ -32,9 +32,6 @@ import com.minecrafttas.tasmod.commands.savetas.SaveTASPacket;
 import com.minecrafttas.tasmod.ktrng.KTRNGSeedPacket;
 import com.minecrafttas.tasmod.ktrng.KTRNGStartSeedPacket;
 import com.minecrafttas.tasmod.ktrng.KillTheRNGHandler;
-import com.minecrafttas.tasmod.networking.IdentificationPacket;
-import com.minecrafttas.tasmod.networking.PacketSerializer;
-import com.minecrafttas.tasmod.networking.TASmodNetworkServer;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.playback.server.InitialSyncStatePacket;
 import com.minecrafttas.tasmod.playback.server.SyncStatePacket;
@@ -78,8 +75,6 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	
 	public static KillTheRNGHandler ktrngHandler;
 	
-	public static TASmodNetworkServer packetServer;
-	
 	public static TickrateChangerServer tickratechanger;
 	
 	public static final TickScheduler tickSchedulerServer = new TickScheduler();
@@ -115,12 +110,6 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		
 		savestateHandler=new SavestateHandler(server, LOGGER);
 		
-		try {
-			packetServer = new TASmodNetworkServer(LOGGER);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 		if(!server.isDedicatedServer()) {
 			TASmod.tickratechanger.ticksPerSecond=0F;
 			TASmod.tickratechanger.tickrateSaved=20F;
@@ -130,7 +119,6 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	@Override
 	public void onServerStop(MinecraftServer mcserver) {
 		serverInstance=null;
-		packetServer.close();
 		try {
 			if (server != null) server.close();
 		} catch (IOException e) {
@@ -155,17 +143,11 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		tickratechanger = new TickrateChangerServer(LOGGER);
 		EventListener.register(tickratechanger);
 		
-		
-		PacketSerializer.registerPacket(IdentificationPacket.class);
-		// Ticksync
-		PacketSerializer.registerPacket(TickSyncPacket.class);
 
-		
 		//Tickratechanger
 		PacketSerializer.registerPacket(ChangeTickratePacket.class);
 		PacketSerializer.registerPacket(PauseTickratePacket.class);
 		PacketSerializer.registerPacket(AdvanceTickratePacket.class);
-		
 		
 		// Savestates
 		PacketSerializer.registerPacket(SavestatePacket.class);

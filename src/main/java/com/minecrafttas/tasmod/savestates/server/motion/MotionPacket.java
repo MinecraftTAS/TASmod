@@ -1,7 +1,5 @@
 package com.minecrafttas.tasmod.savestates.server.motion;
 
-import com.minecrafttas.tasmod.networking.Packet;
-import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer.Saver;
 
 import net.minecraft.entity.player.EntityPlayer;

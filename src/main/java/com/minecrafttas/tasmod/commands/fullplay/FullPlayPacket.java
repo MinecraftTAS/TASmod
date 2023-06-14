@@ -2,8 +2,6 @@ package com.minecrafttas.tasmod.commands.fullplay;
 
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
-import com.minecrafttas.tasmod.networking.Packet;
-import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
 import net.minecraft.client.Minecraft;

@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.networking.Packet;
-import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
 
 import net.minecraft.entity.player.EntityPlayer;
