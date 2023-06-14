@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.lwjgl.input.Keyboard;
 
@@ -15,6 +16,7 @@ import com.minecrafttas.common.events.EventClient.EventClientInit;
 import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
 import com.minecrafttas.common.events.EventClient.EventPlayerLeaveClientSide;
 import com.minecrafttas.common.events.EventListener;
+import com.minecrafttas.server.Client;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.gui.InfoHud;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
@@ -71,6 +73,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	
 	public static InterpolationHandler interpolation = new InterpolationHandler();
 	
+	public static Client client;
+	
 	public static void createTASDir() {
 		File tasDir=new File(tasdirectory);
 		if(!tasDir.exists()) {
@@ -125,6 +129,17 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		EventListener.register(keybindManager);
 		
 		EventListener.register(interpolation);
+		
+		try {
+			// connect to server and authenticate
+			client = new Client("127.0.0.1", 5555);
+			UUID uuid = mc.getSession().getProfile().getId();
+			if (uuid == null) // dev environment
+				uuid = UUID.randomUUID();
+			client.authenticate(uuid);
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to connect TASmod client: {}", e);
+		}
 	}
 
 	@Override
