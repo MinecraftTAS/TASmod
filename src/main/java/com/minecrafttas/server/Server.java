@@ -10,6 +10,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.Getter;
 import lombok.var;
@@ -72,6 +73,18 @@ public class Server {
 		}
 		
 		this.socket.close();
+	}
+
+	/**
+	 * Get client from UUID
+	 * @param uniqueID UUID
+	 */
+	public Client getClient(UUID uniqueID) {
+		for (var client : this.clients)
+			if (client.getId().equals(uniqueID))
+				return client;
+		
+		return null;
 	}
 	
 }

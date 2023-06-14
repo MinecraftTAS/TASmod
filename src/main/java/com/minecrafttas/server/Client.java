@@ -15,11 +15,18 @@ import java.util.function.Consumer;
 
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.savestates.client.InputSavestatesHandler;
+import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
+import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
+import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
+import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer.Saver;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 
+import lombok.Getter;
 import lombok.var;
+import net.minecraft.client.Minecraft;
 
 public class Client {
 	
@@ -28,6 +35,8 @@ public class Client {
 	private ByteBuffer readBuffer;
 	private Future<Integer> future;
 	private Map<Integer, Consumer<ByteBuffer>> handlers = new HashMap<>();
+	
+	@Getter
 	private UUID id;
 	
 	/**
@@ -138,6 +147,73 @@ public class Client {
 		
 		// packet 5: change client tickrate
 		this.handlers.put(5, buf -> TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat()));
+	
+		// packet 8: advance tick on clients
+		this.handlers.put(8, buf -> TASmodClient.tickratechanger.advanceClientTick());
+	
+		// packet 9: change tickrate on client
+		this.handlers.put(9, buf -> TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat()));
+	
+		// packet 10: savestate inputs client
+		this.handlers.put(10, buf -> {
+			try {
+				var nameBytes = new byte[buf.getInt()];
+				buf.get(nameBytes);
+				var name = new String(nameBytes);
+				InputSavestatesHandler.savestate(name);
+			} catch (Exception e) {
+				TASmod.LOGGER.error("Exception occured during input savestate: {}", e);
+			}
+		});
+		
+		// packet 11: close GuiSavestateScreen on client
+		this.handlers.put(11, buf -> 
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				var mc = Minecraft.getMinecraft();
+				if (!(mc.currentScreen instanceof GuiSavestateSavingScreen))
+					mc.displayGuiScreen(new GuiSavestateSavingScreen());
+				else
+					mc.displayGuiScreen(null);
+			})
+		);
+		
+		// packet 12: loadstate inputs client
+		this.handlers.put(12, buf -> {
+			try {
+				var nameBytes = new byte[buf.getInt()];
+				buf.get(nameBytes);
+				var name = new String(nameBytes);
+				InputSavestatesHandler.loadstate(name);
+			} catch (Exception e) {
+				TASmod.LOGGER.error("Exception occured during input loadstate: {}", e);
+			}
+		});
+		
+		// packet 13: unload chunks on client
+		this.handlers.put(13, buf ->
+			Minecraft.getMinecraft().addScheduledTask(() -> 
+				SavestatesChunkControl.unloadAllClientChunks()));
+		
+		// packet 14: request client motion
+		this.handlers.put(14, buf -> {
+			var player = Minecraft.getMinecraft().player;
+			if (player != null) {
+				if (!(Minecraft.getMinecraft().currentScreen instanceof GuiSavestateSavingScreen))
+					Minecraft.getMinecraft().displayGuiScreen(new GuiSavestateSavingScreen());
+				
+				try {
+					// packet 15: send client motion to server
+					TASmodClient.client.write(ByteBuffer.allocate(4 + 8+8+8 + 4+4+4 + 1 + 4).putInt(15)
+						.putDouble(player.motionX).putDouble(player.motionY).putDouble(player.motionZ)
+						.putFloat(player.moveForward).putFloat(player.moveVertical).putFloat(player.moveStrafing)
+						.put((byte) (player.isSprinting() ? 1 : 0))
+						.putFloat(player.jumpMovementFactor)
+					);
+				} catch (Exception e) {
+					TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+				}
+			}
+		});
 	}
 	
 	/**
@@ -172,6 +248,9 @@ public class Client {
 			if (TASmod.tickratechanger.ticksPerSecond == 0)
 				TASmod.tickratechanger.advanceTick();
 		});
+		
+		// packet 15: send client motion to server
+		this.handlers.put(15, buf -> ClientMotionServer.getMotion().put(TASmod.getServerInstance().getPlayerList().getPlayerByUUID(this.id), new Saver(buf.getDouble(), buf.getDouble(), buf.getDouble(), buf.getFloat(), buf.getFloat(), buf.getFloat(), buf.get() == 1 ? true : false, buf.getFloat())));
 	}
 	
 	/**

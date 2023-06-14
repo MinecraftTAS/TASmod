@@ -85,9 +85,9 @@ public abstract class MixinMinecraft {
 	@Inject(method = "shutdownMinecraftApplet", at = @At("HEAD"))
 	public void inject_shutdownMinecraftApplet(CallbackInfo ci) {
 		try {
-			if (TASmodClient.packetClient != null) {
+			if (TASmodClient.client != null) {
 				TASmodClient.tickratechanger.changeTickrate(20);
-				TASmodClient.packetClient.killClient();
+				TASmodClient.client.close();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
