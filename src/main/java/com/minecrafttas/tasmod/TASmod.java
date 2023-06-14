@@ -10,6 +10,7 @@ import com.minecrafttas.common.CommandRegistry;
 import com.minecrafttas.common.events.EventListener;
 import com.minecrafttas.common.events.EventServer.EventServerInit;
 import com.minecrafttas.common.events.EventServer.EventServerStop;
+import com.minecrafttas.server.Server;
 import com.minecrafttas.tasmod.commands.clearinputs.ClearInputsPacket;
 import com.minecrafttas.tasmod.commands.clearinputs.CommandClearInputs;
 import com.minecrafttas.tasmod.commands.folder.CommandFolder;
@@ -83,6 +84,8 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	
 	public static final TickScheduler tickSchedulerServer = new TickScheduler();
 
+	public static Server server;
+	
 	@Override
 	public void onServerInit(MinecraftServer server) {
 		serverInstance = server;
@@ -125,9 +128,15 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	}
 	
 	@Override
-	public void onServerStop(MinecraftServer server) {
+	public void onServerStop(MinecraftServer mcserver) {
 		serverInstance=null;
 		packetServer.close();
+		try {
+			if (server != null) server.close();
+		} catch (IOException e) {
+			LOGGER.error("Unable to close TASmod server: {}", e);
+			e.printStackTrace();
+		}
 	}
 	
 	public static MinecraftServer getServerInstance() {
@@ -192,6 +201,12 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		PacketSerializer.registerPacket(FolderPacket.class);
 		
 		PacketSerializer.registerPacket(PlayUntilPacket.class);
+		
+		try {
+			server = new Server(5555);
+		} catch (Exception e) {
+			LOGGER.error("Unable to launch TASmod server: {}", e);
+		}
 		
 	}
 }
