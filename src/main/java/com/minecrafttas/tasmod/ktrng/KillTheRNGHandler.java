@@ -99,7 +99,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	@Environment(EnvType.CLIENT)
 	public void sendGlobalSeedToServer(long seedIn) {
 		if(isLoaded()) {
-			if(TASmodClient.packetClient!=null)
+			if(TASmodClient.client != null)
 				TASmodClient.packetClient.sendToServer(new KTRNGSeedPacket(seedIn));
 			else
 				setGlobalSeedClient(seedIn);
@@ -129,7 +129,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	
 	@Environment(EnvType.CLIENT)
 	public void setInitialSeed(long initialSeed) {
-		if(TASmodClient.packetClient != null) {
+		if(TASmodClient.client != null) {
 			TASmod.LOGGER.info("Sending initial client seed: {}", initialSeed);
 			TASmodClient.packetClient.sendToServer(new KTRNGStartSeedPacket(initialSeed));	// TODO Every new player in multiplayer will currently send the initial seed, which is BAD
 		} else {

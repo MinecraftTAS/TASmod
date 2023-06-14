@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.savestates.server.motion;
 
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -19,8 +20,14 @@ public class ClientMotionServer {
 	public static void requestMotionFromClient() {
 		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Request motion from client");
 		motion.clear();
-		TASmod.packetServer.sendToAll(new RequestMotionPacket());
+		try {
+			// packet 14: request client motion
+			TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(14));
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+		}
 
+		// TODO: is this still necessary?
 		int i = 1;
 		while (motion.size() != TASmod.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
 			i++;
@@ -31,7 +38,12 @@ public class ClientMotionServer {
 			}
 			if(i % 30 == 1) {
 				TASmod.LOGGER.debug(LoggerMarkers.Savestate, "Resending motion packet");
-				TASmod.packetServer.sendToAll(new RequestMotionPacket());
+				try {
+					// packet 14: request client motion
+					TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(14));
+				} catch (Exception e) {
+					TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+				}
 			}
 			if (i == 1000) {
 				TASmod.LOGGER.warn(LoggerMarkers.Savestate, "Client motion timed out!");

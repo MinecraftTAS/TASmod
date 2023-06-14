@@ -7,8 +7,6 @@ import org.apache.logging.log4j.Logger;
 import com.minecrafttas.common.events.EventServer.EventPlayerJoinedServerSide;
 import com.minecrafttas.common.events.EventServer.EventServerStop;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.tickratechanger.PauseTickratePacket.State;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -175,8 +173,13 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
      * Sends a {@link AdvanceTickratePacket} to all clients
      */
     private static void advanceClientTick() {
-    	TASmod.packetServer.sendToAll(new AdvanceTickratePacket());
-	}
+    	try {
+	    	// packet 8: advance tick on clients
+	    	TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(8));
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+		}
+    }
 
     /**
      * Advances the server by 1 tick
@@ -196,7 +199,12 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 	public void onPlayerJoinedServerSide(EntityPlayerMP player) {
 		if(TASmod.getServerInstance().isDedicatedServer()) {
 			log("Sending the current tickrate ("+ticksPerSecond+") to " +player.getName());
-			TASmod.packetServer.sendTo(new ChangeTickratePacket(ticksPerSecond), player);
+			try {
+				// packet 9: change tickrate on client
+				TASmod.server.getClient(player.getUniqueID()).write(ByteBuffer.allocate(8).putInt(9).putFloat(ticksPerSecond));
+			} catch (Exception e) {
+				TASmod.LOGGER.error("Unable to send packet to {}: {}", player.getUniqueID(), e);
+			}
 		}
 	}
 	

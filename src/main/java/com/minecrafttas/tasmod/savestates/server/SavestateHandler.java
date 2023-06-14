@@ -3,6 +3,7 @@ package com.minecrafttas.tasmod.savestates.server;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +20,6 @@ import com.minecrafttas.tasmod.events.EventServer.EventLoadstate;
 import com.minecrafttas.tasmod.events.EventServer.EventSavestate;
 import com.minecrafttas.tasmod.mixin.savestates.AccessorAnvilChunkLoader;
 import com.minecrafttas.tasmod.mixin.savestates.AccessorChunkLoader;
-import com.minecrafttas.tasmod.savestates.client.InputSavestatesPacket;
 import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateDeleteException;
@@ -31,6 +31,7 @@ import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
+import lombok.var;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -182,7 +183,13 @@ public class SavestateHandler implements EventCompleteLoadstate{
 			 * Send the name of the world to all players. This will make a savestate of the
 			 * recording on the client with that name
 			 */
-			TASmod.packetServer.sendToAll(new InputSavestatesPacket(true, getSavestateName(indexToSave)));
+			try {
+				// packet 10: savestate inputs client
+				var name = this.getSavestateName(indexToSave).getBytes();
+				TASmod.server.writeAll(ByteBuffer.allocate(8 + name.length).putInt(10).putInt(name.length).put(name));
+			} catch (Exception e) {
+				TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+			}
 		}
 
 		// Wait for the chunkloader to save the game
@@ -206,8 +213,12 @@ public class SavestateHandler implements EventCompleteLoadstate{
 		// Send a notification that the savestate has been loaded
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + indexToSave + " saved"));
 
-		// Close the GuiSavestateScreen on the client
-		TASmod.packetServer.sendToAll(new SavestatePacket());
+		try {
+			// packet 11: close GuiSavestateScreen
+			TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(11));
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+		}
 
 		if (!tickrate0) {
 			TASmod.tickratechanger.pauseGame(false);
@@ -308,8 +319,13 @@ public class SavestateHandler implements EventCompleteLoadstate{
 		 * InputSavestate)
 		 */
 		if (savestateIndex != 0) {
-			// Load savestate on the client
-			TASmod.packetServer.sendToAll(new InputSavestatesPacket(false, getSavestateName(indexToLoad)));
+			try {
+				// packet 12: loadstate inputs client
+				var name = this.getSavestateName(indexToLoad).getBytes();
+				TASmod.server.writeAll(ByteBuffer.allocate(8 + name.length).putInt(12).putInt(name.length).put(name));
+			} catch (Exception e) {
+				TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+			}
 		}
 
 		// Disabeling level saving for all worlds in case the auto save kicks in during
@@ -318,8 +334,13 @@ public class SavestateHandler implements EventCompleteLoadstate{
 			world.disableLevelSaving = true;
 		}
 
-		// Unload chunks on the client
-		TASmod.packetServer.sendToAll(new LoadstatePacket());
+		
+		try {
+			// packet 13: unload chunks on client
+			TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(13));
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+		}
 
 		// Unload chunks on the server
 		SavestatesChunkControl.disconnectPlayersFromChunkMap(server);

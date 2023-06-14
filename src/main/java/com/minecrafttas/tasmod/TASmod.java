@@ -45,12 +45,8 @@ import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.savestates.server.motion.MotionPacket;
 import com.minecrafttas.tasmod.savestates.server.motion.RequestMotionPacket;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket;
-import com.minecrafttas.tasmod.tickratechanger.AdvanceTickratePacket;
-import com.minecrafttas.tasmod.tickratechanger.ChangeTickratePacket;
 import com.minecrafttas.tasmod.tickratechanger.CommandTickrate;
-import com.minecrafttas.tasmod.tickratechanger.PauseTickratePacket;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
-import com.minecrafttas.tasmod.ticksync.TickSyncPacket;
 import com.minecrafttas.tasmod.util.TickScheduler;
 
 import net.fabricmc.api.ModInitializer;
@@ -143,22 +139,13 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		tickratechanger = new TickrateChangerServer(LOGGER);
 		EventListener.register(tickratechanger);
 		
-
-		//Tickratechanger
-		PacketSerializer.registerPacket(ChangeTickratePacket.class);
-		PacketSerializer.registerPacket(PauseTickratePacket.class);
-		PacketSerializer.registerPacket(AdvanceTickratePacket.class);
-		
 		// Savestates
 		PacketSerializer.registerPacket(SavestatePacket.class);
 		PacketSerializer.registerPacket(LoadstatePacket.class);
 		
 		PacketSerializer.registerPacket(InputSavestatesPacket.class);
 		PacketSerializer.registerPacket(SavestatePlayerLoadingPacket.class);
-		
-		PacketSerializer.registerPacket(RequestMotionPacket.class);
-		PacketSerializer.registerPacket(MotionPacket.class);
-		
+
 		// KillTheRNG
 		PacketSerializer.registerPacket(KTRNGSeedPacket.class);
 		PacketSerializer.registerPacket(KTRNGStartSeedPacket.class);
