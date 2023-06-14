@@ -18,23 +18,6 @@ public class Server {
 	private AsynchronousServerSocketChannel socket;
 	private List<Client> clients;
 	
-	public static void main(String[] args) throws Exception {
-		Server s = new Server(5555);
-		Client c = new Client("127.0.0.1", 5555);
-		
-		// send hello world double to server
-		var buf = ByteBuffer.allocate(8);
-		buf.putDouble(420.69);
-		c.write(buf);
-		
-		// send world hello double to client multiple times
-		for (int i = 0; i < 10; i++) {
-			buf = ByteBuffer.allocate(8);
-			buf.putDouble(69.420);
-			s.writeAll(buf);
-		}
-	}
-	
 	/**
 	 * Create and bind socket
 	 * @param port Port
@@ -71,7 +54,7 @@ public class Server {
 	 * @throws Exception Networking exception
 	 */
 	public void writeAll(ByteBuffer buf) throws Exception {
-		for (Client client : this.clients)
+		for (var client : this.clients)
 			client.write(buf);
 	}
 	
