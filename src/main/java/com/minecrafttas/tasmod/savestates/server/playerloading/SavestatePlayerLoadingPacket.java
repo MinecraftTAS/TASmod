@@ -1,7 +1,5 @@
 package com.minecrafttas.tasmod.savestates.server.playerloading;
 
-import com.minecrafttas.tasmod.networking.Packet;
-import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 
 import net.minecraft.client.Minecraft;

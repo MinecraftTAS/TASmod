@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.ticksync;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +38,7 @@ public class TickSyncServer {
 	public static boolean shouldTick() {
 		synchronized (synchronizedList) {
 			int acknowledged = synchronizedList.size();
-			int totalConnections = TASmod.packetServer.getConnections();
+			int totalConnections = TASmod.server.getClients().size();
 			if(acknowledged >= totalConnections) {
 				return true;
 			}else {
@@ -51,7 +52,12 @@ public class TickSyncServer {
 	 * to all clients making them tick
 	 */
 	public static void serverPostTick() {
-		TASmod.packetServer.sendToAll(new TickSyncPacket());
+		try {
+			// packet 2: tick clients
+			TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(2));
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+		}
 		if(synchronizedList.size()>0)
 			synchronizedList.clear();
 	}

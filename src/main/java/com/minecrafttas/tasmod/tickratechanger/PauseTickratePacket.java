@@ -2,9 +2,6 @@ package com.minecrafttas.tasmod.tickratechanger;
 
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.networking.Packet;
-import com.minecrafttas.tasmod.networking.PacketSide;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
@@ -45,41 +42,7 @@ public class PauseTickratePacket implements Packet {
 	 * @author Scribble
 	 *
 	 */
-	public enum State {
-		/**
-		 * Set's the game to tickrate 0
-		 */
-		PAUSE((short) 1),
-		/**
-		 * Set's the game to "tickrate saved"
-		 */
-		UNPAUSE((short) 2),
-		/**
-		 * Toggles between {@link #PAUSE} and {@link #UNPAUSE}
-		 */
-		TOGGLE((short) 0);
 
-		private short id;
-
-		State(short i) {
-			id = i;
-		}
-
-		public short toShort() {
-			return id;
-		}
-
-		public static State fromShort(short i) {
-			switch (i) {
-			case 1:
-				return PAUSE;
-			case 2:
-				return UNPAUSE;
-			default:
-				return TOGGLE;
-			}
-		}
-	}
 
 	@Override
 	public void handle(PacketSide side, EntityPlayer player) {

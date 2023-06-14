@@ -13,8 +13,6 @@ import com.minecrafttas.common.events.EventClient.EventOpenGui;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
-import com.minecrafttas.tasmod.networking.Packet;
-import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.playback.server.TASstateClient;
 import com.minecrafttas.tasmod.util.LoggerMarkers;

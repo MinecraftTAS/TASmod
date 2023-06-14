@@ -13,6 +13,12 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
+import com.minecrafttas.tasmod.ticksync.TickSyncClient;
+import com.minecrafttas.tasmod.ticksync.TickSyncServer;
+
 import lombok.var;
 
 public class Client {
@@ -127,16 +133,44 @@ public class Client {
 	 * Register packet handlers for packets received on the client
 	 */
 	private void registerClientsidePacketHandlers() {
+		// packet 2: tick client
+		this.handlers.put(2, buf -> TickSyncClient.onPacket());
 		
+		// packet 5: change client tickrate
+		this.handlers.put(5, buf -> TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat()));
 	}
 	
 	/**
 	 * Register packet handlers for packets received on the server
 	 */
 	private void registerServersidePacketHandlers() {
+		// packet 1: authentication packet
 		this.handlers.put(1, buf -> {
 			this.id = new UUID(buf.getLong(), buf.getLong());
 			LOGGER.info("Client authenticated: " + this.id);
+		});
+		
+		// packet 3: notify server of tick pass
+		this.handlers.put(3, buf -> TickSyncServer.onPacket(this.id));
+		
+		// packet 4: request tickrate change
+		this.handlers.put(4, buf -> TASmod.tickratechanger.changeTickrate(buf.getFloat()));
+		
+		// packet 6: tickrate zero toggle
+		this.handlers.put(6, buf -> {
+			var state = State.fromShort(buf.getShort());
+			if (state == State.PAUSE)
+				TASmod.tickratechanger.pauseGame(true);
+			else if (state == State.UNPAUSE)
+				TASmod.tickratechanger.pauseGame(false);
+			else if (state == State.TOGGLE)
+				TASmod.tickratechanger.togglePause();
+		});
+	
+		// packet 7: request tick advance
+		this.handlers.put(7, buf -> {
+			if (TASmod.tickratechanger.ticksPerSecond == 0)
+				TASmod.tickratechanger.advanceTick();
 		});
 	}
 	
@@ -146,6 +180,8 @@ public class Client {
 	 * @throws Exception Unable to send packet
 	 */
 	public void authenticate(UUID id) throws Exception {
+		this.id = id;
+
 		ByteBuffer buf = ByteBuffer.allocate(4+8+8);
 		buf.putInt(1);
 		buf.putLong(id.getMostSignificantBits());

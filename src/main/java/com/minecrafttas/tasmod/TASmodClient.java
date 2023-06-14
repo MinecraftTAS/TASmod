@@ -21,7 +21,6 @@ import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.gui.InfoHud;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 import com.minecrafttas.tasmod.handlers.LoadingScreenHandler;
-import com.minecrafttas.tasmod.networking.TASmodNetworkClient;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 import com.minecrafttas.tasmod.playback.server.InitialSyncStatePacket;
@@ -56,8 +55,6 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	public static InfoHud hud;
 	
 	public static ShieldDownloader shieldDownloader;
-	
-	public static TASmodNetworkClient packetClient;
 	
 	public static TickrateChangerClient tickratechanger = new TickrateChangerClient();
 	
@@ -174,38 +171,13 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	@Override
 	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
-		Minecraft mc = Minecraft.getMinecraft();
-		
-		if(mc.isIntegratedServerRunning())
-			TASmodClient.packetClient = new TASmodNetworkClient(TASmod.LOGGER);
-		else {
-			String full = mc.getCurrentServerData().serverIP;
-			String[] fullsplit = full.split(":");
-			if(fullsplit.length == 1) {
-				TASmodClient.packetClient = new TASmodNetworkClient(TASmod.LOGGER, full, 3111);
-			} else if(fullsplit.length == 2){
-				String ip = fullsplit[0];
-				TASmodClient.packetClient = new TASmodNetworkClient(TASmod.LOGGER, ip, 3111);
-			} else {
-				TASmod.LOGGER.error("Something went wrong while connecting. The ip seems to be wrong");
-			}
-		}
-		
-		TASmodClient.packetClient.sendToServer(new InitialSyncStatePacket(TASmodClient.virtual.getContainer().getState()));
-		
-		
+		// FIXME: ask how this works
+		// TASmodClient.packetClient.sendToServer(new InitialSyncStatePacket(TASmodClient.virtual.getContainer().getState()));
 	}
 
 	@Override
 	public void onPlayerLeaveClientSide(EntityPlayerSP player) {
-		try {
-			if(TASmodClient.packetClient!=null) {
-				TASmodClient.packetClient.killClient();
-				TASmodClient.packetClient=null;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
 	}
 	
 }

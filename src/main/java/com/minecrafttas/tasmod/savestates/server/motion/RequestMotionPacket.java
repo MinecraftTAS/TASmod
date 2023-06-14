@@ -1,8 +1,6 @@
 package com.minecrafttas.tasmod.savestates.server.motion;
 
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.networking.Packet;
-import com.minecrafttas.tasmod.networking.PacketSide;
 import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
 
 import net.minecraft.client.Minecraft;

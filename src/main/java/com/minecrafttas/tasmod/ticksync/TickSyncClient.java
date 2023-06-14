@@ -1,7 +1,9 @@
 package com.minecrafttas.tasmod.ticksync;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.Minecraft;
@@ -35,10 +37,16 @@ public class TickSyncClient {
 	 * @param mc Instance of Minecraft
 	 */
 	public static void clientPostTick(Minecraft mc) {
-		if (mc.player == null && TASmodClient.packetClient==null) {
+		if (mc.player == null) {
 			return;
 		}
-		TASmodClient.packetClient.sendToServer(new TickSyncPacket(mc.player.getGameProfile().getId()));
+		
+		try {
+			// packet 3: notify server of tick pass
+			TASmodClient.client.write(ByteBuffer.allocate(4).putInt(3));
+		} catch (Exception e) {
+			TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+		}
 	}
 	
 }
