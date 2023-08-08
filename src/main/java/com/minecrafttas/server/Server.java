@@ -53,12 +53,17 @@ public class Server {
 	
 	/**
 	 * Write packet to all clients
-	 * @param buf Packet
+	 * @param id Buffer id
+	 * @param buf Buffer
 	 * @throws Exception Networking exception
 	 */
-	public void writeAll(ByteBuffer buf) throws Exception {
-		for (var client : this.clients)
-			client.write(buf);
+	public void writeAll(int id, ByteBuffer buf) throws Exception {
+		int limit = buf.position();
+		for (var client : this.clients) {
+			var sid = SecureList.POOL.available();
+			client.write(sid, SecureList.POOL.lock(sid).put(buf.position(0).limit(limit)));
+		}
+		SecureList.POOL.unlock(id);
 	}
 	
 	/**

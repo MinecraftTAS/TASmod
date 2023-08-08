@@ -1,13 +1,12 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
-import java.nio.ByteBuffer;
-
 import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
+import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
-
+import lombok.var;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -96,9 +95,10 @@ public class TickrateChangerClient implements EventClientGameLoop{
 		
 		try {
 			// packet 4: request tickrate change
-			TASmodClient.client.write(ByteBuffer.allocate(8).putInt(4).putFloat(tickrate));
+			var bufIndex = SecureList.POOL.available();
+			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(4).putFloat(tickrate));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}
 	}
 
@@ -109,7 +109,8 @@ public class TickrateChangerClient implements EventClientGameLoop{
 		if (Minecraft.getMinecraft().world != null) {
 			try {
 				// packet 6: toggle tickrate zero
-				TASmodClient.client.write(ByteBuffer.allocateDirect(6).putInt(6).putShort(State.TOGGLE.toShort()));
+				var bufIndex = SecureList.POOL.available();
+				TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(6).putShort(State.TOGGLE.toShort()));
 			} catch (Exception e) {
 				TASmod.LOGGER.error("Unable to send packet to server: {}", e);
 			}
@@ -173,9 +174,10 @@ public class TickrateChangerClient implements EventClientGameLoop{
 	public void advanceServerTick() {
 		try {
 			// packet 7: request tick advance
-			TASmodClient.client.write(ByteBuffer.allocate(4).putInt(7));
+			var bufIndex = SecureList.POOL.available();
+			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(7));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}
 	}
 	
