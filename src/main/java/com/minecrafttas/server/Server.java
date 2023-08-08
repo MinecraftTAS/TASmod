@@ -1,6 +1,7 @@
 package com.minecrafttas.server;
 
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
+import lombok.Getter;
+import lombok.var;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -12,15 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.var;
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
+@Getter
 public class Server {
-	
-	private AsynchronousServerSocketChannel socket;
-	
-	@Getter
-	private List<Client> clients;
+
+	private final AsynchronousServerSocketChannel socket;
+	private final List<Client> clients;
 	
 	/**
 	 * Create and bind socket

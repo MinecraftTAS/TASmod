@@ -1,6 +1,18 @@
 package com.minecrafttas.server;
 
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.savestates.client.InputSavestatesHandler;
+import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
+import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
+import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
+import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer.Saver;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
+import com.minecrafttas.tasmod.ticksync.TickSyncClient;
+import com.minecrafttas.tasmod.ticksync.TickSyncServer;
+import lombok.Getter;
+import lombok.var;
+import net.minecraft.client.Minecraft;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -13,29 +25,18 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
-import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.savestates.client.InputSavestatesHandler;
-import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
-import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
-import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
-import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer.Saver;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
-import com.minecrafttas.tasmod.ticksync.TickSyncClient;
-import com.minecrafttas.tasmod.ticksync.TickSyncServer;
-
-import lombok.Getter;
-import lombok.var;
-import net.minecraft.client.Minecraft;
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 public class Client {
-	
-	private AsynchronousSocketChannel socket;
-	private ByteBuffer writeBuffer;
-	private ByteBuffer readBuffer;
+
+	private static final int BUFFER_SIZE = 1024*1024;
+
+	private final AsynchronousSocketChannel socket;
+	private final Map<Integer, Consumer<ByteBuffer>> handlers = new HashMap<>();
+	private final ByteBuffer writeBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+	private final ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
 	private Future<Integer> future;
-	private Map<Integer, Consumer<ByteBuffer>> handlers = new HashMap<>();
-	
+
 	@Getter
 	private UUID id;
 	
@@ -49,6 +50,7 @@ public class Client {
 		LOGGER.info("Connecting tasmod server to {}:{}", host, port);
 		this.socket = AsynchronousSocketChannel.open();
 		this.socket.connect(new InetSocketAddress(host, port)).get();
+
 		this.createHandlers();
 		this.registerClientsidePacketHandlers();
 		LOGGER.info("Connected to tasmod server");
@@ -68,10 +70,6 @@ public class Client {
 	 * Create read/write buffers and handlers for socket
 	 */
 	private void createHandlers() {
-		// create buffers
-		this.writeBuffer = ByteBuffer.allocate(1024*1024);
-		this.readBuffer = ByteBuffer.allocate(1024*1024);
-
 		// create input handler
 		this.readBuffer.limit(4);
 		this.socket.read(this.readBuffer, null, new CompletionHandler<Integer, Object>() {
@@ -118,7 +116,7 @@ public class Client {
 		// prepare buffer
 		this.writeBuffer.clear();
 		this.writeBuffer.putInt(buf.capacity());
-		this.writeBuffer.put((ByteBuffer) buf.position(0));
+		this.writeBuffer.put(buf.position(0));
 		this.writeBuffer.flip();
 		
 		// send buffer async
