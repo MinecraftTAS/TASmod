@@ -91,13 +91,13 @@ public class Client {
 					readBuffer.clear().limit(4);
 					socket.read(readBuffer, null, this);
 				} catch (Throwable exc) {
-					LOGGER.error("Unable to read packet {}", exc);
+					LOGGER.error("Unable to read packet!", exc);
 				}
 			}
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
-				LOGGER.error("Unable to read packet {}", exc);
+				LOGGER.error("Unable to read packet!", exc);
 			}
 
 		});
@@ -160,7 +160,7 @@ public class Client {
 				var name = new String(nameBytes);
 				InputSavestatesHandler.savestate(name);
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Exception occured during input savestate: {}", e);
+				TASmod.LOGGER.error("Exception occured during input savestate:", e);
 			}
 		});
 		
@@ -183,14 +183,12 @@ public class Client {
 				var name = new String(nameBytes);
 				InputSavestatesHandler.loadstate(name);
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Exception occured during input loadstate: {}", e);
+				TASmod.LOGGER.error("Exception occured during input loadstate:", e);
 			}
 		});
 		
 		// packet 13: unload chunks on client
-		this.handlers.put(13, buf ->
-			Minecraft.getMinecraft().addScheduledTask(() -> 
-				SavestatesChunkControl.unloadAllClientChunks()));
+		this.handlers.put(13, buf -> Minecraft.getMinecraft().addScheduledTask(SavestatesChunkControl::unloadAllClientChunks));
 		
 		// packet 14: request client motion
 		this.handlers.put(14, buf -> {
@@ -208,7 +206,7 @@ public class Client {
 						.putFloat(player.jumpMovementFactor)
 					);
 				} catch (Exception e) {
-					TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+					TASmod.LOGGER.error("Unable to send packet to server:", e);
 				}
 			}
 		});
@@ -248,7 +246,7 @@ public class Client {
 		});
 		
 		// packet 15: send client motion to server
-		this.handlers.put(15, buf -> ClientMotionServer.getMotion().put(TASmod.getServerInstance().getPlayerList().getPlayerByUUID(this.id), new Saver(buf.getDouble(), buf.getDouble(), buf.getDouble(), buf.getFloat(), buf.getFloat(), buf.getFloat(), buf.get() == 1 ? true : false, buf.getFloat())));
+		this.handlers.put(15, buf -> ClientMotionServer.getMotion().put(TASmod.getServerInstance().getPlayerList().getPlayerByUUID(this.id), new Saver(buf.getDouble(), buf.getDouble(), buf.getDouble(), buf.getFloat(), buf.getFloat(), buf.getFloat(), buf.get() == 1, buf.getFloat())));
 	}
 	
 	/**
@@ -268,9 +266,7 @@ public class Client {
 	
 	private void handle(ByteBuffer buf) {
 		var id = buf.getInt();
-		this.handlers.getOrDefault(id, _buf -> {
-			LOGGER.error("Received invalid packet: {}", id);
-		}).accept(buf);
+		this.handlers.getOrDefault(id, _buf -> LOGGER.error("Received invalid packet: {}", id)).accept(buf);
 	}
 
 }
