@@ -25,11 +25,10 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
+import static com.minecrafttas.server.SecureList.BUFFER_SIZE;
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 public class Client {
-
-	private static final int BUFFER_SIZE = 1024*1024;
 
 	private final AsynchronousSocketChannel socket;
 	private final Map<Integer, Consumer<ByteBuffer>> handlers = new HashMap<>();
@@ -105,22 +104,25 @@ public class Client {
 	
 	/**
 	 * Write packet to server
-	 * @param buf Packet
+	 * @param id Buffer id
+	 * @param buf Buffer
 	 * @throws Exception Networking exception
 	 */
-	public void write(ByteBuffer buf) throws Exception {
+	public void write(int id, ByteBuffer buf) throws Exception {
 		// wait for previous buffer to send
 		if (this.future != null && !this.future.isDone())
 			this.future.get();
 		
 		// prepare buffer
+		buf.flip();
 		this.writeBuffer.clear();
-		this.writeBuffer.putInt(buf.capacity());
-		this.writeBuffer.put(buf.position(0));
+		this.writeBuffer.putInt(buf.limit());
+		this.writeBuffer.put(buf);
 		this.writeBuffer.flip();
-		
+
 		// send buffer async
 		this.future = this.socket.write(this.writeBuffer);
+		SecureList.POOL.unlock(id);
 	}
 	
 	/**
@@ -199,7 +201,8 @@ public class Client {
 				
 				try {
 					// packet 15: send client motion to server
-					TASmodClient.client.write(ByteBuffer.allocate(4 + 8+8+8 + 4+4+4 + 1 + 4).putInt(15)
+					var bufIndex = SecureList.POOL.available();
+					TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(15)
 						.putDouble(player.motionX).putDouble(player.motionY).putDouble(player.motionZ)
 						.putFloat(player.moveForward).putFloat(player.moveVertical).putFloat(player.moveStrafing)
 						.put((byte) (player.isSprinting() ? 1 : 0))
@@ -257,11 +260,8 @@ public class Client {
 	public void authenticate(UUID id) throws Exception {
 		this.id = id;
 
-		ByteBuffer buf = ByteBuffer.allocate(4+8+8);
-		buf.putInt(1);
-		buf.putLong(id.getMostSignificantBits());
-		buf.putLong(id.getLeastSignificantBits());
-		this.write(buf);
+		var bufIndex = SecureList.POOL.available();
+		this.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(1).putLong(id.getMostSignificantBits()).putLong(id.getLeastSignificantBits()));
 	}
 	
 	private void handle(ByteBuffer buf) {

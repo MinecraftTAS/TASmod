@@ -1,12 +1,12 @@
 package com.minecrafttas.tasmod.ticksync;
 
-import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-
+import lombok.var;
 import net.minecraft.client.Minecraft;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This class manages tick sync
@@ -43,9 +43,10 @@ public class TickSyncClient {
 		
 		try {
 			// packet 3: notify server of tick pass
-			TASmodClient.client.write(ByteBuffer.allocate(4).putInt(3));
+			var bufIndex = SecureList.POOL.available();
+			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(3));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}
 	}
 	

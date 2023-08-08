@@ -1,19 +1,6 @@
 package com.minecrafttas.tasmod.savestates.server;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.Logger;
-
+import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventCompleteLoadstate;
 import com.minecrafttas.tasmod.events.EventServer.EventLoadstate;
@@ -30,7 +17,6 @@ import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
-
 import lombok.var;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -43,6 +29,18 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Creates and loads savestates on both client and server without closing the
@@ -186,9 +184,10 @@ public class SavestateHandler implements EventCompleteLoadstate{
 			try {
 				// packet 10: savestate inputs client
 				var name = this.getSavestateName(indexToSave).getBytes();
-				TASmod.server.writeAll(ByteBuffer.allocate(8 + name.length).putInt(10).putInt(name.length).put(name));
+				var bufIndex = SecureList.POOL.available();
+				TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(10).putInt(name.length).put(name));
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+				TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 			}
 		}
 
@@ -215,9 +214,10 @@ public class SavestateHandler implements EventCompleteLoadstate{
 
 		try {
 			// packet 11: close GuiSavestateScreen
-			TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(11));
+			var bufIndex = SecureList.POOL.available();
+			TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(11));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
 
 		if (!tickrate0) {
@@ -322,9 +322,10 @@ public class SavestateHandler implements EventCompleteLoadstate{
 			try {
 				// packet 12: loadstate inputs client
 				var name = this.getSavestateName(indexToLoad).getBytes();
-				TASmod.server.writeAll(ByteBuffer.allocate(8 + name.length).putInt(12).putInt(name.length).put(name));
+				var bufIndex = SecureList.POOL.available();
+				TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(12).putInt(name.length).put(name));
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+				TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 			}
 		}
 
@@ -337,9 +338,10 @@ public class SavestateHandler implements EventCompleteLoadstate{
 		
 		try {
 			// packet 13: unload chunks on client
-			TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(13));
+			var bufIndex = SecureList.POOL.available();
+			TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(13));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
 
 		// Unload chunks on the server

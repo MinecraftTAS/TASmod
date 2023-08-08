@@ -1,16 +1,14 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
-import java.nio.ByteBuffer;
-
-import org.apache.logging.log4j.Logger;
-
 import com.minecrafttas.common.events.EventServer.EventPlayerJoinedServerSide;
 import com.minecrafttas.common.events.EventServer.EventServerStop;
+import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
-
+import lombok.var;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Controls the tickrate on the server side
@@ -87,9 +85,10 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 		
 		try {
 			// packet 5: send new tickrate to clients
-			TASmod.server.writeAll(ByteBuffer.allocate(8).putInt(5).putFloat(tickrate));
+			var bufIndex = SecureList.POOL.available();
+			TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(5).putFloat(tickrate));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
 	}
 
@@ -175,9 +174,10 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
     private static void advanceClientTick() {
     	try {
 	    	// packet 8: advance tick on clients
-	    	TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(8));
+			var bufIndex = SecureList.POOL.available();
+			TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(8));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
     }
 
@@ -201,7 +201,8 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 			log("Sending the current tickrate ("+ticksPerSecond+") to " +player.getName());
 			try {
 				// packet 9: change tickrate on client
-				TASmod.server.getClient(player.getUniqueID()).write(ByteBuffer.allocate(8).putInt(9).putFloat(ticksPerSecond));
+				var bufIndex = SecureList.POOL.available();
+				TASmod.server.getClient(player.getUniqueID()).write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(9).putFloat(ticksPerSecond));
 			} catch (Exception e) {
 				TASmod.LOGGER.error("Unable to send packet to {}: {}", player.getUniqueID(), e);
 			}

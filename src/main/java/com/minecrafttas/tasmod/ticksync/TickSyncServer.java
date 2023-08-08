@@ -1,12 +1,13 @@
 package com.minecrafttas.tasmod.ticksync;
 
-import java.nio.ByteBuffer;
+import com.minecrafttas.server.SecureList;
+import com.minecrafttas.tasmod.TASmod;
+import lombok.var;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
-import com.minecrafttas.tasmod.TASmod;
 
 /**
  * This class manages tick sync
@@ -54,9 +55,10 @@ public class TickSyncServer {
 	public static void serverPostTick() {
 		try {
 			// packet 2: tick clients
-			TASmod.server.writeAll(ByteBuffer.allocate(4).putInt(2));
+			var bufIndex = SecureList.POOL.available();
+			TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(2));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients: {}", e);
+			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
 		if(synchronizedList.size()>0)
 			synchronizedList.clear();
