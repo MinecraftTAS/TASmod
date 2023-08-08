@@ -44,7 +44,7 @@ public class Server {
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
-				LOGGER.error("Unable to accept client {}", exc);
+				LOGGER.error("Unable to accept client!", exc);
 			}
 		});
 		
