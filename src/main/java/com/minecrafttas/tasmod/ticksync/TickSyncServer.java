@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.ticksync;
 
+import com.minecrafttas.server.Client;
 import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import lombok.var;
@@ -54,9 +55,9 @@ public class TickSyncServer {
 	 */
 	public static void serverPostTick() {
 		try {
-			// packet 2: tick clients
+			// tick clients
 			var bufIndex = SecureList.POOL.available();
-			TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(2));
+			TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.TICK_CLIENT.ordinal()));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}

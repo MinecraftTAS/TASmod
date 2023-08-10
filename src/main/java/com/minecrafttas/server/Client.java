@@ -145,29 +145,27 @@ public class Client {
 
 		// move wherever you want - add client server packet handler
 		for (var packet : ClientPackets.values())
-			this.packets.put(id++, packet);
+			this.packets.put(packet.ordinal(), packet);
 	}
 
 	/**
 	 * Register packet handlers for packets received on the server
 	 */
 	private void registerServersidePacketHandlers() {
-		int id = 0;
-
 		// add authentication packet
-		this.packets.put(id++, () -> (pid, buf, uuid) -> {
+		this.packets.put(-1, () -> (pid, buf, uuid) -> {
 			this.id = new UUID(buf.getLong(), buf.getLong());
 			LOGGER.info("Client authenticated: " + this.id);
 		});
 
 		// move wherever you want - add server packet handlers
 		for (var packet : ServerPackets.values())
-			this.packets.put(id++, packet);
+			this.packets.put(packet.ordinal(), packet);
 	}
 
 	// move wherever you want
 	@AllArgsConstructor
-	private enum ClientPackets implements Packet {
+	public static enum ClientPackets implements Packet {
 		TICK_CLIENT((pid, buf, id) ->
 			TickSyncClient.onPacket()),
 		CHANGE_CLIENT_TICKRATE((pid, buf, id) ->
@@ -212,9 +210,9 @@ public class Client {
 					Minecraft.getMinecraft().displayGuiScreen(new GuiSavestateSavingScreen());
 
 				try {
-					// packet 15: send client motion to server
+					// send client motion to server
 					var bufIndex = SecureList.POOL.available();
-					TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(15)
+					TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(ServerPackets.SEND_CLIENT_MOTION_TO_SERVER.ordinal())
 							.putDouble(player.motionX).putDouble(player.motionY).putDouble(player.motionZ)
 							.putFloat(player.moveForward).putFloat(player.moveVertical).putFloat(player.moveStrafing)
 							.put((byte) (player.isSprinting() ? 1 : 0))
@@ -234,7 +232,8 @@ public class Client {
 		}
 	}
 
-	private enum ServerPackets implements Packet {
+	@AllArgsConstructor
+	public static enum ServerPackets implements Packet {
 		NOTIFY_SERVER_OF_TICK_PASS((pid, buf, id) ->
 			TickSyncServer.onPacket(id)),
 		REQUEST_TICKRATE_CHANGE((pid, buf, id) ->
@@ -257,10 +256,6 @@ public class Client {
 
 
 		private final PacketHandler handler;
-
-		private ServerPackets(PacketHandler handler) {
-			this.handler = handler;
-		}
 
 		@Override
 		public PacketHandler handler() {

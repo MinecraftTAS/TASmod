@@ -1,6 +1,7 @@
 package com.minecrafttas.tasmod.savestates.server.motion;
 
 import com.google.common.collect.Maps;
+import com.minecrafttas.server.Client;
 import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
@@ -21,9 +22,9 @@ public class ClientMotionServer {
 		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Request motion from client");
 		motion.clear();
 		try {
-			// packet 14: request client motion
+			// request client motion
 			var bufIndex = SecureList.POOL.available();
-			TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(14));
+			TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.REQUEST_CLIENT_MOTION.ordinal()));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
@@ -40,9 +41,9 @@ public class ClientMotionServer {
 			if(i % 30 == 1) {
 				TASmod.LOGGER.debug(LoggerMarkers.Savestate, "Resending motion packet");
 				try {
-					// packet 14: request client motion
+					// request client motion
 					var bufIndex = SecureList.POOL.available();
-					TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(14));
+					TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.REQUEST_CLIENT_MOTION.ordinal()));
 				} catch (Exception e) {
 					TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 				}

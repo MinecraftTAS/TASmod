@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.ticksync;
 
+import com.minecrafttas.server.Client;
 import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
@@ -42,9 +43,9 @@ public class TickSyncClient {
 		}
 		
 		try {
-			// packet 3: notify server of tick pass
+			// notify server of tick pass
 			var bufIndex = SecureList.POOL.available();
-			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(3));
+			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.NOTIFY_SERVER_OF_TICK_PASS.ordinal()));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}
