@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.virtual;
 
+@Deprecated
 public class VirtualKeyboardEvent {
 	private int keycode;
 	private boolean keystate;

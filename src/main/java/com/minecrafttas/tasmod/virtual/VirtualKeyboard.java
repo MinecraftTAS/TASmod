@@ -13,6 +13,7 @@ import org.lwjgl.input.Keyboard;
 import com.google.common.collect.Maps;
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 
+@Deprecated
 public class VirtualKeyboard implements Serializable {
 
 	/**

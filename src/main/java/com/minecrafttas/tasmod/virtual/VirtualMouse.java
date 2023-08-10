@@ -10,6 +10,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 
+@Deprecated
 public class VirtualMouse implements Serializable {
 
 	/**

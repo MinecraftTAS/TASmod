@@ -84,6 +84,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
  * @author Scribble
  *
  */
+@Deprecated
 public class VirtualInput implements EventPlayerJoinedClientSide{
 
 	/**

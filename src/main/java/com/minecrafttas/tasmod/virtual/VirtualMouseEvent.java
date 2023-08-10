@@ -6,6 +6,7 @@ package com.minecrafttas.tasmod.virtual;
  * @author ScribbleLP
  *
  */
+@Deprecated
 public class VirtualMouseEvent {
 	private int keycode;
 	private boolean state;
@@ -42,7 +43,7 @@ public class VirtualMouseEvent {
 	}
 	
 	@Override
-		public String toString() {
-			return keycode+", "+state+", "+scrollwheel+", "+mouseX+", "+mouseY;
-		}
+	public String toString() {
+		return keycode+", "+state+", "+scrollwheel+", "+mouseX+", "+mouseY;
+	}
 }

@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author Scribble
  *
  */
+@Deprecated
 public class VirtualKey implements Serializable {
 	
 	/**
