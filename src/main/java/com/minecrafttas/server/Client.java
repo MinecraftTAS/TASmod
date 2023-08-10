@@ -6,10 +6,10 @@ import com.minecrafttas.tasmod.savestates.client.InputSavestatesHandler;
 import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
 import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
-import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer.Saver;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.var;
 import net.minecraft.client.Minecraft;
@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
 
 import static com.minecrafttas.server.SecureList.BUFFER_SIZE;
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
@@ -31,7 +30,7 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 public class Client {
 
 	private final AsynchronousSocketChannel socket;
-	private final Map<Integer, Consumer<ByteBuffer>> handlers = new HashMap<>();
+	private final Map<Integer, Packet> packets = new HashMap<>();
 	private final ByteBuffer writeBuffer = ByteBuffer.allocate(BUFFER_SIZE);
 	private final ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
 	private Future<Integer> future;
@@ -142,20 +141,42 @@ public class Client {
 	 * Register packet handlers for packets received on the client
 	 */
 	private void registerClientsidePacketHandlers() {
-		// packet 2: tick client
-		this.handlers.put(2, buf -> TickSyncClient.onPacket());
-		
-		// packet 5: change client tickrate
-		this.handlers.put(5, buf -> TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat()));
-	
-		// packet 8: advance tick on clients
-		this.handlers.put(8, buf -> TASmodClient.tickratechanger.advanceClientTick());
-	
-		// packet 9: change tickrate on client
-		this.handlers.put(9, buf -> TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat()));
-	
-		// packet 10: savestate inputs client
-		this.handlers.put(10, buf -> {
+		int id = 0;
+
+		// move wherever you want - add client server packet handler
+		for (var packet : ClientPackets.values())
+			this.packets.put(id++, packet);
+	}
+
+	/**
+	 * Register packet handlers for packets received on the server
+	 */
+	private void registerServersidePacketHandlers() {
+		int id = 0;
+
+		// add authentication packet
+		this.packets.put(id++, () -> (pid, buf, uuid) -> {
+			this.id = new UUID(buf.getLong(), buf.getLong());
+			LOGGER.info("Client authenticated: " + this.id);
+		});
+
+		// move wherever you want - add server packet handlers
+		for (var packet : ServerPackets.values())
+			this.packets.put(id++, packet);
+	}
+
+	// move wherever you want
+	@AllArgsConstructor
+	private enum ClientPackets implements Packet {
+		TICK_CLIENT((pid, buf, id) ->
+			TickSyncClient.onPacket()),
+		CHANGE_CLIENT_TICKRATE((pid, buf, id) ->
+			TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat())),
+		ADVANCE_TICK_ON_CLIENTS((pid, buf, id) ->
+			TASmodClient.tickratechanger.advanceClientTick()),
+		CHANGE_TICKRATE_ON_CLIENTS((pid, buf, id) ->
+			TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat())), // funny duplicate please fix
+		SAVESTATE_INPUTS_CLIENT((pid, buf, id) -> {
 			try {
 				var nameBytes = new byte[buf.getInt()];
 				buf.get(nameBytes);
@@ -164,21 +185,15 @@ public class Client {
 			} catch (Exception e) {
 				TASmod.LOGGER.error("Exception occured during input savestate:", e);
 			}
-		});
-		
-		// packet 11: close GuiSavestateScreen on client
-		this.handlers.put(11, buf -> 
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				var mc = Minecraft.getMinecraft();
-				if (!(mc.currentScreen instanceof GuiSavestateSavingScreen))
-					mc.displayGuiScreen(new GuiSavestateSavingScreen());
-				else
-					mc.displayGuiScreen(null);
-			})
-		);
-		
-		// packet 12: loadstate inputs client
-		this.handlers.put(12, buf -> {
+		}),
+		CLOSE_GUISAVESTATESCREEN_ON_CLIENTS((pid, buf, id) -> {
+			var mc = Minecraft.getMinecraft();
+			if (!(mc.currentScreen instanceof GuiSavestateSavingScreen))
+				mc.displayGuiScreen(new GuiSavestateSavingScreen());
+			else
+				mc.displayGuiScreen(null);
+		}),
+		LOADSTATE_INPUTS_CLIENT((pid, buf, id) -> {
 			try {
 				var nameBytes = new byte[buf.getInt()];
 				buf.get(nameBytes);
@@ -187,71 +202,72 @@ public class Client {
 			} catch (Exception e) {
 				TASmod.LOGGER.error("Exception occured during input loadstate:", e);
 			}
-		});
-		
-		// packet 13: unload chunks on client
-		this.handlers.put(13, buf -> Minecraft.getMinecraft().addScheduledTask(SavestatesChunkControl::unloadAllClientChunks));
-		
-		// packet 14: request client motion
-		this.handlers.put(14, buf -> {
+		}),
+		UNLOAD_CHUNKS_ON_CLIENTS((pid, buf, id) ->
+			Minecraft.getMinecraft().addScheduledTask(SavestatesChunkControl::unloadAllClientChunks)),
+		REQUEST_CLIENT_MOTION((pid, buf, id) -> {
 			var player = Minecraft.getMinecraft().player;
 			if (player != null) {
 				if (!(Minecraft.getMinecraft().currentScreen instanceof GuiSavestateSavingScreen))
 					Minecraft.getMinecraft().displayGuiScreen(new GuiSavestateSavingScreen());
-				
+
 				try {
 					// packet 15: send client motion to server
 					var bufIndex = SecureList.POOL.available();
 					TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(15)
-						.putDouble(player.motionX).putDouble(player.motionY).putDouble(player.motionZ)
-						.putFloat(player.moveForward).putFloat(player.moveVertical).putFloat(player.moveStrafing)
-						.put((byte) (player.isSprinting() ? 1 : 0))
-						.putFloat(player.jumpMovementFactor)
+							.putDouble(player.motionX).putDouble(player.motionY).putDouble(player.motionZ)
+							.putFloat(player.moveForward).putFloat(player.moveVertical).putFloat(player.moveStrafing)
+							.put((byte) (player.isSprinting() ? 1 : 0))
+							.putFloat(player.jumpMovementFactor)
 					);
 				} catch (Exception e) {
 					TASmod.LOGGER.error("Unable to send packet to server:", e);
 				}
 			}
 		});
+
+		private final PacketHandler handler;
+
+		@Override
+		public PacketHandler handler() {
+			return this.handler;
+		}
 	}
-	
-	/**
-	 * Register packet handlers for packets received on the server
-	 */
-	private void registerServersidePacketHandlers() {
-		// packet 1: authentication packet
-		this.handlers.put(1, buf -> {
-			this.id = new UUID(buf.getLong(), buf.getLong());
-			LOGGER.info("Client authenticated: " + this.id);
-		});
-		
-		// packet 3: notify server of tick pass
-		this.handlers.put(3, buf -> TickSyncServer.onPacket(this.id));
-		
-		// packet 4: request tickrate change
-		this.handlers.put(4, buf -> TASmod.tickratechanger.changeTickrate(buf.getFloat()));
-		
-		// packet 6: tickrate zero toggle
-		this.handlers.put(6, buf -> {
-			var state = State.fromShort(buf.getShort());
-			if (state == State.PAUSE)
+
+	private enum ServerPackets implements Packet {
+		NOTIFY_SERVER_OF_TICK_PASS((pid, buf, id) ->
+			TickSyncServer.onPacket(id)),
+		REQUEST_TICKRATE_CHANGE((pid, buf, id) ->
+			TASmod.tickratechanger.changeTickrate(buf.getFloat())),
+		TICKRATE_ZERO_TOGGLE((pid, buf, id) -> {
+			var state = TickrateChangerServer.State.fromShort(buf.getShort());
+			if (state == TickrateChangerServer.State.PAUSE)
 				TASmod.tickratechanger.pauseGame(true);
-			else if (state == State.UNPAUSE)
+			else if (state == TickrateChangerServer.State.UNPAUSE)
 				TASmod.tickratechanger.pauseGame(false);
-			else if (state == State.TOGGLE)
+			else if (state == TickrateChangerServer.State.TOGGLE)
 				TASmod.tickratechanger.togglePause();
-		});
-	
-		// packet 7: request tick advance
-		this.handlers.put(7, buf -> {
+		}),
+		REQUEST_TICK_ADVANCE((pid, buf, id) -> {
 			if (TASmod.tickratechanger.ticksPerSecond == 0)
 				TASmod.tickratechanger.advanceTick();
-		});
-		
-		// packet 15: send client motion to server
-		this.handlers.put(15, buf -> ClientMotionServer.getMotion().put(TASmod.getServerInstance().getPlayerList().getPlayerByUUID(this.id), new Saver(buf.getDouble(), buf.getDouble(), buf.getDouble(), buf.getFloat(), buf.getFloat(), buf.getFloat(), buf.get() == 1, buf.getFloat())));
+		}),
+		SEND_CLIENT_MOTION_TO_SERVER((pid, buf, id) ->
+			ClientMotionServer.getMotion().put(TASmod.getServerInstance().getPlayerList().getPlayerByUUID(id), new ClientMotionServer.Saver(buf.getDouble(), buf.getDouble(), buf.getDouble(), buf.getFloat(), buf.getFloat(), buf.getFloat(), buf.get() == 1, buf.getFloat())));
+
+
+		private final PacketHandler handler;
+
+		private ServerPackets(PacketHandler handler) {
+			this.handler = handler;
+		}
+
+		@Override
+		public PacketHandler handler() {
+			return this.handler;
+		}
 	}
-	
+
 	/**
 	 * Sends then authentication packet to the server
 	 * @param id Unique ID
@@ -266,7 +282,11 @@ public class Client {
 	
 	private void handle(ByteBuffer buf) {
 		var id = buf.getInt();
-		this.handlers.getOrDefault(id, _buf -> LOGGER.error("Received invalid packet: {}", id)).accept(buf);
+		var packet = this.packets.get(id);
+		if (packet != null)
+			packet.handler().handle(packet, buf, this.id);
+		else
+			LOGGER.error("Received invalid packet: {}", this.id);
 	}
 
 }
