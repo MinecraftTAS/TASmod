@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.savestates.server;
 
+import com.minecrafttas.server.Client;
 import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventCompleteLoadstate;
@@ -182,10 +183,10 @@ public class SavestateHandler implements EventCompleteLoadstate{
 			 * recording on the client with that name
 			 */
 			try {
-				// packet 10: savestate inputs client
+				// savestate inputs client
 				var name = this.getSavestateName(indexToSave).getBytes();
 				var bufIndex = SecureList.POOL.available();
-				TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(10).putInt(name.length).put(name));
+				TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.SAVESTATE_INPUTS_CLIENT.ordinal()).putInt(name.length).put(name));
 			} catch (Exception e) {
 				TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 			}
@@ -213,9 +214,9 @@ public class SavestateHandler implements EventCompleteLoadstate{
 		server.getPlayerList().sendMessage(new TextComponentString(TextFormatting.GREEN + "Savestate " + indexToSave + " saved"));
 
 		try {
-			// packet 11: close GuiSavestateScreen
+			// close GuiSavestateScreen
 			var bufIndex = SecureList.POOL.available();
-			TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(11));
+			TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.CLOSE_GUISAVESTATESCREEN_ON_CLIENTS.ordinal()));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
@@ -320,10 +321,10 @@ public class SavestateHandler implements EventCompleteLoadstate{
 		 */
 		if (savestateIndex != 0) {
 			try {
-				// packet 12: loadstate inputs client
+				// loadstate inputs client
 				var name = this.getSavestateName(indexToLoad).getBytes();
 				var bufIndex = SecureList.POOL.available();
-				TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(12).putInt(name.length).put(name));
+				TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.LOADSTATE_INPUTS_CLIENT.ordinal()).putInt(name.length).put(name));
 			} catch (Exception e) {
 				TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 			}
@@ -337,9 +338,9 @@ public class SavestateHandler implements EventCompleteLoadstate{
 
 		
 		try {
-			// packet 13: unload chunks on client
+			// unload chunks on client
 			var bufIndex = SecureList.POOL.available();
-			TASmod.server.writeAll(SecureList.POOL.lock(bufIndex).putInt(13));
+			TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.UNLOAD_CHUNKS_ON_CLIENTS.ordinal()));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}

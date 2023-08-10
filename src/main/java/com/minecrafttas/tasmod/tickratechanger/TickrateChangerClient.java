@@ -1,6 +1,7 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
 import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
+import com.minecrafttas.server.Client;
 import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
@@ -94,9 +95,9 @@ public class TickrateChangerClient implements EventClientGameLoop{
 		}
 		
 		try {
-			// packet 4: request tickrate change
+			// request tickrate change
 			var bufIndex = SecureList.POOL.available();
-			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(4).putFloat(tickrate));
+			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.REQUEST_TICKRATE_CHANGE.ordinal()).putFloat(tickrate));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}
@@ -108,11 +109,11 @@ public class TickrateChangerClient implements EventClientGameLoop{
 	public void togglePause() {
 		if (Minecraft.getMinecraft().world != null) {
 			try {
-				// packet 6: toggle tickrate zero
+				// toggle tickrate zero
 				var bufIndex = SecureList.POOL.available();
-				TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(6).putShort(State.TOGGLE.toShort()));
+				TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.TICKRATE_ZERO_TOGGLE.ordinal()).putShort(State.TOGGLE.toShort()));
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Unable to send packet to server: {}", e);
+				TASmod.LOGGER.error("Unable to send packet to server:", e);
 			}
 		} else {
 			togglePauseClient();
@@ -173,9 +174,9 @@ public class TickrateChangerClient implements EventClientGameLoop{
 	 */
 	public void advanceServerTick() {
 		try {
-			// packet 7: request tick advance
+			// request tick advance
 			var bufIndex = SecureList.POOL.available();
-			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(7));
+			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.REQUEST_TICK_ADVANCE.ordinal()));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}
