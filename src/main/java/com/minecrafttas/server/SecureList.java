@@ -1,7 +1,5 @@
 package com.minecrafttas.server;
 
-import lombok.var;
-
 import java.nio.ByteBuffer;
 
 /**
@@ -36,7 +34,7 @@ public class SecureList {
 	 * @return Available byte buffer or -1
 	 */
 	public int available() {
-		for (var i = 0; i < this.locked.length; i++)
+		for (int i = 0; i < this.locked.length; i++)
 			if (!this.locked[i])
 				return i;
 		return -1;
@@ -52,7 +50,7 @@ public class SecureList {
 			throw new RuntimeException("Tried to lock already locked buffer");
 
 		this.locked[i] = true;
-		return this.buffers[i].clear();
+		return (ByteBuffer) this.buffers[i].clear();
 	}
 	
 	/**

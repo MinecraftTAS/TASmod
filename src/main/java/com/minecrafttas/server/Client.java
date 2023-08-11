@@ -7,12 +7,11 @@ import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
 import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.var;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -35,7 +34,6 @@ public class Client {
 	private final ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
 	private Future<Integer> future;
 
-	@Getter
 	private UUID id;
 	
 	/**
@@ -141,10 +139,8 @@ public class Client {
 	 * Register packet handlers for packets received on the client
 	 */
 	private void registerClientsidePacketHandlers() {
-		int id = 0;
-
 		// move wherever you want - add client server packet handler
-		for (var packet : ClientPackets.values())
+		for (ClientPackets packet : ClientPackets.values())
 			this.packets.put(packet.ordinal(), packet);
 	}
 
@@ -159,12 +155,11 @@ public class Client {
 		});
 
 		// move wherever you want - add server packet handlers
-		for (var packet : ServerPackets.values())
+		for (ServerPackets packet : ServerPackets.values())
 			this.packets.put(packet.ordinal(), packet);
 	}
 
 	// move wherever you want
-	@AllArgsConstructor
 	public static enum ClientPackets implements Packet {
 		TICK_CLIENT((pid, buf, id) ->
 			TickSyncClient.onPacket()),
@@ -176,16 +171,16 @@ public class Client {
 			TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat())), // funny duplicate please fix
 		SAVESTATE_INPUTS_CLIENT((pid, buf, id) -> {
 			try {
-				var nameBytes = new byte[buf.getInt()];
+				byte[] nameBytes = new byte[buf.getInt()];
 				buf.get(nameBytes);
-				var name = new String(nameBytes);
+				String name = new String(nameBytes);
 				InputSavestatesHandler.savestate(name);
 			} catch (Exception e) {
 				TASmod.LOGGER.error("Exception occured during input savestate:", e);
 			}
 		}),
 		CLOSE_GUISAVESTATESCREEN_ON_CLIENTS((pid, buf, id) -> {
-			var mc = Minecraft.getMinecraft();
+			Minecraft mc = Minecraft.getMinecraft();
 			if (!(mc.currentScreen instanceof GuiSavestateSavingScreen))
 				mc.displayGuiScreen(new GuiSavestateSavingScreen());
 			else
@@ -193,9 +188,9 @@ public class Client {
 		}),
 		LOADSTATE_INPUTS_CLIENT((pid, buf, id) -> {
 			try {
-				var nameBytes = new byte[buf.getInt()];
+				byte[] nameBytes = new byte[buf.getInt()];
 				buf.get(nameBytes);
-				var name = new String(nameBytes);
+				String name = new String(nameBytes);
 				InputSavestatesHandler.loadstate(name);
 			} catch (Exception e) {
 				TASmod.LOGGER.error("Exception occured during input loadstate:", e);
@@ -204,14 +199,14 @@ public class Client {
 		UNLOAD_CHUNKS_ON_CLIENTS((pid, buf, id) ->
 			Minecraft.getMinecraft().addScheduledTask(SavestatesChunkControl::unloadAllClientChunks)),
 		REQUEST_CLIENT_MOTION((pid, buf, id) -> {
-			var player = Minecraft.getMinecraft().player;
+			EntityPlayerSP player = Minecraft.getMinecraft().player;
 			if (player != null) {
 				if (!(Minecraft.getMinecraft().currentScreen instanceof GuiSavestateSavingScreen))
 					Minecraft.getMinecraft().displayGuiScreen(new GuiSavestateSavingScreen());
 
 				try {
 					// send client motion to server
-					var bufIndex = SecureList.POOL.available();
+					int bufIndex = SecureList.POOL.available();
 					TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(ServerPackets.SEND_CLIENT_MOTION_TO_SERVER.ordinal())
 							.putDouble(player.motionX).putDouble(player.motionY).putDouble(player.motionZ)
 							.putFloat(player.moveForward).putFloat(player.moveVertical).putFloat(player.moveStrafing)
@@ -226,20 +221,23 @@ public class Client {
 
 		private final PacketHandler handler;
 
+		ClientPackets(PacketHandler handler) {
+			this.handler = handler;
+		}
+
 		@Override
 		public PacketHandler handler() {
 			return this.handler;
 		}
 	}
 
-	@AllArgsConstructor
 	public static enum ServerPackets implements Packet {
 		NOTIFY_SERVER_OF_TICK_PASS((pid, buf, id) ->
 			TickSyncServer.onPacket(id)),
 		REQUEST_TICKRATE_CHANGE((pid, buf, id) ->
 			TASmod.tickratechanger.changeTickrate(buf.getFloat())),
 		TICKRATE_ZERO_TOGGLE((pid, buf, id) -> {
-			var state = TickrateChangerServer.State.fromShort(buf.getShort());
+			State state = TickrateChangerServer.State.fromShort(buf.getShort());
 			if (state == TickrateChangerServer.State.PAUSE)
 				TASmod.tickratechanger.pauseGame(true);
 			else if (state == TickrateChangerServer.State.UNPAUSE)
@@ -257,6 +255,10 @@ public class Client {
 
 		private final PacketHandler handler;
 
+		ServerPackets(PacketHandler handler) {
+			this.handler = handler;
+		}
+
 		@Override
 		public PacketHandler handler() {
 			return this.handler;
@@ -271,17 +273,22 @@ public class Client {
 	public void authenticate(UUID id) throws Exception {
 		this.id = id;
 
-		var bufIndex = SecureList.POOL.available();
+		int bufIndex = SecureList.POOL.available();
 		this.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(1).putLong(id.getMostSignificantBits()).putLong(id.getLeastSignificantBits()));
 	}
 	
 	private void handle(ByteBuffer buf) {
-		var id = buf.getInt();
-		var packet = this.packets.get(id);
+		int id = buf.getInt();
+		Packet packet = this.packets.get(id);
 		if (packet != null)
 			packet.handler().handle(packet, buf, this.id);
 		else
 			LOGGER.error("Received invalid packet: {}", this.id);
+	}
+
+	public UUID getId() {
+		// TODO Auto-generated method stub
+		return this.id;
 	}
 
 }
