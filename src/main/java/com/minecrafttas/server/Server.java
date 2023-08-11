@@ -1,7 +1,6 @@
 package com.minecrafttas.server;
 
-import lombok.Getter;
-import lombok.var;
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -13,9 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
-
-@Getter
 public class Server {
 
 	private final AsynchronousServerSocketChannel socket;
@@ -59,9 +55,9 @@ public class Server {
 	 */
 	public void writeAll(int id, ByteBuffer buf) throws Exception {
 		int limit = buf.position();
-		for (var client : this.clients) {
-			var sid = SecureList.POOL.available();
-			client.write(sid, SecureList.POOL.lock(sid).put(buf.position(0).limit(limit)));
+		for (Client client : this.clients) {
+			int sid = SecureList.POOL.available();
+			client.write(sid, SecureList.POOL.lock(sid).put((ByteBuffer) buf.position(0).limit(limit)));
 		}
 		SecureList.POOL.unlock(id);
 	}
@@ -84,11 +80,15 @@ public class Server {
 	 * @param uniqueID UUID
 	 */
 	public Client getClient(UUID uniqueID) {
-		for (var client : this.clients)
+		for (Client client : this.clients)
 			if (client.getId().equals(uniqueID))
 				return client;
 		
 		return null;
+	}
+	
+	public AsynchronousServerSocketChannel getAsynchronousSocketChannel() {
+		return this.socket;
 	}
 	
 }
