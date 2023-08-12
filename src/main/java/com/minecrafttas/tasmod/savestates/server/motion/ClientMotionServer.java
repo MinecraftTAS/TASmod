@@ -1,14 +1,14 @@
 package com.minecrafttas.tasmod.savestates.server.motion;
 
+import java.util.Map;
+
 import com.google.common.collect.Maps;
 import com.minecrafttas.server.Client;
 import com.minecrafttas.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
-import lombok.var;
-import net.minecraft.entity.player.EntityPlayerMP;
 
-import java.util.Map;
+import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ClientMotionServer {
 
@@ -24,7 +24,7 @@ public class ClientMotionServer {
 		try {
 			// request client motion
 			var bufIndex = SecureList.POOL.available();
-			TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.REQUEST_CLIENT_MOTION.ordinal()));
+			TASmod.server.sendToAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.REQUEST_CLIENT_MOTION.ordinal()));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
@@ -43,7 +43,7 @@ public class ClientMotionServer {
 				try {
 					// request client motion
 					var bufIndex = SecureList.POOL.available();
-					TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.REQUEST_CLIENT_MOTION.ordinal()));
+					TASmod.server.sendToAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.REQUEST_CLIENT_MOTION.ordinal()));
 				} catch (Exception e) {
 					TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 				}

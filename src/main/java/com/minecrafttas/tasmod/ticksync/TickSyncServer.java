@@ -1,14 +1,19 @@
 package com.minecrafttas.tasmod.ticksync;
 
-import com.minecrafttas.server.Client;
-import com.minecrafttas.server.SecureList;
-import com.minecrafttas.tasmod.TASmod;
-import lombok.var;
-
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import com.minecrafttas.server.ByteBufferBuilder;
+import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.server.interfaces.ServerPacketHandler;
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodPackets;
+import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;
+
+import net.minecraft.server.MinecraftServer;
 
 /**
  * This class manages tick sync
@@ -17,9 +22,10 @@ import java.util.UUID;
  *
  * @author Pancake
  */
-public class TickSyncServer {
+public class TickSyncServer implements ServerPacketHandler, EventServerTickPost {
 	
 	private static List<UUID> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+
 
 	/**
 	 * Handles incoming tick packets from the client to the server
@@ -29,7 +35,8 @@ public class TickSyncServer {
 	 * @param uuid Player UUID
 	 * @param tick Current tick of the player
 	 */
-	public static void onPacket(UUID uuid) {
+	@Override
+	public void onServerPacket(PacketID id, ByteBuffer buf, UUID uuid) {
 		synchronized (synchronizedList) {
 			if(!synchronizedList.contains(uuid)) {
 				synchronizedList.add(uuid);
@@ -37,7 +44,7 @@ public class TickSyncServer {
 		}
 	}
 
-	public static boolean shouldTick() {
+	public boolean shouldTick() {
 		synchronized (synchronizedList) {
 			int acknowledged = synchronizedList.size();
 			int totalConnections = TASmod.server.getClients().size();
@@ -53,11 +60,23 @@ public class TickSyncServer {
 	 * Called after a server tick. This will send a packet
 	 * to all clients making them tick
 	 */
-	public static void serverPostTick() {
+	public void serverPostTick() {
+
+	}
+
+	public static void clearList() {
+		synchronizedList.clear();
+	}
+
+	@Override
+	public PacketID[] getAcceptedPacketIDs() {
+		return new TASmodPackets[]{TASmodPackets.TICKSYNC};
+	}
+
+	@Override
+	public void onServerTickPost(MinecraftServer server) {
 		try {
-			// tick clients
-			var bufIndex = SecureList.POOL.available();
-			TASmod.server.writeAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.TICK_CLIENT.ordinal()));
+			TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.TICKSYNC));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
@@ -65,7 +84,4 @@ public class TickSyncServer {
 			synchronizedList.clear();
 	}
 
-	public static void clearList() {
-		synchronizedList.clear();
-	}
 }

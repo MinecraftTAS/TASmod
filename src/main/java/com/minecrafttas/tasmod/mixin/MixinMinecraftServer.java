@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventCompleteLoadstate;
+import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
-import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -68,7 +68,7 @@ public abstract class MixinMinecraftServer {
 		
 		/*	The server should tick if:
 		 *	(shouldTick in ticksync is true OR there are no players connected to the custom server) AND the tickrate is not zero. That or advance tick is true*/
-		if( (TickSyncServer.shouldTick() && TASmod.tickratechanger.ticksPerSecond != 0) || TASmod.tickratechanger.advanceTick) {
+		if( (TASmod.ticksyncServer.shouldTick() && TASmod.tickratechanger.ticksPerSecond != 0) || TASmod.tickratechanger.advanceTick) {
 			long timeBeforeTick = System.currentTimeMillis();
 			
 			if (TASmod.savestateHandler.state == SavestateState.WASLOADING) {
@@ -83,7 +83,7 @@ public abstract class MixinMinecraftServer {
 				TASmod.tickratechanger.changeServerTickrate(0F);
 				TASmod.tickratechanger.advanceTick = false;
 			}
-			TickSyncServer.serverPostTick();
+			EventServerTickPost.fireServerTickPost((MinecraftServer)(Object)this);
 			
 			long tickDuration = System.currentTimeMillis() - timeBeforeTick;
 			

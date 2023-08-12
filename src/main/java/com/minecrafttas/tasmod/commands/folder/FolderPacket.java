@@ -1,9 +1,11 @@
 package com.minecrafttas.tasmod.commands.folder;
 
+import com.minecrafttas.server.interfaces.PacketID;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
-public class FolderPacket implements Packet {
+public class FolderPacket implements PacketID {
 	int command;
 	
 	public FolderPacket() {

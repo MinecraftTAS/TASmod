@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.playback.server;
 
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackController;
@@ -18,7 +19,7 @@ import net.minecraft.util.text.TextComponentString;
  * @author Scribble
  *
  */
-public class SyncStatePacket implements Packet {
+public class SyncStatePacket implements PacketID {
 
 
 	private short state;

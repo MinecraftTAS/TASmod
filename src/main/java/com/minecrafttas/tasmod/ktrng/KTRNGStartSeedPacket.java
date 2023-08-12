@@ -1,11 +1,13 @@
 package com.minecrafttas.tasmod.ktrng;
 
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
-public class KTRNGStartSeedPacket implements Packet{
+public class KTRNGStartSeedPacket implements PacketID{
 
 	private long seed;
 	

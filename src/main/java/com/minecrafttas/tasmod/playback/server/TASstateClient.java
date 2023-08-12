@@ -13,7 +13,7 @@ public class TASstateClient {
 	
 	public static void setOrSend(TASstate state) {
 		if(Minecraft.getMinecraft().player!=null) {
-			TASmodClient.packetClient.sendToServer(new SyncStatePacket(state));
+			TASmodClient.packetClient.send(new SyncStatePacket(state));
 		}else {
 			TASmodClient.virtual.getContainer().setTASState(state);
 		}

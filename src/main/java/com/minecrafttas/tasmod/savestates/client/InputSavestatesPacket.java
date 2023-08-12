@@ -3,13 +3,14 @@ package com.minecrafttas.tasmod.savestates.client;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
-public class InputSavestatesPacket implements Packet{
+public class InputSavestatesPacket implements PacketID{
 	private boolean mode;
 	private String name;
 	

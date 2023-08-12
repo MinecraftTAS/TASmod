@@ -2,7 +2,7 @@ package com.minecrafttas.common.events;
 
 import java.util.ArrayList;
 
-public class EventListener {
+public class EventListenerRegistry {
 	
 	private static ArrayList<EventBase> EVENTLISTENER_REGISTRY = new ArrayList<>();
 	

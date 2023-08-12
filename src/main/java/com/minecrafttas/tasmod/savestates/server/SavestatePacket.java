@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.savestates.server;
 
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
@@ -12,7 +13,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
-public class SavestatePacket implements Packet {
+public class SavestatePacket implements PacketID {
 
 	public int index;
 	

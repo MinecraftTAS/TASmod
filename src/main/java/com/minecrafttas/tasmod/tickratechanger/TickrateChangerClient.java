@@ -7,7 +7,7 @@ import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
-import lombok.var;
+
 import net.minecraft.client.Minecraft;
 
 /**
@@ -97,7 +97,7 @@ public class TickrateChangerClient implements EventClientGameLoop{
 		try {
 			// request tickrate change
 			var bufIndex = SecureList.POOL.available();
-			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.REQUEST_TICKRATE_CHANGE.ordinal()).putFloat(tickrate));
+			TASmodClient.client.sendToServer(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.REQUEST_TICKRATE_CHANGE.ordinal()).putFloat(tickrate));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}
@@ -111,7 +111,7 @@ public class TickrateChangerClient implements EventClientGameLoop{
 			try {
 				// toggle tickrate zero
 				var bufIndex = SecureList.POOL.available();
-				TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.TICKRATE_ZERO_TOGGLE.ordinal()).putShort(State.TOGGLE.toShort()));
+				TASmodClient.client.sendToServer(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.TICKRATE_ZERO_TOGGLE.ordinal()).putShort(State.TOGGLE.toShort()));
 			} catch (Exception e) {
 				TASmod.LOGGER.error("Unable to send packet to server:", e);
 			}
@@ -176,7 +176,7 @@ public class TickrateChangerClient implements EventClientGameLoop{
 		try {
 			// request tick advance
 			var bufIndex = SecureList.POOL.available();
-			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.REQUEST_TICK_ADVANCE.ordinal()));
+			TASmodClient.client.sendToServer(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.REQUEST_TICK_ADVANCE.ordinal()));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}

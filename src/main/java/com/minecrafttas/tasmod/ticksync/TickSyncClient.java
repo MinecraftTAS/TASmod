@@ -1,13 +1,18 @@
 package com.minecrafttas.tasmod.ticksync;
 
-import com.minecrafttas.server.Client;
-import com.minecrafttas.server.SecureList;
+import java.nio.ByteBuffer;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.minecrafttas.server.ByteBufferBuilder;
+import com.minecrafttas.server.interfaces.ClientPacketHandler;
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import lombok.var;
-import net.minecraft.client.Minecraft;
+import com.minecrafttas.tasmod.TASmodPackets;
+import com.minecrafttas.tasmod.events.EventClient.EventClientTickPost;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import net.minecraft.client.Minecraft;
 
 /**
  * This class manages tick sync
@@ -16,9 +21,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Pancake
  */
-public class TickSyncClient {
+public class TickSyncClient implements ClientPacketHandler, EventClientTickPost{
 
 	public static final AtomicBoolean shouldTick = new AtomicBoolean(true);
+	
+	@Override
+	public PacketID[] getAcceptedPacketIDs() {
+		return new TASmodPackets[] {TASmodPackets.TICKSYNC};
+	}
+
 	
 	/**
 	 * Handles incoming tick packets from the server to the client
@@ -27,9 +38,11 @@ public class TickSyncClient {
 	 * @param uuid Server UUID, null
 	 * @param tick Current tick of the server
 	 */
-	public static void onPacket() {
+	@Override
+	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) {
 		shouldTick.set(true);
 	}
+
 
 	/**
 	 * Called after a client tick. This will send a packet
@@ -37,18 +50,16 @@ public class TickSyncClient {
 	 *
 	 * @param mc Instance of Minecraft
 	 */
-	public static void clientPostTick(Minecraft mc) {
+	@Override
+	public void onClientTickPost(Minecraft mc) {
 		if (mc.player == null) {
 			return;
 		}
 		
 		try {
-			// notify server of tick pass
-			var bufIndex = SecureList.POOL.available();
-			TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.NOTIFY_SERVER_OF_TICK_PASS.ordinal()));
+			TASmodClient.client.send(new ByteBufferBuilder(TASmodPackets.TICKSYNC));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}
 	}
-	
 }
