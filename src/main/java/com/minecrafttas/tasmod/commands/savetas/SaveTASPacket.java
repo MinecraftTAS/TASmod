@@ -3,8 +3,10 @@ package com.minecrafttas.tasmod.commands.savetas;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -12,7 +14,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
-public class SaveTASPacket implements Packet {
+public class SaveTASPacket implements PacketID {
 	String name;
 
 	public SaveTASPacket() {

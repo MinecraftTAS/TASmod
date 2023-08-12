@@ -1,10 +1,12 @@
 package com.minecrafttas.tasmod.commands.playuntil;
 
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmodClient;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
-public class PlayUntilPacket implements Packet {
+public class PlayUntilPacket implements PacketID {
 
 	private int until;
 

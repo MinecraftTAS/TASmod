@@ -1,40 +1,36 @@
 package com.minecrafttas.server;
 
-import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.savestates.client.InputSavestatesHandler;
-import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
-import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
-import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
-import com.minecrafttas.tasmod.ticksync.TickSyncClient;
-import com.minecrafttas.tasmod.ticksync.TickSyncServer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import static com.minecrafttas.server.SecureList.BUFFER_SIZE;
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
-import static com.minecrafttas.server.SecureList.BUFFER_SIZE;
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
+import com.minecrafttas.server.exception.InvalidPacketException;
+import com.minecrafttas.server.interfaces.PacketID;
 
 public class Client {
 
 	private final AsynchronousSocketChannel socket;
-	private final Map<Integer, Packet> packets = new HashMap<>();
+	private final PacketID[] packetIDs;
 	private final ByteBuffer writeBuffer = ByteBuffer.allocate(BUFFER_SIZE);
 	private final ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
 	private Future<Integer> future;
 
-	private UUID id;
+	private UUID clientID;
+	
+	private Side side;
+	
+	
+	public enum Side {
+		CLIENT,
+		SERVER;
+	}
 	
 	/**
 	 * Create and connect socket
@@ -42,24 +38,29 @@ public class Client {
 	 * @param port Port
 	 * @throws Exception Unable to connect
 	 */
-	public Client(String host, int port) throws Exception {
+	public Client(String host, int port, PacketID[] packetIDs, UUID uuid) throws Exception {
 		LOGGER.info("Connecting tasmod server to {}:{}", host, port);
 		this.socket = AsynchronousSocketChannel.open();
 		this.socket.connect(new InetSocketAddress(host, port)).get();
 
+		this.side = Side.CLIENT;
+		this.packetIDs = packetIDs;
+		
 		this.createHandlers();
-		this.registerClientsidePacketHandlers();
 		LOGGER.info("Connected to tasmod server");
+		
+		authenticate(uuid);
 	}
 	
 	/**
 	 * Fork existing socket
 	 * @param socket Socket
 	 */
-	public Client(AsynchronousSocketChannel socket) {
+	public Client(AsynchronousSocketChannel socket, PacketID[] packetIDs) {
 		this.socket = socket;
+		this.packetIDs = packetIDs;
 		this.createHandlers();
-		this.registerServersidePacketHandlers();
+		this.side = Side.SERVER;
 	}
 	
 	/**
@@ -105,10 +106,12 @@ public class Client {
 	 * @param buf Buffer
 	 * @throws Exception Networking exception
 	 */
-	public void write(int id, ByteBuffer buf) throws Exception {
+	public void send(ByteBufferBuilder bufferBuilder) throws Exception {
 		// wait for previous buffer to send
 		if (this.future != null && !this.future.isDone())
 			this.future.get();
+		
+		ByteBuffer buf = bufferBuilder.build();
 		
 		// prepare buffer
 		buf.flip();
@@ -119,7 +122,7 @@ public class Client {
 
 		// send buffer async
 		this.future = this.socket.write(this.writeBuffer);
-		SecureList.POOL.unlock(id);
+		bufferBuilder.close();
 	}
 	
 	/**
@@ -135,160 +138,151 @@ public class Client {
 		this.socket.close();
 	}
 	
-	/**
-	 * Register packet handlers for packets received on the client
-	 */
-	private void registerClientsidePacketHandlers() {
-		// move wherever you want - add client server packet handler
-		for (ClientPackets packet : ClientPackets.values())
-			this.packets.put(packet.ordinal(), packet);
-	}
-
-	/**
-	 * Register packet handlers for packets received on the server
-	 */
-	private void registerServersidePacketHandlers() {
-		// add authentication packet
-		this.packets.put(-1, () -> (pid, buf, uuid) -> {
-			this.id = new UUID(buf.getLong(), buf.getLong());
-			LOGGER.info("Client authenticated: " + this.id);
-		});
-
-		// move wherever you want - add server packet handlers
-		for (ServerPackets packet : ServerPackets.values())
-			this.packets.put(packet.ordinal(), packet);
-	}
-
 	// move wherever you want
-	public static enum ClientPackets implements Packet {
-		TICK_CLIENT((pid, buf, id) ->
-			TickSyncClient.onPacket()),
-		CHANGE_CLIENT_TICKRATE((pid, buf, id) ->
-			TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat())),
-		ADVANCE_TICK_ON_CLIENTS((pid, buf, id) ->
-			TASmodClient.tickratechanger.advanceClientTick()),
-		CHANGE_TICKRATE_ON_CLIENTS((pid, buf, id) ->
-			TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat())), // funny duplicate please fix
-		SAVESTATE_INPUTS_CLIENT((pid, buf, id) -> {
-			try {
-				byte[] nameBytes = new byte[buf.getInt()];
-				buf.get(nameBytes);
-				String name = new String(nameBytes);
-				InputSavestatesHandler.savestate(name);
-			} catch (Exception e) {
-				TASmod.LOGGER.error("Exception occured during input savestate:", e);
-			}
-		}),
-		CLOSE_GUISAVESTATESCREEN_ON_CLIENTS((pid, buf, id) -> {
-			Minecraft mc = Minecraft.getMinecraft();
-			if (!(mc.currentScreen instanceof GuiSavestateSavingScreen))
-				mc.displayGuiScreen(new GuiSavestateSavingScreen());
-			else
-				mc.displayGuiScreen(null);
-		}),
-		LOADSTATE_INPUTS_CLIENT((pid, buf, id) -> {
-			try {
-				byte[] nameBytes = new byte[buf.getInt()];
-				buf.get(nameBytes);
-				String name = new String(nameBytes);
-				InputSavestatesHandler.loadstate(name);
-			} catch (Exception e) {
-				TASmod.LOGGER.error("Exception occured during input loadstate:", e);
-			}
-		}),
-		UNLOAD_CHUNKS_ON_CLIENTS((pid, buf, id) ->
-			Minecraft.getMinecraft().addScheduledTask(SavestatesChunkControl::unloadAllClientChunks)),
-		REQUEST_CLIENT_MOTION((pid, buf, id) -> {
-			EntityPlayerSP player = Minecraft.getMinecraft().player;
-			if (player != null) {
-				if (!(Minecraft.getMinecraft().currentScreen instanceof GuiSavestateSavingScreen))
-					Minecraft.getMinecraft().displayGuiScreen(new GuiSavestateSavingScreen());
+//	public static enum ClientPackets implements Packet {
+//		TICK_CLIENT((pid, buf, id) ->
+//			TickSyncClient.onPacket()),
+//		CHANGE_CLIENT_TICKRATE((pid, buf, id) ->
+//			TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat())),
+//		ADVANCE_TICK_ON_CLIENTS((pid, buf, id) ->
+//			TASmodClient.tickratechanger.advanceClientTick()),
+//		CHANGE_TICKRATE_ON_CLIENTS((pid, buf, id) ->
+//			TASmodClient.tickratechanger.changeClientTickrate(buf.getFloat())), // funny duplicate please fix
+//		SAVESTATE_INPUTS_CLIENT((pid, buf, id) -> {
+//			try {
+//				byte[] nameBytes = new byte[buf.getInt()];
+//				buf.get(nameBytes);
+//				String name = new String(nameBytes);
+//				InputSavestatesHandler.savestate(name);
+//			} catch (Exception e) {
+//				TASmod.LOGGER.error("Exception occured during input savestate:", e);
+//			}
+//		}),
+//		CLOSE_GUISAVESTATESCREEN_ON_CLIENTS((pid, buf, id) -> {
+//			Minecraft mc = Minecraft.getMinecraft();
+//			if (!(mc.currentScreen instanceof GuiSavestateSavingScreen))
+//				mc.displayGuiScreen(new GuiSavestateSavingScreen());
+//			else
+//				mc.displayGuiScreen(null);
+//		}),
+//		LOADSTATE_INPUTS_CLIENT((pid, buf, id) -> {
+//			try {
+//				byte[] nameBytes = new byte[buf.getInt()];
+//				buf.get(nameBytes);
+//				String name = new String(nameBytes);
+//				InputSavestatesHandler.loadstate(name);
+//			} catch (Exception e) {
+//				TASmod.LOGGER.error("Exception occured during input loadstate:", e);
+//			}
+//		}),
+//		UNLOAD_CHUNKS_ON_CLIENTS((pid, buf, id) ->
+//			Minecraft.getMinecraft().addScheduledTask(SavestatesChunkControl::unloadAllClientChunks)),
+//		REQUEST_CLIENT_MOTION((pid, buf, id) -> {
+//			EntityPlayerSP player = Minecraft.getMinecraft().player;
+//			if (player != null) {
+//				if (!(Minecraft.getMinecraft().currentScreen instanceof GuiSavestateSavingScreen))
+//					Minecraft.getMinecraft().displayGuiScreen(new GuiSavestateSavingScreen());
+//
+//				try {
+//					// send client motion to server
+//					int bufIndex = SecureList.POOL.available();
+//					TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(ServerPackets.SEND_CLIENT_MOTION_TO_SERVER.ordinal())
+//							.putDouble(player.motionX).putDouble(player.motionY).putDouble(player.motionZ)
+//							.putFloat(player.moveForward).putFloat(player.moveVertical).putFloat(player.moveStrafing)
+//							.put((byte) (player.isSprinting() ? 1 : 0))
+//							.putFloat(player.jumpMovementFactor)
+//					);
+//				} catch (Exception e) {
+//					TASmod.LOGGER.error("Unable to send packet to server:", e);
+//				}
+//			}
+//		});
+//	}
 
-				try {
-					// send client motion to server
-					int bufIndex = SecureList.POOL.available();
-					TASmodClient.client.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(ServerPackets.SEND_CLIENT_MOTION_TO_SERVER.ordinal())
-							.putDouble(player.motionX).putDouble(player.motionY).putDouble(player.motionZ)
-							.putFloat(player.moveForward).putFloat(player.moveVertical).putFloat(player.moveStrafing)
-							.put((byte) (player.isSprinting() ? 1 : 0))
-							.putFloat(player.jumpMovementFactor)
-					);
-				} catch (Exception e) {
-					TASmod.LOGGER.error("Unable to send packet to server:", e);
-				}
-			}
-		});
-
-		private final PacketHandler handler;
-
-		ClientPackets(PacketHandler handler) {
-			this.handler = handler;
-		}
-
-		@Override
-		public PacketHandler handler() {
-			return this.handler;
-		}
-	}
-
-	public static enum ServerPackets implements Packet {
-		NOTIFY_SERVER_OF_TICK_PASS((pid, buf, id) ->
-			TickSyncServer.onPacket(id)),
-		REQUEST_TICKRATE_CHANGE((pid, buf, id) ->
-			TASmod.tickratechanger.changeTickrate(buf.getFloat())),
-		TICKRATE_ZERO_TOGGLE((pid, buf, id) -> {
-			State state = TickrateChangerServer.State.fromShort(buf.getShort());
-			if (state == TickrateChangerServer.State.PAUSE)
-				TASmod.tickratechanger.pauseGame(true);
-			else if (state == TickrateChangerServer.State.UNPAUSE)
-				TASmod.tickratechanger.pauseGame(false);
-			else if (state == TickrateChangerServer.State.TOGGLE)
-				TASmod.tickratechanger.togglePause();
-		}),
-		REQUEST_TICK_ADVANCE((pid, buf, id) -> {
-			if (TASmod.tickratechanger.ticksPerSecond == 0)
-				TASmod.tickratechanger.advanceTick();
-		}),
-		SEND_CLIENT_MOTION_TO_SERVER((pid, buf, id) ->
-			ClientMotionServer.getMotion().put(TASmod.getServerInstance().getPlayerList().getPlayerByUUID(id), new ClientMotionServer.Saver(buf.getDouble(), buf.getDouble(), buf.getDouble(), buf.getFloat(), buf.getFloat(), buf.getFloat(), buf.get() == 1, buf.getFloat())));
-
-
-		private final PacketHandler handler;
-
-		ServerPackets(PacketHandler handler) {
-			this.handler = handler;
-		}
-
-		@Override
-		public PacketHandler handler() {
-			return this.handler;
-		}
-	}
+//	public static enum ServerPackets implements Packet {
+//		NOTIFY_SERVER_OF_TICK_PASS((pid, buf, id) ->
+//			TickSyncServer.onPacket(id)),
+//		REQUEST_TICKRATE_CHANGE((pid, buf, id) ->
+//			TASmod.tickratechanger.changeTickrate(buf.getFloat())),
+//		TICKRATE_ZERO_TOGGLE((pid, buf, id) -> {
+//			State state = TickrateChangerServer.State.fromShort(buf.getShort());
+//			if (state == TickrateChangerServer.State.PAUSE)
+//				TASmod.tickratechanger.pauseGame(true);
+//			else if (state == TickrateChangerServer.State.UNPAUSE)
+//				TASmod.tickratechanger.pauseGame(false);
+//			else if (state == TickrateChangerServer.State.TOGGLE)
+//				TASmod.tickratechanger.togglePause();
+//		}),
+//		REQUEST_TICK_ADVANCE((pid, buf, id) -> {
+//			if (TASmod.tickratechanger.ticksPerSecond == 0)
+//				TASmod.tickratechanger.advanceTick();
+//		}),
+//		SEND_CLIENT_MOTION_TO_SERVER((pid, buf, id) ->
+//			ClientMotionServer.getMotion().put(TASmod.getServerInstance().getPlayerList().getPlayerByUUID(id), new ClientMotionServer.Saver(buf.getDouble(), buf.getDouble(), buf.getDouble(), buf.getFloat(), buf.getFloat(), buf.getFloat(), buf.get() == 1, buf.getFloat())));
+//
+//
+//		private final PacketHandler handler;
+//
+//		ServerPackets(PacketHandler handler) {
+//			this.handler = handler;
+//		}
+//
+//		@Override
+//		public PacketHandler handler() {
+//			return this.handler;
+//		}
+//	}
 
 	/**
 	 * Sends then authentication packet to the server
 	 * @param id Unique ID
 	 * @throws Exception Unable to send packet
 	 */
-	public void authenticate(UUID id) throws Exception {
-		this.id = id;
+	private void authenticate(UUID id) throws Exception {
+		this.clientID = id;
 
-		int bufIndex = SecureList.POOL.available();
-		this.write(bufIndex, SecureList.POOL.lock(bufIndex).putInt(1).putLong(id.getMostSignificantBits()).putLong(id.getLeastSignificantBits()));
+		this.send(new ByteBufferBuilder(-1).writeUUID(id));
+	}
+	
+	private void completeAuthentication(ByteBuffer buf) throws Exception {
+		if(this.clientID!=null) {
+			throw new Exception("The client tried to authenticate while being authenticated already");
+		}
+		
+		long mostSignificant = buf.getLong();
+		long leastSignificant = buf.getLong();
+		
+		this.clientID = new UUID(mostSignificant, leastSignificant);
 	}
 	
 	private void handle(ByteBuffer buf) {
 		int id = buf.getInt();
-		Packet packet = this.packets.get(id);
-		if (packet != null)
-			packet.handler().handle(packet, buf, this.id);
-		else
-			LOGGER.error("Received invalid packet: {}", this.id);
-	}
+		try {
+			if(id==-1) {
+				completeAuthentication(buf);
+				return;
+			}
+			PacketID packet = getPacketFromID(id);
+			PacketHandlerRegistry.handle(side, packet, buf, this.clientID);
+		} catch (InvalidPacketException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
+	}
+	
 	public UUID getId() {
-		// TODO Auto-generated method stub
-		return this.id;
+		return this.clientID;
 	}
 
+	
+	private PacketID getPacketFromID(int id) throws InvalidPacketException {
+		for(PacketID packet : packetIDs) {
+			if(packet.getID() == id) {
+				return packet;
+			}
+		}
+		throw new InvalidPacketException(String.format("Received invalid packet with id {}", id));
+	}
 }

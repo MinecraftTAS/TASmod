@@ -7,46 +7,30 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.common.CommandRegistry;
-import com.minecrafttas.common.events.EventListener;
+import com.minecrafttas.common.events.EventListenerRegistry;
 import com.minecrafttas.common.events.EventServer.EventServerInit;
 import com.minecrafttas.common.events.EventServer.EventServerStop;
+import com.minecrafttas.server.PacketHandlerRegistry;
 import com.minecrafttas.server.Server;
-import com.minecrafttas.tasmod.commands.clearinputs.ClearInputsPacket;
 import com.minecrafttas.tasmod.commands.clearinputs.CommandClearInputs;
 import com.minecrafttas.tasmod.commands.folder.CommandFolder;
-import com.minecrafttas.tasmod.commands.folder.FolderPacket;
 import com.minecrafttas.tasmod.commands.fullplay.CommandFullPlay;
-import com.minecrafttas.tasmod.commands.fullplay.FullPlayPacket;
 import com.minecrafttas.tasmod.commands.fullrecord.CommandFullRecord;
-import com.minecrafttas.tasmod.commands.fullrecord.FullRecordPacket;
 import com.minecrafttas.tasmod.commands.loadtas.CommandLoadTAS;
-import com.minecrafttas.tasmod.commands.loadtas.LoadTASPacket;
 import com.minecrafttas.tasmod.commands.playback.CommandPlay;
 import com.minecrafttas.tasmod.commands.playuntil.CommandPlayUntil;
-import com.minecrafttas.tasmod.commands.playuntil.PlayUntilPacket;
 import com.minecrafttas.tasmod.commands.recording.CommandRecord;
 import com.minecrafttas.tasmod.commands.restartandplay.CommandRestartAndPlay;
-import com.minecrafttas.tasmod.commands.restartandplay.RestartAndPlayPacket;
 import com.minecrafttas.tasmod.commands.savetas.CommandSaveTAS;
-import com.minecrafttas.tasmod.commands.savetas.SaveTASPacket;
-import com.minecrafttas.tasmod.ktrng.KTRNGSeedPacket;
-import com.minecrafttas.tasmod.ktrng.KTRNGStartSeedPacket;
 import com.minecrafttas.tasmod.ktrng.KillTheRNGHandler;
-import com.minecrafttas.tasmod.playback.PlaybackController;
-import com.minecrafttas.tasmod.playback.server.InitialSyncStatePacket;
-import com.minecrafttas.tasmod.playback.server.SyncStatePacket;
 import com.minecrafttas.tasmod.playback.server.TASstateServer;
-import com.minecrafttas.tasmod.savestates.client.InputSavestatesPacket;
-import com.minecrafttas.tasmod.savestates.server.LoadstatePacket;
 import com.minecrafttas.tasmod.savestates.server.SavestateCommand;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
-import com.minecrafttas.tasmod.savestates.server.SavestatePacket;
 import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
-import com.minecrafttas.tasmod.savestates.server.motion.MotionPacket;
-import com.minecrafttas.tasmod.savestates.server.motion.RequestMotionPacket;
-import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoadingPacket;
 import com.minecrafttas.tasmod.tickratechanger.CommandTickrate;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
+import com.minecrafttas.tasmod.ticksync.TickSyncServer;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.TickScheduler;
 
 import net.fabricmc.api.ModInitializer;
@@ -72,6 +56,8 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	public static KillTheRNGHandler ktrngHandler;
 	
 	public static TickrateChangerServer tickratechanger;
+	
+	public static TickSyncServer ticksyncServer;
 	
 	public static final TickScheduler tickSchedulerServer = new TickScheduler();
 
@@ -129,50 +115,59 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 
 	@Override
 	public void onInitialize() {
+		
+		// Events
 		LOGGER.info("Initializing TASmod");
-		EventListener.register(this);
+		EventListenerRegistry.register(this);
+		
+		ticksyncServer = new TickSyncServer();
+		EventListenerRegistry.register(ticksyncServer);
+		PacketHandlerRegistry.registerClass(ticksyncServer);
 		
 		LOGGER.info("Testing connection with KillTheRNG");
 		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
-		EventListener.register(ktrngHandler);
+		EventListenerRegistry.register(ktrngHandler);
 		
 		tickratechanger = new TickrateChangerServer(LOGGER);
-		EventListener.register(tickratechanger);
+		EventListenerRegistry.register(tickratechanger);
 		
-		// Savestates
-		PacketSerializer.registerPacket(SavestatePacket.class);
-		PacketSerializer.registerPacket(LoadstatePacket.class);
+		// Networking
+		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers");
 		
-		PacketSerializer.registerPacket(InputSavestatesPacket.class);
-		PacketSerializer.registerPacket(SavestatePlayerLoadingPacket.class);
-
-		// KillTheRNG
-		PacketSerializer.registerPacket(KTRNGSeedPacket.class);
-		PacketSerializer.registerPacket(KTRNGStartSeedPacket.class);
-		
-		// Recording/Playback
-		PacketSerializer.registerPacket(SyncStatePacket.class);
-		PacketSerializer.registerPacket(InitialSyncStatePacket.class);
-		
-		PacketSerializer.registerPacket(ClearInputsPacket.class);
-		
-		PacketSerializer.registerPacket(FullRecordPacket.class);
-		PacketSerializer.registerPacket(FullPlayPacket.class);
-		
-		PacketSerializer.registerPacket(RestartAndPlayPacket.class);
-		
-		// Storing
-		PacketSerializer.registerPacket(SaveTASPacket.class);
-		PacketSerializer.registerPacket(LoadTASPacket.class);
-
-		// Misc
-		PacketSerializer.registerPacket(PlaybackController.TeleportPlayerPacket.class);
-		PacketSerializer.registerPacket(FolderPacket.class);
-		
-		PacketSerializer.registerPacket(PlayUntilPacket.class);
+//		// Savestates
+//		PacketSerializer.registerPacket(SavestatePacket.class);
+//		PacketSerializer.registerPacket(LoadstatePacket.class);
+//		
+//		PacketSerializer.registerPacket(InputSavestatesPacket.class);
+//		PacketSerializer.registerPacket(SavestatePlayerLoadingPacket.class);
+//
+//		// KillTheRNG
+//		PacketSerializer.registerPacket(KTRNGSeedPacket.class);
+//		PacketSerializer.registerPacket(KTRNGStartSeedPacket.class);
+//		
+//		// Recording/Playback
+//		PacketSerializer.registerPacket(SyncStatePacket.class);
+//		PacketSerializer.registerPacket(InitialSyncStatePacket.class);
+//		
+//		PacketSerializer.registerPacket(ClearInputsPacket.class);
+//		
+//		PacketSerializer.registerPacket(FullRecordPacket.class);
+//		PacketSerializer.registerPacket(FullPlayPacket.class);
+//		
+//		PacketSerializer.registerPacket(RestartAndPlayPacket.class);
+//		
+//		// Storing
+//		PacketSerializer.registerPacket(SaveTASPacket.class);
+//		PacketSerializer.registerPacket(LoadTASPacket.class);
+//
+//		// Misc
+//		PacketSerializer.registerPacket(PlaybackController.TeleportPlayerPacket.class);
+//		PacketSerializer.registerPacket(FolderPacket.class);
+//		
+//		PacketSerializer.registerPacket(PlayUntilPacket.class);
 		
 		try {
-			server = new Server(5555);
+			server = new Server(5555, TASmodPackets.values());
 		} catch (Exception e) {
 			LOGGER.error("Unable to launch TASmod server: {}", e);
 		}

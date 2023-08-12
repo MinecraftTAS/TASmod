@@ -2,9 +2,11 @@ package com.minecrafttas.tasmod.events;
 
 import java.io.File;
 
-import com.minecrafttas.common.events.EventListener.EventBase;
+import com.minecrafttas.common.events.EventListenerRegistry.EventBase;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
+
+import net.minecraft.server.MinecraftServer;
 
 public interface EventServer {
 	
@@ -24,7 +26,7 @@ public interface EventServer {
 		public void onSavestateEvent(int index, File target, File current);
 		
 		public static void fireSavestateEvent(int index, File target, File current) {
-			TASmod.logger.trace(LoggerMarkers.Event, "SavestateEvent {} {} {}", index, target, current);
+			TASmod.LOGGER.trace(LoggerMarkers.Event, "SavestateEvent {} {} {}", index, target, current);
 			for (EventBase eventListener : TASmodEventListener.getEventListeners()) {
 				if(eventListener instanceof EventSavestate) {
 					EventSavestate event = (EventSavestate) eventListener;
@@ -50,7 +52,7 @@ public interface EventServer {
 		public void onLoadstateEvent(int index, File target, File current);
 		
 		public static void fireLoadstateEvent(int index, File target, File current) {
-			TASmod.logger.trace(LoggerMarkers.Event, "LoadstateEvent {} {} {}", index, target, current);
+			TASmod.LOGGER.trace(LoggerMarkers.Event, "LoadstateEvent {} {} {}", index, target, current);
 			for (EventBase eventListener : TASmodEventListener.getEventListeners()) {
 				if(eventListener instanceof EventLoadstate) {
 					EventLoadstate event = (EventLoadstate) eventListener;
@@ -74,11 +76,34 @@ public interface EventServer {
 		public void onLoadstateComplete();
 		
 		public static void fireLoadstateComplete() {
-			TASmod.logger.trace(LoggerMarkers.Event, "LoadstateCompleteEvent");
+			TASmod.LOGGER.trace(LoggerMarkers.Event, "LoadstateCompleteEvent");
 			for (EventBase eventListener : TASmodEventListener.getEventListeners()) {
 				if(eventListener instanceof EventCompleteLoadstate) {
 					EventCompleteLoadstate event = (EventCompleteLoadstate) eventListener;
 					event.onLoadstateComplete();
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Fired at the end of a server tick
+	 * @author Scribble
+	 * 
+	 */
+	public static interface EventServerTickPost extends EventBase{
+		
+		/**
+		 * Fired at the end of a server tick
+		 */
+		public void onServerTickPost(MinecraftServer minecraftServer);
+		
+		public static void fireServerTickPost(MinecraftServer minecraftServer) {
+			TASmod.LOGGER.trace(LoggerMarkers.Event, "ServerTickPostEvent");
+			for (EventBase eventListener : TASmodEventListener.getEventListeners()) {
+				if(eventListener instanceof EventServerTickPost) {
+					EventServerTickPost event = (EventServerTickPost) eventListener;
+					event.onServerTickPost(minecraftServer);
 				}
 			}
 		}

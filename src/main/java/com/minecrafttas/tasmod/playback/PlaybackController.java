@@ -10,6 +10,7 @@ import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.common.events.EventClient.EventOpenGui;
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
@@ -631,7 +632,7 @@ public class PlaybackController implements EventOpenGui{
 		float angleYaw = Float.parseFloat(section[3]);
 		float anglePitch = Float.parseFloat(section[4]);
 
-		TASmodClient.packetClient.sendToServer(new TeleportPlayerPacket(x, y, z, angleYaw, anglePitch));
+		TASmodClient.packetClient.send(new TeleportPlayerPacket(x, y, z, angleYaw, anglePitch));
 	}
 
 	/**
@@ -640,7 +641,7 @@ public class PlaybackController implements EventOpenGui{
 	 * @author Scribble
 	 *
 	 */
-	public static class TeleportPlayerPacket implements Packet {
+	public static class TeleportPlayerPacket implements PacketID {
 
 		double x;
 		double y;

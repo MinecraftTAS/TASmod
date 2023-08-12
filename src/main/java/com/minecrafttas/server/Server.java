@@ -4,13 +4,14 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import com.minecrafttas.server.interfaces.PacketID;
 
 public class Server {
 
@@ -22,7 +23,7 @@ public class Server {
 	 * @param port Port
 	 * @throws Exception Unable to bind
 	 */
-	public Server(int port) throws Exception {
+	public Server(int port, PacketID[] packetIDs) throws Exception {
 		// create connection
 		LOGGER.info("Creating tasmod server on {}", port);
 		this.socket = AsynchronousServerSocketChannel.open();
@@ -34,7 +35,7 @@ public class Server {
 
 			@Override
 			public void completed(AsynchronousSocketChannel clientSocket, Object attachment) {
-				clients.add(new Client(clientSocket));
+				clients.add(new Client(clientSocket, packetIDs));
 				socket.accept(null, this);
 			}
 
@@ -53,13 +54,16 @@ public class Server {
 	 * @param buf Buffer
 	 * @throws Exception Networking exception
 	 */
-	public void writeAll(int id, ByteBuffer buf) throws Exception {
-		int limit = buf.position();
+	public void sendToAll(ByteBufferBuilder builder) throws Exception {
 		for (Client client : this.clients) {
-			int sid = SecureList.POOL.available();
-			client.write(sid, SecureList.POOL.lock(sid).put((ByteBuffer) buf.position(0).limit(limit)));
+			client.send(builder.clone());
 		}
-		SecureList.POOL.unlock(id);
+		builder.close();
+	}
+	
+	public void sendTo(UUID uuid, ByteBufferBuilder builder) throws Exception{
+		Client client = getClient(uuid);
+		client.send(builder);
 	}
 	
 	/**
@@ -79,12 +83,16 @@ public class Server {
 	 * Get client from UUID
 	 * @param uniqueID UUID
 	 */
-	public Client getClient(UUID uniqueID) {
+	private Client getClient(UUID uniqueID) {
 		for (Client client : this.clients)
 			if (client.getId().equals(uniqueID))
 				return client;
 		
 		return null;
+	}
+	
+	public List<Client> getClients(){
+		return this.clients;
 	}
 	
 	public AsynchronousServerSocketChannel getAsynchronousSocketChannel() {

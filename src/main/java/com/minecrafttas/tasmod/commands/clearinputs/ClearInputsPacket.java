@@ -1,13 +1,15 @@
 package com.minecrafttas.tasmod.commands.clearinputs;
 
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 
-public class ClearInputsPacket implements Packet{
+public class ClearInputsPacket implements PacketID{
 
 	@Override
 	public void handle(PacketSide side, EntityPlayer playerz) {

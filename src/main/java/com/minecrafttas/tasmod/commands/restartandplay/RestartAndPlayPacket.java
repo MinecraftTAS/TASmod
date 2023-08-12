@@ -3,12 +3,14 @@ package com.minecrafttas.tasmod.commands.restartandplay;
 import java.nio.charset.Charset;
 
 import com.minecrafttas.common.Configuration.ConfigOptions;
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmodClient;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
-public class RestartAndPlayPacket implements Packet{
+public class RestartAndPlayPacket implements PacketID{
 	private String name;
 	
 	public RestartAndPlayPacket() {

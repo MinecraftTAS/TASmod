@@ -1,7 +1,7 @@
 package com.minecrafttas.common.events;
 
 import com.minecrafttas.common.Common;
-import com.minecrafttas.common.events.EventListener.EventBase;
+import com.minecrafttas.common.events.EventListenerRegistry.EventBase;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -23,7 +23,7 @@ public interface EventServer {
 
 		public static void fireServerStartEvent(MinecraftServer server) {
 			Common.LOGGER.trace(Common.Event, "Firing ServerStartEvent");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if (eventListener instanceof EventServerInit) {
 					EventServerInit event = (EventServerInit) eventListener;
 					event.onServerInit(server);
@@ -46,7 +46,7 @@ public interface EventServer {
 		public void onServerTick(MinecraftServer server);
 
 		public static void fireOnServerTick(MinecraftServer server) {
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if (eventListener instanceof EventServerTick) {
 					EventServerTick event = (EventServerTick) eventListener;
 					event.onServerTick(server);
@@ -70,7 +70,7 @@ public interface EventServer {
 
 		public static void fireOnServerStop(MinecraftServer server) {
 			Common.LOGGER.trace(Common.Event, "Firing ServerStopEvent");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if (eventListener instanceof EventServerStop) {
 					EventServerStop event = (EventServerStop) eventListener;
 					event.onServerStop(server);
@@ -93,7 +93,7 @@ public interface EventServer {
 		public void onRunServerGameLoop(MinecraftServer server);
 
 		public static void fireOnServerGameLoop(MinecraftServer server) {
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if (eventListener instanceof EventServerGameLoop) {
 					EventServerGameLoop event = (EventServerGameLoop) eventListener;
 					event.onRunServerGameLoop(server);
@@ -108,7 +108,7 @@ public interface EventServer {
 
 		public static void firePlayerJoinedServerSide(EntityPlayerMP player) {
 			Common.LOGGER.trace(Common.Event, "Firing PlayerJoinedServerSide");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if (eventListener instanceof EventPlayerJoinedServerSide) {
 					EventPlayerJoinedServerSide event = (EventPlayerJoinedServerSide) eventListener;
 					event.onPlayerJoinedServerSide(player);
@@ -132,7 +132,7 @@ public interface EventServer {
 
 		public static void firePlayerLeaveServerSide(EntityPlayerMP player) {
 			Common.LOGGER.trace(Common.Event, "Firing PlayerLeaveServerSideEvent");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if (eventListener instanceof EventPlayerLeaveServerSide) {
 					EventPlayerLeaveServerSide event = (EventPlayerLeaveServerSide) eventListener;
 					event.onPlayerLeaveServerSide(player);

@@ -1,7 +1,7 @@
 package com.minecrafttas.common.events;
 
 import com.minecrafttas.common.Common;
-import com.minecrafttas.common.events.EventListener.EventBase;
+import com.minecrafttas.common.events.EventListenerRegistry.EventBase;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.Minecraft;
@@ -26,7 +26,7 @@ public interface EventClient {
 		
 		public static GuiScreen fireOpenGuiEvent(GuiScreen gui) {
 			Common.LOGGER.trace(Common.Event, "Firing OpenGuiEvent");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventOpenGui) {
 					EventOpenGui event = (EventOpenGui) eventListener;
 					GuiScreen newGui = event.onOpenGui(gui);
@@ -53,7 +53,7 @@ public interface EventClient {
 		
 		public static void fireOnLaunchIntegratedServer() {
 			Common.LOGGER.trace(Common.Event, "Firing LaunchIntegratedServer");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventLaunchIntegratedServer) {
 					EventLaunchIntegratedServer event = (EventLaunchIntegratedServer) eventListener;
 					event.onLaunchIntegratedServer();
@@ -76,7 +76,7 @@ public interface EventClient {
 		
 		public static void fireOnDoneLoadingWorld() {
 			Common.LOGGER.trace(Common.Event, "Firing DoneLoadingWorld");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventDoneLoadingWorld) {
 					EventDoneLoadingWorld event = (EventDoneLoadingWorld) eventListener;
 					event.onDoneLoadingWorld();
@@ -99,7 +99,7 @@ public interface EventClient {
 		public void onClientTick(Minecraft mc);
 		
 		public static void fireOnClientTick(Minecraft mc) {
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventClientTick) {
 					EventClientTick event = (EventClientTick) eventListener;
 					event.onClientTick(mc);
@@ -123,7 +123,7 @@ public interface EventClient {
 		
 		public static void fireOnClientInit(Minecraft mc) {
 			Common.LOGGER.trace(Common.Event, "Firing ClientInit");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventClientInit) {
 					EventClientInit event = (EventClientInit) eventListener;
 					event.onClientInit(mc);
@@ -146,7 +146,7 @@ public interface EventClient {
 		public void onRunClientGameLoop(Minecraft mc);
 		
 		public static void fireOnClientGameLoop(Minecraft mc) {
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventClientGameLoop) {
 					EventClientGameLoop event = (EventClientGameLoop) eventListener;
 					event.onRunClientGameLoop(mc);
@@ -170,7 +170,7 @@ public interface EventClient {
 		public CameraData onCameraEvent(CameraData dataIn);
 		
 		public static CameraData fireCameraEvent(CameraData dataIn) {
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventCamera) {
 					EventCamera event = (EventCamera) eventListener;
 					CameraData data = event.onCameraEvent(dataIn);
@@ -223,7 +223,7 @@ public interface EventClient {
 		
 		public static void firePlayerLeaveClientSide(EntityPlayerSP player) {
 			Common.LOGGER.trace(Common.Event, "Firing PlayerLeaveClientSideEvent");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventPlayerLeaveClientSide) {
 					EventPlayerLeaveClientSide event = (EventPlayerLeaveClientSide) eventListener;
 					event.onPlayerLeaveClientSide(player);
@@ -247,7 +247,7 @@ public interface EventClient {
 		
 		public static void firePlayerJoinedClientSide(EntityPlayerSP player) {
 			Common.LOGGER.trace(Common.Event, "Firing PlayerJoinedClientSide");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventPlayerJoinedClientSide) {
 					EventPlayerJoinedClientSide event = (EventPlayerJoinedClientSide) eventListener;
 					event.onPlayerJoinedClientSide(player);
@@ -272,7 +272,7 @@ public interface EventClient {
 		 */
 		public static void fireOtherPlayerJoinedClientSide(GameProfile profile) {
 			Common.LOGGER.trace(Common.Event, "Firing OtherPlayerJoinedClientSide");
-			for (EventBase eventListener : EventListener.getEventListeners()) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
 				if(eventListener instanceof EventOtherPlayerJoinedClientSide) {
 					EventOtherPlayerJoinedClientSide event = (EventOtherPlayerJoinedClientSide) eventListener;
 					event.onOtherPlayerJoinedClientSide(profile);

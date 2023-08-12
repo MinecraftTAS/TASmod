@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.events.EventClient.EventClientTickPost;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
 import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
-import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 import com.minecrafttas.tasmod.util.Ducks.GuiScreenDuck;
 import com.minecrafttas.tasmod.util.Ducks.SubtickDuck;
 
@@ -76,7 +76,7 @@ public abstract class MixinMinecraft {
 			TASmodClient.tickratechanger.advanceTick = false;
 			TASmodClient.tickratechanger.changeClientTickrate(0F);
 		}
-		TickSyncClient.clientPostTick((Minecraft)(Object)this);
+		EventClientTickPost.fireOnClientPostTick((Minecraft)(Object)this);
 	}
 
 	@Shadow

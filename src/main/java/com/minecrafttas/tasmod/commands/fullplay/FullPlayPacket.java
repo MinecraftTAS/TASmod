@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.commands.fullplay;
 
+import com.minecrafttas.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
@@ -10,7 +11,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
-public class FullPlayPacket implements Packet {
+public class FullPlayPacket implements PacketID {
 
 	@Override
 	public void handle(PacketSide side, EntityPlayer player) {
