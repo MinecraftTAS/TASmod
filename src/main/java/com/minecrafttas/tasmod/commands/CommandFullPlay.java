@@ -1,6 +1,8 @@
-package com.minecrafttas.tasmod.commands.fullplay;
+package com.minecrafttas.tasmod.commands;
 
+import com.minecrafttas.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
 import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
@@ -39,7 +41,11 @@ public class CommandFullPlay extends CommandBase{
 			TASmod.savestateHandler.state=SavestateState.NONE;
 		}
 		TASmod.containerStateServer.setServerState(TASstate.PLAYBACK);
-		TASmod.packetServer.sendToAll(new FullPlayPacket());
+		try {
+			TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_FULLPLAY));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

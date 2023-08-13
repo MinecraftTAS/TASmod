@@ -13,6 +13,8 @@ import java.util.UUID;
 
 import com.minecrafttas.server.interfaces.PacketID;
 
+import net.minecraft.entity.player.EntityPlayer;
+
 public class Server {
 
 	private final AsynchronousServerSocketChannel socket;
@@ -63,6 +65,11 @@ public class Server {
 	
 	public void sendTo(UUID uuid, ByteBufferBuilder builder) throws Exception{
 		Client client = getClient(uuid);
+		client.send(builder);
+	}
+	
+	public void sendTo(EntityPlayer player, ByteBufferBuilder builder) throws Exception{
+		Client client = getClient(player.getUniqueID());
 		client.send(builder);
 	}
 	

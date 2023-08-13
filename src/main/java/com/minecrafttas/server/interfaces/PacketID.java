@@ -9,4 +9,6 @@ public interface PacketID {
 	public CompactPacketHandler getLambda();
 	
 	public Side getSide();
+	
+	public String getName();
 }

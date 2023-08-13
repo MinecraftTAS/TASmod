@@ -1,9 +1,15 @@
-package com.minecrafttas.tasmod.commands.folder;
+package com.minecrafttas.tasmod.commands;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.minecrafttas.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.TASmodPackets;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -32,10 +38,16 @@ public class CommandFolder extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if (args.length == 1) {
+			short action = 0;
 			if (args[0].equalsIgnoreCase("savestates")) {
-				TASmod.packetServer.sendTo(new FolderPacket(0), (EntityPlayerMP) sender);
+				action = 0;
 			} else if (args[0].equalsIgnoreCase("tasfiles")) {
-				TASmod.packetServer.sendTo(new FolderPacket(1), (EntityPlayerMP) sender);
+				action = 1;
+			}
+			try {
+				TASmod.server.sendTo((EntityPlayerMP) sender, new ByteBufferBuilder(TASmodPackets.OPEN_FOLDER).writeShort(action));
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -51,4 +63,27 @@ public class CommandFolder extends CommandBase {
 		return tab;
 	}
 
+	public static void openTASFolder() {
+		File file = new File(TASmodClient.tasdirectory);
+		try {
+			if (!file.exists())
+				file.mkdir();
+			Desktop.getDesktop().open(file);
+		} catch (IOException e) {
+			TASmod.LOGGER.error("Something went wrong while opening ", file.getPath());
+			e.printStackTrace();
+		}
+	}
+
+	public static void openSavestates() {
+		File file = new File(TASmodClient.savestatedirectory);
+		try {
+			if (!file.exists())
+				file.mkdir();
+			Desktop.getDesktop().open(file);
+		} catch (IOException e) {
+			TASmod.LOGGER.error("Something went wrong while opening ", file.getPath());
+			e.printStackTrace();
+		}
+	}
 }

@@ -120,7 +120,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		
 		ticksyncClient = new TickSyncClient();
 		EventListenerRegistry.register(ticksyncClient);
-		PacketHandlerRegistry.registerClass(ticksyncClient);
+		PacketHandlerRegistry.register(ticksyncClient);
 		
 		keybindManager = new KeybindManager() {
 			

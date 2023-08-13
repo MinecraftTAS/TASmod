@@ -1,62 +1,62 @@
-package com.minecrafttas.tasmod.commands.restartandplay;
+package com.minecrafttas.tasmod.commands;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
-import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
-public class CommandRestartAndPlay extends CommandBase{
+public class CommandSaveTAS extends CommandBase {
+
+	private boolean check = false;
 
 	@Override
 	public String getName() {
-		return "restartandplay";
+		return "save";
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "/restartandplay <filename>";
+		return "/save <filename>";
+	}
+
+	@Override
+	public List<String> getAliases() {
+		return ImmutableList.of("saveTAS");
 	}
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (sender.canUseCommand(2, "load")) {
-			if (args.length < 1) {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Please add a filename, " + getUsage(sender)));
-			} else {
-				String name = "";
-				String spacer = " ";
-				for (int i = 0; i < args.length; i++) {
-					if (i == args.length - 1) {
-						spacer="";
+		if (sender instanceof EntityPlayer) {
+			if (sender.canUseCommand(2, "save")) {
+				if (args.length < 1) {
+					sender.sendMessage(new TextComponentString(TextFormatting.RED + "Please add a filename, " + getUsage(sender)));
+				} else {
+					String name = "";
+					String spacer = " ";
+					for (int i = 0; i < args.length; i++) {
+						if (i == args.length - 1) {
+							spacer = "";
+						}
+						name = name.concat(args[i] + spacer);
 					}
-					name=name.concat(args[i]+spacer);
+					TASmod.packetServer.sendToAll(new SaveTASPacket(name));
 				}
-				try {
-					TASmod.savestateHandler.loadState(0, false);
-				} catch (LoadstateException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				TASmod.containerStateServer.setServerState(TASstate.PLAYBACK);
-				TASmod.packetServer.sendToAll(new RestartAndPlayPacket(args[0]));
+			} else {
+				sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));
 			}
-		} else {
-			sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));
 		}
 	}
 
@@ -64,6 +64,10 @@ public class CommandRestartAndPlay extends CommandBase{
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
 		List<String> tab;
 		if (args.length == 1) {
+			if (!check) {
+				sender.sendMessage(new TextComponentString(TextFormatting.BOLD + "" + TextFormatting.RED + "WARNING!" + TextFormatting.RESET + TextFormatting.RED + " Existing filenames will be overwritten! /fail to abort the recording if you accidentally started one"));
+				check = true;
+			}
 			tab = getFilenames();
 			if (tab.isEmpty()) {
 				sender.sendMessage(new TextComponentString(TextFormatting.RED + "No files in directory"));
@@ -87,5 +91,10 @@ public class CommandRestartAndPlay extends CommandBase{
 			tab.add(listOfFiles[i].getName().replaceAll("\\.mctas", ""));
 		}
 		return tab;
+	}
+
+	@Override
+	public int getRequiredPermissionLevel() {
+		return 2;
 	}
 }

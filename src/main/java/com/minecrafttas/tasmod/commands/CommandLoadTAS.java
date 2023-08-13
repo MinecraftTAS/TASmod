@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.commands.loadtas;
+package com.minecrafttas.tasmod.commands;
 
 import java.io.File;
 import java.io.FileFilter;
