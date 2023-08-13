@@ -4,9 +4,9 @@ import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.minecrafttas.server.ByteBufferBuilder;
-import com.minecrafttas.server.interfaces.ClientPacketHandler;
-import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.common.server.ByteBufferBuilder;
+import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
+import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmodPackets;

@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.savestates.server.playerloading;
 
-import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.savestates.server.chunkloading.SavestatesChunkControl;
 
 import net.minecraft.client.Minecraft;

@@ -1,9 +1,9 @@
-package com.minecrafttas.server;
+package com.minecrafttas.common.server;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
-import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.PacketID;
 
 /**
  * Helper method for creating byte buffers which get pooled from a
@@ -107,10 +107,18 @@ public class ByteBufferBuilder {
 	}
 
 	@Override
-	protected ByteBufferBuilder clone() throws CloneNotSupportedException {
-		int limit = this.buffer.position();
+	public ByteBufferBuilder clone() throws CloneNotSupportedException {
+		int current = this.buffer.position();
 		int sid = SecureList.POOL.available();
-		return new ByteBufferBuilder(sid, SecureList.POOL.lock(sid).put((ByteBuffer) this.buffer.position(0).limit(limit)));
+		ByteBuffer clone = SecureList.POOL.lock(sid);
+		
+		this.buffer.position(0); //Reset buffer pos
+		
+		clone.put(this.buffer).limit(current).position(0);
+		
+		this.buffer.position(current);
+		
+		return new ByteBufferBuilder(sid, clone);
 	}
 
 	public static int readInt(ByteBuffer buf) {
@@ -118,7 +126,7 @@ public class ByteBufferBuilder {
 	}
 
 	public static double readDouble(ByteBuffer buf) {
-		return buf.getInt();
+		return buf.getDouble();
 	}
 
 	public static float readFloat(ByteBuffer buf) {
@@ -129,12 +137,16 @@ public class ByteBufferBuilder {
 		return buf.getLong();
 	}
 
-	public static float readShort(ByteBuffer buf) {
+	public static short readShort(ByteBuffer buf) {
 		return buf.getShort();
 	}
 
 	public static boolean readBoolean(ByteBuffer buf) {
 		return buf.get() == 1 ? true : false;
+	}
+	
+	public static UUID readUUID(ByteBuffer buf) {
+		return new UUID(buf.getLong(), buf.getLong());
 	}
 
 	public static String readString(ByteBuffer buf) {

@@ -13,12 +13,12 @@ import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.common.events.EventClient.EventOpenGui;
-import com.minecrafttas.server.ByteBufferBuilder;
-import com.minecrafttas.server.exception.PacketNotImplementedException;
-import com.minecrafttas.server.exception.WrongSideException;
-import com.minecrafttas.server.interfaces.ClientPacketHandler;
-import com.minecrafttas.server.interfaces.PacketID;
-import com.minecrafttas.server.interfaces.ServerPacketHandler;
+import com.minecrafttas.common.server.ByteBufferBuilder;
+import com.minecrafttas.common.server.exception.PacketNotImplementedException;
+import com.minecrafttas.common.server.exception.WrongSideException;
+import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
+import com.minecrafttas.common.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.TASmodPackets;

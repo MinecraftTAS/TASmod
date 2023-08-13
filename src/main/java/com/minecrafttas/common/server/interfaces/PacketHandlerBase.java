@@ -1,4 +1,4 @@
-package com.minecrafttas.server.interfaces;
+package com.minecrafttas.common.server.interfaces;
 
 public interface PacketHandlerBase {
 	/**

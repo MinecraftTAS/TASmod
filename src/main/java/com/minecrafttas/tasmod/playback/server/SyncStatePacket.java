@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.playback.server;
 
-import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackController;

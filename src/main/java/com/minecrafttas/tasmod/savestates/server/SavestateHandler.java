@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
-import com.minecrafttas.server.Client;
-import com.minecrafttas.server.SecureList;
+import com.minecrafttas.common.server.Client;
+import com.minecrafttas.common.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventCompleteLoadstate;
 import com.minecrafttas.tasmod.events.EventServer.EventLoadstate;

@@ -3,7 +3,7 @@ package com.minecrafttas.tasmod.savestates.client;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
 

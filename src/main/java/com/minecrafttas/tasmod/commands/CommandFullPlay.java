@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.commands;
 
-import com.minecrafttas.server.ByteBufferBuilder;
+import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;

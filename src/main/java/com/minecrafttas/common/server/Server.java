@@ -1,6 +1,4 @@
-package com.minecrafttas.server;
-
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
+package com.minecrafttas.common.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -11,13 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.minecrafttas.server.interfaces.PacketID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.minecrafttas.common.server.interfaces.PacketID;
 
 import net.minecraft.entity.player.EntityPlayer;
 
 public class Server {
 
 	private final AsynchronousServerSocketChannel socket;
+	public static final Logger LOGGER = LogManager.getLogger("PacketServer");
 	private final List<Client> clients;
 	
 	/**
@@ -27,7 +29,7 @@ public class Server {
 	 */
 	public Server(int port, PacketID[] packetIDs) throws Exception {
 		// create connection
-		LOGGER.info("Creating tasmod server on {}", port);
+		LOGGER.info("Creating server on port {}", port);
 		this.socket = AsynchronousServerSocketChannel.open();
 		this.socket.bind(new InetSocketAddress(port));
 		
@@ -47,7 +49,7 @@ public class Server {
 			}
 		});
 		
-		LOGGER.info("TASmod server created");
+		LOGGER.info("Server created");
 	}
 	
 	/**
