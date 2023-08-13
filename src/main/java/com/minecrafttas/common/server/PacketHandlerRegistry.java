@@ -1,4 +1,4 @@
-package com.minecrafttas.server;
+package com.minecrafttas.common.server;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -7,12 +7,13 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.minecrafttas.server.Client.Side;
-import com.minecrafttas.server.exception.PacketNotImplementedException;
-import com.minecrafttas.server.interfaces.ClientPacketHandler;
-import com.minecrafttas.server.interfaces.PacketHandlerBase;
-import com.minecrafttas.server.interfaces.PacketID;
-import com.minecrafttas.server.interfaces.ServerPacketHandler;
+import com.minecrafttas.common.server.Client.Side;
+import com.minecrafttas.common.server.exception.PacketNotImplementedException;
+import com.minecrafttas.common.server.exception.WrongSideException;
+import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
+import com.minecrafttas.common.server.interfaces.PacketHandlerBase;
+import com.minecrafttas.common.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 
 public class PacketHandlerRegistry {
 	private static final List<PacketHandlerBase> REGISTRY = new ArrayList<>();
@@ -33,7 +34,7 @@ public class PacketHandlerRegistry {
 		}
 	}
 
-	public static void handle(Side side, PacketID packet, ByteBuffer buf, UUID clientID) throws Exception {
+	public static void handle(Side side, PacketID packet, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
 		if (side != null && side == packet.getSide()) {
 			packet.getLambda().onPacket(buf, clientID);
 			return;

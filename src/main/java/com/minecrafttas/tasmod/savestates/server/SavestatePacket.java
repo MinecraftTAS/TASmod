@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.savestates.server;
 
-import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;

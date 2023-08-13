@@ -1,7 +1,7 @@
 package com.minecrafttas.tasmod.networking;
 
-import com.minecrafttas.server.ByteBufferBuilder;
-import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.common.server.ByteBufferBuilder;
+import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
 public class TASmodBufferBuilder extends ByteBufferBuilder{

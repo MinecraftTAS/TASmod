@@ -1,10 +1,10 @@
-package com.minecrafttas.server.interfaces;
+package com.minecrafttas.common.server.interfaces;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
-import com.minecrafttas.server.exception.PacketNotImplementedException;
-import com.minecrafttas.server.exception.WrongSideException;
+import com.minecrafttas.common.server.exception.PacketNotImplementedException;
+import com.minecrafttas.common.server.exception.WrongSideException;
 
 public interface ClientPacketHandler extends PacketHandlerBase{
 	

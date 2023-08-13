@@ -1,6 +1,6 @@
-package com.minecrafttas.server;
+package com.minecrafttas.common.server;
 
-import static com.minecrafttas.server.SecureList.BUFFER_SIZE;
+import static com.minecrafttas.common.server.SecureList.BUFFER_SIZE;
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.io.IOException;
@@ -11,8 +11,12 @@ import java.nio.channels.CompletionHandler;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
-import com.minecrafttas.server.exception.InvalidPacketException;
-import com.minecrafttas.server.interfaces.PacketID;
+import org.apache.logging.log4j.Level;
+
+import com.minecrafttas.common.server.exception.InvalidPacketException;
+import com.minecrafttas.common.server.exception.PacketNotImplementedException;
+import com.minecrafttas.common.server.exception.WrongSideException;
+import com.minecrafttas.common.server.interfaces.PacketID;
 
 public class Client {
 
@@ -47,7 +51,7 @@ public class Client {
 		this.packetIDs = packetIDs;
 		
 		this.createHandlers();
-		LOGGER.info("Connected to tasmod server");
+		Server.LOGGER.info("Connected to tasmod server");
 		
 		authenticate(uuid);
 	}
@@ -88,13 +92,13 @@ public class Client {
 					readBuffer.clear().limit(4);
 					socket.read(readBuffer, null, this);
 				} catch (Throwable exc) {
-					LOGGER.error("Unable to read packet!", exc);
+					Server.LOGGER.error("Unable to read packet!", exc);
 				}
 			}
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
-				LOGGER.error("Unable to read packet!", exc);
+				Server.LOGGER.error("Unable to read packet!", exc);
 			}
 
 		});
@@ -264,8 +268,10 @@ public class Client {
 			}
 			PacketID packet = getPacketFromID(id);
 			PacketHandlerRegistry.handle(side, packet, buf, this.clientID);
+		} catch (PacketNotImplementedException | WrongSideException e) {
+			Server.LOGGER.throwing(Level.ERROR, e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Server.LOGGER.throwing(Level.ERROR, e);
 		}
 
 	}

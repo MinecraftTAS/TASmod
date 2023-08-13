@@ -1,4 +1,4 @@
-package com.minecrafttas.server;
+package com.minecrafttas.common.server;
 
 import java.nio.ByteBuffer;
 

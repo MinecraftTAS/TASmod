@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import com.minecrafttas.server.ByteBufferBuilder;
-import com.minecrafttas.server.interfaces.PacketID;
-import com.minecrafttas.server.interfaces.ServerPacketHandler;
+import com.minecrafttas.common.server.ByteBufferBuilder;
+import com.minecrafttas.common.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodPackets;
 import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;

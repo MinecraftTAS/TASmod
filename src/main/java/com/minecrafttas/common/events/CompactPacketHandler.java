@@ -3,7 +3,7 @@ package com.minecrafttas.common.events;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
-import com.minecrafttas.server.exception.PacketNotImplementedException;
+import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 
 @FunctionalInterface
 public interface CompactPacketHandler {

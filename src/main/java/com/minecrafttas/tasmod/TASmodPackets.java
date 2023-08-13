@@ -1,8 +1,8 @@
 package com.minecrafttas.tasmod;
 
 import com.minecrafttas.common.events.CompactPacketHandler;
-import com.minecrafttas.server.Client.Side;
-import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.common.server.Client.Side;
+import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.commands.CommandFolder;
 import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
 
