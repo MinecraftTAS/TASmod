@@ -12,16 +12,16 @@ import com.minecrafttas.common.events.EventServer.EventServerInit;
 import com.minecrafttas.common.events.EventServer.EventServerStop;
 import com.minecrafttas.server.PacketHandlerRegistry;
 import com.minecrafttas.server.Server;
-import com.minecrafttas.tasmod.commands.clearinputs.CommandClearInputs;
-import com.minecrafttas.tasmod.commands.folder.CommandFolder;
-import com.minecrafttas.tasmod.commands.fullplay.CommandFullPlay;
-import com.minecrafttas.tasmod.commands.fullrecord.CommandFullRecord;
-import com.minecrafttas.tasmod.commands.loadtas.CommandLoadTAS;
-import com.minecrafttas.tasmod.commands.playback.CommandPlay;
-import com.minecrafttas.tasmod.commands.playuntil.CommandPlayUntil;
-import com.minecrafttas.tasmod.commands.recording.CommandRecord;
-import com.minecrafttas.tasmod.commands.restartandplay.CommandRestartAndPlay;
-import com.minecrafttas.tasmod.commands.savetas.CommandSaveTAS;
+import com.minecrafttas.tasmod.commands.CommandClearInputs;
+import com.minecrafttas.tasmod.commands.CommandFolder;
+import com.minecrafttas.tasmod.commands.CommandFullPlay;
+import com.minecrafttas.tasmod.commands.CommandFullRecord;
+import com.minecrafttas.tasmod.commands.CommandLoadTAS;
+import com.minecrafttas.tasmod.commands.CommandPlay;
+import com.minecrafttas.tasmod.commands.CommandPlayUntil;
+import com.minecrafttas.tasmod.commands.CommandRecord;
+import com.minecrafttas.tasmod.commands.CommandRestartAndPlay;
+import com.minecrafttas.tasmod.commands.CommandSaveTAS;
 import com.minecrafttas.tasmod.ktrng.KillTheRNGHandler;
 import com.minecrafttas.tasmod.playback.server.TASstateServer;
 import com.minecrafttas.tasmod.savestates.server.SavestateCommand;
@@ -60,7 +60,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	public static TickSyncServer ticksyncServer;
 	
 	public static final TickScheduler tickSchedulerServer = new TickScheduler();
-
+	
 	public static Server server;
 	
 	@Override
@@ -122,7 +122,9 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		
 		ticksyncServer = new TickSyncServer();
 		EventListenerRegistry.register(ticksyncServer);
-		PacketHandlerRegistry.registerClass(ticksyncServer);
+		PacketHandlerRegistry.register(ticksyncServer);
+		
+		PacketHandlerRegistry.register(TASmodClient.virtual.getContainer());
 		
 		LOGGER.info("Testing connection with KillTheRNG");
 		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));

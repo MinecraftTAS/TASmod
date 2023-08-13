@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.commands.fullrecord;
+package com.minecrafttas.tasmod.commands;
 
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;

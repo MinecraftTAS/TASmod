@@ -264,8 +264,6 @@ public class Client {
 			}
 			PacketID packet = getPacketFromID(id);
 			PacketHandlerRegistry.handle(side, packet, buf, this.clientID);
-		} catch (InvalidPacketException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -31,12 +31,12 @@ public class SyncStatePacket implements PacketID {
 
 	public SyncStatePacket(TASstate state) {
 		verbose = true;
-		this.state = (short) state.getIndex();
+		this.state = (short) state.ordinal();
 	}
 
 	public SyncStatePacket(TASstate state, boolean verbose) {
 		this.verbose = verbose;
-		this.state = (short) state.getIndex();
+		this.state = (short) state.ordinal();
 	}
 
 	@Override

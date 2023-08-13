@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.commands.recording;
+package com.minecrafttas.tasmod.commands;
 
 import java.util.List;
 
@@ -14,16 +14,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
-public class CommandRecord extends CommandBase {
+public class CommandPlay extends CommandBase {
 
 	@Override
 	public String getName() {
-		return "record";
+		return "play";
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "/record";
+		return "/play";
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class CommandRecord extends CommandBase {
 
 	@Override
 	public List<String> getAliases() {
-		return ImmutableList.of("r");
+		return ImmutableList.of("p");
 	}
 
 	@Override
@@ -42,10 +42,7 @@ public class CommandRecord extends CommandBase {
 			return;
 		}
 		if (args.length < 1) {
-			TASmod.containerStateServer.toggleRecording();
-			TASmod.tickSchedulerServer.add(() ->{
-				TASmod.ktrngHandler.broadcastStartSeed();
-			});
+			TASmod.containerStateServer.togglePlayback();
 		} else if (args.length > 1) {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments. " + getUsage(sender)));
 		}

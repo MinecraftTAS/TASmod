@@ -14,7 +14,7 @@ public class SavestateDataFile {
 	
 	public enum DataValues {
 		INDEX("currentIndex"),
-		Name("savestateName"),
+		NAME("savestateName"),
 		SEED("ktrngSeed");
 		
 		

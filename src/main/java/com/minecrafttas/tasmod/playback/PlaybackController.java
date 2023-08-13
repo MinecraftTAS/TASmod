@@ -1,18 +1,28 @@
 package com.minecrafttas.tasmod.playback;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.common.events.EventClient.EventOpenGui;
+import com.minecrafttas.server.ByteBufferBuilder;
+import com.minecrafttas.server.exception.PacketNotImplementedException;
+import com.minecrafttas.server.exception.WrongSideException;
+import com.minecrafttas.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.server.interfaces.PacketID;
+import com.minecrafttas.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.TASmodPackets;
+import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.playback.server.TASstateClient;
@@ -28,6 +38,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -52,7 +63,7 @@ import net.minecraft.util.text.TextFormatting;
  * @author Scribble
  *
  */
-public class PlaybackController implements EventOpenGui{
+public class PlaybackController implements EventOpenGui, ServerPacketHandler, ClientPacketHandler{
 
 	/**
 	 * The current state of the controller.
@@ -806,51 +817,21 @@ public class PlaybackController implements EventOpenGui{
 	 */
 	public static enum TASstate {
 		/**
-		 * The game records inputs to the {@link InputContainer}.
+		 * The game is neither recording, playing back or paused, is also set when aborting all mentioned states.
 		 */
-		RECORDING,
+		NONE,
 		/**
 		 * The game plays back the inputs loaded in {@link InputContainer} and locks user interaction.
 		 */
 		PLAYBACK,
 		/**
+		 * The game records inputs to the {@link InputContainer}.
+		 */
+		RECORDING,
+		/**
 		 * The playback or recording is paused and may be resumed. Note that the game isn't paused, only the playback. Useful for debugging things.
 		 */
-		PAUSED,	// #124
-		/**
-		 * The game is neither recording, playing back or paused, is also set when aborting all mentioned states.
-		 */
-		NONE;
-		
-		public int getIndex() {
-			switch(this) {
-			case NONE:
-				return 0;
-			case PLAYBACK:
-				return 1;
-			case RECORDING:
-				return 2;
-			case PAUSED:
-				return 3;
-			default:
-				return 0;	
-			}
-		}
-		
-		public static TASstate fromIndex(int state) {
-			switch (state) {
-			case 0:
-				return NONE;
-			case 1:
-				return PLAYBACK;
-			case 2:
-				return RECORDING;
-			case 3:
-				return PAUSED;
-			default:
-				return NONE;
-			}
-		}
+		PAUSED;	// #124
 	}
 
 	private TASstate stateWhenOpened;
@@ -874,5 +855,87 @@ public class PlaybackController implements EventOpenGui{
 			}
 		}
 		return gui;
+	}
+
+	// ====================================== Networking
+	
+	@Override
+	public PacketID[] getAcceptedPacketIDs() {
+		return new TASmodPackets[] {
+				TASmodPackets.PLAYBACK_PLAY,
+				TASmodPackets.PLAYBACK_RECORD,
+				TASmodPackets.PLAYBACK_SAVE,
+				TASmodPackets.PLAYBACK_LOAD,
+				TASmodPackets.PLAYBACK_FULLPLAY,
+				TASmodPackets.PLAYBACK_FULLRECORD,
+				TASmodPackets.PLAYBACK_RESTARTANDPLAY,
+				TASmodPackets.PLAYBACK_PLAYUNTIL
+				
+		};
+	}
+
+	@Override
+	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+		TASmodPackets packet = (TASmodPackets) id;
+		
+		Minecraft mc = Minecraft.getMinecraft();
+
+		switch (packet) {
+		
+		case PLAYBACK_PLAY:
+			break;
+
+		case PLAYBACK_RECORD:
+			break;
+
+		case PLAYBACK_SAVE:
+			break;
+
+		case PLAYBACK_LOAD:
+			mc.addScheduledTask(() -> {
+				String name = ByteBufferBuilder.readString(buf);
+				try {
+					TASmodClient.virtual.loadInputs(name);
+				} catch (IOException e) {
+					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
+					return;
+				}
+				mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Loaded inputs from " + name + ".mctas"));
+			});
+			break;
+
+		case PLAYBACK_FULLPLAY:
+			OpenGuiEvents.stateWhenOpened = TASstate.PLAYBACK;
+			TASmodClient.tickSchedulerClient.add(() -> {
+				mc.world.sendQuittingDisconnectingPacket();
+				mc.loadWorld((WorldClient) null);
+				mc.displayGuiScreen(new GuiMainMenu());
+			});
+			break;
+
+		case PLAYBACK_FULLRECORD:
+			OpenGuiEvents.stateWhenOpened = TASstate.RECORDING;
+			TASmodClient.virtual.getContainer().clear();
+			TASmodClient.tickSchedulerClient.add(() -> {
+				mc.world.sendQuittingDisconnectingPacket();
+				mc.loadWorld((WorldClient) null);
+				mc.displayGuiScreen(new GuiMainMenu());
+			});
+			break;
+
+		case PLAYBACK_RESTARTANDPLAY:
+			break;
+
+		case PLAYBACK_PLAYUNTIL:
+			break;
+
+		default:
+			throw new PacketNotImplementedException(packet, this.getClass());
+		}
+	}
+
+	@Override
+	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+		
 	}
 }

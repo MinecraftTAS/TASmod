@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.commands.playuntil;
+package com.minecrafttas.tasmod.commands;
 
 import com.minecrafttas.tasmod.TASmod;
 
