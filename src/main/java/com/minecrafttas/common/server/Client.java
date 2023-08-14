@@ -13,11 +13,17 @@ import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.Level;
 
+import com.minecrafttas.common.Common;
 import com.minecrafttas.common.server.exception.InvalidPacketException;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.PacketID;
 
+/**
+ * A custom asynchronous client
+ * 
+ * @author Pancake
+ */
 public class Client {
 
 	private final AsynchronousSocketChannel socket;
@@ -40,6 +46,8 @@ public class Client {
 	 * Create and connect socket
 	 * @param host Host
 	 * @param port Port
+	 * @param packetIDs A list of PacketIDs which are registered
+	 * @param uuid The UUID of the client
 	 * @throws Exception Unable to connect
 	 */
 	public Client(String host, int port, PacketID[] packetIDs, UUID uuid) throws Exception {
@@ -51,7 +59,7 @@ public class Client {
 		this.packetIDs = packetIDs;
 		
 		this.createHandlers();
-		Server.LOGGER.info("Connected to tasmod server");
+		Common.LOGGER.info("Connected to tasmod server");
 		
 		authenticate(uuid);
 	}
@@ -92,13 +100,13 @@ public class Client {
 					readBuffer.clear().limit(4);
 					socket.read(readBuffer, null, this);
 				} catch (Throwable exc) {
-					Server.LOGGER.error("Unable to read packet!", exc);
+					Common.LOGGER.error("Unable to read packet!", exc);
 				}
 			}
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
-				Server.LOGGER.error("Unable to read packet!", exc);
+				Common.LOGGER.error("Unable to read packet!", exc);
 			}
 
 		});
@@ -135,7 +143,7 @@ public class Client {
 	 */
 	public void close() throws IOException {
 		if (this.socket == null || !this.socket.isOpen()) {
-			LOGGER.warn("Tried to close dead socket");
+			Common.LOGGER.warn("Tried to close dead socket");
 			return;
 		}
 		
@@ -269,9 +277,9 @@ public class Client {
 			PacketID packet = getPacketFromID(id);
 			PacketHandlerRegistry.handle(side, packet, buf, this.clientID);
 		} catch (PacketNotImplementedException | WrongSideException e) {
-			Server.LOGGER.throwing(Level.ERROR, e);
+			Common.LOGGER.throwing(Level.ERROR, e);
 		} catch (Exception e) {
-			Server.LOGGER.throwing(Level.ERROR, e);
+			Common.LOGGER.throwing(Level.ERROR, e);
 		}
 
 	}
@@ -288,5 +296,9 @@ public class Client {
 			}
 		}
 		throw new InvalidPacketException(String.format("Received invalid packet with id {}", id));
+	}
+
+	public boolean isClosed() {
+		return this.socket == null || !this.socket.isOpen();
 	}
 }

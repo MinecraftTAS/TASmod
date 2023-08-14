@@ -1,7 +1,6 @@
 package common.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.nio.ByteBuffer;
@@ -27,14 +26,18 @@ import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 
-import net.minecraft.client.renderer.BufferBuilder;
-
 class ServerTest {
 
 	private enum TestPacketIDs implements PacketID {
-		TEST_INTERFACE, TEST_LAMBDA_CLIENT(Side.CLIENT, (buf, clientID) -> {
+		TEST_INTERFACE_INT,
+		TEST_INTERFACE_STRING,
+		TEST_LAMBDA_CLIENT(Side.CLIENT, (buf, clientID) -> {
+			result = ByteBufferBuilder.readInt(buf);
+			ServerTest.side = Side.CLIENT;
 			latch.countDown();
 		}), TEST_LAMBDA_SERVER(Side.SERVER, (buf, clientID) -> {
+			result = ByteBufferBuilder.readInt(buf);
+			ServerTest.side = Side.SERVER;
 			latch.countDown();
 		});
 
@@ -71,22 +74,28 @@ class ServerTest {
 
 	}
 
-	private static Client.Side side;
+	private static Client.Side side = null;
 
 	private static class TestingClass implements ClientPacketHandler, ServerPacketHandler {
 
 		@Override
 		public PacketID[] getAcceptedPacketIDs() {
-			return new TestPacketIDs[] { TestPacketIDs.TEST_INTERFACE };
+			return new TestPacketIDs[] { TestPacketIDs.TEST_INTERFACE_INT, TestPacketIDs.TEST_INTERFACE_STRING };
 		}
 
 		@Override
 		public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
 			TestPacketIDs packet = (TestPacketIDs) id;
 			switch (packet) {
-			case TEST_INTERFACE:
-				latch.countDown();
+			case TEST_INTERFACE_INT:
+				result = ByteBufferBuilder.readInt(buf);
 				side = Side.SERVER;
+				latch.countDown();
+				break;
+			case TEST_INTERFACE_STRING:
+				result2 = ByteBufferBuilder.readString(buf);
+				side = Side.SERVER;
+				latch.countDown();
 				break;
 			default:
 				throw new PacketNotImplementedException(id, this.getClass());
@@ -97,9 +106,10 @@ class ServerTest {
 		public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
 			TestPacketIDs packet = (TestPacketIDs) id;
 			switch (packet) {
-			case TEST_INTERFACE:
+			case TEST_INTERFACE_INT:
+				result = ByteBufferBuilder.readInt(buf);
+				side = Side.CLIENT;
 				latch.countDown();
-				side = Side.SERVER;
 				break;
 			default:
 				throw new PacketNotImplementedException(id, this.getClass());
@@ -111,29 +121,30 @@ class ServerTest {
 	private static Server server;
 	private static Client client;
 
-	private Integer result = null;
-	
-	private static TestingClass clazz=new TestingClass();
-	
+	private static Integer result = null;
+	private static String result2 = null;
+
+	private static TestingClass clazz = new TestingClass();
+
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		try {
-			server = new Server(25565, TestPacketIDs.values());
+			server = new Server(25566, TestPacketIDs.values());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		UUID uuid = UUID.fromString("b8abdafc-5002-40df-ab68-63206ea4c7e8");
 
-		client = new Client("127.0.0.1", 25565, TestPacketIDs.values(), uuid);
-		
+		try {
+			client = new Client("127.0.0.1", 25566, TestPacketIDs.values(), uuid);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		PacketHandlerRegistry.register(clazz);
 	}
 
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
-		server.close();
-		client.close();
 		PacketHandlerRegistry.unregister(clazz);
 	}
 
@@ -151,25 +162,130 @@ class ServerTest {
 	}
 
 	@Test
-	void testSendClient() {
+	void testSendToServerInterface() {
 		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		try {
-			client.send(new ByteBufferBuilder(TestPacketIDs.TEST_INTERFACE).writeInt(1));
+			client.send(new ByteBufferBuilder(TestPacketIDs.TEST_INTERFACE_INT).writeInt(1));
 		} catch (Exception e) {
 			fail(e);
 			return;
 		}
 		try {
-			latch.await(2, TimeUnit.SECONDS);
+			latch.await(1, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			fail(e);
 			return;
 		}
 		assertEquals(1, result);
+		assertEquals(Client.Side.SERVER, side);
 	}
 
+	@Test
+	void testSendToAllClientsInterface() {
+		try {
+			server.sendToAll(new ByteBufferBuilder(TestPacketIDs.TEST_INTERFACE_INT).writeInt(2));
+		} catch (Exception e) {
+			fail(e);
+			return;
+		}
+		try {
+			latch.await(1, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			fail(e);
+			return;
+		}
+		assertEquals(2, result);
+		assertEquals(Client.Side.CLIENT, side);
+	}
+	
+	@Test
+	void testSendToClientInterface() {
+		try {
+			server.sendTo(UUID.fromString("b8abdafc-5002-40df-ab68-63206ea4c7e8"), new ByteBufferBuilder(TestPacketIDs.TEST_INTERFACE_INT).writeInt(3));
+		} catch (Exception e) {
+			fail(e);
+			return;
+		}
+		try {
+			latch.await(1, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			fail(e);
+			return;
+		}
+		assertEquals(3, result);
+		assertEquals(Client.Side.CLIENT, side);
+	}
+	
+	@Test
+	void testSendToServerInterface2() {
+		try {
+			client.send(new ByteBufferBuilder(TestPacketIDs.TEST_INTERFACE_STRING).writeString("TEST"));
+		} catch (Exception e) {
+			fail(e);
+			return;
+		}
+		try {
+			latch.await(1, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			fail(e);
+			return;
+		}
+		assertEquals("TEST", result2);
+		assertEquals(Client.Side.SERVER, side);
+	}
+	
+	// ============================ Lambda
+	
+	@Test
+	void testSendToServerLambda() {
+		try {
+			client.send(new ByteBufferBuilder(TestPacketIDs.TEST_LAMBDA_SERVER).writeInt(4));
+		} catch (Exception e) {
+			fail(e);
+			return;
+		}
+		try {
+			latch.await(1, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			fail(e);
+			return;
+		}
+		assertEquals(4, result);
+		assertEquals(Client.Side.SERVER, side);
+	}
+	
+	@Test
+	void testSendToAllClientsLambda() {
+		try {
+			server.sendToAll(new ByteBufferBuilder(TestPacketIDs.TEST_LAMBDA_CLIENT).writeInt(2));
+		} catch (Exception e) {
+			fail(e);
+			return;
+		}
+		try {
+			latch.await(1, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			fail(e);
+			return;
+		}
+		assertEquals(2, result);
+		assertEquals(Client.Side.CLIENT, side);
+	}
+	
+	@Test
+	void testSendToClientLambda() {
+		try {
+			server.sendTo(UUID.fromString("b8abdafc-5002-40df-ab68-63206ea4c7e8"), new ByteBufferBuilder(TestPacketIDs.TEST_LAMBDA_CLIENT).writeInt(6));
+		} catch (Exception e) {
+			fail(e);
+			return;
+		}
+		try {
+			latch.await(1, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			fail(e);
+			return;
+		}
+		assertEquals(6, result);
+		assertEquals(Client.Side.CLIENT, side);
+	}
 }
