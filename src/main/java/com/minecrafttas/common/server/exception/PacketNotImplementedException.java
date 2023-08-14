@@ -16,7 +16,7 @@ public class PacketNotImplementedException extends Exception {
 	}
 	
 	public PacketNotImplementedException(PacketID packet) {
-		super(String.format("The packet %s is not implemented", packet.getName()));
+		super(String.format("The packet %s is not implemented or not registered in getAssociatedPacketIDs", packet.getName()));
 	}
 	
 }

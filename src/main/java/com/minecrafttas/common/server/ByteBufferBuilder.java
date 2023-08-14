@@ -112,9 +112,9 @@ public class ByteBufferBuilder {
 		int sid = SecureList.POOL.available();
 		ByteBuffer clone = SecureList.POOL.lock(sid);
 		
-		this.buffer.position(0); //Reset buffer pos
+		this.buffer.limit(current).position(0);
 		
-		clone.put(this.buffer).limit(current).position(0);
+		clone.put(this.buffer);
 		
 		this.buffer.position(current);
 		

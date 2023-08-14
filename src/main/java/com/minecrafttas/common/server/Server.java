@@ -9,17 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import com.minecrafttas.common.Common;
 import com.minecrafttas.common.server.interfaces.PacketID;
 
 import net.minecraft.entity.player.EntityPlayer;
 
+/**
+ * A custom asynchronous server
+ * 
+ * @author Pancake
+ */
 public class Server {
 
 	private final AsynchronousServerSocketChannel socket;
-	public static final Logger LOGGER = LogManager.getLogger("PacketServer");
 	private final List<Client> clients;
 	
 	/**
@@ -29,7 +31,7 @@ public class Server {
 	 */
 	public Server(int port, PacketID[] packetIDs) throws Exception {
 		// create connection
-		LOGGER.info("Creating server on port {}", port);
+		Common.LOGGER.info("Creating server on port {}", port);
 		this.socket = AsynchronousServerSocketChannel.open();
 		this.socket.bind(new InetSocketAddress(port));
 		
@@ -45,17 +47,16 @@ public class Server {
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
-				LOGGER.error("Unable to accept client!", exc);
+				Common.LOGGER.error("Unable to accept client!", exc);
 			}
 		});
 		
-		LOGGER.info("Server created");
+		Common.LOGGER.info("Server created");
 	}
 	
 	/**
 	 * Write packet to all clients
-	 * @param id Buffer id
-	 * @param buf Buffer
+	 * @param builder The packet contents
 	 * @throws Exception Networking exception
 	 */
 	public void sendToAll(ByteBufferBuilder builder) throws Exception {
@@ -65,14 +66,28 @@ public class Server {
 		builder.close();
 	}
 	
+	/**
+	 * Send a packet to the specified uuid
+	 * @param uuid The UUID to send to
+	 * @param builder The packet contents
+	 * @throws Exception Networking exception
+	 */
 	public void sendTo(UUID uuid, ByteBufferBuilder builder) throws Exception{
 		Client client = getClient(uuid);
 		client.send(builder);
 	}
 	
+	/**
+	 * Send a packet to a specified player
+	 * 
+	 * Similar to {@link #sendTo(UUID, ByteBufferBuilder)}
+	 * 
+	 * @param player The player to send to
+	 * @param builder The packet contents
+	 * @throws Exception Networking exception
+	 */
 	public void sendTo(EntityPlayer player, ByteBufferBuilder builder) throws Exception{
-		Client client = getClient(player.getUniqueID());
-		client.send(builder);
+		sendTo(player.getUniqueID(), builder);
 	}
 	
 	/**
@@ -81,13 +96,17 @@ public class Server {
 	 */
 	public void close() throws IOException {
 		if (this.socket == null || !this.socket.isOpen()) {
-			LOGGER.warn("Tried to close dead socket");
+			Common.LOGGER.warn("Tried to close dead socket");
 			return;
 		}
 		
 		this.socket.close();
 	}
 
+	public boolean isClosed() {
+		return this.socket == null || !this.socket.isOpen();
+	}
+	
 	/**
 	 * Get client from UUID
 	 * @param uniqueID UUID
