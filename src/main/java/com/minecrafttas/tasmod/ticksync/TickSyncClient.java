@@ -9,8 +9,8 @@ import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.TASmodPackets;
 import com.minecrafttas.tasmod.events.EventClient.EventClientTickPost;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.client.Minecraft;
 

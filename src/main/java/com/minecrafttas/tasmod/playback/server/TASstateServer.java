@@ -1,6 +1,15 @@
 package com.minecrafttas.tasmod.playback.server;
 
+import java.nio.ByteBuffer;
+import java.util.UUID;
+
+import com.minecrafttas.common.server.exception.PacketNotImplementedException;
+import com.minecrafttas.common.server.exception.WrongSideException;
+import com.minecrafttas.common.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -20,7 +29,7 @@ import net.minecraft.server.MinecraftServer;
  * @author Scribble
  *
  */
-public class TASstateServer {
+public class TASstateServer implements ServerPacketHandler{
 	
 	private TASstate state;
 
@@ -31,20 +40,36 @@ public class TASstateServer {
 		shouldChange = true;
 	}
 
-	public void onInitialPacket(EntityPlayerMP player, TASstate tasState) {
-		if(player.canUseCommand(2, "") && shouldChange) {
-			setState(tasState);
-			shouldChange = false;
-		}else {
-			TASmod.packetServer.sendTo(new SyncStatePacket(tasState), player);
+	@Override
+	public PacketID[] getAcceptedPacketIDs() {
+		return new TASmodPackets[] {TASmodPackets.STATESYNC_INITIAL, TASmodPackets.STATESYNC};
+	}
+
+	@Override
+	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+		TASmodPackets packet = (TASmodPackets) id;
+		TASstate networkState = TASmodBufferBuilder.readTASState(buf);
+		
+		switch (packet) {
+		case STATESYNC_INITIAL:
+			if (/* TODO Permissions && */ shouldChange) {
+				setState(networkState);
+				shouldChange = false;
+			} else {
+				TASmod.server.sendTo(clientID, new TASmodBufferBuilder(TASmodPackets.STATESYNC_INITIAL).writeTASState(networkState));
+			}
+			break;
+
+		case STATESYNC:
+			/* TODO Permissions */
+			setState(networkState);
+			break;
+
+		default:
+			throw new PacketNotImplementedException(packet, this.getClass());
 		}
 	}
 	
-	public void onPacket(EntityPlayerMP player, TASstate tasState) {
-		if(player.canUseCommand(2, "")) {
-			setState(tasState);
-		}
-	}
 
 	public void leaveServer(EntityPlayerMP player) {
 		MinecraftServer server = TASmod.getServerInstance();
@@ -58,7 +83,11 @@ public class TASstateServer {
 
 	public void setState(TASstate stateIn) {
 		setServerState(stateIn);
-		TASmod.packetServer.sendToAll(new SyncStatePacket(state, true));
+		try {
+			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.STATESYNC).writeTASState(state).writeBoolean(true));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void setServerState(TASstate stateIn) {
@@ -84,4 +113,5 @@ public class TASstateServer {
 	public TASstate getState() {
 		return state;
 	}
+
 }

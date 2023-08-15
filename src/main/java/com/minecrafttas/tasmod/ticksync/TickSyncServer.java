@@ -10,8 +10,8 @@ import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.TASmodPackets;
 import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.server.MinecraftServer;
 
