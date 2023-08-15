@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod;
+package com.minecrafttas.tasmod.networking;
 
 import com.minecrafttas.common.events.CompactPacketHandler;
 import com.minecrafttas.common.server.Client.Side;
@@ -8,6 +8,11 @@ import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
 
 import net.minecraft.client.Minecraft;
 
+/**
+ * PacketIDs and handlers specifically for TASmod
+ * 
+ * @author Pancake, Scribble
+ */
 public enum TASmodPackets implements PacketID {
 	/**
 	 * <p>Ticksync is a system to sync the tick execution between client and server.
@@ -48,8 +53,6 @@ public enum TASmodPackets implements PacketID {
 	}),
 	SAVESTATE_MOTION,
 	CLEAR_INNPUTS,
-	PLAYBACK_RECORD,
-	PLAYBACK_PLAY,
 	PLAYBACK_FULLRECORD,
 	PLAYBACK_FULLPLAY,
 	PLAYBACK_RESTARTANDPLAY,

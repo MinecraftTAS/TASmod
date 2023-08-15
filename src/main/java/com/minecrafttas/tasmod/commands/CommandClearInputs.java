@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod.commands;
 
 import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.TASmodPackets;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;

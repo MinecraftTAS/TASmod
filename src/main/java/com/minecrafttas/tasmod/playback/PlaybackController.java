@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
+import com.minecrafttas.common.Configuration.ConfigOptions;
 import com.minecrafttas.common.events.EventClient.EventOpenGui;
 import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
@@ -21,9 +22,9 @@ import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.TASmodPackets;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.playback.server.TASstateClient;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
@@ -862,14 +863,13 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
 		return new TASmodPackets[] {
-				TASmodPackets.PLAYBACK_PLAY,
-				TASmodPackets.PLAYBACK_RECORD,
 				TASmodPackets.PLAYBACK_SAVE,
 				TASmodPackets.PLAYBACK_LOAD,
 				TASmodPackets.PLAYBACK_FULLPLAY,
 				TASmodPackets.PLAYBACK_FULLRECORD,
 				TASmodPackets.PLAYBACK_RESTARTANDPLAY,
-				TASmodPackets.PLAYBACK_PLAYUNTIL
+				TASmodPackets.PLAYBACK_PLAYUNTIL,
+				TASmodPackets.CLEAR_INNPUTS
 				
 		};
 	}
@@ -882,51 +882,74 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 
 		switch (packet) {
 		
-		case PLAYBACK_PLAY:
-			break;
-
-		case PLAYBACK_RECORD:
-			break;
-
 		case PLAYBACK_SAVE:
 			break;
 
 		case PLAYBACK_LOAD:
-			mc.addScheduledTask(() -> {
-				String name = ByteBufferBuilder.readString(buf);
-				try {
-					TASmodClient.virtual.loadInputs(name);
-				} catch (IOException e) {
+			String name = ByteBufferBuilder.readString(buf);
+			try {
+				TASmodClient.virtual.loadInputs(name);
+			} catch (IOException e) {
+				if (mc.world != null)
 					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
-					return;
-				}
+				else
+					e.printStackTrace();
+				return;
+			}
+			if (mc.world != null)
 				mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Loaded inputs from " + name + ".mctas"));
-			});
+			else
+				TASmod.LOGGER.debug(LoggerMarkers.Playback, "Loaded inputs from " + name + ".mctas");
 			break;
 
 		case PLAYBACK_FULLPLAY:
-			OpenGuiEvents.stateWhenOpened = TASstate.PLAYBACK;
-			TASmodClient.tickSchedulerClient.add(() -> {
-				mc.world.sendQuittingDisconnectingPacket();
-				mc.loadWorld((WorldClient) null);
+			OpenGuiEvents.stateWhenOpened = TASstate.PLAYBACK; // Set the state to PLAYBACK when the main menu is opened
+
+			TASmodClient.tickSchedulerClient.add(() -> { // Schedule code to be executed on the next tick
+				// Exit the server if you are in one
+				if (mc.world != null) {
+					mc.world.sendQuittingDisconnectingPacket();
+					mc.loadWorld((WorldClient) null);
+				}
 				mc.displayGuiScreen(new GuiMainMenu());
 			});
 			break;
 
 		case PLAYBACK_FULLRECORD:
-			OpenGuiEvents.stateWhenOpened = TASstate.RECORDING;
-			TASmodClient.virtual.getContainer().clear();
+			OpenGuiEvents.stateWhenOpened = TASstate.RECORDING;	// Set the state to RECORDING when the main menu is opened
+			
+			TASmodClient.virtual.getContainer().clear();	// Clear inputs
+			
+			// Schedule code to be executed on the next tick
 			TASmodClient.tickSchedulerClient.add(() -> {
-				mc.world.sendQuittingDisconnectingPacket();
-				mc.loadWorld((WorldClient) null);
+				if (mc.world != null) {	// Exit the server if you are in one
+					mc.world.sendQuittingDisconnectingPacket();
+					mc.loadWorld((WorldClient) null);
+				}
 				mc.displayGuiScreen(new GuiMainMenu());
 			});
 			break;
 
 		case PLAYBACK_RESTARTANDPLAY:
+			name = ByteBufferBuilder.readString(buf);
+			try {
+				Thread.sleep(100L);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				TASmodClient.config.set(ConfigOptions.FileToOpen, name);
+				System.exit(0);
+			});
 			break;
 
 		case PLAYBACK_PLAYUNTIL:
+			int until = ByteBufferBuilder.readInt(buf);
+			TASmodClient.virtual.getContainer().setPlayUntil(until);
+			break;
+			
+		case CLEAR_INNPUTS:
+			TASmodClient.virtual.getContainer().clear();
 			break;
 
 		default:
@@ -936,6 +959,34 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 
 	@Override
 	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+		TASmodPackets packet = (TASmodPackets) id;
+		//TODO #181 Permissions
+		switch (packet) {
 		
+		case PLAYBACK_SAVE:
+			break;
+
+		case PLAYBACK_LOAD:
+			TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_LOAD));
+			break;
+
+		case PLAYBACK_FULLPLAY:
+			break;
+
+		case PLAYBACK_FULLRECORD:
+			break;
+
+		case PLAYBACK_RESTARTANDPLAY:
+			break;
+
+		case PLAYBACK_PLAYUNTIL:
+			break;
+			
+		case CLEAR_INNPUTS:
+			TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.CLEAR_INNPUTS));
+
+		default:
+			throw new PacketNotImplementedException(packet, this.getClass());
+		}
 	}
 }

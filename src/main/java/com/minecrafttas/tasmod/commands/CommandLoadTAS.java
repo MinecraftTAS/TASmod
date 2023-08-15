@@ -5,7 +5,9 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
@@ -44,7 +46,11 @@ public class CommandLoadTAS extends CommandBase {
 						}
 						name=name.concat(args[i]+spacer);
 					}
-					TASmod.packetServer.sendToAll(new LoadTASPacket(name));
+					try {
+						TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_LOAD).writeString(name));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			} else {
 				sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));

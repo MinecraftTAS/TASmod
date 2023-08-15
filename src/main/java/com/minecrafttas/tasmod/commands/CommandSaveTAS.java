@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
@@ -52,7 +54,11 @@ public class CommandSaveTAS extends CommandBase {
 						}
 						name = name.concat(args[i] + spacer);
 					}
-					TASmod.packetServer.sendToAll(new SaveTASPacket(name));
+					try {
+						TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_SAVE).writeString(name));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			} else {
 				sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));
@@ -81,6 +87,7 @@ public class CommandSaveTAS extends CommandBase {
 	public List<String> getFilenames() {
 		List<String> tab = new ArrayList<String>();
 		File folder = new File(Minecraft.getMinecraft().mcDataDir, "saves" + File.separator + "tasfiles");
+		
 		File[] listOfFiles = folder.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {

@@ -23,6 +23,7 @@ import com.minecrafttas.tasmod.commands.CommandRecord;
 import com.minecrafttas.tasmod.commands.CommandRestartAndPlay;
 import com.minecrafttas.tasmod.commands.CommandSaveTAS;
 import com.minecrafttas.tasmod.ktrng.KillTheRNGHandler;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.server.TASstateServer;
 import com.minecrafttas.tasmod.savestates.server.SavestateCommand;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler;

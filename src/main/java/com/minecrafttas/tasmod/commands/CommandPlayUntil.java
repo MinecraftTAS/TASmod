@@ -1,6 +1,8 @@
 package com.minecrafttas.tasmod.commands;
 
+import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -29,7 +31,11 @@ public class CommandPlayUntil extends CommandBase{
 			} catch (NumberFormatException e) {
 				throw new CommandException("{} is not a number", args[0]);
 			}
-			TASmod.packetServer.sendToAll(new PlayUntilPacket(i));
+			try {
+				TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_PLAYUNTIL).writeInt(i));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		else {
 			sender.sendMessage(new TextComponentString("Stops the next playback one tick before the specified tick and lets you record from there:\n\n/playuntil 10, runs the playback until tick 9 and will record from there. Useful when you can't savestate"));

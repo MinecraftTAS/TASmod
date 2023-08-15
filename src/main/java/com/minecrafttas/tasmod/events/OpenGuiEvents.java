@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiMainMenu;
 
+@Deprecated
 public class OpenGuiEvents {
 	/**
 	 * The state that should be used when the main menu opens

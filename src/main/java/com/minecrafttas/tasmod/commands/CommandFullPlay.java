@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod.commands;
 
 import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.TASmodPackets;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
 import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;

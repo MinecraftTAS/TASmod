@@ -100,7 +100,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	public void sendGlobalSeedToServer(long seedIn) {
 		if(isLoaded()) {
 			if(TASmodClient.client != null)
-				TASmodClient.packetClient.send(new KTRNGSeedPacket(seedIn));
+				TASmodClient.client.send(new KTRNGSeedPacket(seedIn));
 			else
 				setGlobalSeedClient(seedIn);
 		}
