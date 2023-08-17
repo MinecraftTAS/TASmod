@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
@@ -56,7 +56,7 @@ public class CommandRestartAndPlay extends CommandBase{
 				}
 				TASmod.containerStateServer.setServerState(TASstate.PLAYBACK);
 				try {
-					TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_RESTARTANDPLAY).writeString(args[0]));
+					TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_RESTARTANDPLAY).writeString(args[0]));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

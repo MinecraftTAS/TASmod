@@ -4,12 +4,12 @@ import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventClient.EventClientTickPost;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.client.Minecraft;
@@ -57,7 +57,7 @@ public class TickSyncClient implements ClientPacketHandler, EventClientTickPost{
 		}
 		
 		try {
-			TASmodClient.client.send(new ByteBufferBuilder(TASmodPackets.TICKSYNC));
+			TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.TICKSYNC));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to server:", e);
 		}

@@ -1,7 +1,7 @@
 package com.minecrafttas.tasmod.commands;
 
-import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.command.CommandBase;
@@ -32,7 +32,7 @@ public class CommandPlayUntil extends CommandBase{
 				throw new CommandException("{} is not a number", args[0]);
 			}
 			try {
-				TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_PLAYUNTIL).writeInt(i));
+				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_PLAYUNTIL).writeInt(i));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
