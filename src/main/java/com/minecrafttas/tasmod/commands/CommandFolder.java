@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.command.CommandBase;
@@ -45,7 +45,7 @@ public class CommandFolder extends CommandBase {
 				action = 1;
 			}
 			try {
-				TASmod.server.sendTo((EntityPlayerMP) sender, new ByteBufferBuilder(TASmodPackets.OPEN_FOLDER).writeShort(action));
+				TASmod.server.sendTo((EntityPlayerMP) sender, new TASmodBufferBuilder(TASmodPackets.OPEN_FOLDER).writeShort(action));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

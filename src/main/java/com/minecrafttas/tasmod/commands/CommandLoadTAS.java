@@ -5,8 +5,8 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.client.Minecraft;
@@ -47,7 +47,7 @@ public class CommandLoadTAS extends CommandBase {
 						name=name.concat(args[i]+spacer);
 					}
 					try {
-						TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_LOAD).writeString(name));
+						TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_LOAD).writeString(name));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

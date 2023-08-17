@@ -1,7 +1,7 @@
 package com.minecrafttas.tasmod.commands;
 
-import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
@@ -42,7 +42,7 @@ public class CommandFullRecord extends CommandBase {
 		}
 		TASmod.containerStateServer.setServerState(TASstate.RECORDING);
 		try {
-			TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_FULLRECORD));
+			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_FULLRECORD));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

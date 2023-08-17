@@ -24,6 +24,7 @@ import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 import com.minecrafttas.tasmod.playback.server.TASstateClient;
@@ -886,7 +887,7 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 			break;
 
 		case PLAYBACK_LOAD:
-			String name = ByteBufferBuilder.readString(buf);
+			String name = TASmodBufferBuilder.readString(buf);
 			try {
 				TASmodClient.virtual.loadInputs(name);
 			} catch (IOException e) {
@@ -967,7 +968,7 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 			break;
 
 		case PLAYBACK_LOAD:
-			TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.PLAYBACK_LOAD));
+			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_LOAD));
 			break;
 
 		case PLAYBACK_FULLPLAY:
@@ -983,7 +984,7 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 			break;
 			
 		case CLEAR_INNPUTS:
-			TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.CLEAR_INNPUTS));
+			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.CLEAR_INNPUTS));
 
 		default:
 			throw new PacketNotImplementedException(packet, this.getClass());

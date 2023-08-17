@@ -6,11 +6,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 
 import net.minecraft.server.MinecraftServer;
@@ -76,7 +76,7 @@ public class TickSyncServer implements ServerPacketHandler, EventServerTickPost 
 	@Override
 	public void onServerTickPost(MinecraftServer server) {
 		try {
-			TASmod.server.sendToAll(new ByteBufferBuilder(TASmodPackets.TICKSYNC));
+			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKSYNC));
 		} catch (Exception e) {
 			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
 		}
