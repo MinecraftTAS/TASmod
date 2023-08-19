@@ -1,9 +1,16 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
+import java.nio.ByteBuffer;
+import java.util.UUID;
+
 import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.common.events.EventServer.EventPlayerJoinedServerSide;
 import com.minecrafttas.common.events.EventServer.EventServerStop;
+import com.minecrafttas.common.server.exception.PacketNotImplementedException;
+import com.minecrafttas.common.server.exception.WrongSideException;
+import com.minecrafttas.common.server.interfaces.PacketID;
+import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
@@ -26,7 +33,7 @@ import net.minecraft.server.MinecraftServer;
  * @author Scribble
  *
  */
-public class TickrateChangerServer implements EventServerStop, EventPlayerJoinedServerSide{
+public class TickrateChangerServer implements EventServerStop, EventPlayerJoinedServerSide, ServerPacketHandler{
 	
 	/**
 	 * The current tickrate of the client
@@ -255,6 +262,20 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 				return TOGGLE;
 			}
 		}
+	}
+
+	@Override
+	public PacketID[] getAcceptedPacketIDs() {
+		return new TASmodPackets[] {
+			TASmodPackets.TICKRATE_CHANGE,
+			TASmodPackets.TICKRATE_ADVANCE,
+			TASmodPackets.TICKRATE_ZERO,
+		};
+	}
+
+	@Override
+	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+		
 	}
 	
 }
