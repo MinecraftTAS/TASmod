@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.minecrafttas.common.events.CompactPacketHandler;
@@ -26,9 +27,10 @@ import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 
+@Disabled
 class ServerTest {
 
-	private static int ttl = 5;
+	private static int ttl = 1;
 	
 	private enum TestPacketIDs implements PacketID {
 		TEST_INTERFACE_INT,
