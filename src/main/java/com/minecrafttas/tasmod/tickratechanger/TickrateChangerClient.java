@@ -1,11 +1,11 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
 import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
-import com.minecrafttas.common.server.Client;
-import com.minecrafttas.common.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.State;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.TickratePauseState;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.client.Minecraft;
@@ -96,10 +96,9 @@ public class TickrateChangerClient implements EventClientGameLoop{
 		
 		try {
 			// request tickrate change
-			var bufIndex = SecureList.POOL.available();
-			TASmodClient.client.sendToServer(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.REQUEST_TICKRATE_CHANGE.ordinal()).putFloat(tickrate));
+			TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.TICKRATE_CHANGE).writeFloat(tickrate));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to server:", e);
+			e.printStackTrace();
 		}
 	}
 
@@ -109,11 +108,10 @@ public class TickrateChangerClient implements EventClientGameLoop{
 	public void togglePause() {
 		if (Minecraft.getMinecraft().world != null) {
 			try {
-				// toggle tickrate zero
-				var bufIndex = SecureList.POOL.available();
-				TASmodClient.client.sendToServer(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.TICKRATE_ZERO_TOGGLE.ordinal()).putShort(State.TOGGLE.toShort()));
+				// request tickrate change
+				TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.TICKRATE_ZERO).writeTickratePauseState(TickratePauseState.TOGGLE));
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Unable to send packet to server:", e);
+				e.printStackTrace();
 			}
 		} else {
 			togglePauseClient();
@@ -174,11 +172,9 @@ public class TickrateChangerClient implements EventClientGameLoop{
 	 */
 	public void advanceServerTick() {
 		try {
-			// request tick advance
-			var bufIndex = SecureList.POOL.available();
-			TASmodClient.client.sendToServer(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ServerPackets.REQUEST_TICK_ADVANCE.ordinal()));
+			TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.TICKRATE_ADVANCE));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to server:", e);
+			e.printStackTrace();
 		}
 	}
 	

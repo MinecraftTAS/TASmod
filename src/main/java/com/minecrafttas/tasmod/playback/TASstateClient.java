@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.playback.server;
+package com.minecrafttas.tasmod.playback;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -12,7 +12,6 @@ import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
-import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.TickScheduler.TickTask;

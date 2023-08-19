@@ -4,9 +4,6 @@ import com.minecrafttas.common.events.CompactPacketHandler;
 import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.commands.CommandFolder;
-import com.minecrafttas.tasmod.savestates.client.gui.GuiSavestateSavingScreen;
-
-import net.minecraft.client.Minecraft;
 
 /**
  * PacketIDs and handlers specifically for TASmod
@@ -30,7 +27,7 @@ public enum TASmodPackets implements PacketID {
 	 * <p>SIDE: Both<br>
 	 * ARGS: int tickrate
 	 */
-	TICKRATE_SET,
+	TICKRATE_CHANGE,
 	/**
 	 * <p>Sets the tickrate to 0, pausing the game. Also unpauses the game
 	 * 
@@ -44,14 +41,9 @@ public enum TASmodPackets implements PacketID {
 	 * <p>SIDE: Client<br>
 	 * ARGS: none
 	 */
-	SAVESTATE_SCREEN(Side.CLIENT, (buf, clientID) -> {
-		Minecraft mc = Minecraft.getMinecraft();
-		if (!(mc.currentScreen instanceof GuiSavestateSavingScreen))
-			mc.displayGuiScreen(new GuiSavestateSavingScreen());
-		else
-			mc.displayGuiScreen(null);
-	}),
-	SAVESTATE_MOTION,
+	SAVESTATE_SCREEN,
+	SAVESTATE_PLAYER,
+	SAVESTATE_UNLOAD_CHUNKS,
 	CLEAR_INNPUTS,
 	PLAYBACK_FULLRECORD,
 	PLAYBACK_FULLPLAY,
@@ -59,6 +51,7 @@ public enum TASmodPackets implements PacketID {
 	PLAYBACK_SAVE,
 	PLAYBACK_LOAD,
 	PLAYBACK_PLAYUNTIL,
+	PLAYBACK_TELEPORT,
 	STATESYNC_INITIAL,
 	STATESYNC,
 	/**

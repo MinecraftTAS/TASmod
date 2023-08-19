@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.playback.server;
+package com.minecrafttas.tasmod.playback;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;

@@ -5,8 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer;
-import com.minecrafttas.tasmod.savestates.server.motion.ClientMotionServer.Saver;
+import com.minecrafttas.tasmod.savestates.SavestateHandlerServer;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,7 +16,7 @@ public class MixinEntityPlayerMP {
 	@Inject(method = "writeEntityToNBT", at = @At(value = "RETURN"))
 	public void writeClientMotion(NBTTagCompound compound, CallbackInfo ci) {
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
-		ClientMotionServer.Saver saver = ClientMotionServer.getMotion().get((EntityPlayerMP) (Object) this);
+		SavestateHandlerServer.Saver saver = SavestateHandlerServer.getMotion().get((EntityPlayerMP) (Object) this);
 		if (saver != null) {
 			nbttagcompound.setDouble("x", saver.getClientX());
 			nbttagcompound.setDouble("y", saver.getClientY());
@@ -52,8 +51,8 @@ public class MixinEntityPlayerMP {
 		boolean sprinting = nbttagcompound.getBoolean("Sprinting");
 		float jumpVector = nbttagcompound.getFloat("JumpFactor");
 		
-		ClientMotionServer.Saver saver = new Saver(clientmotionX, clientmotionY, clientmotionZ, clientmotionrX, clientmotionrY, clientmotionrZ, sprinting, jumpVector);
-		ClientMotionServer.getMotion().put((EntityPlayerMP) (Object) this, saver);
+		SavestateHandlerServer.Saver saver = new SavestateHandlerServer.Saver(clientmotionX, clientmotionY, clientmotionZ, clientmotionrX, clientmotionrY, clientmotionrZ, sprinting, jumpVector);
+		SavestateHandlerServer.getMotion().put((EntityPlayerMP) (Object) this, saver);
 
 	}
 }

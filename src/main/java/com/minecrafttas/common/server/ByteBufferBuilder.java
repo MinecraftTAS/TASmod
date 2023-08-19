@@ -14,7 +14,7 @@ import com.minecrafttas.common.server.interfaces.PacketID;
 public class ByteBufferBuilder {
 
 	private int bufferIndex;
-	private ByteBuffer buffer;
+	protected ByteBuffer buffer;
 
 	public ByteBufferBuilder(int id) {
 		bufferIndex = SecureList.POOL.available();

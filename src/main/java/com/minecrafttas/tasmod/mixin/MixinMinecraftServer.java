@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventCompleteLoadstate;
 import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;
-import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
+import com.minecrafttas.tasmod.savestates.SavestateHandlerServer.SavestateState;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

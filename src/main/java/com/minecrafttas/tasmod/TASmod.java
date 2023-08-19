@@ -22,13 +22,13 @@ import com.minecrafttas.tasmod.commands.CommandPlayUntil;
 import com.minecrafttas.tasmod.commands.CommandRecord;
 import com.minecrafttas.tasmod.commands.CommandRestartAndPlay;
 import com.minecrafttas.tasmod.commands.CommandSaveTAS;
+import com.minecrafttas.tasmod.commands.CommandTickrate;
+import com.minecrafttas.tasmod.commands.CommandSavestate;
 import com.minecrafttas.tasmod.ktrng.KillTheRNGHandler;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
-import com.minecrafttas.tasmod.playback.server.TASstateServer;
-import com.minecrafttas.tasmod.savestates.server.SavestateCommand;
-import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
-import com.minecrafttas.tasmod.savestates.server.files.SavestateTrackerFile;
-import com.minecrafttas.tasmod.tickratechanger.CommandTickrate;
+import com.minecrafttas.tasmod.playback.TASstateServer;
+import com.minecrafttas.tasmod.savestates.SavestateHandlerServer;
+import com.minecrafttas.tasmod.savestates.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
@@ -52,7 +52,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	
 	public static TASstateServer containerStateServer;
 	
-	public static SavestateHandler savestateHandler;
+	public static SavestateHandlerServer savestateHandler;
 	
 	public static KillTheRNGHandler ktrngHandler;
 	
@@ -77,7 +77,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		CommandRegistry.registerServerCommand(new CommandLoadTAS(), server);
 		CommandRegistry.registerServerCommand(new CommandFolder(), server);
 		CommandRegistry.registerServerCommand(new CommandClearInputs(), server);
-		CommandRegistry.registerServerCommand(new SavestateCommand(), server);
+		CommandRegistry.registerServerCommand(new CommandSavestate(), server);
 		CommandRegistry.registerServerCommand(new CommandFullRecord(), server);
 		CommandRegistry.registerServerCommand(new CommandFullPlay(), server);
 		CommandRegistry.registerServerCommand(new CommandRestartAndPlay(), server);
@@ -91,7 +91,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 			e.printStackTrace();
 		}
 		
-		savestateHandler=new SavestateHandler(server, LOGGER);
+		savestateHandler=new SavestateHandlerServer(server, LOGGER);
 		
 		if(!server.isDedicatedServer()) {
 			TASmod.tickratechanger.ticksPerSecond=0F;
@@ -124,8 +124,6 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		ticksyncServer = new TickSyncServer();
 		EventListenerRegistry.register(ticksyncServer);
 		PacketHandlerRegistry.register(ticksyncServer);
-		
-		PacketHandlerRegistry.register(TASmodClient.virtual.getContainer());
 		
 		LOGGER.info("Testing connection with KillTheRNG");
 		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));

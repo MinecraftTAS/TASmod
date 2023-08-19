@@ -4,9 +4,9 @@ import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.common.events.EventServer.EventPlayerJoinedServerSide;
 import com.minecrafttas.common.events.EventServer.EventServerStop;
-import com.minecrafttas.common.server.Client;
-import com.minecrafttas.common.server.SecureList;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
+import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -86,11 +86,9 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 			log("Changing the tickrate "+ tickrate + " to all clients");
 		
 		try {
-			// send new tickrate to clients
-			int bufIndex = SecureList.POOL.available();
-			TASmod.server.sendToAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.CHANGE_TICKRATE_ON_CLIENTS.ordinal()).putFloat(tickrate));
+			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_CHANGE).writeFloat(tickrate));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+			e.printStackTrace();
 		}
 	}
 
@@ -175,11 +173,9 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
      */
     private static void advanceClientTick() {
     	try {
-	    	// advance tick on clients
-			int bufIndex = SecureList.POOL.available();
-			TASmod.server.sendToAll(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.ADVANCE_TICK_ON_CLIENTS.ordinal()));
+			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_ADVANCE));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+			e.printStackTrace();
 		}
     }
 
@@ -201,12 +197,11 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 	public void onPlayerJoinedServerSide(EntityPlayerMP player) {
 		if(TASmod.getServerInstance().isDedicatedServer()) {
 			log("Sending the current tickrate ("+ticksPerSecond+") to " +player.getName());
+			
 			try {
-				// change tickrate on client
-				int bufIndex = SecureList.POOL.available();
-				TASmod.server.getClient(player.getUniqueID()).sendToServer(bufIndex, SecureList.POOL.lock(bufIndex).putInt(Client.ClientPackets.CHANGE_TICKRATE_ON_CLIENTS.ordinal()).putFloat(ticksPerSecond));
+				TASmod.server.sendTo(player.getUniqueID(), new TASmodBufferBuilder(TASmodPackets.TICKRATE_CHANGE).writeFloat(ticksPerSecond));
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Unable to send packet to {}: {}", player.getUniqueID(), e);
+				e.printStackTrace();
 			}
 		}
 	}
@@ -226,7 +221,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 		}
 	}
 	
-	public static enum State {
+	public static enum TickratePauseState {
 		/**
 		 * Set's the game to tickrate 0
 		 */
@@ -242,7 +237,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 
 		private short id;
 
-		State(short i) {
+		TickratePauseState(short i) {
 			id = i;
 		}
 
@@ -250,7 +245,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 			return id;
 		}
 
-		public static State fromShort(short i) {
+		public static TickratePauseState fromShort(short i) {
 			switch (i) {
 			case 1:
 				return PAUSE;
