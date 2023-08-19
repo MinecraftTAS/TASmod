@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.playback.controlbytes;
+package com.minecrafttas.tasmod.playback;
 
 import java.util.List;
 

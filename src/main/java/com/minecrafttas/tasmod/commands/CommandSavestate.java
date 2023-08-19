@@ -1,13 +1,13 @@
-package com.minecrafttas.tasmod.savestates.server;
+package com.minecrafttas.tasmod.commands;
 
 import java.io.IOException;
 import java.util.List;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.savestates.server.SavestateHandler.SavestateState;
-import com.minecrafttas.tasmod.savestates.server.exceptions.LoadstateException;
-import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateDeleteException;
-import com.minecrafttas.tasmod.savestates.server.exceptions.SavestateException;
+import com.minecrafttas.tasmod.savestates.SavestateHandlerServer.SavestateState;
+import com.minecrafttas.tasmod.savestates.exceptions.LoadstateException;
+import com.minecrafttas.tasmod.savestates.exceptions.SavestateDeleteException;
+import com.minecrafttas.tasmod.savestates.exceptions.SavestateException;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -18,7 +18,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 
-public class SavestateCommand extends CommandBase {
+public class CommandSavestate extends CommandBase {
 
 	@Override
 	public String getName() {

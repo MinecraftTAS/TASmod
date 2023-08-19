@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.savestates.server.files;
+package com.minecrafttas.tasmod.savestates.files;
 
 import java.io.File;
 import java.io.IOException;

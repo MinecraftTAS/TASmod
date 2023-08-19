@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.savestates.client.gui;
+package com.minecrafttas.tasmod.savestates.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

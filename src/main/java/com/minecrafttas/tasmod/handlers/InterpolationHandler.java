@@ -2,8 +2,8 @@ package com.minecrafttas.tasmod.handlers;
 
 import com.minecrafttas.common.events.EventClient.EventCamera;
 import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.playback.ControlByteHandler;
 import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
-import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.MathHelper;

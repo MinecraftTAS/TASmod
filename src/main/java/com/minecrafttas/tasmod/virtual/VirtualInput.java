@@ -449,7 +449,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	 * Loads and preloads the inputs from the new InputContainer to
 	 * {@link #container}
 	 * 
-	 * Saving a savestate is done via {@linkplain com.minecrafttas.tasmod.playback.PlaybackSerialiser#saveToFileV1(File, PlaybackController)} in {@linkplain com.minecrafttas.tasmod.savestates.client.InputSavestatesHandler#savestate(String)}
+	 * Saving a savestate is done via {@linkplain com.minecrafttas.tasmod.playback.PlaybackSerialiser#saveToFileV1(File, PlaybackController)} in {@linkplain com.minecrafttas.tasmod.savestates.SavestateHandlerClient#savestate(String)}
 	 * 
 	 * @param savestatecontainer The container that should be loaded.
 	 */

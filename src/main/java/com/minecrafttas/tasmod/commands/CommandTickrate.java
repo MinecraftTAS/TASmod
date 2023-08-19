@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.tickratechanger;
+package com.minecrafttas.tasmod.commands;
 
 import java.util.List;
 

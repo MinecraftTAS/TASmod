@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.savestates.server.exceptions;
+package com.minecrafttas.tasmod.savestates.exceptions;
 
 public class SavestateException extends Exception{
 	/**

@@ -15,6 +15,7 @@ import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.common.Configuration.ConfigOptions;
 import com.minecrafttas.common.events.EventClient.EventOpenGui;
 import com.minecrafttas.common.server.ByteBufferBuilder;
+import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
@@ -26,8 +27,6 @@ import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
-import com.minecrafttas.tasmod.playback.controlbytes.ControlByteHandler;
-import com.minecrafttas.tasmod.playback.server.TASstateClient;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
@@ -41,9 +40,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
@@ -645,69 +642,18 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 		float angleYaw = Float.parseFloat(section[3]);
 		float anglePitch = Float.parseFloat(section[4]);
 
-		TASmodClient.packetClient.send(new TeleportPlayerPacket(x, y, z, angleYaw, anglePitch));
+		try {
+			TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_TELEPORT)
+					.writeDouble(x)
+					.writeDouble(y)
+					.writeDouble(z)
+					.writeFloat(angleYaw)
+					.writeFloat(anglePitch)
+					);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-
-	/**
-	 * Permissionless player teleporting packet
-	 * 
-	 * @author Scribble
-	 *
-	 */
-	public static class TeleportPlayerPacket implements PacketID {
-
-		double x;
-		double y;
-		double z;
-
-		float angleYaw;
-		float anglePitch;
-
-		public TeleportPlayerPacket(double x, double y, double z, float angleYaw, float anglePitch) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-			this.angleYaw = angleYaw;
-			this.anglePitch = anglePitch;
-		}
-
-		public TeleportPlayerPacket() {
-		}
-
-		@Override
-		public void handle(PacketSide side, EntityPlayer playerz) {
-			if (side.isServer()) {
-				EntityPlayerMP player = (EntityPlayerMP) playerz;
-				player.getServerWorld().addScheduledTask(() -> {
-					player.rotationPitch = anglePitch;
-					player.rotationYaw = angleYaw;
-
-					player.setPositionAndUpdate(x, y, z);
-				});
-			}
-		}
-
-		@Override
-		public void serialize(PacketBuffer buf) {
-			buf.writeDouble(x);
-			buf.writeDouble(y);
-			buf.writeDouble(z);
-
-			buf.writeFloat(angleYaw);
-			buf.writeFloat(anglePitch);
-		}
-
-		@Override
-		public void deserialize(PacketBuffer buf) {
-			this.x = buf.readDouble();
-			this.y = buf.readDouble();
-			this.z = buf.readDouble();
-			this.angleYaw = buf.readFloat();
-			this.anglePitch = buf.readFloat();
-		}
-
-	}
-
 
 	// ==============================================================
 
@@ -870,6 +816,7 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 				TASmodPackets.PLAYBACK_FULLRECORD,
 				TASmodPackets.PLAYBACK_RESTARTANDPLAY,
 				TASmodPackets.PLAYBACK_PLAYUNTIL,
+				TASmodPackets.PLAYBACK_TELEPORT,
 				TASmodPackets.CLEAR_INNPUTS
 				
 		};
@@ -952,6 +899,9 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 		case CLEAR_INNPUTS:
 			TASmodClient.virtual.getContainer().clear();
 			break;
+			
+		case PLAYBACK_TELEPORT:
+			throw new WrongSideException(packet, Side.CLIENT);
 
 		default:
 			throw new PacketNotImplementedException(packet, this.getClass());
@@ -981,6 +931,22 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 			break;
 
 		case PLAYBACK_PLAYUNTIL:
+			break;
+			
+		case PLAYBACK_TELEPORT:
+			double x = TASmodBufferBuilder.readDouble(buf);
+			double y = TASmodBufferBuilder.readDouble(buf);
+			double z = TASmodBufferBuilder.readDouble(buf);
+			float angleYaw = TASmodBufferBuilder.readFloat(buf);
+			float anglePitch = TASmodBufferBuilder.readFloat(buf);
+			
+			EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUUID(clientID);
+			player.getServerWorld().addScheduledTask(() -> {
+				player.rotationPitch = anglePitch;
+				player.rotationYaw = angleYaw;
+
+				player.setPositionAndUpdate(x, y, z);
+			});
 			break;
 			
 		case CLEAR_INNPUTS:

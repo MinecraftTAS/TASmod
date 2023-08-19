@@ -16,8 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventClient.EventClientTickPost;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
-import com.minecrafttas.tasmod.savestates.server.SavestateHandler;
-import com.minecrafttas.tasmod.savestates.server.playerloading.SavestatePlayerLoading;
+import com.minecrafttas.tasmod.savestates.SavestateHandlerServer;
 import com.minecrafttas.tasmod.util.Ducks.GuiScreenDuck;
 import com.minecrafttas.tasmod.util.Ducks.SubtickDuck;
 
@@ -100,11 +99,11 @@ public abstract class MixinMinecraft {
 	public void injectRunTick(CallbackInfo ci) throws IOException {
 		
 		InputContainerView.update(TASmodClient.virtual);
-		if (SavestatePlayerLoading.wasLoading) {
-			SavestatePlayerLoading.wasLoading = false;
+		if (SavestateHandlerServer.wasLoading) {
+			SavestateHandlerServer.wasLoading = false;
 			
 			if(Minecraft.getMinecraft().player!=null) { 		//The player can be null when loading a savestate and quitting to the main menu
-				SavestateHandler.playerLoadSavestateEventClient();
+				SavestateHandlerServer.playerLoadSavestateEventClient();
 			}
 		}
 	}
