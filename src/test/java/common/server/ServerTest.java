@@ -28,6 +28,8 @@ import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 
 class ServerTest {
 
+	private static int ttl = 5;
+	
 	private enum TestPacketIDs implements PacketID {
 		TEST_INTERFACE_INT,
 		TEST_INTERFACE_STRING,
@@ -35,7 +37,8 @@ class ServerTest {
 			result = ByteBufferBuilder.readInt(buf);
 			ServerTest.side = Side.CLIENT;
 			latch.countDown();
-		}), TEST_LAMBDA_SERVER(Side.SERVER, (buf, clientID) -> {
+		}), 
+		TEST_LAMBDA_SERVER(Side.SERVER, (buf, clientID) -> {
 			result = ByteBufferBuilder.readInt(buf);
 			ServerTest.side = Side.SERVER;
 			latch.countDown();
@@ -170,12 +173,12 @@ class ServerTest {
 			return;
 		}
 		try {
-			latch.await(1, TimeUnit.SECONDS);
+			latch.await(ttl, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			fail(e);
 			return;
 		}
-		assertEquals(1, result);
+		assertEquals(ttl, result);
 		assertEquals(Client.Side.SERVER, side);
 	}
 
@@ -188,7 +191,7 @@ class ServerTest {
 			return;
 		}
 		try {
-			latch.await(1, TimeUnit.SECONDS);
+			latch.await(ttl, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			fail(e);
 			return;
@@ -206,7 +209,7 @@ class ServerTest {
 			return;
 		}
 		try {
-			latch.await(1, TimeUnit.SECONDS);
+			latch.await(ttl, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			fail(e);
 			return;
@@ -224,7 +227,7 @@ class ServerTest {
 			return;
 		}
 		try {
-			latch.await(1, TimeUnit.SECONDS);
+			latch.await(ttl, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			fail(e);
 			return;
@@ -244,7 +247,7 @@ class ServerTest {
 			return;
 		}
 		try {
-			latch.await(1, TimeUnit.SECONDS);
+			latch.await(ttl, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			fail(e);
 			return;
@@ -256,18 +259,18 @@ class ServerTest {
 	@Test
 	void testSendToAllClientsLambda() {
 		try {
-			server.sendToAll(new ByteBufferBuilder(TestPacketIDs.TEST_LAMBDA_CLIENT).writeInt(2));
+			server.sendToAll(new ByteBufferBuilder(TestPacketIDs.TEST_LAMBDA_CLIENT).writeInt(5));
 		} catch (Exception e) {
 			fail(e);
 			return;
 		}
 		try {
-			latch.await(1, TimeUnit.SECONDS);
+			latch.await(ttl, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			fail(e);
 			return;
 		}
-		assertEquals(2, result);
+		assertEquals(5, result);
 		assertEquals(Client.Side.CLIENT, side);
 	}
 	
@@ -280,7 +283,7 @@ class ServerTest {
 			return;
 		}
 		try {
-			latch.await(1, TimeUnit.SECONDS);
+			latch.await(ttl, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			fail(e);
 			return;
