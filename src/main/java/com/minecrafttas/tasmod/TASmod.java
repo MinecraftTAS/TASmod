@@ -22,8 +22,8 @@ import com.minecrafttas.tasmod.commands.CommandPlayUntil;
 import com.minecrafttas.tasmod.commands.CommandRecord;
 import com.minecrafttas.tasmod.commands.CommandRestartAndPlay;
 import com.minecrafttas.tasmod.commands.CommandSaveTAS;
-import com.minecrafttas.tasmod.commands.CommandTickrate;
 import com.minecrafttas.tasmod.commands.CommandSavestate;
+import com.minecrafttas.tasmod.commands.CommandTickrate;
 import com.minecrafttas.tasmod.ktrng.KillTheRNGHandler;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.TASstateServer;
@@ -32,7 +32,7 @@ import com.minecrafttas.tasmod.savestates.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
-import com.minecrafttas.tasmod.util.TickScheduler;
+import com.minecrafttas.tasmod.util.Scheduler;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
@@ -60,7 +60,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	
 	public static TickSyncServer ticksyncServer;
 	
-	public static final TickScheduler tickSchedulerServer = new TickScheduler();
+	public static final Scheduler tickSchedulerServer = new Scheduler();
 	
 	public static Server server;
 	

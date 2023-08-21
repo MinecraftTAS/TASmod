@@ -13,7 +13,6 @@ import org.lwjgl.opengl.Display;
 
 import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.common.Configuration.ConfigOptions;
-import com.minecrafttas.common.events.EventClient.EventOpenGui;
 import com.minecrafttas.common.server.ByteBufferBuilder;
 import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
@@ -23,7 +22,6 @@ import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
@@ -38,7 +36,6 @@ import com.mojang.realmsclient.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;
@@ -62,7 +59,7 @@ import net.minecraft.util.text.TextFormatting;
  * @author Scribble
  *
  */
-public class PlaybackController implements EventOpenGui, ServerPacketHandler, ClientPacketHandler{
+public class PlaybackController implements ServerPacketHandler, ClientPacketHandler{
 
 	/**
 	 * The current state of the controller.
@@ -782,29 +779,18 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 		PAUSED;	// #124
 	}
 
-	private TASstate stateWhenOpened;
 	
 	public void setStateWhenOpened(TASstate state) {
-		TASmod.LOGGER.trace(LoggerMarkers.Playback, "Set state when opened to {}", state);
-		stateWhenOpened = state;
-	}
-	
-	@Override
-	public GuiScreen onOpenGui(GuiScreen gui) {
-		if(gui instanceof GuiMainMenu) {
-			if (stateWhenOpened != null) {
+		TASmodClient.openMainMenuScheduler.add(()->{
 				PlaybackController container = TASmodClient.virtual.getContainer();
-				if(stateWhenOpened == TASstate.RECORDING) {
+				if(state == TASstate.RECORDING) {
 					long seed = TASmod.ktrngHandler.getGlobalSeedClient();
 					container.setStartSeed(seed);
 				}
-				container.setTASState(stateWhenOpened);
-				stateWhenOpened = null;
-			}
-		}
-		return gui;
+				TASstateClient.setOrSend(state);
+		});
 	}
-
+	
 	// ====================================== Networking
 	
 	@Override
@@ -825,16 +811,30 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 	@Override
 	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
-		
+		String name = null;
 		Minecraft mc = Minecraft.getMinecraft();
 
 		switch (packet) {
 		
 		case PLAYBACK_SAVE:
+			name = TASmodBufferBuilder.readString(buf);
+			try {
+				TASmodClient.virtual.saveInputs(name);
+			} catch (IOException e) {
+				if (mc.world != null)
+					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
+				else
+					e.printStackTrace();
+				return;
+			}
+			if (mc.world != null)
+				mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Saved inputs to " + name + ".mctas"));
+			else
+				TASmod.LOGGER.debug(LoggerMarkers.Playback, "Saved inputs to " + name + ".mctas");
 			break;
 
 		case PLAYBACK_LOAD:
-			String name = TASmodBufferBuilder.readString(buf);
+			name = TASmodBufferBuilder.readString(buf);
 			try {
 				TASmodClient.virtual.loadInputs(name);
 			} catch (IOException e) {
@@ -851,7 +851,7 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 			break;
 
 		case PLAYBACK_FULLPLAY:
-			OpenGuiEvents.stateWhenOpened = TASstate.PLAYBACK; // Set the state to PLAYBACK when the main menu is opened
+			setStateWhenOpened(TASstate.PLAYBACK);		// Set the state to PLAYBACK when the main menu is opened
 
 			TASmodClient.tickSchedulerClient.add(() -> { // Schedule code to be executed on the next tick
 				// Exit the server if you are in one
@@ -864,7 +864,7 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 			break;
 
 		case PLAYBACK_FULLRECORD:
-			OpenGuiEvents.stateWhenOpened = TASstate.RECORDING;	// Set the state to RECORDING when the main menu is opened
+			setStateWhenOpened(TASstate.RECORDING); 	// Set the state to RECORDING when the main menu is opened
 			
 			TASmodClient.virtual.getContainer().clear();	// Clear inputs
 			
@@ -879,14 +879,15 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 			break;
 
 		case PLAYBACK_RESTARTANDPLAY:
-			name = ByteBufferBuilder.readString(buf);
+			final String finalname = ByteBufferBuilder.readString(buf);
+			
 			try {
 				Thread.sleep(100L);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-				TASmodClient.config.set(ConfigOptions.FileToOpen, name);
+				TASmodClient.config.set(ConfigOptions.FileToOpen, finalname);
 				System.exit(0);
 			});
 			break;
@@ -911,28 +912,11 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 	@Override
 	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
+		
+		
 		//TODO #181 Permissions
 		switch (packet) {
-		
-		case PLAYBACK_SAVE:
-			break;
 
-		case PLAYBACK_LOAD:
-			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_LOAD));
-			break;
-
-		case PLAYBACK_FULLPLAY:
-			break;
-
-		case PLAYBACK_FULLRECORD:
-			break;
-
-		case PLAYBACK_RESTARTANDPLAY:
-			break;
-
-		case PLAYBACK_PLAYUNTIL:
-			break;
-			
 		case PLAYBACK_TELEPORT:
 			double x = TASmodBufferBuilder.readDouble(buf);
 			double y = TASmodBufferBuilder.readDouble(buf);
@@ -952,6 +936,14 @@ public class PlaybackController implements EventOpenGui, ServerPacketHandler, Cl
 		case CLEAR_INNPUTS:
 			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.CLEAR_INNPUTS));
 
+		case PLAYBACK_FULLPLAY:
+		case PLAYBACK_FULLRECORD:
+		case PLAYBACK_RESTARTANDPLAY:
+		case PLAYBACK_PLAYUNTIL:
+		case PLAYBACK_SAVE:
+		case PLAYBACK_LOAD:
+			TASmod.server.sendToAll(new TASmodBufferBuilder(buf));
+			break;
 		default:
 			throw new PacketNotImplementedException(packet, this.getClass());
 		}

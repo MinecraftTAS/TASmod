@@ -41,6 +41,8 @@ import net.minecraft.world.chunk.Chunk;
  */
 public class SavestateHandlerClient implements ClientPacketHandler{
 
+	public final static File savestateDirectory = new File(TASmodClient.tasdirectory + File.separator + "savestates");
+	
 	/**
 	 * A bug occurs when unloading the client world. The client world has a "unloadedEntityList" which, as the name implies, stores all unloaded entities <br>
 	 * <br>
@@ -114,8 +116,6 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 			TASmodClient.serialiser.saveToFileV1Until(targetfile, container, container.index()); //If the container is playing, store it until the current index
 		}
 	}
-
-	public final static File savestateDirectory = new File(TASmodClient.tasdirectory + File.separator + "savestates");
 
 	/**
 	 * Replaces the current recording with the recording from the savestate.

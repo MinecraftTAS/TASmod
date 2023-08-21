@@ -14,7 +14,7 @@ import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
-import com.minecrafttas.tasmod.util.TickScheduler.TickTask;
+import com.minecrafttas.tasmod.util.Scheduler.Task;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
@@ -54,7 +54,7 @@ public class TASstateClient implements ClientPacketHandler{
 		case STATESYNC:
 			
 			boolean verbose = TASmodBufferBuilder.readBoolean(buf);
-			TickTask task = ()->{
+			Task task = ()->{
 				PlaybackController container = TASmodClient.virtual.getContainer();
 				if (networkState != container.getState()) {
 					
