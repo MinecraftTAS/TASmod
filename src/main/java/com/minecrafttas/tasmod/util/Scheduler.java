@@ -4,28 +4,28 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Schedules a lambda to be run in the next tick
+ * A simple scheduling interface
  * 
  * @author Scribble
  *
  */
-public class TickScheduler {
+public class Scheduler {
 	
-	Queue<TickTask> queue = new ConcurrentLinkedQueue<>();
+	Queue<Task> queue = new ConcurrentLinkedQueue<>();
 	
 	public void runAllTasks() {
-		TickTask task;
+		Task task;
 		while((task = queue.poll()) != null) {
 			task.runTask();
 		}
 	}
 	
-	public void add(TickTask task) {
+	public void add(Task task) {
 		queue.add(task);
 	}
 	
 	@FunctionalInterface
-	public interface TickTask {
+	public interface Task {
 		public void runTask();
 	}
 }

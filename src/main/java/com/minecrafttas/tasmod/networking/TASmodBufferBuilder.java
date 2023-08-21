@@ -24,6 +24,10 @@ public class TASmodBufferBuilder extends ByteBufferBuilder{
 		super(packet);
 	}
 	
+	public TASmodBufferBuilder(ByteBuffer buf) {
+		super(buf);
+	}
+	
 	public TASmodBufferBuilder writeTASState(TASstate state) {
 		this.writeShort((short)state.ordinal());
 		return this;

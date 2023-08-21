@@ -9,7 +9,6 @@ import java.util.List;
 import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.events.OpenGuiEvents;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
 import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
@@ -130,7 +129,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 		if (fileToLoad != null) {
 			try {
 				loadInputs(fileToLoad);
-				OpenGuiEvents.stateWhenOpened = TASstate.PLAYBACK;
+				container.setStateWhenOpened(TASstate.PLAYBACK);
 			} catch (IOException e) {
 				TASmod.LOGGER.error("Cannot load inputs from the start of the TAS: {}", e.getMessage());
 			}

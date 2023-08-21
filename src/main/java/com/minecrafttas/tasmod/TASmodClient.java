@@ -12,6 +12,7 @@ import com.minecrafttas.common.Configuration.ConfigOptions;
 import com.minecrafttas.common.KeybindManager;
 import com.minecrafttas.common.KeybindManager.Keybind;
 import com.minecrafttas.common.events.EventClient.EventClientInit;
+import com.minecrafttas.common.events.EventClient.EventOpenGui;
 import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
 import com.minecrafttas.common.events.EventClient.EventPlayerLeaveClientSide;
 import com.minecrafttas.common.events.EventListenerRegistry;
@@ -28,8 +29,8 @@ import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 import com.minecrafttas.tasmod.playback.TASstateClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
+import com.minecrafttas.tasmod.util.Scheduler;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
-import com.minecrafttas.tasmod.util.TickScheduler;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 
@@ -37,6 +38,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.settings.KeyBinding;
 
 public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventPlayerLeaveClientSide{
@@ -60,9 +62,11 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	
 	public static TickrateChangerClient tickratechanger = new TickrateChangerClient();
 	
-	public static TickScheduler gameLoopSchedulerClient = new TickScheduler();
+	public static Scheduler gameLoopSchedulerClient = new Scheduler();
 	
-	public static TickScheduler tickSchedulerClient = new TickScheduler();
+	public static Scheduler tickSchedulerClient = new Scheduler();
+	
+	public static Scheduler openMainMenuScheduler = new Scheduler();
 	
 	public static Configuration config;
 	
@@ -106,8 +110,6 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		
 		virtual=new VirtualInput(fileOnStart);
 		EventListenerRegistry.register(virtual);
-		EventListenerRegistry.register(virtual.getContainer());
-
 		
 		hud = new InfoHud();
 		EventListenerRegistry.register(hud);
@@ -132,6 +134,16 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		EventListenerRegistry.register(keybindManager);
 		
 		EventListenerRegistry.register(interpolation);
+		
+		
+		EventListenerRegistry.register((EventOpenGui)(gui -> {
+			if(gui instanceof GuiMainMenu) {
+				openMainMenuScheduler.runAllTasks();
+			}
+			return gui;
+		}));
+		
+		EventListenerRegistry.register(hud);
 		
 		try {
 			UUID uuid = mc.getSession().getProfile().getId();

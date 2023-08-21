@@ -25,6 +25,12 @@ public class ByteBufferBuilder {
 	public ByteBufferBuilder(PacketID packet) {
 		this(packet.getID());
 	}
+	
+	public ByteBufferBuilder(ByteBuffer buf) {
+		bufferIndex = SecureList.POOL.available();
+		buffer = SecureList.POOL.lock(bufferIndex);
+		buffer.put(buf);
+	}
 
 	private ByteBufferBuilder(int bufferIndex, ByteBuffer buffer) {
 		this.bufferIndex = bufferIndex;
