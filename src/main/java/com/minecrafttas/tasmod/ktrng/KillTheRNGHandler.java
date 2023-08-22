@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.ktrng;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
@@ -48,7 +50,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 			
 			KillTheRNG.annotations.register(new KTRNGMonitor());
 		}else {
-			TASmod.LOGGER.info("KillTheRNG doesn't appear to be loaded");
+			LOGGER.info("KillTheRNG doesn't appear to be loaded");
 		}
 	}
 	
@@ -152,7 +154,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	@Environment(EnvType.CLIENT)
 	public void setInitialSeed(long initialSeed) {
 		if(TASmodClient.client != null) {
-			TASmod.LOGGER.info("Sending initial client seed: {}", initialSeed);
+			LOGGER.info("Sending initial client seed: {}", initialSeed);
 			try {
 				TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.KILLTHERNG_STARTSEED).writeLong(initialSeed)); // TODO Every new player in multiplayer will currently send the initial seed, which is BAD
 			} catch (Exception e) {

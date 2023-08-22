@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.savestates;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,7 +11,6 @@ import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.common.server.interfaces.PacketID;
-import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
@@ -57,7 +58,7 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 	 */
 	@Environment(EnvType.CLIENT)
 	public static void keepPlayerInLoadedEntityList(net.minecraft.entity.player.EntityPlayer player) {
-		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Keep player {} in loaded entity list", player.getName());
+		LOGGER.trace(LoggerMarkers.Savestate, "Keep player {} in loaded entity list", player.getName());
 		Minecraft.getMinecraft().world.unloadedEntityList.remove(player);
 	}
 
@@ -77,7 +78,7 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 	 */
 	@Environment(EnvType.CLIENT)
 	public static void addPlayerToClientChunk(EntityPlayer player) {
-		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to loaded entity list", player.getName());
+		LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to loaded entity list", player.getName());
 		int i = MathHelper.floor(player.posX / 16.0D);
 		int j = MathHelper.floor(player.posZ / 16.0D);
 		Chunk chunk = Minecraft.getMinecraft().world.getChunkFromChunkCoords(i, j);
@@ -99,9 +100,9 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 	 * @throws IOException
 	 */
 	public static void savestate(String nameOfSavestate) throws SavestateException, IOException {
-		TASmod.LOGGER.debug(LoggerMarkers.Savestate, "Saving client savestate {}", nameOfSavestate);
+		LOGGER.debug(LoggerMarkers.Savestate, "Saving client savestate {}", nameOfSavestate);
 		if (nameOfSavestate.isEmpty()) {
-			TASmod.LOGGER.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
+			LOGGER.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
 	
@@ -126,9 +127,9 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 	 * @throws IOException
 	 */
 	public static void loadstate(String nameOfSavestate) throws IOException {
-		TASmod.LOGGER.debug(LoggerMarkers.Savestate, "Loading client savestate {}", nameOfSavestate);
+		LOGGER.debug(LoggerMarkers.Savestate, "Loading client savestate {}", nameOfSavestate);
 		if (nameOfSavestate.isEmpty()) {
-			TASmod.LOGGER.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
+			LOGGER.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
 	
@@ -144,7 +145,7 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 				TASmodClient.virtual.getContainer().setTASState(TASstate.NONE, false);
 				Minecraft.getMinecraft().player.sendMessage(new TextComponentString(ChatFormatting.YELLOW
 						+ "Inputs could not be loaded for this savestate, since the file doesn't exist. Stopping!"));
-				TASmod.LOGGER.warn(LoggerMarkers.Savestate, "Inputs could not be loaded for this savestate, since the file doesn't exist.");
+				LOGGER.warn(LoggerMarkers.Savestate, "Inputs could not be loaded for this savestate, since the file doesn't exist.");
 			}
 		}
 	}
@@ -195,7 +196,7 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 	 */
 	@Environment(EnvType.CLIENT)
 	public static void unloadAllClientChunks() {
-		TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Unloading All Client Chunks");
+		LOGGER.trace(LoggerMarkers.Savestate, "Unloading All Client Chunks");
 		Minecraft mc = Minecraft.getMinecraft();
 		
 		ChunkProviderClient chunkProvider=mc.world.getChunkProvider();
@@ -228,7 +229,7 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 			try {
 				SavestateHandlerClient.savestate(name);
 			} catch (SavestateException e) {
-				TASmod.LOGGER.error(e.getMessage());
+				LOGGER.error(e.getMessage());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

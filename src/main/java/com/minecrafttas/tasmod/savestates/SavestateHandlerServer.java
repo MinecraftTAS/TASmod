@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.savestates;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -150,7 +152,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			// Open GuiSavestateScreen
 			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_SCREEN).writeBoolean(true));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+			e.printStackTrace();
 		}
 		
 		// Lock savestating and loadstating
@@ -213,7 +215,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 				// savestate inputs client
 				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_SAVE).writeString(getSavestateName(indexToSave)));
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+				e.printStackTrace();
 			}
 		}
 
@@ -242,7 +244,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			// close GuiSavestateScreen
 			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_SCREEN).writeBoolean(false));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+			e.printStackTrace();
 		}
 
 		if (!tickrate0) {
@@ -348,7 +350,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 				// loadstate inputs client
 				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_LOAD).writeString(getSavestateName(savestateIndex)));
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+				e.printStackTrace();
 			}
 		}
 
@@ -363,7 +365,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			// unload chunks on client
 			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_UNLOAD_CHUNKS));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+			e.printStackTrace();
 		}
 
 		// Unload chunks on the server
@@ -676,7 +678,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 
 	@Override
 	public void onLoadstateComplete() {
-		TASmod.LOGGER.trace(LoggerMarkers.Event, "Running loadstate complete event");
+		logger.trace(LoggerMarkers.Event, "Running loadstate complete event");
 		PlayerList playerList = TASmod.getServerInstance().getPlayerList();
 		for (EntityPlayerMP player : playerList.getPlayers()) {
 			NBTTagCompound nbttagcompound = playerList.readPlayerDataFromFile(player);
@@ -753,12 +755,12 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 				if(player!=null)
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getMessage()));
 
-				TASmod.LOGGER.error(LoggerMarkers.Savestate, "Failed to create a savestate: "+ e.getMessage());
+				LOGGER.error(LoggerMarkers.Savestate, "Failed to create a savestate: "+ e.getMessage());
 			} catch (Exception e) {
 				if(player!=null)
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getCause().toString()));
 				
-				TASmod.LOGGER.error(e);
+				LOGGER.error(e);
 			} finally {
 				TASmod.savestateHandler.state=SavestateState.NONE;
 			}
@@ -887,7 +889,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		
 		            if (!playerIn.isRiding())
 		            {
-		                TASmod.LOGGER.warn("Couldn't reattach entity to player");
+		                LOGGER.warn("Couldn't reattach entity to player");
 		                worldserver.removeEntityDangerously(entity1);
 		
 		                for (Entity entity2 : entity1.getRecursivePassengers())
@@ -948,13 +950,13 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		}
 
 		public static void requestMotionFromClient() {
-			TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Request motion from client");
+			LOGGER.trace(LoggerMarkers.Savestate, "Request motion from client");
 			PlayerHandler.motion.clear();
 			try {
 				// request client motion
 				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_PLAYER));
 			} catch (Exception e) {
-				TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+				e.printStackTrace();
 			}
 		
 			// TODO: is this still necessary?
@@ -967,16 +969,16 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 					e.printStackTrace();
 				}
 				if(i % 30 == 1) {
-					TASmod.LOGGER.debug(LoggerMarkers.Savestate, "Resending motion packet");
+					LOGGER.debug(LoggerMarkers.Savestate, "Resending motion packet");
 					try {
 						// request client motion
 						TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_PLAYER));
 					} catch (Exception e) {
-						TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+						LOGGER.error("Unable to send packet to all clients:", e);
 					}
 				}
 				if (i == 1000) {
-					TASmod.LOGGER.warn(LoggerMarkers.Savestate, "Client motion timed out!");
+					LOGGER.warn(LoggerMarkers.Savestate, "Client motion timed out!");
 					break;
 				}
 		
@@ -1000,7 +1002,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		 * Updates ticklist entries to the current world time, allowing them to not be stuck in a pressed state #136
 		 */
 		public static void updateWorldServerTickListEntries() {
-			TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Update server tick list entries");
+			LOGGER.trace(LoggerMarkers.Savestate, "Update server tick list entries");
 			MinecraftServer server=TASmod.getServerInstance();
 			for (WorldServer world : server.worlds) {
 		        for (NextTickListEntry nextticklistentry : world.pendingTickListEntriesHashSet) {
@@ -1016,7 +1018,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		 * Side: Server
 		 */
 		public static void addPlayerToServerChunk(EntityPlayerMP player) {
-			TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to server chunk", player.getName());
+			LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to server chunk", player.getName());
 			int i = MathHelper.floor(player.posX / 16.0D);
 			int j = MathHelper.floor(player.posZ / 16.0D);
 			WorldServer world = player.getServerWorld();
@@ -1045,7 +1047,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		 * Side: Server
 		 */
 		public static void updateSessionLock(MinecraftServer server) {
-			TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Update the session lock");
+			LOGGER.trace(LoggerMarkers.Savestate, "Update the session lock");
 			WorldServer[] worlds=server.worlds;
 			for(WorldServer world : worlds) {
 				((SaveHandler) world.getSaveHandler()).setSessionLock();
@@ -1058,7 +1060,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		 * Side: Server
 		 */
 		public static void flushSaveHandler(MinecraftServer server) {
-			TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Flush the save handler");
+			LOGGER.trace(LoggerMarkers.Savestate, "Flush the save handler");
 			//Vanilla
 			WorldServer[] worlds=server.worlds;
 			for(WorldServer world : worlds) {
@@ -1078,7 +1080,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			//Vanilla
 			WorldServer[] worlds=server.worlds;
 			for (EntityPlayerMP player : players) {
-				TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to the chunk map", player.getName());
+				LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to the chunk map", player.getName());
 				switch (player.dimension) {
 				case -1:
 					worlds[1].getPlayerChunkMap().addPlayer(player);
@@ -1109,7 +1111,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			WorldServer[] worlds=server.worlds;
 			for (WorldServer world : worlds) {
 				for (EntityPlayerMP player : players) {
-					TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Disconnect player {} from the chunk map", player.getName());
+					LOGGER.trace(LoggerMarkers.Savestate, "Disconnect player {} from the chunk map", player.getName());
 					world.getPlayerChunkMap().removePlayer(player);
 				}
 			}
@@ -1122,7 +1124,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		 * @see MixinChunkProviderServer#unloadAllChunks()
 		 */
 		public static void unloadAllServerChunks(MinecraftServer server) {
-			TASmod.LOGGER.trace(LoggerMarkers.Savestate, "Unloading all server chunks");
+			LOGGER.trace(LoggerMarkers.Savestate, "Unloading all server chunks");
 			//Vanilla
 			WorldServer[] worlds=server.worlds;
 			

@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
@@ -8,7 +10,6 @@ import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.common.server.interfaces.PacketID;
-import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
@@ -200,7 +201,7 @@ public class TickrateChangerClient implements EventClientGameLoop, ClientPacketH
 	}
 	
 	private static void log(String msg) {
-		TASmod.LOGGER.debug(LoggerMarkers.Tickrate, msg);
+		LOGGER.debug(LoggerMarkers.Tickrate, msg);
 	}
 
 	@Override

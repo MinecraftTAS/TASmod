@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.playback;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
@@ -98,7 +100,7 @@ public class TASstateServer implements ServerPacketHandler{
 				return;
 			}
 			this.state = stateIn;
-			TASmod.LOGGER.info(String.format("Set the server state to %s", stateIn.toString()));
+			LOGGER.info(String.format("Set the server state to %s", stateIn.toString()));
 		}
 	}
 	

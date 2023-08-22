@@ -1,5 +1,8 @@
 package com.minecrafttas.tasmod.ticksync;
 
+
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,7 +81,7 @@ public class TickSyncServer implements ServerPacketHandler, EventServerTickPost 
 		try {
 			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKSYNC));
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to send packet to all clients:", e);
+			LOGGER.error("Unable to send packet to all clients:", e);
 		}
 		if(synchronizedList.size()>0)
 			synchronizedList.clear();

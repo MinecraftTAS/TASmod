@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.playback;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -97,7 +99,7 @@ public class PlaybackSerialiser {
 	 * @throws IOException When the input container is empty
 	 */
 	public void saveToFileV1Until(File file, PlaybackController container, int index) throws IOException{
-		TASmod.LOGGER.debug(LoggerMarkers.Playback, "Saving playback controller to file {}", file);
+		LOGGER.debug(LoggerMarkers.Playback, "Saving playback controller to file {}", file);
 		if (container.size() == 0) {
 			throw new IOException("There are no inputs to save to a file");
 		}
@@ -163,7 +165,7 @@ public class PlaybackSerialiser {
 	}
 
 	public int getFileVersion(File file) throws IOException {
-		TASmod.LOGGER.trace(LoggerMarkers.Playback, "Retrieving file version from {}", file);
+		LOGGER.trace(LoggerMarkers.Playback, "Retrieving file version from {}", file);
 		List<String> lines = FileUtils.readLines(file, Charset.defaultCharset());
 		for (String line : lines) {
 			if (line.contains("Version")) {
@@ -181,7 +183,7 @@ public class PlaybackSerialiser {
 	}
 
 	public PlaybackController fromEntireFileV1(File file) throws IOException {
-		TASmod.LOGGER.debug(LoggerMarkers.Playback, "Loading playback controller to file {}", file);
+		LOGGER.debug(LoggerMarkers.Playback, "Loading playback controller to file {}", file);
 		List<String> lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
 		
 		File monitorFile=new File(file, "../"+file.getName().replace(".mctas", "")+".mon");
