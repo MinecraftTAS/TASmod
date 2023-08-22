@@ -5,7 +5,6 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
-import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
@@ -23,7 +22,7 @@ import net.minecraft.client.Minecraft;
  * @author Scribble
  *
  */
-public class TickrateChangerClient implements EventClientGameLoop, ClientPacketHandler{
+public class TickrateChangerClient implements ClientPacketHandler{
 	/**
 	 * The current tickrate of the client
 	 */
@@ -202,11 +201,6 @@ public class TickrateChangerClient implements EventClientGameLoop, ClientPacketH
 	
 	private static void log(String msg) {
 		LOGGER.debug(LoggerMarkers.Tickrate, msg);
-	}
-
-	@Override
-	public void onRunClientGameLoop(Minecraft mc) {
-		
 	}
 
 	@Override

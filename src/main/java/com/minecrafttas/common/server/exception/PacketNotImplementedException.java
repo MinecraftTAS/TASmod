@@ -3,10 +3,9 @@ package com.minecrafttas.common.server.exception;
 import com.minecrafttas.common.server.interfaces.PacketHandlerBase;
 import com.minecrafttas.common.server.interfaces.PacketID;
 
+@SuppressWarnings("serial")
 public class PacketNotImplementedException extends Exception {
 
-	private static final long serialVersionUID = -8089503724361521594L;
-	
 	public PacketNotImplementedException(String msg) {
 		super(msg);
 	}

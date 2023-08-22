@@ -63,6 +63,8 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	public static final Scheduler tickSchedulerServer = new Scheduler();
 	
 	public static Server server;
+
+	public static int networkingport = 8999;
 	
 	@Override
 	public void onServerInit(MinecraftServer server) {
@@ -168,10 +170,9 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 //		PacketSerializer.registerPacket(PlayUntilPacket.class);
 		
 		try {
-			server = new Server(5555, TASmodPackets.values());
+			server = new Server(networkingport, TASmodPackets.values());
 		} catch (Exception e) {
-			LOGGER.error("Unable to launch TASmod server: {}", e);
+			LOGGER.error("Unable to launch TASmod server: {}", e.getMessage());
 		}
-		
 	}
 }

@@ -1,11 +1,7 @@
 package com.minecrafttas.common.server.exception;
 
+@SuppressWarnings("serial")
 public class InvalidPacketException extends Exception {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5253939281926562204L;
 
 	public InvalidPacketException() {
 		super();
