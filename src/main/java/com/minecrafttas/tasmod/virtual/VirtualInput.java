@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.virtual;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
-import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
@@ -131,7 +132,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 				loadInputs(fileToLoad);
 				container.setStateWhenOpened(TASstate.PLAYBACK);
 			} catch (IOException e) {
-				TASmod.LOGGER.error("Cannot load inputs from the start of the TAS: {}", e.getMessage());
+				LOGGER.error("Cannot load inputs from the start of the TAS: {}", e.getMessage());
 			}
 		}
 	}
@@ -531,7 +532,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 																						// "currentKeyboard"
 			 Minecraft.getMinecraft().runTickMouse();
 		} else {
-			TASmod.LOGGER.warn("Can't preload inputs, specified inputs are null!");
+			LOGGER.warn("Can't preload inputs, specified inputs are null!");
 		}
 	}
 	// ================================Load/Save Inputs=====================================

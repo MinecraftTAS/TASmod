@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.commands;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +72,7 @@ public class CommandFolder extends CommandBase {
 				file.mkdir();
 			Desktop.getDesktop().open(file);
 		} catch (IOException e) {
-			TASmod.LOGGER.error("Something went wrong while opening ", file.getPath());
+			LOGGER.error("Something went wrong while opening ", file.getPath());
 			e.printStackTrace();
 		}
 	}
@@ -82,7 +84,7 @@ public class CommandFolder extends CommandBase {
 				file.mkdir();
 			Desktop.getDesktop().open(file);
 		} catch (IOException e) {
-			TASmod.LOGGER.error("Something went wrong while opening ", file.getPath());
+			LOGGER.error("Something went wrong while opening ", file.getPath());
 			e.printStackTrace();
 		}
 	}

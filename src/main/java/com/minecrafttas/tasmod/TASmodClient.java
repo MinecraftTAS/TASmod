@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,7 +154,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			// connect to server and authenticate
 			client = new Client("127.0.0.1", 5555, TASmodPackets.values(), uuid);
 		} catch (Exception e) {
-			TASmod.LOGGER.error("Unable to connect TASmod client: {}", e);
+			LOGGER.error("Unable to connect TASmod client: {}", e);
 		}
 	}
 

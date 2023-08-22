@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.playback;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
@@ -8,7 +10,6 @@ import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.common.server.interfaces.PacketID;
-import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
@@ -64,7 +65,7 @@ public class TASstateClient implements ClientPacketHandler{
 						if(Minecraft.getMinecraft().world != null)
 							Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(message));
 						else
-							TASmod.LOGGER.debug(LoggerMarkers.Playback, message);
+							LOGGER.debug(LoggerMarkers.Playback, message);
 					} 
 				}
 				

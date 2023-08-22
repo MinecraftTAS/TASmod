@@ -1,7 +1,6 @@
 package com.minecrafttas.common.server;
 
 import static com.minecrafttas.common.server.SecureList.BUFFER_SIZE;
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -51,7 +50,7 @@ public class Client {
 	 * @throws Exception Unable to connect
 	 */
 	public Client(String host, int port, PacketID[] packetIDs, UUID uuid) throws Exception {
-		LOGGER.info("Connecting tasmod server to {}:{}", host, port);
+		Common.LOGGER.info("Connecting server to {}:{}", host, port);
 		this.socket = AsynchronousSocketChannel.open();
 		this.socket.connect(new InetSocketAddress(host, port)).get();
 
@@ -59,7 +58,7 @@ public class Client {
 		this.packetIDs = packetIDs;
 		
 		this.createHandlers();
-		Common.LOGGER.info("Connected to tasmod server");
+		Common.LOGGER.info("Connected to server");
 		
 		authenticate(uuid);
 	}
@@ -167,7 +166,7 @@ public class Client {
 //				String name = new String(nameBytes);
 //				InputSavestatesHandler.savestate(name);
 //			} catch (Exception e) {
-//				TASmod.LOGGER.error("Exception occured during input savestate:", e);
+//				LOGGER.error("Exception occured during input savestate:", e);
 //			}
 //		}),
 //		CLOSE_GUISAVESTATESCREEN_ON_CLIENTS((pid, buf, id) -> {
@@ -184,7 +183,7 @@ public class Client {
 //				String name = new String(nameBytes);
 //				InputSavestatesHandler.loadstate(name);
 //			} catch (Exception e) {
-//				TASmod.LOGGER.error("Exception occured during input loadstate:", e);
+//				LOGGER.error("Exception occured during input loadstate:", e);
 //			}
 //		}),
 //		UNLOAD_CHUNKS_ON_CLIENTS((pid, buf, id) ->
@@ -205,7 +204,7 @@ public class Client {
 //							.putFloat(player.jumpMovementFactor)
 //					);
 //				} catch (Exception e) {
-//					TASmod.LOGGER.error("Unable to send packet to server:", e);
+//					LOGGER.error("Unable to send packet to server:", e);
 //				}
 //			}
 //		});

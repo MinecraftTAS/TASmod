@@ -7,7 +7,7 @@ import org.apache.logging.log4j.MarkerManager;
  * <p>A list of Log4J markers which can be added to logging statements.
  * 
  * <p>Simply add the marker as the first argument:
- * <pre>TASmod.logger.info({@linkplain LoggerMarkers}.{@link #Event}, "Message");</pre>
+ * <pre>LOGGER.info({@linkplain LoggerMarkers}.{@link #Event}, "Message");</pre>
  * 
  * <p>You can then turn off log messages by adding a VM option to your run configuration:
  * <pre>-Dtasmod.marker.event=DENY</pre>
