@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import com.minecrafttas.common.Common;
 import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
@@ -22,7 +23,7 @@ public class PacketHandlerRegistry {
 		if (!REGISTRY.contains(handler)) {
 			REGISTRY.add(handler);
 		} else {
-			System.out.println("Warning...");
+			Common.LOGGER.warn("Trying to register packet handler {}, but it is already registered!", handler.getClass().getName());
 		}
 	}
 
@@ -30,7 +31,7 @@ public class PacketHandlerRegistry {
 		if (REGISTRY.contains(handler)) {
 			REGISTRY.remove(handler);
 		} else {
-			System.out.println("Warning...");
+			Common.LOGGER.warn("Trying to unregister packet handler {}, but is was not registered!", handler.getClass().getName());
 		}
 	}
 
