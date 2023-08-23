@@ -178,12 +178,14 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
     /**
      * Sends a {@link AdvanceTickratePacket} to all clients
      */
-    private static void advanceClientTick() {
-    	try {
-			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_ADVANCE));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    private void advanceClientTick() {
+    	if(ticksPerSecond == 0) {
+    		try {
+    			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_ADVANCE));
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+    	}
     }
 
     /**
@@ -275,7 +277,36 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 
 	@Override
 	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+		TASmodPackets packet = (TASmodPackets) id;
 		
+		switch (packet) {
+		case TICKRATE_CHANGE:
+			float tickrate = TASmodBufferBuilder.readFloat(buf);
+			changeTickrate(tickrate);
+			break;
+		case TICKRATE_ADVANCE:
+			advanceTick();
+			break;
+		case TICKRATE_ZERO:
+			TickratePauseState state = TASmodBufferBuilder.readTickratePauseState(buf);
+
+			switch (state) {
+			case PAUSE:
+				pauseGame(true);
+				break;
+			case UNPAUSE:
+				pauseGame(false);
+				break;
+			case TOGGLE:
+				togglePause();
+			default:
+				break;
+			}
+			break;
+
+		default:
+			throw new PacketNotImplementedException(packet, this.getClass());
+		}
 	}
 	
 }
