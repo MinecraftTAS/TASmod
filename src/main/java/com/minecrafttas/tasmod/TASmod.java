@@ -130,9 +130,11 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		LOGGER.info("Testing connection with KillTheRNG");
 		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
 		EventListenerRegistry.register(ktrngHandler);
+		PacketHandlerRegistry.register(ktrngHandler);
 		
 		tickratechanger = new TickrateChangerServer(LOGGER);
 		EventListenerRegistry.register(tickratechanger);
+		PacketHandlerRegistry.register(tickratechanger);
 		
 		// Networking
 		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers");

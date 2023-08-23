@@ -213,7 +213,36 @@ public class TickrateChangerClient implements ClientPacketHandler{
 	}
 	@Override
 	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+		TASmodPackets packet = (TASmodPackets) id;
 		
+		switch (packet) {
+		case TICKRATE_CHANGE:
+			float tickrate = TASmodBufferBuilder.readFloat(buf);
+			changeClientTickrate(tickrate);
+			break;
+		case TICKRATE_ADVANCE:
+			advanceClientTick();
+			break;
+		case TICKRATE_ZERO:
+			TickratePauseState state = TASmodBufferBuilder.readTickratePauseState(buf);
+
+			switch (state) {
+			case PAUSE:
+				pauseClientGame(true);
+				break;
+			case UNPAUSE:
+				pauseClientGame(false);
+				break;
+			case TOGGLE:
+				togglePauseClient();
+			default:
+				break;
+			}
+			break;
+
+		default:
+			throw new PacketNotImplementedException(packet, this.getClass());
+		}
 	}
 
 }

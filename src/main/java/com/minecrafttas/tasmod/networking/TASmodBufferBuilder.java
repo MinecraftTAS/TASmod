@@ -206,7 +206,7 @@ public class TASmodBufferBuilder extends ByteBufferBuilder{
 		return CompressedStreamTools.read(input, NBTSizeTracker.INFINITE);
 	}
 	
-	public TickratePauseState readTickratePauseState(ByteBuffer buf) {
+	public static TickratePauseState readTickratePauseState(ByteBuffer buf) {
 		return TickratePauseState.values()[buf.getShort()];
 	}
 }
