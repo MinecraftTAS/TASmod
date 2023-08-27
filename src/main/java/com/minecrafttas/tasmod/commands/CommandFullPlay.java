@@ -29,7 +29,7 @@ public class CommandFullPlay extends CommandBase{
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		try {
-			TASmod.savestateHandler.loadState(0, false, false);
+			TASmod.savestateHandlerServer.loadState(0, false, false);
 		} catch (LoadstateException e) {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to load a savestate: "+e.getMessage()));
 			return;
@@ -38,7 +38,7 @@ public class CommandFullPlay extends CommandBase{
 			e.printStackTrace();
 			return;
 		} finally {
-			TASmod.savestateHandler.state=SavestateState.NONE;
+			TASmod.savestateHandlerServer.state=SavestateState.NONE;
 		}
 		TASmod.containerStateServer.setServerState(TASstate.PLAYBACK);
 		try {

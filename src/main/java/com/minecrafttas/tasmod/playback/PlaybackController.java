@@ -53,15 +53,15 @@ import net.minecraft.util.text.TextFormatting;
  * These inputs can be played back at any time by setting
  * {@linkplain #setPlayback(boolean)} to true. <br>
  * <br>
- * Information about the author etc. get stored in the playback controller too and
- * will be printed out in chat when the player loads into a world <br>
+ * Information about the author etc. get stored in the playback controller too
+ * and will be printed out in chat when the player loads into a world <br>
  * Inputs are saved and loaded to/from file via the
  * {@linkplain PlaybackSerialiser}
  * 
  * @author Scribble
  *
  */
-public class PlaybackController implements ServerPacketHandler, ClientPacketHandler{
+public class PlaybackController implements ServerPacketHandler, ClientPacketHandler {
 
 	/**
 	 * The current state of the controller.
@@ -76,7 +76,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	 * The current index of the inputs
 	 */
 	private int index;
-	
+
 	private VirtualKeyboard keyboard = new VirtualKeyboard();
 
 	private VirtualMouse mouse = new VirtualMouse();
@@ -91,42 +91,44 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	private BigArrayList<TickInputContainer> inputs = new BigArrayList<TickInputContainer>(directory + File.separator + "temp");
 
 	/**
-	 * A map of control bytes. Used to change settings during playback via the playback file.
+	 * A map of control bytes. Used to change settings during playback via the
+	 * playback file.
 	 * <p>
 	 * A full list of changes can be found in {@link ControlByteHandler}
 	 * <p>
-	 * The values are as follows:<p>
+	 * The values are as follows:
+	 * <p>
 	 * <code>Map(int playbackLine, List(Pair(String controlCommand, String[] arguments))</code>"
 	 */
 	private Map<Integer, List<Pair<String, String[]>>> controlBytes = new HashMap<Integer, List<Pair<String, String[]>>>();
-	
+
 	/**
 	 * The comments in the file, used to store them again later
 	 */
 	private Map<Integer, List<String>> comments = new HashMap<>();
-	
+
 	public DesyncMonitoring desyncMonitor = new DesyncMonitoring(this);
-	
+
 	// =====================================================================================================
 
 	private String title = "Insert TAS category here";
-	
+
 	private String authors = "Insert author here";
 
 	private String playtime = "00:00.0";
-	
+
 	private int rerecords = 0;
 
 	private String startLocation = "";
-	
+
 	private long startSeed = TASmod.ktrngHandler.getGlobalSeedClient();
 
 	// =====================================================================================================
 
-	private boolean creditsPrinted=false;
+	private boolean creditsPrinted = false;
 
 	private Integer playUntil = null;
-	
+
 	/**
 	 * Starts or stops a recording/playback
 	 * 
@@ -148,107 +150,107 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		ControlByteHandler.reset();
 		if (state == stateIn) {
 			switch (stateIn) {
-			case PLAYBACK:
-				return verbose ? TextFormatting.RED + "A playback is already running" : "";
-			case RECORDING:
-				return verbose ? TextFormatting.RED + "A recording is already running" : "";
-			case PAUSED:
-				return verbose ? TextFormatting.RED + "The game is already paused" : "";
-			case NONE:
-				return verbose ? TextFormatting.RED + "Nothing is running" : "";
+				case PLAYBACK:
+					return verbose ? TextFormatting.RED + "A playback is already running" : "";
+				case RECORDING:
+					return verbose ? TextFormatting.RED + "A recording is already running" : "";
+				case PAUSED:
+					return verbose ? TextFormatting.RED + "The game is already paused" : "";
+				case NONE:
+					return verbose ? TextFormatting.RED + "Nothing is running" : "";
 			}
 
 		} else if (state == TASstate.NONE) { // If the container is currently doing nothing
 			switch (stateIn) {
-			case PLAYBACK:
-				LOGGER.debug(LoggerMarkers.Playback, "Starting playback");
-				if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
-					try {
-						tpPlayer(startLocation);
-					} catch (NumberFormatException e) {
-						state = TASstate.NONE;
-						e.printStackTrace();
-						return verbose ? TextFormatting.RED + "An error occured while reading the start location of the TAS. The file might be broken" : "";
+				case PLAYBACK:
+					LOGGER.debug(LoggerMarkers.Playback, "Starting playback");
+					if (Minecraft.getMinecraft().player != null && !startLocation.isEmpty()) {
+						try {
+							tpPlayer(startLocation);
+						} catch (NumberFormatException e) {
+							state = TASstate.NONE;
+							e.printStackTrace();
+							return verbose ? TextFormatting.RED + "An error occured while reading the start location of the TAS. The file might be broken" : "";
+						}
 					}
-				}
-				Minecraft.getMinecraft().gameSettings.chatLinks = false; // #119
-				index = 0;
-				state = TASstate.PLAYBACK;
-				creditsPrinted=false;
-				TASmod.ktrngHandler.setInitialSeed(startSeed);
-				return verbose ? TextFormatting.GREEN + "Starting playback" : "";
-			case RECORDING:
-				LOGGER.debug(LoggerMarkers.Playback, "Starting recording");
-				if (Minecraft.getMinecraft().player != null && startLocation.isEmpty()) {
-					startLocation = getStartLocation(Minecraft.getMinecraft().player);
-				}
-				if(this.inputs.isEmpty()) {
-					inputs.add(new TickInputContainer(index));
-					desyncMonitor.recordNull(index);
-				}
-				state = TASstate.RECORDING;
-				return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
-			case PAUSED:
-				return verbose ? TextFormatting.RED + "Can't pause anything because nothing is running" : "";
-			case NONE:
-				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: None)";
+					Minecraft.getMinecraft().gameSettings.chatLinks = false; // #119
+					index = 0;
+					state = TASstate.PLAYBACK;
+					creditsPrinted = false;
+					TASmod.ktrngHandler.setInitialSeed(startSeed);
+					return verbose ? TextFormatting.GREEN + "Starting playback" : "";
+				case RECORDING:
+					LOGGER.debug(LoggerMarkers.Playback, "Starting recording");
+					if (Minecraft.getMinecraft().player != null && startLocation.isEmpty()) {
+						startLocation = getStartLocation(Minecraft.getMinecraft().player);
+					}
+					if (this.inputs.isEmpty()) {
+						inputs.add(new TickInputContainer(index));
+						desyncMonitor.recordNull(index);
+					}
+					state = TASstate.RECORDING;
+					return verbose ? TextFormatting.GREEN + "Starting a recording" : "";
+				case PAUSED:
+					return verbose ? TextFormatting.RED + "Can't pause anything because nothing is running" : "";
+				case NONE:
+					return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: None)";
 			}
 		} else if (state == TASstate.RECORDING) { // If the container is currently recording
 			switch (stateIn) {
-			case PLAYBACK:
-				return verbose ? TextFormatting.RED + "A recording is currently running. Please stop the recording first before starting a playback" : "";
-			case RECORDING:
-				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Recording)";
-			case PAUSED:
-				LOGGER.debug(LoggerMarkers.Playback, "Pausing a recording");
-				state = TASstate.PAUSED;
-				tempPause = TASstate.RECORDING;
-				return verbose ? TextFormatting.GREEN + "Pausing a recording" : "";
-			case NONE:
-				LOGGER.debug(LoggerMarkers.Playback, "Stopping a recording");
-				TASmodClient.virtual.unpressEverything();
-				state = TASstate.NONE;
-				return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
+				case PLAYBACK:
+					return verbose ? TextFormatting.RED + "A recording is currently running. Please stop the recording first before starting a playback" : "";
+				case RECORDING:
+					return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Recording)";
+				case PAUSED:
+					LOGGER.debug(LoggerMarkers.Playback, "Pausing a recording");
+					state = TASstate.PAUSED;
+					tempPause = TASstate.RECORDING;
+					return verbose ? TextFormatting.GREEN + "Pausing a recording" : "";
+				case NONE:
+					LOGGER.debug(LoggerMarkers.Playback, "Stopping a recording");
+					TASmodClient.virtual.unpressEverything();
+					state = TASstate.NONE;
+					return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
 			}
 		} else if (state == TASstate.PLAYBACK) { // If the container is currently playing back
 			switch (stateIn) {
-			case PLAYBACK:
-				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Playback)";
-			case RECORDING:
-				return verbose ? TextFormatting.RED + "A playback is currently running. Please stop the playback first before starting a recording" : "";
-			case PAUSED:
-				LOGGER.debug(LoggerMarkers.Playback, "Pausing a playback");
-				state = TASstate.PAUSED;
-				tempPause = TASstate.PLAYBACK;
-				TASmodClient.virtual.unpressEverything();
-				return verbose ? TextFormatting.GREEN + "Pausing a playback" : "";
-			case NONE:
-				LOGGER.debug(LoggerMarkers.Playback, "Stopping a playback");
-				Minecraft.getMinecraft().gameSettings.chatLinks = true;
-				TASmodClient.virtual.unpressEverything();
-				state = TASstate.NONE;
-				return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";
+				case PLAYBACK:
+					return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Playback)";
+				case RECORDING:
+					return verbose ? TextFormatting.RED + "A playback is currently running. Please stop the playback first before starting a recording" : "";
+				case PAUSED:
+					LOGGER.debug(LoggerMarkers.Playback, "Pausing a playback");
+					state = TASstate.PAUSED;
+					tempPause = TASstate.PLAYBACK;
+					TASmodClient.virtual.unpressEverything();
+					return verbose ? TextFormatting.GREEN + "Pausing a playback" : "";
+				case NONE:
+					LOGGER.debug(LoggerMarkers.Playback, "Stopping a playback");
+					Minecraft.getMinecraft().gameSettings.chatLinks = true;
+					TASmodClient.virtual.unpressEverything();
+					state = TASstate.NONE;
+					return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";
 			}
 		} else if (state == TASstate.PAUSED) {
 			switch (stateIn) {
-			case PLAYBACK:
-				LOGGER.debug(LoggerMarkers.Playback, "Resuming a playback");
-				state=TASstate.PLAYBACK;
-				tempPause=TASstate.NONE;
-				return verbose ? TextFormatting.GREEN + "Resuming a playback" : "";
-			case RECORDING:
-				LOGGER.debug(LoggerMarkers.Playback, "Resuming a recording");
-				state=TASstate.RECORDING;
-				tempPause=TASstate.NONE;
-				return verbose ? TextFormatting.GREEN + "Resuming a recording" : "";
-			case PAUSED:
-				return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Paused)";
-			case NONE:
-				LOGGER.debug(LoggerMarkers.Playback, "Aborting pausing");
-				state=TASstate.NONE;
-				TASstate statey=tempPause;
-				tempPause=TASstate.NONE;
-				return TextFormatting.GREEN + "Aborting a "+statey.toString().toLowerCase()+" that was paused";
+				case PLAYBACK:
+					LOGGER.debug(LoggerMarkers.Playback, "Resuming a playback");
+					state = TASstate.PLAYBACK;
+					tempPause = TASstate.NONE;
+					return verbose ? TextFormatting.GREEN + "Resuming a playback" : "";
+				case RECORDING:
+					LOGGER.debug(LoggerMarkers.Playback, "Resuming a recording");
+					state = TASstate.RECORDING;
+					tempPause = TASstate.NONE;
+					return verbose ? TextFormatting.GREEN + "Resuming a recording" : "";
+				case PAUSED:
+					return TextFormatting.RED + "Please report this message to the mod author, because you should never be able to see this (Error: Paused)";
+				case NONE:
+					LOGGER.debug(LoggerMarkers.Playback, "Aborting pausing");
+					state = TASstate.NONE;
+					TASstate statey = tempPause;
+					tempPause = TASstate.NONE;
+					return TextFormatting.GREEN + "Aborting a " + statey.toString().toLowerCase() + " that was paused";
 			}
 		}
 		return "Something went wrong ._.";
@@ -256,12 +258,13 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 
 	/**
 	 * Switches between the paused state and the state it was in before the pause
+	 * 
 	 * @return The new state
 	 */
 	public TASstate togglePause() {
-		if(state!=TASstate.PAUSED) {
+		if (state != TASstate.PAUSED) {
 			setTASState(TASstate.PAUSED);
-		}else {
+		} else {
 			setTASState(tempPause);
 		}
 		return state;
@@ -269,21 +272,22 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 
 	/**
 	 * Forces the playback to pause or unpause
+	 * 
 	 * @param pause True, if it should be paused
 	 */
 	public void pause(boolean pause) {
 		LOGGER.trace(LoggerMarkers.Playback, "Pausing {}", pause);
-		if(pause) {
-			if(state!=TASstate.NONE) {
+		if (pause) {
+			if (state != TASstate.NONE) {
 				setTASState(TASstate.PAUSED, false);
 			}
-		}else {
-			if(state == TASstate.PAUSED) {
+		} else {
+			if (state == TASstate.PAUSED) {
 				setTASState(tempPause, false);
 			}
 		}
 	}
-	
+
 	public boolean isPlayingback() {
 		return state == TASstate.PLAYBACK;
 	}
@@ -291,7 +295,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	public boolean isRecording() {
 		return state == TASstate.RECORDING;
 	}
-	
+
 	public boolean isPaused() {
 		return state == TASstate.PAUSED;
 	}
@@ -376,30 +380,30 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	 * the next inputs
 	 */
 	public void nextTick() {
-		/*Stop the playback while player is still loading*/
-		EntityPlayerSP player=Minecraft.getMinecraft().player;
-		
-		if(player!=null && player.addedToChunk) {
-			if(isPaused() && tempPause != TASstate.NONE) {
-				TASstateClient.setOrSend(tempPause);	// The recording is paused in LoadWorldEvents#startLaunchServer
+		/* Stop the playback while player is still loading */
+		EntityPlayerSP player = Minecraft.getMinecraft().player;
+
+		if (player != null && player.addedToChunk) {
+			if (isPaused() && tempPause != TASstate.NONE) {
+				TASstateClient.setOrSend(tempPause); // The recording is paused in LoadWorldEvents#startLaunchServer
 				pause(false);
 				printCredits();
 			}
 		}
-		
-		/*Tick the next playback or recording*/
+
+		/* Tick the next playback or recording */
 		if (state == TASstate.RECORDING) {
 			recordNextTick();
 		} else if (state == TASstate.PLAYBACK) {
 			playbackNextTick();
 		}
 	}
-	
+
 	private void recordNextTick() {
 		index++;
-		if(inputs.size()<=index) {
-			if(inputs.size()<index) {
-				LOGGER.warn("Index is {} inputs bigger than the container!", index-inputs.size());
+		if (inputs.size() <= index) {
+			if (inputs.size() < index) {
+				LOGGER.warn("Index is {} inputs bigger than the container!", index - inputs.size());
 			}
 			inputs.add(new TickInputContainer(index, keyboard.clone(), mouse.clone(), subticks.clone()));
 		} else {
@@ -409,35 +413,36 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	}
 
 	private void playbackNextTick() {
-		
-		if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe, secondly as potential exploit protection
+
+		if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe,
+									// secondly as potential exploit protection
 			LOGGER.info(LoggerMarkers.Playback, "Stopping a {} since the user tabbed out of the game", state);
 			setTASState(TASstate.NONE);
 		}
-		
-		index++;	// Increase the index and load the next inputs
-		
-		/*Playuntil logic*/
-		if(playUntil!=null && playUntil == index) {
+
+		index++; // Increase the index and load the next inputs
+
+		/* Playuntil logic */
+		if (playUntil != null && playUntil == index) {
 			TASmodClient.tickratechanger.pauseGame(true);
 			playUntil = null;
 			TASstateClient.setOrSend(TASstate.NONE);
-			for(long i = inputs.size()-1; i >= index; i--) {
+			for (long i = inputs.size() - 1; i >= index; i--) {
 				inputs.remove(i);
 			}
 			index--;
 			TASstateClient.setOrSend(TASstate.RECORDING);
 			return;
 		}
-		
-		/*Stop condition*/
+
+		/* Stop condition */
 		if (index == inputs.size()) {
 			unpressContainer();
 			TASstateClient.setOrSend(TASstate.NONE);
 		}
-		/*Continue condition*/
+		/* Continue condition */
 		else {
-			TickInputContainer tickcontainer = inputs.get(index);	//Loads the new inputs from the container
+			TickInputContainer tickcontainer = inputs.get(index); // Loads the new inputs from the container
 			this.keyboard = tickcontainer.getKeyboard().clone();
 			this.mouse = tickcontainer.getMouse().clone();
 			this.subticks = tickcontainer.getSubticks().clone();
@@ -468,13 +473,13 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	public Map<Integer, List<Pair<String, String[]>>> getControlBytes() {
 		return controlBytes;
 	}
-	
+
 	public Map<Integer, List<String>> getComments() {
 		return comments;
 	}
-	
-	public void setIndex(int index) throws IndexOutOfBoundsException{
-		if(index<=size()) {
+
+	public void setIndex(int index) throws IndexOutOfBoundsException {
+		if (index <= size()) {
 			this.index = index;
 			if (state == TASstate.PLAYBACK) {
 				TickInputContainer tickcontainer = inputs.get(index);
@@ -482,7 +487,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 				this.mouse = tickcontainer.getMouse();
 				this.subticks = tickcontainer.getSubticks();
 			}
-		}else {
+		} else {
 			throw new IndexOutOfBoundsException("Index is bigger than the container");
 		}
 	}
@@ -496,7 +501,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		}
 		return tickcontainer;
 	}
-	
+
 	/**
 	 * @return The {@link TickInputContainer} at the current index
 	 */
@@ -510,13 +515,13 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		controlBytes.clear();
 		comments.clear();
 		index = 0;
-		startLocation="";
+		startLocation = "";
 		desyncMonitor.clear();
 		clearCredits();
 	}
-	
+
 	private void clearCredits() {
-		title="Insert Author here";
+		title = "Insert Author here";
 		authors = "Insert author here";
 		playtime = "00:00.0";
 		rerecords = 0;
@@ -581,7 +586,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 			inputs.get(i).setTick(i + 1);
 		}
 	}
-	
+
 	public long getStartSeed() {
 		return startSeed;
 	}
@@ -642,13 +647,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		float anglePitch = Float.parseFloat(section[4]);
 
 		try {
-			TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_TELEPORT)
-					.writeDouble(x)
-					.writeDouble(y)
-					.writeDouble(z)
-					.writeFloat(angleYaw)
-					.writeFloat(anglePitch)
-					);
+			TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_TELEPORT).writeDouble(x).writeDouble(y).writeDouble(z).writeFloat(angleYaw).writeFloat(anglePitch));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -664,13 +663,13 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		keyboard.clear();
 		mouse.clear();
 	}
-	
+
 	// ==============================================================
 
 	public void printCredits() {
 		LOGGER.trace(LoggerMarkers.Playback, "Printing credits");
-		if (state == TASstate.PLAYBACK&&!creditsPrinted) {
-			creditsPrinted=true;
+		if (state == TASstate.PLAYBACK && !creditsPrinted) {
+			creditsPrinted = true;
 			printMessage(title, ChatFormatting.GOLD);
 			printMessage("", null);
 			printMessage("by " + authors, ChatFormatting.AQUA);
@@ -680,23 +679,24 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 			printMessage("Rerecords: " + rerecords, null);
 		}
 	}
-	
+
 	private void printMessage(String msg, ChatFormatting format) {
-		String formatString="";
-		if(format!=null)
-			formatString=format.toString();
-		
+		String formatString = "";
+		if (format != null)
+			formatString = format.toString();
+
 		Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(formatString + msg));
 	}
 
 	public void setPlayUntil(int until) {
-		this.playUntil  = until;
+		this.playUntil = until;
 	}
-	
+
 	// ==============================================================
-	
+
 	/**
 	 * Storage class which stores the keyboard, mouse and subticks of a given tick.
+	 * 
 	 * @author Scribble
 	 *
 	 */
@@ -750,25 +750,28 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		public void setTick(int tick) {
 			this.tick = tick;
 		}
-		
+
 		@Override
 		public TickInputContainer clone() {
 			return new TickInputContainer(tick, keyboard, mouse, subticks);
 		}
 	}
-	
+
 	/**
 	 * State of the input recorder
+	 * 
 	 * @author Scribble
 	 *
 	 */
 	public static enum TASstate {
 		/**
-		 * The game is neither recording, playing back or paused, is also set when aborting all mentioned states.
+		 * The game is neither recording, playing back or paused, is also set when
+		 * aborting all mentioned states.
 		 */
 		NONE,
 		/**
-		 * The game plays back the inputs loaded in {@link InputContainer} and locks user interaction.
+		 * The game plays back the inputs loaded in {@link InputContainer} and locks
+		 * user interaction.
 		 */
 		PLAYBACK,
 		/**
@@ -776,37 +779,29 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		 */
 		RECORDING,
 		/**
-		 * The playback or recording is paused and may be resumed. Note that the game isn't paused, only the playback. Useful for debugging things.
+		 * The playback or recording is paused and may be resumed. Note that the game
+		 * isn't paused, only the playback. Useful for debugging things.
 		 */
-		PAUSED;	// #124
+		PAUSED; // #124
 	}
 
-	
 	public void setStateWhenOpened(TASstate state) {
-		TASmodClient.openMainMenuScheduler.add(()->{
-				PlaybackController container = TASmodClient.virtual.getContainer();
-				if(state == TASstate.RECORDING) {
-					long seed = TASmod.ktrngHandler.getGlobalSeedClient();
-					container.setStartSeed(seed);
-				}
-				TASstateClient.setOrSend(state);
+		TASmodClient.openMainMenuScheduler.add(() -> {
+			PlaybackController container = TASmodClient.virtual.getContainer();
+			if (state == TASstate.RECORDING) {
+				long seed = TASmod.ktrngHandler.getGlobalSeedClient();
+				container.setStartSeed(seed);
+			}
+			TASstateClient.setOrSend(state);
 		});
 	}
-	
+
 	// ====================================== Networking
-	
+
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
-		return new TASmodPackets[] {
-				TASmodPackets.PLAYBACK_SAVE,
-				TASmodPackets.PLAYBACK_LOAD,
-				TASmodPackets.PLAYBACK_FULLPLAY,
-				TASmodPackets.PLAYBACK_FULLRECORD,
-				TASmodPackets.PLAYBACK_RESTARTANDPLAY,
-				TASmodPackets.PLAYBACK_PLAYUNTIL,
-				TASmodPackets.PLAYBACK_TELEPORT,
-				TASmodPackets.CLEAR_INNPUTS
-				
+		return new TASmodPackets[] { TASmodPackets.PLAYBACK_SAVE, TASmodPackets.PLAYBACK_LOAD, TASmodPackets.PLAYBACK_FULLPLAY, TASmodPackets.PLAYBACK_FULLRECORD, TASmodPackets.PLAYBACK_RESTARTANDPLAY, TASmodPackets.PLAYBACK_PLAYUNTIL, TASmodPackets.PLAYBACK_TELEPORT, TASmodPackets.CLEAR_INNPUTS
+
 		};
 	}
 
@@ -817,137 +812,136 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		Minecraft mc = Minecraft.getMinecraft();
 
 		switch (packet) {
-		
-		case PLAYBACK_SAVE:
-			name = TASmodBufferBuilder.readString(buf);
-			try {
-				TASmodClient.virtual.saveInputs(name);
-			} catch (IOException e) {
-				if (mc.world != null)
-					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
-				else
-					e.printStackTrace();
-				return;
-			}
-			if (mc.world != null)
-				mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Saved inputs to " + name + ".mctas"));
-			else
-				LOGGER.debug(LoggerMarkers.Playback, "Saved inputs to " + name + ".mctas");
-			break;
 
-		case PLAYBACK_LOAD:
-			name = TASmodBufferBuilder.readString(buf);
-			try {
-				TASmodClient.virtual.loadInputs(name);
-			} catch (IOException e) {
-				if (mc.world != null)
-					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
-				else
-					e.printStackTrace();
-				return;
-			}
-			if (mc.world != null)
-				mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Loaded inputs from " + name + ".mctas"));
-			else
-				LOGGER.debug(LoggerMarkers.Playback, "Loaded inputs from " + name + ".mctas");
-			break;
-
-		case PLAYBACK_FULLPLAY:
-			setStateWhenOpened(TASstate.PLAYBACK);		// Set the state to PLAYBACK when the main menu is opened
-
-			TASmodClient.tickSchedulerClient.add(() -> { // Schedule code to be executed on the next tick
-				// Exit the server if you are in one
-				if (mc.world != null) {
-					mc.world.sendQuittingDisconnectingPacket();
-					mc.loadWorld((WorldClient) null);
+			case PLAYBACK_SAVE:
+				name = TASmodBufferBuilder.readString(buf);
+				try {
+					TASmodClient.virtual.saveInputs(name);
+				} catch (IOException e) {
+					if (mc.world != null)
+						mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
+					else
+						e.printStackTrace();
+					return;
 				}
-				mc.displayGuiScreen(new GuiMainMenu());
-			});
-			break;
+				if (mc.world != null)
+					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Saved inputs to " + name + ".mctas"));
+				else
+					LOGGER.debug(LoggerMarkers.Playback, "Saved inputs to " + name + ".mctas");
+				break;
 
-		case PLAYBACK_FULLRECORD:
-			setStateWhenOpened(TASstate.RECORDING); 	// Set the state to RECORDING when the main menu is opened
-			
-			TASmodClient.virtual.getContainer().clear();	// Clear inputs
-			
-			// Schedule code to be executed on the next tick
-			TASmodClient.tickSchedulerClient.add(() -> {
-				if (mc.world != null) {	// Exit the server if you are in one
-					mc.world.sendQuittingDisconnectingPacket();
-					mc.loadWorld((WorldClient) null);
+			case PLAYBACK_LOAD:
+				name = TASmodBufferBuilder.readString(buf);
+				try {
+					TASmodClient.virtual.loadInputs(name);
+				} catch (IOException e) {
+					if (mc.world != null)
+						mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
+					else
+						e.printStackTrace();
+					return;
 				}
-				mc.displayGuiScreen(new GuiMainMenu());
-			});
-			break;
+				if (mc.world != null)
+					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Loaded inputs from " + name + ".mctas"));
+				else
+					LOGGER.debug(LoggerMarkers.Playback, "Loaded inputs from " + name + ".mctas");
+				break;
 
-		case PLAYBACK_RESTARTANDPLAY:
-			final String finalname = ByteBufferBuilder.readString(buf);
-			
-			try {
-				Thread.sleep(100L);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				TASmodClient.config.set(ConfigOptions.FileToOpen, finalname);
-				System.exit(0);
-			});
-			break;
+			case PLAYBACK_FULLPLAY:
+				setStateWhenOpened(TASstate.PLAYBACK); // Set the state to PLAYBACK when the main menu is opened
 
-		case PLAYBACK_PLAYUNTIL:
-			int until = ByteBufferBuilder.readInt(buf);
-			TASmodClient.virtual.getContainer().setPlayUntil(until);
-			break;
-			
-		case CLEAR_INNPUTS:
-			TASmodClient.virtual.getContainer().clear();
-			break;
-			
-		case PLAYBACK_TELEPORT:
-			throw new WrongSideException(packet, Side.CLIENT);
+				TASmodClient.tickSchedulerClient.add(() -> { // Schedule code to be executed on the next tick
+					// Exit the server if you are in one
+					if (mc.world != null) {
+						mc.world.sendQuittingDisconnectingPacket();
+						mc.loadWorld((WorldClient) null);
+					}
+					mc.displayGuiScreen(new GuiMainMenu());
+				});
+				break;
 
-		default:
-			throw new PacketNotImplementedException(packet, this.getClass());
+			case PLAYBACK_FULLRECORD:
+				setStateWhenOpened(TASstate.RECORDING); // Set the state to RECORDING when the main menu is opened
+
+				TASmodClient.virtual.getContainer().clear(); // Clear inputs
+
+				// Schedule code to be executed on the next tick
+				TASmodClient.tickSchedulerClient.add(() -> {
+					if (mc.world != null) { // Exit the server if you are in one
+						mc.world.sendQuittingDisconnectingPacket();
+						mc.loadWorld((WorldClient) null);
+					}
+					mc.displayGuiScreen(new GuiMainMenu());
+				});
+				break;
+
+			case PLAYBACK_RESTARTANDPLAY:
+				final String finalname = ByteBufferBuilder.readString(buf);
+
+				try {
+					Thread.sleep(100L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				Minecraft.getMinecraft().addScheduledTask(() -> {
+					TASmodClient.config.set(ConfigOptions.FileToOpen, finalname);
+					System.exit(0);
+				});
+				break;
+
+			case PLAYBACK_PLAYUNTIL:
+				int until = ByteBufferBuilder.readInt(buf);
+				TASmodClient.virtual.getContainer().setPlayUntil(until);
+				break;
+
+			case CLEAR_INNPUTS:
+				TASmodClient.virtual.getContainer().clear();
+				break;
+
+			case PLAYBACK_TELEPORT:
+				throw new WrongSideException(packet, Side.CLIENT);
+
+			default:
+				throw new PacketNotImplementedException(packet, this.getClass(), Side.CLIENT);
 		}
 	}
 
 	@Override
 	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
-		
-		
-		//TODO #181 Permissions
+
+		// TODO #181 Permissions
 		switch (packet) {
 
-		case PLAYBACK_TELEPORT:
-			double x = TASmodBufferBuilder.readDouble(buf);
-			double y = TASmodBufferBuilder.readDouble(buf);
-			double z = TASmodBufferBuilder.readDouble(buf);
-			float angleYaw = TASmodBufferBuilder.readFloat(buf);
-			float anglePitch = TASmodBufferBuilder.readFloat(buf);
-			
-			EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUUID(clientID);
-			player.getServerWorld().addScheduledTask(() -> {
-				player.rotationPitch = anglePitch;
-				player.rotationYaw = angleYaw;
+			case PLAYBACK_TELEPORT:
+				double x = TASmodBufferBuilder.readDouble(buf);
+				double y = TASmodBufferBuilder.readDouble(buf);
+				double z = TASmodBufferBuilder.readDouble(buf);
+				float angleYaw = TASmodBufferBuilder.readFloat(buf);
+				float anglePitch = TASmodBufferBuilder.readFloat(buf);
 
-				player.setPositionAndUpdate(x, y, z);
-			});
-			break;
-			
-		case CLEAR_INNPUTS:
-			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.CLEAR_INNPUTS));
+				EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUUID(clientID);
+				player.getServerWorld().addScheduledTask(() -> {
+					player.rotationPitch = anglePitch;
+					player.rotationYaw = angleYaw;
 
-		case PLAYBACK_FULLPLAY:
-		case PLAYBACK_FULLRECORD:
-		case PLAYBACK_RESTARTANDPLAY:
-		case PLAYBACK_PLAYUNTIL:
-		case PLAYBACK_SAVE:
-		case PLAYBACK_LOAD:
-			TASmod.server.sendToAll(new TASmodBufferBuilder(buf));
-			break;
-		default:
-			throw new PacketNotImplementedException(packet, this.getClass());
+					player.setPositionAndUpdate(x, y, z);
+				});
+				break;
+
+			case CLEAR_INNPUTS:
+				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.CLEAR_INNPUTS));
+
+			case PLAYBACK_FULLPLAY:
+			case PLAYBACK_FULLRECORD:
+			case PLAYBACK_RESTARTANDPLAY:
+			case PLAYBACK_PLAYUNTIL:
+			case PLAYBACK_SAVE:
+			case PLAYBACK_LOAD:
+				TASmod.server.sendToAll(new TASmodBufferBuilder(buf));
+				break;
+			default:
+				throw new PacketNotImplementedException(packet, this.getClass(), Side.SERVER);
 		}
 	}
 }

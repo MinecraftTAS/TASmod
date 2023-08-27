@@ -304,23 +304,23 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) {
 					return "State";
-				}else {
-				TASstate state=TASmodClient.virtual.getContainer().getState();
-				ChatFormatting format=ChatFormatting.WHITE;
-				String out="";
-				if(state==TASstate.PLAYBACK) {
-					out="Playback";
-					format=ChatFormatting.GREEN;
-				}else if(state==TASstate.RECORDING){
-					out="Recording";
-					format=ChatFormatting.RED;
-				}else if(state==TASstate.PAUSED) {
-					out="Paused";
-					format=ChatFormatting.YELLOW;
-				}else if(state==TASstate.NONE) {
-					out="";
-				}
-				return String.format("%s%s", format, out);
+				} else {
+					TASstate state = TASmodClient.virtual.getContainer().getState();
+					ChatFormatting format = ChatFormatting.WHITE;
+					String out = "";
+					if (state == TASstate.PLAYBACK) {
+						out = "Playback";
+						format = ChatFormatting.GREEN;
+					} else if (state == TASstate.RECORDING) {
+						out = "Recording";
+						format = ChatFormatting.RED;
+					} else if (state == TASstate.PAUSED) {
+						out = "Paused";
+						format = ChatFormatting.YELLOW;
+					} else if (state == TASstate.NONE) {
+						out = "";
+					}
+					return String.format("%s%s", format, out);
 				}
 			}));
 			

@@ -2,10 +2,9 @@ package com.minecrafttas.common.server;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 import com.minecrafttas.common.Common;
 import com.minecrafttas.common.server.Client.Side;
@@ -20,6 +19,9 @@ public class PacketHandlerRegistry {
 	private static final List<PacketHandlerBase> REGISTRY = new ArrayList<>();
 
 	public static void register(PacketHandlerBase handler) {
+		if(handler==null) {
+			throw new NullPointerException("Tried to register a handler with value null");
+		}
 		if (!REGISTRY.contains(handler)) {
 			REGISTRY.add(handler);
 		} else {
@@ -28,6 +30,9 @@ public class PacketHandlerRegistry {
 	}
 
 	public static void unregister(PacketHandlerBase handler) {
+		if(handler==null) {
+			throw new NullPointerException("Tried to unregister a handler with value null");
+		}
 		if (REGISTRY.contains(handler)) {
 			REGISTRY.remove(handler);
 		} else {
@@ -43,7 +48,7 @@ public class PacketHandlerRegistry {
 
 		boolean isImplemented = false;
 		for (PacketHandlerBase handler : REGISTRY) {
-			if (ArrayUtils.contains(handler.getAcceptedPacketIDs(), packet)) { 		// TODO Remove the third party library
+			if (Arrays.stream(handler.getAcceptedPacketIDs()).anyMatch(packet::equals)) {
 				if (side == Side.CLIENT && handler instanceof ClientPacketHandler) {
 					ClientPacketHandler clientHandler = (ClientPacketHandler) handler;
 					clientHandler.onClientPacket(packet, buf, clientID);
@@ -56,7 +61,7 @@ public class PacketHandlerRegistry {
 			}
 		}
 		if(!isImplemented) {
-			throw new PacketNotImplementedException(packet);
+			throw new PacketNotImplementedException(packet, side);
 		}
 	}
 }

@@ -48,7 +48,7 @@ public class CommandRestartAndPlay extends CommandBase{
 					name=name.concat(args[i]+spacer);
 				}
 				try {
-					TASmod.savestateHandler.loadState(0, false);
+					TASmod.savestateHandlerServer.loadState(0, false);
 				} catch (LoadstateException e) {
 					e.printStackTrace();
 				} catch (IOException e) {

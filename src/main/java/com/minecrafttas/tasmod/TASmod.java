@@ -52,7 +52,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	
 	public static TASstateServer containerStateServer;
 	
-	public static SavestateHandlerServer savestateHandler;
+	public static SavestateHandlerServer savestateHandlerServer;
 	
 	public static KillTheRNGHandler ktrngHandler;
 	
@@ -93,7 +93,8 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 			e.printStackTrace();
 		}
 		
-		savestateHandler=new SavestateHandlerServer(server, LOGGER);
+		savestateHandlerServer=new SavestateHandlerServer(server, LOGGER);
+		PacketHandlerRegistry.register(savestateHandlerServer);
 		
 		if(!server.isDedicatedServer()) {
 			TASmod.tickratechanger.ticksPerSecond=0F;
@@ -138,38 +139,6 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		
 		// Networking
 		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers");
-		
-//		// Savestates
-//		PacketSerializer.registerPacket(SavestatePacket.class);
-//		PacketSerializer.registerPacket(LoadstatePacket.class);
-//		
-//		PacketSerializer.registerPacket(InputSavestatesPacket.class);
-//		PacketSerializer.registerPacket(SavestatePlayerLoadingPacket.class);
-//
-//		// KillTheRNG
-//		PacketSerializer.registerPacket(KTRNGSeedPacket.class);
-//		PacketSerializer.registerPacket(KTRNGStartSeedPacket.class);
-//		
-//		// Recording/Playback
-//		PacketSerializer.registerPacket(SyncStatePacket.class);
-//		PacketSerializer.registerPacket(InitialSyncStatePacket.class);
-//		
-//		PacketSerializer.registerPacket(ClearInputsPacket.class);
-//		
-//		PacketSerializer.registerPacket(FullRecordPacket.class);
-//		PacketSerializer.registerPacket(FullPlayPacket.class);
-//		
-//		PacketSerializer.registerPacket(RestartAndPlayPacket.class);
-//		
-//		// Storing
-//		PacketSerializer.registerPacket(SaveTASPacket.class);
-//		PacketSerializer.registerPacket(LoadTASPacket.class);
-//
-//		// Misc
-//		PacketSerializer.registerPacket(PlaybackController.TeleportPlayerPacket.class);
-//		PacketSerializer.registerPacket(FolderPacket.class);
-//		
-//		PacketSerializer.registerPacket(PlayUntilPacket.class);
 		
 		try {
 			server = new Server(networkingport, TASmodPackets.values());

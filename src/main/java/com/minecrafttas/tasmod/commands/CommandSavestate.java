@@ -74,8 +74,8 @@ public class CommandSavestate extends CommandBase {
 					deleteMultiple(args);
 				}
 			} else if ("list".equals(args[0])) {
-				sender.sendMessage(new TextComponentString(String.format("The current savestate index is %s%s", TextFormatting.AQUA, TASmod.savestateHandler.getCurrentIndex())));
-				sender.sendMessage(new TextComponentString(String.format("Available indexes are %s%s", TextFormatting.AQUA, TASmod.savestateHandler.getIndexesAsString().isEmpty() ? "None" : TASmod.savestateHandler.getIndexesAsString())));
+				sender.sendMessage(new TextComponentString(String.format("The current savestate index is %s%s", TextFormatting.AQUA, TASmod.savestateHandlerServer.getCurrentIndex())));
+				sender.sendMessage(new TextComponentString(String.format("Available indexes are %s%s", TextFormatting.AQUA, TASmod.savestateHandlerServer.getIndexesAsString().isEmpty() ? "None" : TASmod.savestateHandlerServer.getIndexesAsString())));
 			} else if ("help".equals(args[0])) {
 				if (args.length == 1) {
 					sendHelp(sender);
@@ -100,7 +100,7 @@ public class CommandSavestate extends CommandBase {
 	}
 
 	private void sendHelp(ICommandSender sender, int i) throws CommandException {
-		int currentIndex = TASmod.savestateHandler.getCurrentIndex();
+		int currentIndex = TASmod.savestateHandlerServer.getCurrentIndex();
 		if (i > 3) {
 			throw new CommandException("This help page doesn't exist (yet?)", new Object[] {});
 		}
@@ -142,7 +142,7 @@ public class CommandSavestate extends CommandBase {
 		if (args.length == 1) {
 			return getListOfStringsMatchingLastWord(args, new String[] { "save", "load", "delete", "list", "help"});
 		} else if (args.length == 2 && !"list".equals(args[0])) {
-			sender.sendMessage(new TextComponentString("Available indexes: " + TextFormatting.AQUA + TASmod.savestateHandler.getIndexesAsString()));
+			sender.sendMessage(new TextComponentString("Available indexes: " + TextFormatting.AQUA + TASmod.savestateHandlerServer.getIndexesAsString()));
 		}
 		return super.getTabCompletions(server, sender, args, targetPos);
 	}
@@ -151,14 +151,14 @@ public class CommandSavestate extends CommandBase {
 
 	private void saveLatest() throws CommandException {
 		try {
-			TASmod.savestateHandler.saveState();
+			TASmod.savestateHandlerServer.saveState();
 		} catch (SavestateException e) {
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} finally {
-			TASmod.savestateHandler.state = SavestateState.NONE;
+			TASmod.savestateHandlerServer.state = SavestateState.NONE;
 		}
 	}
 
@@ -168,47 +168,47 @@ public class CommandSavestate extends CommandBase {
 			if (indexToSave <= 0) { // Disallow to save on Savestate 0
 				indexToSave = -1;
 			}
-			TASmod.savestateHandler.saveState(indexToSave, true);
+			TASmod.savestateHandlerServer.saveState(indexToSave, true);
 		} catch (SavestateException e) {
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} finally {
-			TASmod.savestateHandler.state = SavestateState.NONE;
+			TASmod.savestateHandlerServer.state = SavestateState.NONE;
 		}
 	}
 
 	private void loadLatest() throws CommandException {
 		try {
-			TASmod.savestateHandler.loadState();
+			TASmod.savestateHandlerServer.loadState();
 		} catch (LoadstateException e) {
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} finally {
-			TASmod.savestateHandler.state = SavestateState.NONE;
+			TASmod.savestateHandlerServer.state = SavestateState.NONE;
 		}
 	}
 
 	private void loadLatest(String[] args) throws CommandException {
 		try {
-			TASmod.savestateHandler.loadState(processIndex(args[1]), true);
+			TASmod.savestateHandlerServer.loadState(processIndex(args[1]), true);
 		} catch (LoadstateException e) {
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new CommandException(e.getMessage(), new Object[] {});
 		} finally {
-			TASmod.savestateHandler.state = SavestateState.NONE;
+			TASmod.savestateHandlerServer.state = SavestateState.NONE;
 		}
 	}
 
 	private void delete(String[] args) throws CommandException {
 		int arg1 = processIndex(args[1]);
 		try {
-			TASmod.savestateHandler.deleteSavestate(arg1);
+			TASmod.savestateHandlerServer.deleteSavestate(arg1);
 		} catch (SavestateDeleteException e) {
 			throw new CommandException(e.getMessage(), new Object[] {});
 		}
@@ -216,7 +216,7 @@ public class CommandSavestate extends CommandBase {
 
 	private void deleteMultiple(String[] args) throws CommandException {
 		try {
-			TASmod.savestateHandler.deleteSavestate(processIndex(args[1]), processIndex(args[2]));
+			TASmod.savestateHandlerServer.deleteSavestate(processIndex(args[1]), processIndex(args[2]));
 		} catch (SavestateDeleteException e) {
 			throw new CommandException(e.getMessage(), new Object[] {});
 		}
@@ -226,11 +226,11 @@ public class CommandSavestate extends CommandBase {
 
 	private int processIndex(String arg) throws CommandException {
 		if ("~".equals(arg)) {
-			return TASmod.savestateHandler.getCurrentIndex();
+			return TASmod.savestateHandlerServer.getCurrentIndex();
 		} else if (arg.matches("~-?\\d")) {
 			arg = arg.replace("~", "");
 			int i = Integer.parseInt(arg);
-			return TASmod.savestateHandler.getCurrentIndex() + i;
+			return TASmod.savestateHandlerServer.getCurrentIndex() + i;
 		} else {
 			int i = 0;
 			try {
