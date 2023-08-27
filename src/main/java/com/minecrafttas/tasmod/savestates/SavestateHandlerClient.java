@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
+import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
@@ -40,16 +41,21 @@ import net.minecraft.world.chunk.Chunk;
  * 
  * @author Scribble
  */
-public class SavestateHandlerClient implements ClientPacketHandler{
+public class SavestateHandlerClient implements ClientPacketHandler {
 
 	public final static File savestateDirectory = new File(TASmodClient.tasdirectory + File.separator + "savestates");
-	
+
 	/**
-	 * A bug occurs when unloading the client world. The client world has a "unloadedEntityList" which, as the name implies, stores all unloaded entities <br>
+	 * A bug occurs when unloading the client world. The client world has a
+	 * "unloadedEntityList" which, as the name implies, stores all unloaded entities
 	 * <br>
-	 * Strange things happen, when the client player is unloaded, which is what happens when we use {@linkplain SavestateHandlerClient#unloadAllClientChunks()}.<br>
 	 * <br>
-	 * This method ensures that the player is loaded by removing the player from the unloadedEntityList. <br>
+	 * Strange things happen, when the client player is unloaded, which is what
+	 * happens when we use
+	 * {@linkplain SavestateHandlerClient#unloadAllClientChunks()}.<br>
+	 * <br>
+	 * This method ensures that the player is loaded by removing the player from the
+	 * unloadedEntityList. <br>
 	 * <br>
 	 * TLDR:<br>
 	 * Makes sure that the player is not removed from the loaded entity list<br>
@@ -63,12 +69,15 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 	}
 
 	/**
-	 * Similar to {@linkplain keepPlayerInLoadedEntityList}, the chunks themselves have a list with loaded entities <br>
+	 * Similar to {@linkplain keepPlayerInLoadedEntityList}, the chunks themselves
+	 * have a list with loaded entities <br>
 	 * <br>
-	 * Even after adding the player to the world, the chunks may not load the player correctly. <br>
+	 * Even after adding the player to the world, the chunks may not load the player
+	 * correctly. <br>
 	 * <br>
 	 * Without this, no model is shown in third person<br>
-	 * This state is fixed, once the player moves into a different chunk, since the new chunk adds the player to it's list. <br>
+	 * This state is fixed, once the player moves into a different chunk, since the
+	 * new chunk adds the player to it's list. <br>
 	 * <br>
 	 * 
 	 * TLDR:<br>
@@ -105,22 +114,22 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 			LOGGER.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
-	
+
 		SavestateHandlerClient.savestateDirectory.mkdir();
-	
+
 		File targetfile = new File(SavestateHandlerClient.savestateDirectory, nameOfSavestate + ".mctas");
-	
+
 		PlaybackController container = TASmodClient.virtual.getContainer();
 		if (container.isRecording()) {
-			TASmodClient.serialiser.saveToFileV1(targetfile, container);	//If the container is recording, store it entirely
-		} else if(container.isPlayingback()){
-			TASmodClient.serialiser.saveToFileV1Until(targetfile, container, container.index()); //If the container is playing, store it until the current index
+			TASmodClient.serialiser.saveToFileV1(targetfile, container); // If the container is recording, store it entirely
+		} else if (container.isPlayingback()) {
+			TASmodClient.serialiser.saveToFileV1Until(targetfile, container, container.index()); // If the container is playing, store it until the current index
 		}
 	}
 
 	/**
-	 * Replaces the current recording with the recording from the savestate.
-	 * Gets triggered when a savestate is loaded on the server<br>
+	 * Replaces the current recording with the recording from the savestate. Gets
+	 * triggered when a savestate is loaded on the server<br>
 	 * Side: Client
 	 * 
 	 * @param nameOfSavestate coming from the server
@@ -132,19 +141,19 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 			LOGGER.error(LoggerMarkers.Savestate, "No recording savestate loaded since the name of savestate is empty");
 			return;
 		}
-	
+
 		savestateDirectory.mkdir();
-	
+
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".mctas");
-	
+
 		PlaybackController container = TASmodClient.virtual.getContainer();
-		if (!container.isNothingPlaying()) { // If the file exists and the container is recording or playing, load the clientSavestate
+		if (!container.isNothingPlaying()) { // If the file exists and the container is recording or playing, load the
+												// clientSavestate
 			if (targetfile.exists()) {
 				TASmodClient.virtual.loadClientSavestate(TASmodClient.serialiser.fromEntireFileV1(targetfile));
 			} else {
 				TASmodClient.virtual.getContainer().setTASState(TASstate.NONE, false);
-				Minecraft.getMinecraft().player.sendMessage(new TextComponentString(ChatFormatting.YELLOW
-						+ "Inputs could not be loaded for this savestate, since the file doesn't exist. Stopping!"));
+				Minecraft.getMinecraft().player.sendMessage(new TextComponentString(ChatFormatting.YELLOW + "Inputs could not be loaded for this savestate, since the file doesn't exist. Stopping!"));
 				LOGGER.warn(LoggerMarkers.Savestate, "Inputs could not be loaded for this savestate, since the file doesn't exist.");
 			}
 		}
@@ -189,31 +198,33 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 	}
 
 	/**
-	 * Unloads all chunks and reloads the renderer so no chunks will be visible throughout the unloading progress<br>
+	 * Unloads all chunks and reloads the renderer so no chunks will be visible
+	 * throughout the unloading progress<br>
 	 * <br>
 	 * Side: Client
+	 * 
 	 * @see MixinChunkProviderClient#unloadAllChunks()
 	 */
 	@Environment(EnvType.CLIENT)
 	public static void unloadAllClientChunks() {
 		LOGGER.trace(LoggerMarkers.Savestate, "Unloading All Client Chunks");
 		Minecraft mc = Minecraft.getMinecraft();
-		
-		ChunkProviderClient chunkProvider=mc.world.getChunkProvider();
-		
-		((ChunkProviderDuck)chunkProvider).unloadAllChunks();
+
+		ChunkProviderClient chunkProvider = mc.world.getChunkProvider();
+
+		((ChunkProviderDuck) chunkProvider).unloadAllChunks();
 		Minecraft.getMinecraft().renderGlobal.loadRenderers();
 	}
 
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
-		return new TASmodPackets[] {
-				TASmodPackets.SAVESTATE_SAVE,
-				TASmodPackets.SAVESTATE_LOAD,
-				TASmodPackets.SAVESTATE_PLAYER,
-				TASmodPackets.SAVESTATE_SCREEN,
-				TASmodPackets.SAVESTATE_UNLOAD_CHUNKS
-		};
+		return new TASmodPackets[] { 
+				TASmodPackets.SAVESTATE_SAVE, 
+				TASmodPackets.SAVESTATE_LOAD, 
+				TASmodPackets.SAVESTATE_PLAYER, 
+				TASmodPackets.SAVESTATE_SCREEN, 
+				TASmodPackets.SAVESTATE_UNLOAD_CHUNKS 
+				};
 	}
 
 	@Override
@@ -221,51 +232,51 @@ public class SavestateHandlerClient implements ClientPacketHandler{
 		TASmodPackets packet = (TASmodPackets) id;
 		String name = null;
 		Minecraft mc = Minecraft.getMinecraft();
-		
-		switch (packet) {
-		case SAVESTATE_SAVE:
-			// Create client savestate
-			name = TASmodBufferBuilder.readString(buf);
-			try {
-				SavestateHandlerClient.savestate(name);
-			} catch (SavestateException e) {
-				LOGGER.error(e.getMessage());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			break;
-		case SAVESTATE_LOAD:
-			// Load client savestate
-			name = TASmodBufferBuilder.readString(buf);
-			try {
-				SavestateHandlerClient.loadstate(name);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			break;
-		case SAVESTATE_PLAYER:
-			NBTTagCompound compound = TASmodBufferBuilder.readNBTTagCompound(buf);
-			SavestateHandlerClient.loadPlayer(compound);
-			break;
-			
-		case SAVESTATE_SCREEN:
-			// Open/Close Savestate screen
-			boolean open = TASmodBufferBuilder.readBoolean(buf);
-			if (open) {
-				mc.displayGuiScreen(new GuiSavestateSavingScreen());
-			} else {
-				mc.displayGuiScreen(null);
-			}
-			break;
-			
-		case SAVESTATE_UNLOAD_CHUNKS:
-			SavestateHandlerClient.unloadAllClientChunks();
-			break;
 
-		default:
-			throw new PacketNotImplementedException(packet, this.getClass());
+		switch (packet) {
+			case SAVESTATE_SAVE:
+				// Create client savestate
+				name = TASmodBufferBuilder.readString(buf);
+				try {
+					SavestateHandlerClient.savestate(name);
+				} catch (SavestateException e) {
+					LOGGER.error(e.getMessage());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
+			case SAVESTATE_LOAD:
+				// Load client savestate
+				name = TASmodBufferBuilder.readString(buf);
+				try {
+					SavestateHandlerClient.loadstate(name);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
+			case SAVESTATE_PLAYER:
+				NBTTagCompound compound = TASmodBufferBuilder.readNBTTagCompound(buf);
+				SavestateHandlerClient.loadPlayer(compound);
+				break;
+
+			case SAVESTATE_SCREEN:
+				// Open/Close Savestate screen
+				boolean open = TASmodBufferBuilder.readBoolean(buf);
+				if (open) {
+					mc.displayGuiScreen(new GuiSavestateSavingScreen());
+				} else {
+					mc.displayGuiScreen(null);
+				}
+				break;
+
+			case SAVESTATE_UNLOAD_CHUNKS:
+				SavestateHandlerClient.unloadAllClientChunks();
+				break;
+
+			default:
+				throw new PacketNotImplementedException(packet, this.getClass(), Side.CLIENT);
 		}
-		
+
 	}
 
 }

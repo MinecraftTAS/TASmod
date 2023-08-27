@@ -27,9 +27,14 @@ import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 
+/**
+ * An integration test for the {@link Server} class by setting up a connection.
+ * Disabled due to gihub actions failing to execute the tests
+ */
 @Disabled
 class ServerTest {
 
+	// The time to live for how long the tests should wait for the asynchronous server
 	private static int ttl = 1;
 	
 	private enum TestPacketIDs implements PacketID {
@@ -103,7 +108,7 @@ class ServerTest {
 				latch.countDown();
 				break;
 			default:
-				throw new PacketNotImplementedException(id, this.getClass());
+				throw new PacketNotImplementedException(id, this.getClass(), Side.SERVER);
 			}
 		}
 
@@ -117,7 +122,7 @@ class ServerTest {
 				latch.countDown();
 				break;
 			default:
-				throw new PacketNotImplementedException(id, this.getClass());
+				throw new PacketNotImplementedException(id, this.getClass(), Side.CLIENT);
 			}
 		}
 
@@ -131,6 +136,10 @@ class ServerTest {
 
 	private static TestingClass clazz = new TestingClass();
 
+	/**
+	 * Setting up a local connection between client and server
+	 * @throws Exception
+	 */
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		try {
@@ -166,6 +175,9 @@ class ServerTest {
 		result = null;
 	}
 
+	/**
+	 * Test sending an int packet to {@link TestingClass#onServerPacket(PacketID, ByteBuffer, UUID)}
+	 */
 	@Test
 	void testSendToServerInterface() {
 		try {
@@ -184,6 +196,9 @@ class ServerTest {
 		assertEquals(Client.Side.SERVER, side);
 	}
 
+	/**
+	 * Test sending an int packet to {@link TestingClass#onClientPacket(PacketID, ByteBuffer, UUID)} to all clients currently connected
+	 */
 	@Test
 	void testSendToAllClientsInterface() {
 		try {
@@ -202,6 +217,9 @@ class ServerTest {
 		assertEquals(Client.Side.CLIENT, side);
 	}
 	
+	/**
+	 * Test sending an int packet to {@link TestingClass#onClientPacket(PacketID, ByteBuffer, UUID)} to only one client
+	 */
 	@Test
 	void testSendToClientInterface() {
 		try {
@@ -220,6 +238,9 @@ class ServerTest {
 		assertEquals(Client.Side.CLIENT, side);
 	}
 	
+	/**
+	 * Test sending an string packet to {@link TestingClass#onClientPacket(PacketID, ByteBuffer, UUID)} to only one client
+	 */
 	@Test
 	void testSendToServerInterface2() {
 		try {
@@ -240,6 +261,9 @@ class ServerTest {
 	
 	// ============================ Lambda
 	
+	/**
+	 * Test sending an int packet to {@link TestPacketIDs#TEST_LAMBDA_SERVER}
+	 */
 	@Test
 	void testSendToServerLambda() {
 		try {
@@ -258,6 +282,9 @@ class ServerTest {
 		assertEquals(Client.Side.SERVER, side);
 	}
 	
+	/**
+	 * Test sending an int packet to {@link TestPacketIDs#TEST_LAMBDA_CLIENT} to all clients
+	 */
 	@Test
 	void testSendToAllClientsLambda() {
 		try {
@@ -276,6 +303,9 @@ class ServerTest {
 		assertEquals(Client.Side.CLIENT, side);
 	}
 	
+	/**
+	 * Test sending an int packet to {@link TestPacketIDs#TEST_LAMBDA_CLIENT} to one client
+	 */
 	@Test
 	void testSendToClientLambda() {
 		try {

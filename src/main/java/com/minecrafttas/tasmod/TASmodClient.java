@@ -27,6 +27,7 @@ import com.minecrafttas.tasmod.handlers.LoadingScreenHandler;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.savestates.SavestateHandlerClient;
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 import com.minecrafttas.tasmod.playback.TASstateClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
@@ -78,6 +79,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	
 	public static InterpolationHandler interpolation = new InterpolationHandler();
 	
+	public static SavestateHandlerClient savestateHandlerClient = new SavestateHandlerClient();
+	
 	public static Client client;
 	
 	public static void createTASDir() {
@@ -127,6 +130,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		PacketHandlerRegistry.register(ticksyncClient);
 
 		PacketHandlerRegistry.register(tickratechanger);
+		
+		PacketHandlerRegistry.register(savestateHandlerClient);
 		
 		keybindManager = new KeybindManager() {
 			

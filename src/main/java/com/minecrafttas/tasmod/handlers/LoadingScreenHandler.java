@@ -14,12 +14,12 @@ import net.minecraft.client.Minecraft;
 
 /**
  * Handles logic during a loading screen to transition between states.
+ * 
  * @author Scribble
  *
  */
-public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventClientGameLoop, EventDoneLoadingWorld{
-	
-	
+public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventClientGameLoop, EventDoneLoadingWorld {
+
 	private boolean waszero;
 	private boolean isLoading;
 	private int loadingScreenDelay = -1;
@@ -28,7 +28,7 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 	public void onLaunchIntegratedServer() {
 		LOGGER.debug(LoggerMarkers.Event, "Starting the integrated server");
 		PlaybackController container = TASmodClient.virtual.getContainer();
-		if(!container.isNothingPlaying() && !container.isPaused()) {
+		if (!container.isNothingPlaying() && !container.isPaused()) {
 			container.pause(true);
 		}
 		if (TASmodClient.tickratechanger.ticksPerSecond == 0 || TASmodClient.tickratechanger.advanceTick) {
@@ -44,7 +44,7 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 				LOGGER.debug(LoggerMarkers.Event, "Finished loading screen on the client");
 				TASmodClient.tickratechanger.joinServer();
 				if (!waszero) {
-					if(TASmod.getServerInstance()!=null) {	//Check if a server is running and if it's an integrated server
+					if (TASmod.getServerInstance() != null) { // Check if a server is running and if it's an integrated server
 						TASmodClient.tickratechanger.pauseClientGame(false);
 						TASmod.tickratechanger.pauseServerGame(false);
 					}
@@ -56,15 +56,15 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 			loadingScreenDelay--;
 		}
 	}
-	
+
 	@Override
 	public void onDoneLoadingWorld() {
-		if(TASmod.getServerInstance()!=null) { //Check if a server is running and if it's an integrated server
+		if (TASmod.getServerInstance() != null) { // Check if a server is running and if it's an integrated server
 			LOGGER.debug(LoggerMarkers.Event, "Finished loading the world on the client");
 			loadingScreenDelay = 1;
 		}
 	}
-	
+
 	public boolean isLoading() {
 		return isLoading;
 	}

@@ -750,7 +750,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 //				return;
 //			}
 			try {
-				TASmod.savestateHandler.saveState(index, true);
+				TASmod.savestateHandlerServer.saveState(index, true);
 			} catch (SavestateException e) {
 				if(player!=null)
 					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getMessage()));
@@ -762,7 +762,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 				
 				LOGGER.error(e);
 			} finally {
-				TASmod.savestateHandler.state=SavestateState.NONE;
+				TASmod.savestateHandlerServer.state=SavestateState.NONE;
 			}
 			break;
 			
@@ -783,7 +783,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		case SAVESTATE_UNLOAD_CHUNKS:
 			throw new WrongSideException(id, Side.SERVER);
 		default:
-			throw new PacketNotImplementedException(packet, this.getClass());
+			throw new PacketNotImplementedException(packet, this.getClass(), Side.SERVER);
 		}
 	}
 
@@ -935,7 +935,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 				
 				if(dimensionNow!=dimensionPrev) {
 					list.changePlayerDimension(player, dimensionNow);
-				}else {
+				} else {
 					player.getServerWorld().unloadedEntityList.remove(player);
 				}
 				

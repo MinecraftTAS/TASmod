@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
 import com.minecrafttas.common.events.EventServer.EventServerTick;
+import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
@@ -31,64 +32,65 @@ import net.minecraft.server.MinecraftServer;
  * @author Scribble
  *
  */
-public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClientSide, ClientPacketHandler, ServerPacketHandler{
-	
+public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClientSide, ClientPacketHandler, ServerPacketHandler {
+
 	private boolean isLoaded;
-	
+
 	/**
 	 * Instantiates a KillTheRNGHandler instance
+	 * 
 	 * @param isLoaded If the KillTheRNG mod is loaded
 	 */
 	public KillTheRNGHandler(boolean isLoaded) {
-		
-		this.isLoaded=isLoaded;
-		
+
+		this.isLoaded = isLoaded;
+
 		if (isLoaded) {
 			KillTheRNG.LOGGER.info("Connection established with TASmod");
-			KillTheRNG.isLibrary=true;
-			KillTheRNG.mode=SeedingModes.TickChange;
-			
+			KillTheRNG.isLibrary = true;
+			KillTheRNG.mode = SeedingModes.TickChange;
+
 			KillTheRNG.annotations.register(new KTRNGMonitor());
-		}else {
+		} else {
 			LOGGER.info("KillTheRNG doesn't appear to be loaded");
 		}
 	}
-	
+
 	public long advanceGlobalSeedServer() {
-		if(isLoaded()) {
+		if (isLoaded()) {
 			return KillTheRNG.commonRandom.nextSeed();
 		} else {
 			return 0;
 		}
 	}
-	
+
 	public long getGlobalSeedServer() {
-		if(isLoaded()) {
+		if (isLoaded()) {
 			return KillTheRNG.commonRandom.GlobalServer.getSeed();
 		} else {
 			return 0;
 		}
 	}
-	
+
 	public boolean isLoaded() {
 		return isLoaded;
 	}
-	
-	
-	//=================================================Setting the seed
+
+	// =================================================Setting the seed
 	/**
 	 * @return The global seed of the client
 	 */
 	@Environment(EnvType.CLIENT)
 	public long getGlobalSeedClient() {
-		if(isLoaded()) 
+		if (isLoaded())
 			return KillTheRNG.clientRandom.GlobalClient.getSeed();
 		else
 			return 0;
 	}
-	
+
 	/**
 	 * Set the global seed on the client
+	 * 
 	 * @param seedIn The seed on the client
 	 */
 	@Environment(EnvType.CLIENT)
@@ -97,21 +99,22 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 			KillTheRNG.clientRandom.setSeedAll(seedIn);
 		}
 	}
-	
-	
+
 	public void setGlobalSeedServer(long seedIn) {
 		if (isLoaded()) {
 			KillTheRNG.commonRandom.setSeedAll(seedIn);
 		}
 	}
+
 	/**
 	 * Sends a packet to the server, setting the global seed
+	 * 
 	 * @param seedIn The seed on the server
 	 */
 	@Environment(EnvType.CLIENT)
 	public void sendGlobalSeedToServer(long seedIn) {
-		if(isLoaded()) {
-			if(TASmodClient.client != null)
+		if (isLoaded()) {
+			if (TASmodClient.client != null)
 				try {
 					TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.KILLTHERNG_SEED).writeLong(seedIn));
 				} catch (Exception e) {
@@ -121,15 +124,15 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 				setGlobalSeedClient(seedIn);
 		}
 	}
-	//=================================================TASmod integration
-	
+	// =================================================TASmod integration
+
 	/**
 	 * Executed every tick on the server
 	 */
 	@Override
 	public void onServerTick(MinecraftServer server) {
-		if(isLoaded()) {
-			if(TASmod.containerStateServer.getState() != TASstate.PAUSED)
+		if (isLoaded()) {
+			if (TASmod.containerStateServer.getState() != TASstate.PAUSED)
 				try {
 					TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.KILLTHERNG_SEED).writeLong(advanceGlobalSeedServer()));
 				} catch (Exception e) {
@@ -137,11 +140,11 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 				}
 		}
 	}
-	
-	//================================================= Seedsync
-	
+
+	// ================================================= Seedsync
+
 	public void broadcastStartSeed() {
-		if(isLoaded()) {
+		if (isLoaded()) {
 			long seed = getGlobalSeedServer();
 			try {
 				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.KILLTHERNG_SEED).writeLong(seed));
@@ -150,13 +153,14 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 			}
 		}
 	}
-	
+
 	@Environment(EnvType.CLIENT)
 	public void setInitialSeed(long initialSeed) {
-		if(TASmodClient.client != null) {
+		if (TASmodClient.client != null) {
 			LOGGER.info("Sending initial client seed: {}", initialSeed);
 			try {
-				TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.KILLTHERNG_STARTSEED).writeLong(initialSeed)); // TODO Every new player in multiplayer will currently send the initial seed, which is BAD
+				TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.KILLTHERNG_STARTSEED).writeLong(initialSeed)); // TODO Every new player in multiplayer will currently send the initial seed,
+																																// which is BAD
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -173,27 +177,27 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
-		return new TASmodPackets[] {TASmodPackets.KILLTHERNG_SEED, TASmodPackets.KILLTHERNG_STARTSEED};
+		return new TASmodPackets[] { TASmodPackets.KILLTHERNG_SEED, TASmodPackets.KILLTHERNG_STARTSEED };
 	}
 
 	@Override
 	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
 		long seed = TASmodBufferBuilder.readLong(buf);
 		TASmodPackets packet = (TASmodPackets) id;
-		
-		switch (packet) {
-		case KILLTHERNG_SEED:
-			setGlobalSeedServer(seed);
-			break;
-			
-		case KILLTHERNG_STARTSEED:
-			TASmod.tickSchedulerServer.add(()->{
-				TASmod.ktrngHandler.setGlobalSeedServer(seed);
-			});
-			break;
 
-		default:
-			throw new PacketNotImplementedException(packet, this.getClass());
+		switch (packet) {
+			case KILLTHERNG_SEED:
+				setGlobalSeedServer(seed);
+				break;
+
+			case KILLTHERNG_STARTSEED:
+				TASmod.tickSchedulerServer.add(() -> {
+					TASmod.ktrngHandler.setGlobalSeedServer(seed);
+				});
+				break;
+
+			default:
+				throw new PacketNotImplementedException(packet, this.getClass(), Side.SERVER);
 		}
 	}
 
@@ -201,20 +205,19 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
 		long seed = TASmodBufferBuilder.readLong(buf);
 		TASmodPackets packet = (TASmodPackets) id;
-		
-		switch (packet) {
-		case KILLTHERNG_SEED:
-			setGlobalSeedClient(seed);
-			break;
-		
-		case KILLTHERNG_STARTSEED:
-			TASmodClient.virtual.getContainer().setStartSeed(seed);
-			break;
 
-		default:
-			throw new PacketNotImplementedException(packet, this.getClass());
+		switch (packet) {
+			case KILLTHERNG_SEED:
+				setGlobalSeedClient(seed);
+				break;
+
+			case KILLTHERNG_STARTSEED:
+				TASmodClient.virtual.getContainer().setStartSeed(seed);
+				break;
+
+			default:
+				throw new PacketNotImplementedException(packet, this.getClass(), Side.CLIENT);
 		}
 	}
-	
-	
+
 }

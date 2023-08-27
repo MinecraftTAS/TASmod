@@ -55,6 +55,9 @@ class ByteBufferBuilderTest {
 		
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting the packetid
+	 */
 	@Test
 	void testId() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -64,6 +67,9 @@ class ByteBufferBuilderTest {
 		assertEquals(0, buf.getInt());
 	}
 
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting the packetid
+	 */
 	@Test
 	void testId2() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_2);
@@ -73,6 +79,9 @@ class ByteBufferBuilderTest {
 		assertEquals(1, buf.getInt());
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting the packetid
+	 */
 	@Test
 	void testId3() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_3);
@@ -82,6 +91,9 @@ class ByteBufferBuilderTest {
 		assertEquals(2, buf.getInt());
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting an integer
+	 */
 	@Test
 	void testInt() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -94,6 +106,9 @@ class ByteBufferBuilderTest {
 		assertEquals(1234, ByteBufferBuilder.readInt(buf));
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting a float
+	 */
 	@Test
 	void testFloat() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -106,6 +121,9 @@ class ByteBufferBuilderTest {
 		assertEquals(12.2F, ByteBufferBuilder.readFloat(buf));
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting a double
+	 */
 	@Test
 	void testDouble() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -118,6 +136,9 @@ class ByteBufferBuilderTest {
 		assertEquals(60.9D, ByteBufferBuilder.readDouble(buf));
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting a long
+	 */
 	@Test
 	void testLong() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -130,6 +151,9 @@ class ByteBufferBuilderTest {
 		assertEquals(800815L, ByteBufferBuilder.readLong(buf));
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting a short
+	 */
 	@Test
 	void testShort() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -142,6 +166,9 @@ class ByteBufferBuilderTest {
 		assertEquals(12, ByteBufferBuilder.readShort(buf));
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting a boolean
+	 */
 	@Test
 	void testBoolean() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -154,6 +181,9 @@ class ByteBufferBuilderTest {
 		assertEquals(true, ByteBufferBuilder.readBoolean(buf));
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting a boolean
+	 */
 	@Test
 	void testBoolean2() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -166,6 +196,9 @@ class ByteBufferBuilderTest {
 		assertEquals(false, ByteBufferBuilder.readBoolean(buf));
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting a string
+	 */
 	@Test
 	void testString() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -178,6 +211,9 @@ class ByteBufferBuilderTest {
 		assertEquals("Test", ByteBufferBuilder.readString(buf));
 	}
 	
+	/**
+	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting a uuid
+	 */
 	@Test
 	void testUUID() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -193,6 +229,9 @@ class ByteBufferBuilderTest {
 	
 	// ====================================
 	
+	/**
+	 * Test creating a clone from an existing ByteBufferBuilder
+	 */
 	@Test
 	void testClone() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
@@ -214,6 +253,9 @@ class ByteBufferBuilderTest {
 	
 	// =====================================
 	
+	/**
+	 * Test an exception for all types if a ByteBufferBuilder is already closed
+	 */
 	@Test
 	void testClosed() {
 		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);

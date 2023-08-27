@@ -23,9 +23,10 @@ public class Server {
 
 	private final AsynchronousServerSocketChannel socket;
 	private final List<Client> clients;
-	
+
 	/**
 	 * Create and bind socket
+	 * 
 	 * @param port Port
 	 * @throws Exception Unable to bind
 	 */
@@ -34,7 +35,7 @@ public class Server {
 		Common.LOGGER.info("Creating server on port {}", port);
 		this.socket = AsynchronousServerSocketChannel.open();
 		this.socket.bind(new InetSocketAddress(port));
-		
+
 		// create connection handler
 		this.clients = new ArrayList<>();
 		this.socket.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>() {
@@ -50,12 +51,13 @@ public class Server {
 				Common.LOGGER.error("Unable to accept client!", exc);
 			}
 		});
-		
+
 		Common.LOGGER.info("Server created");
 	}
-	
+
 	/**
 	 * Write packet to all clients
+	 * 
 	 * @param builder The packet contents
 	 * @throws Exception Networking exception
 	 */
@@ -65,33 +67,35 @@ public class Server {
 		}
 		builder.close();
 	}
-	
+
 	/**
 	 * Send a packet to the specified uuid
-	 * @param uuid The UUID to send to
+	 * 
+	 * @param uuid    The UUID to send to
 	 * @param builder The packet contents
 	 * @throws Exception Networking exception
 	 */
-	public void sendTo(UUID uuid, ByteBufferBuilder builder) throws Exception{
+	public void sendTo(UUID uuid, ByteBufferBuilder builder) throws Exception {
 		Client client = getClient(uuid);
 		client.send(builder);
 	}
-	
+
 	/**
 	 * Send a packet to a specified player
 	 * 
 	 * Similar to {@link #sendTo(UUID, ByteBufferBuilder)}
 	 * 
-	 * @param player The player to send to
+	 * @param player  The player to send to
 	 * @param builder The packet contents
 	 * @throws Exception Networking exception
 	 */
-	public void sendTo(EntityPlayer player, ByteBufferBuilder builder) throws Exception{
+	public void sendTo(EntityPlayer player, ByteBufferBuilder builder) throws Exception {
 		sendTo(player.getUniqueID(), builder);
 	}
-	
+
 	/**
 	 * Try to close socket
+	 * 
 	 * @throws IOException Unable to close
 	 */
 	public void close() throws IOException {
@@ -99,32 +103,33 @@ public class Server {
 			Common.LOGGER.warn("Tried to close dead socket");
 			return;
 		}
-		
+
 		this.socket.close();
 	}
 
 	public boolean isClosed() {
 		return this.socket == null || !this.socket.isOpen();
 	}
-	
+
 	/**
 	 * Get client from UUID
+	 * 
 	 * @param uniqueID UUID
 	 */
 	private Client getClient(UUID uniqueID) {
 		for (Client client : this.clients)
 			if (client.getId().equals(uniqueID))
 				return client;
-		
+
 		return null;
 	}
-	
-	public List<Client> getClients(){
+
+	public List<Client> getClients() {
 		return this.clients;
 	}
-	
+
 	public AsynchronousServerSocketChannel getAsynchronousSocketChannel() {
 		return this.socket;
 	}
-	
+
 }

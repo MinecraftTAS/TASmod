@@ -29,7 +29,7 @@ public class CommandFullRecord extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		try {
-			TASmod.savestateHandler.saveState(0, false);
+			TASmod.savestateHandlerServer.saveState(0, false);
 		} catch (SavestateException e) {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to create a savestate: " + e.getMessage()));
 			return;
@@ -38,7 +38,7 @@ public class CommandFullRecord extends CommandBase {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to create a savestate: " + e.getCause().toString()));
 			return;
 		} finally {
-			TASmod.savestateHandler.state = SavestateState.NONE;
+			TASmod.savestateHandlerServer.state = SavestateState.NONE;
 		}
 		TASmod.containerStateServer.setServerState(TASstate.RECORDING);
 		try {

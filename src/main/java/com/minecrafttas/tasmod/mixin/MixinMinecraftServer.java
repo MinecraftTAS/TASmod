@@ -71,8 +71,8 @@ public abstract class MixinMinecraftServer {
 		if( (TASmod.ticksyncServer.shouldTick() && TASmod.tickratechanger.ticksPerSecond != 0) || TASmod.tickratechanger.advanceTick) {
 			long timeBeforeTick = System.currentTimeMillis();
 			
-			if (TASmod.savestateHandler.state == SavestateState.WASLOADING) {
-				TASmod.savestateHandler.state = SavestateState.NONE;
+			if (TASmod.savestateHandlerServer.state == SavestateState.WASLOADING) {
+				TASmod.savestateHandlerServer.state = SavestateState.NONE;
 				EventCompleteLoadstate.fireLoadstateComplete();
 			}
 

@@ -29,6 +29,10 @@ public class TickSyncServer implements ServerPacketHandler, EventServerTickPost 
 	
 	private static List<UUID> synchronizedList = Collections.synchronizedList(new ArrayList<>());
 
+	@Override
+	public PacketID[] getAcceptedPacketIDs() {
+		return new TASmodPackets[]{TASmodPackets.TICKSYNC};
+	}
 
 	/**
 	 * Handles incoming tick packets from the client to the server
@@ -69,11 +73,6 @@ public class TickSyncServer implements ServerPacketHandler, EventServerTickPost 
 
 	public static void clearList() {
 		synchronizedList.clear();
-	}
-
-	@Override
-	public PacketID[] getAcceptedPacketIDs() {
-		return new TASmodPackets[]{TASmodPackets.TICKSYNC};
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
+import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
@@ -19,10 +20,11 @@ import net.minecraft.client.Minecraft;
 
 /**
  * Changes the {@link Minecraft#timer} variable
+ * 
  * @author Scribble
  *
  */
-public class TickrateChangerClient implements ClientPacketHandler{
+public class TickrateChangerClient implements ClientPacketHandler {
 	/**
 	 * The current tickrate of the client
 	 */
@@ -33,22 +35,22 @@ public class TickrateChangerClient implements ClientPacketHandler{
 	 * pausing
 	 */
 	public float tickrateSaved = 20F;
-	
+
 	/**
 	 * True if the tickrate is 20 and the client should advance 1 tick
 	 */
 	public boolean advanceTick = false;
-	
+
 	public long millisecondsPerTick = 50L;
 
 	public TickrateChangerClient() {
 		this(20f);
 	}
-	
+
 	public TickrateChangerClient(float initialTickrate) {
 		ticksPerSecond = initialTickrate;
 	}
-	
+
 	/**
 	 * Changes both client and server tickrates
 	 * 
@@ -58,7 +60,7 @@ public class TickrateChangerClient implements ClientPacketHandler{
 		changeClientTickrate(tickrate);
 		changeServerTickrate(tickrate);
 	}
-	
+
 	public void changeClientTickrate(float tickrate) {
 		changeClientTickrate(tickrate, true);
 	}
@@ -78,7 +80,7 @@ public class TickrateChangerClient implements ClientPacketHandler{
 		if (tickrate > 0) {
 			millisecondsPerTick = (long) (1000F / tickrate);
 			mc.timer.tickLength = millisecondsPerTick;
-			
+
 		} else if (tickrate == 0F) {
 			if (ticksPerSecond != 0) {
 				tickrateSaved = ticksPerSecond;
@@ -86,8 +88,8 @@ public class TickrateChangerClient implements ClientPacketHandler{
 			mc.timer.tickLength = Float.MAX_VALUE;
 		}
 		ticksPerSecond = tickrate;
-		if(log)
-			log("Setting the client tickrate to "+ ticksPerSecond);
+		if (log)
+			log("Setting the client tickrate to " + ticksPerSecond);
 	}
 
 	/**
@@ -100,7 +102,7 @@ public class TickrateChangerClient implements ClientPacketHandler{
 		if (tickrate < 0) {
 			return;
 		}
-		
+
 		try {
 			// request tickrate change
 			TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.TICKRATE_CHANGE).writeFloat(tickrate));
@@ -146,25 +148,27 @@ public class TickrateChangerClient implements ClientPacketHandler{
 		if (pause) {
 			changeTickrate(0F);
 		} else {
-			advanceTick=false;
+			advanceTick = false;
 			changeTickrate(tickrateSaved);
 		}
 	}
 
 	/**
 	 * Pauses the game without sending a command to the server
+	 * 
 	 * @param pause The state of the client
 	 */
 	public void pauseClientGame(boolean pause) {
-		if(pause) {
+		if (pause) {
 			changeClientTickrate(0F);
-		}else {
+		} else {
 			changeClientTickrate(tickrateSaved);
 		}
 	}
-	
+
 	/**
-	 * Advances the game by 1 tick. Sends a {@link AdvanceTickratePacket} to the server or calls {@link #advanceClientTick()} if the world is null
+	 * Advances the game by 1 tick. Sends a {@link AdvanceTickratePacket} to the
+	 * server or calls {@link #advanceClientTick()} if the world is null
 	 */
 	public void advanceTick() {
 		if (Minecraft.getMinecraft().world != null) {
@@ -184,7 +188,7 @@ public class TickrateChangerClient implements ClientPacketHandler{
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Advances the game by 1 tick. Doesn't send a packet to the server
 	 */
@@ -194,54 +198,51 @@ public class TickrateChangerClient implements ClientPacketHandler{
 			changeClientTickrate(tickrateSaved);
 		}
 	}
-	
+
 	public void joinServer() {
 		changeServerTickrate(ticksPerSecond);
 	}
-	
+
 	private static void log(String msg) {
 		LOGGER.debug(LoggerMarkers.Tickrate, msg);
 	}
 
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
-		return new TASmodPackets[] {
-			TASmodPackets.TICKRATE_CHANGE,
-			TASmodPackets.TICKRATE_ADVANCE,
-			TASmodPackets.TICKRATE_ZERO,
-		};
+		return new TASmodPackets[] { TASmodPackets.TICKRATE_CHANGE, TASmodPackets.TICKRATE_ADVANCE, TASmodPackets.TICKRATE_ZERO, };
 	}
+
 	@Override
 	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
-		
+
 		switch (packet) {
-		case TICKRATE_CHANGE:
-			float tickrate = TASmodBufferBuilder.readFloat(buf);
-			changeClientTickrate(tickrate);
-			break;
-		case TICKRATE_ADVANCE:
-			advanceClientTick();
-			break;
-		case TICKRATE_ZERO:
-			TickratePauseState state = TASmodBufferBuilder.readTickratePauseState(buf);
+			case TICKRATE_CHANGE:
+				float tickrate = TASmodBufferBuilder.readFloat(buf);
+				changeClientTickrate(tickrate);
+				break;
+			case TICKRATE_ADVANCE:
+				advanceClientTick();
+				break;
+			case TICKRATE_ZERO:
+				TickratePauseState state = TASmodBufferBuilder.readTickratePauseState(buf);
 
-			switch (state) {
-			case PAUSE:
-				pauseClientGame(true);
+				switch (state) {
+					case PAUSE:
+						pauseClientGame(true);
+						break;
+					case UNPAUSE:
+						pauseClientGame(false);
+						break;
+					case TOGGLE:
+						togglePauseClient();
+					default:
+						break;
+				}
 				break;
-			case UNPAUSE:
-				pauseClientGame(false);
-				break;
-			case TOGGLE:
-				togglePauseClient();
+
 			default:
-				break;
-			}
-			break;
-
-		default:
-			throw new PacketNotImplementedException(packet, this.getClass());
+				throw new PacketNotImplementedException(packet, this.getClass(), Side.CLIENT);
 		}
 	}
 

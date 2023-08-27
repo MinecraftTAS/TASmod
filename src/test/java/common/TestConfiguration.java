@@ -35,11 +35,17 @@ class TestConfiguration {
 		configPath.delete();
 	}
 
+	/**
+	 * Test if the config is successfully initialized
+	 */
 	@Test
 	void testIfInitialized() {
 		assertNotNull(config);
 	}
 	
+	/**
+	 * Test if the default option is correctly set
+	 */
 	@Test
 	void testDefault() {
 		configPath.delete();
@@ -47,6 +53,9 @@ class TestConfiguration {
 		assertEquals("", config.get(ConfigOptions.FileToOpen));
 	}
 	
+	/**
+	 * Setting a value and recreating the config should result in the value still being set
+	 */
 	@Test
 	void testSavingAndLoading() {
 		config.set(ConfigOptions.FileToOpen, "Test");
@@ -54,24 +63,36 @@ class TestConfiguration {
 		assertEquals("Test", config.get(ConfigOptions.FileToOpen));
 	}
 	
+	/**
+	 * Test if integers can be set
+	 */
 	@Test
 	void testIntegers() {
 		config.set(ConfigOptions.FileToOpen, 3);
 		assertEquals(3, config.getInt(ConfigOptions.FileToOpen));
 	}
 
+	/**
+	 * Test if booleans can be set
+	 */
 	@Test
 	void testBooleans() {
 		config.set(ConfigOptions.FileToOpen, true);
 		assertEquals(true, config.getBoolean(ConfigOptions.FileToOpen));
 	}
 	
+	/**
+	 * Test if deleting and unsetting a config value works
+	 */
 	@Test
 	void testDeleteAndContains() {
 		config.delete(ConfigOptions.FileToOpen);
 		assertFalse(config.has(ConfigOptions.FileToOpen));
 	}
 	
+	/**
+	 * Test if resetting to default works
+	 */
 	@Test
 	void resetToDefault() {
 		config.reset(ConfigOptions.FileToOpen);

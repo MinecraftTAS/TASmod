@@ -5,6 +5,7 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
+import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.PacketID;
@@ -68,7 +69,7 @@ public class TASstateServer implements ServerPacketHandler{
 			break;
 
 		default:
-			throw new PacketNotImplementedException(packet, this.getClass());
+			throw new PacketNotImplementedException(packet, this.getClass(), Side.SERVER);
 		}
 	}
 	

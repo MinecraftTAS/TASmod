@@ -80,7 +80,7 @@ public class TASstateClient implements ClientPacketHandler{
 			break;
 			
 		default:
-				throw new PacketNotImplementedException(packet, this.getClass());
+				throw new PacketNotImplementedException(packet, this.getClass(), Side.CLIENT);
 		}
 	}
 

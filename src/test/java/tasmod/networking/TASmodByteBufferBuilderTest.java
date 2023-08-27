@@ -55,7 +55,9 @@ class TASmodByteBufferBuilderTest {
 		
 	}
 	
-
+	/**
+	 * Test if NBTTagCompounds get correctly stored in a ByteBuffer
+	 */
 	@Test
 	void testNBT() {
 		
