@@ -18,6 +18,7 @@ import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackController;
 import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.savestates.SavestateHandlerServer.PlayerHandler.MotionData;
 import com.minecrafttas.tasmod.savestates.exceptions.SavestateException;
 import com.minecrafttas.tasmod.savestates.gui.GuiSavestateSavingScreen;
 import com.minecrafttas.tasmod.util.Ducks.ChunkProviderDuck;
@@ -221,9 +222,10 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 		return new TASmodPackets[] { 
 				TASmodPackets.SAVESTATE_SAVE, 
 				TASmodPackets.SAVESTATE_LOAD, 
-				TASmodPackets.SAVESTATE_PLAYER, 
-				TASmodPackets.SAVESTATE_SCREEN, 
-				TASmodPackets.SAVESTATE_UNLOAD_CHUNKS 
+				TASmodPackets.SAVESTATE_PLAYER,
+				TASmodPackets.SAVESTATE_REQUEST_MOTION,
+				TASmodPackets.SAVESTATE_SCREEN,
+				TASmodPackets.SAVESTATE_UNLOAD_CHUNKS
 				};
 	}
 
@@ -255,10 +257,39 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 				}
 				break;
 			case SAVESTATE_PLAYER:
-				NBTTagCompound compound = TASmodBufferBuilder.readNBTTagCompound(buf);
-				SavestateHandlerClient.loadPlayer(compound);
+				Minecraft.getMinecraft().addScheduledTask(()->{
+					NBTTagCompound compound = null;
+					try {
+						compound = TASmodBufferBuilder.readNBTTagCompound(buf);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					SavestateHandlerClient.loadPlayer(compound);
+				});
 				break;
 
+			case SAVESTATE_REQUEST_MOTION:
+				EntityPlayerSP player = Minecraft.getMinecraft().player;
+				if (player != null) {
+					if (!(Minecraft.getMinecraft().currentScreen instanceof GuiSavestateSavingScreen)) {
+						Minecraft.getMinecraft().displayGuiScreen(new GuiSavestateSavingScreen());
+					}
+					TASmodClient.client.send(
+							new TASmodBufferBuilder(TASmodPackets.SAVESTATE_REQUEST_MOTION)
+							.writeMotionData(
+									new MotionData(
+											player.motionX,
+											player.motionY,
+											player.motionZ,
+											player.moveForward,
+											player.moveVertical,
+											player.moveStrafing,
+											player.isSprinting(),
+											player.jumpMovementFactor)
+									)
+							);
+				}
+				break;
 			case SAVESTATE_SCREEN:
 				// Open/Close Savestate screen
 				boolean open = TASmodBufferBuilder.readBoolean(buf);

@@ -33,6 +33,7 @@ import com.minecrafttas.tasmod.mixin.savestates.AccessorChunkLoader;
 import com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderServer;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
+import com.minecrafttas.tasmod.savestates.SavestateHandlerServer.PlayerHandler.MotionData;
 import com.minecrafttas.tasmod.savestates.exceptions.LoadstateException;
 import com.minecrafttas.tasmod.savestates.exceptions.SavestateDeleteException;
 import com.minecrafttas.tasmod.savestates.exceptions.SavestateException;
@@ -728,6 +729,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 				TASmodPackets.SAVESTATE_SAVE,
 				TASmodPackets.SAVESTATE_LOAD,
 				TASmodPackets.SAVESTATE_PLAYER,
+				TASmodPackets.SAVESTATE_REQUEST_MOTION,
 				TASmodPackets.SAVESTATE_SCREEN,
 				TASmodPackets.SAVESTATE_UNLOAD_CHUNKS
 		};
@@ -767,18 +769,37 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			break;
 			
 		case SAVESTATE_LOAD:
+			TASmod.tickSchedulerServer.add(() -> {
+				int indexing = TASmodBufferBuilder.readInt(buf);
+				// if (player!=null && !player.canUseCommand(2, "loadstate")) {
+				// player.sendMessage(new TextComponentString(TextFormatting.RED+"You don't have
+				// permission to do that"));
+				// return;
+				// }
+				try {
+					TASmod.savestateHandlerServer.loadState(indexing, true);
+				} catch (LoadstateException e) {
+					if (player != null)
+						player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getMessage()));
+
+					LOGGER.error(LoggerMarkers.Savestate, "Failed to create a savestate: " + e.getMessage());
+				} catch (Exception e) {
+					if (player != null)
+						player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getCause().toString()));
+
+					LOGGER.error(e);
+				} finally {
+					TASmod.savestateHandlerServer.state = SavestateState.NONE;
+				}
+			});
+			break;
+
+		case SAVESTATE_REQUEST_MOTION:
+			System.out.println("Ahh");
+			MotionData data = TASmodBufferBuilder.readMotionData(buf);
+			PlayerHandler.getMotion().put(player, data);
 			break;
 		case SAVESTATE_PLAYER:
-			double x = TASmodBufferBuilder.readDouble(buf);
-			double y = TASmodBufferBuilder.readDouble(buf);
-			double z = TASmodBufferBuilder.readDouble(buf);
-			float rx = TASmodBufferBuilder.readFloat(buf);
-			float ry = TASmodBufferBuilder.readFloat(buf);
-			float rz = TASmodBufferBuilder.readFloat(buf);
-			boolean sprinting = TASmodBufferBuilder.readBoolean(buf);
-			float jumpMovementVector = TASmodBufferBuilder.readFloat(buf);
-			PlayerHandler.getMotion().put(player, new PlayerHandler.Saver(x, y, z, rx, ry, rz, sprinting, jumpMovementVector));
-			break;
 		case SAVESTATE_SCREEN:
 		case SAVESTATE_UNLOAD_CHUNKS:
 			throw new WrongSideException(id, Side.SERVER);
@@ -792,7 +813,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 	 */
 	public static class PlayerHandler {
 
-		public static class Saver {
+		public static class MotionData {
 			private double clientX;
 			private double clientY;
 			private double clientZ;
@@ -802,7 +823,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			private boolean sprinting;
 			private float jumpMovementVector;
 		
-			public Saver(double x, double y, double z, float rx, float ry, float rz, boolean sprinting, float jumpMovementVector) {
+			public MotionData(double x, double y, double z, float rx, float ry, float rz, boolean sprinting, float jumpMovementVector) {
 				clientX = x;
 				clientY = y;
 				clientZ = z;
@@ -954,42 +975,17 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			PlayerHandler.motion.clear();
 			try {
 				// request client motion
-				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_PLAYER));
+				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_REQUEST_MOTION));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		
-			// TODO: is this still necessary?
-			int i = 1;
-			while (PlayerHandler.motion.size() != TASmod.getServerInstance().getPlayerList().getCurrentPlayerCount()) {
-				i++;
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				if(i % 30 == 1) {
-					LOGGER.debug(LoggerMarkers.Savestate, "Resending motion packet");
-					try {
-						// request client motion
-						TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_PLAYER));
-					} catch (Exception e) {
-						LOGGER.error("Unable to send packet to all clients:", e);
-					}
-				}
-				if (i == 1000) {
-					LOGGER.warn(LoggerMarkers.Savestate, "Client motion timed out!");
-					break;
-				}
-		
-			}
 		}
 
-		public static Map<EntityPlayerMP, PlayerHandler.Saver> getMotion() {
+		public static Map<EntityPlayerMP, PlayerHandler.MotionData> getMotion() {
 			return PlayerHandler.motion;
 		}
 
-		public static Map<EntityPlayerMP, PlayerHandler.Saver> motion = Maps.<EntityPlayerMP, PlayerHandler.Saver>newHashMap();
+		public static Map<EntityPlayerMP, PlayerHandler.MotionData> motion = Maps.<EntityPlayerMP, PlayerHandler.MotionData>newHashMap();
 		
 	}
 	

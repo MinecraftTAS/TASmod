@@ -16,7 +16,7 @@ public class MixinEntityPlayerMP {
 	@Inject(method = "writeEntityToNBT", at = @At(value = "RETURN"))
 	public void writeClientMotion(NBTTagCompound compound, CallbackInfo ci) {
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
-		PlayerHandler.Saver saver = PlayerHandler.getMotion().get((EntityPlayerMP) (Object) this);
+		PlayerHandler.MotionData saver = PlayerHandler.getMotion().get((EntityPlayerMP) (Object) this);
 		if (saver != null) {
 			nbttagcompound.setDouble("x", saver.getClientX());
 			nbttagcompound.setDouble("y", saver.getClientY());
@@ -51,7 +51,7 @@ public class MixinEntityPlayerMP {
 		boolean sprinting = nbttagcompound.getBoolean("Sprinting");
 		float jumpVector = nbttagcompound.getFloat("JumpFactor");
 		
-		PlayerHandler.Saver saver = new PlayerHandler.Saver(clientmotionX, clientmotionY, clientmotionZ, clientmotionrX, clientmotionrY, clientmotionrZ, sprinting, jumpVector);
+		PlayerHandler.MotionData saver = new PlayerHandler.MotionData(clientmotionX, clientmotionY, clientmotionZ, clientmotionrX, clientmotionrY, clientmotionrZ, sprinting, jumpVector);
 		PlayerHandler.getMotion().put((EntityPlayerMP) (Object) this, saver);
 
 	}
