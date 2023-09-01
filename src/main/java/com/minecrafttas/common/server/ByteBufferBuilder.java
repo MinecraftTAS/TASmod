@@ -101,6 +101,12 @@ public class ByteBufferBuilder {
 		buffer.putLong(uuid.getLeastSignificantBits());
 		return this;
 	}
+	
+	public ByteBufferBuilder writeByteArray(byte[] value) {
+		buffer.putInt(value.length);
+		buffer.put(value);
+		return this;
+	}
 
 	/**
 	 * Unlocks the buffer from the pool making it available for other uses
@@ -159,5 +165,12 @@ public class ByteBufferBuilder {
 		byte[] nameBytes = new byte[buf.getInt()];
 		buf.get(nameBytes);
 		return new String(nameBytes);
+	}
+	
+	public static byte[] readByteArray(ByteBuffer buf) {
+		int length = buf.getInt();
+		byte[] array = new byte[length];
+		buf.get(array);
+		return array;
 	}
 }
