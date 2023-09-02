@@ -157,7 +157,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		try {
 			UUID uuid = mc.getSession().getProfile().getId();
 			if (uuid == null) // dev environment
-				uuid = UUID.randomUUID();
+				uuid = UUID.nameUUIDFromBytes(mc.getSession().getUsername().getBytes());
 			// connect to server and authenticate
 			client = new Client("127.0.0.1", TASmod.networkingport, TASmodPackets.values(), uuid);
 		} catch (Exception e) {

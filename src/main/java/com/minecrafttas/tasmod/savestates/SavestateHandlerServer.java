@@ -962,6 +962,8 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 				
 				player.readFromNBT(nbttagcompound);
 				
+				LOGGER.debug(LoggerMarkers.Savestate, "Sending motion to {}", player.getUniqueID());
+				
 				try {
 					TASmod.server.sendTo(player.getUniqueID(), new TASmodBufferBuilder(TASmodPackets.SAVESTATE_PLAYER).writeNBTTagCompound(nbttagcompound));
 				} catch (Exception e) {

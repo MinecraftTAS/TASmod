@@ -301,7 +301,9 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 				break;
 
 			case SAVESTATE_UNLOAD_CHUNKS:
-				SavestateHandlerClient.unloadAllClientChunks();
+				Minecraft.getMinecraft().addScheduledTask(()-> {
+					SavestateHandlerClient.unloadAllClientChunks();
+				});
 				break;
 
 			default:

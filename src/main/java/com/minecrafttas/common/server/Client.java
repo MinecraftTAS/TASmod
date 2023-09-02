@@ -159,7 +159,7 @@ public class Client {
 	 */
 	private void authenticate(UUID id) throws Exception {
 		this.clientID = id;
-
+		Common.LOGGER.info("Authenticating with UUID {}", id.toString());
 		this.send(new ByteBufferBuilder(-1).writeUUID(id));
 	}
 
