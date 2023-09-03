@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
@@ -19,8 +20,9 @@ import com.minecrafttas.tasmod.events.EventClient.EventDrawHotbar;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.playback.ControlByteHandler;
-import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
 import com.minecrafttas.tasmod.util.TrajectoriesCalculator;
+import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.Minecraft;
@@ -73,12 +75,17 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 	private int gridSizeY=14;
 	
 	public Properties configuration;
+	private boolean resetLayout;
 	public static List<InfoLabel> lists = new ArrayList<>();
 	
 	private void setDefaults(String string, int y) {
+		setDefaults(string, y, false);
+	}
+	
+	private void setDefaults(String string, int y, boolean enabled) {
 		configuration.setProperty(string + "_x", "0");
 		configuration.setProperty(string + "_y", y + "");
-		configuration.setProperty(string + "_visible", "false");
+		configuration.setProperty(string + "_visible", enabled?"true":"false");
 		configuration.setProperty(string + "_rect", "false");
 		saveConfig();
 	}
@@ -116,7 +123,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 	}
 	
 	@Override protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-		if (mouseButton == 1) {
+		if (mouseButton == 2) {
 			identify(mouseX, mouseY);
 			if (currentlyDraggedIndex != -1) {
 				String id = lists.get(currentlyDraggedIndex).displayName;
@@ -126,7 +133,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 				currentlyDraggedIndex = -1;
 			}
 			return;
-		} else if (mouseButton == 2) {
+		} else if (mouseButton == 1) {
 			identify(mouseX, mouseY);
 			if (currentlyDraggedIndex != -1) {
 				String id = lists.get(currentlyDraggedIndex).displayName;
@@ -208,11 +215,15 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 		/* Check whether already rendered before */
 		try {
 			configuration = new Properties();
-			File tasmodDir = new File(Minecraft.getMinecraft().mcDataDir, "tasmod");
-			tasmodDir.mkdir();
-			File configFile = new File(tasmodDir, "infogui2.cfg");
-			if (!configFile.exists()) configFile.createNewFile();
-			configuration.load(new FileReader(configFile));
+			if (!resetLayout) {
+				File tasmodDir = new File(Minecraft.getMinecraft().mcDataDir, "tasmod");
+				tasmodDir.mkdir();
+				File configFile = new File(tasmodDir, "infogui2.cfg");
+				if (!configFile.exists()) configFile.createNewFile();
+				configuration.load(new FileReader(configFile));
+			}else {
+				resetLayout = false;
+			}
 			lists = new ArrayList<InfoLabel>();
 			/* ====================== */
 			String title = "tickrate";
@@ -389,17 +400,18 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 				return dMonitor.getSeed();
 			}));
 
-			y += 14;
+			
+			y = height - 28;
 			title = "playback_index";
-			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y, true);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "PlaybackIndex";
 				return Integer.toString(TASmodClient.virtual.getContainer().index());
 			}));
 			
-			y += 14;
+			y = height - 14;
 			title = "keystrokes";
-			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y, true);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Keystrokes";
 				return keystrokes();
@@ -430,19 +442,20 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 				drawRectWithText(label.renderText, label.x, label.y, label.renderRect);
 			} else if (Minecraft.getMinecraft().currentScreen != null) {
 				if (Minecraft.getMinecraft().currentScreen.getClass().getSimpleName().contains("InfoHud")) {
-					GL11.glPushMatrix();
-		         	GL11.glEnable(GL11.GL_BLEND);
-		         	GL11.glBlendFunc(770, 771);
 		         	Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(label.renderText, label.x + 2, label.y + 3, 0x60FFFFFF);
-		    		GL11.glDisable(GL11.GL_BLEND);
-		         	GL11.glPopMatrix();
 				}
 			}
 			if(Minecraft.getMinecraft().currentScreen instanceof InfoHud) {
 				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Leftclick to move", width-ypos, xpos- 30, 0x60FF00);
-				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Middleclick to enable", width-ypos, xpos-20, 0x60FF00);
-				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Rightclick to add black background", width-ypos, xpos-10, 0x60FF00);
+				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Rightclick to enable", width-ypos, xpos-20, 0x60FF00);
+				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Middleclick to add black background", width-ypos, xpos-10, 0x60FF00);
 				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Hold Shift to snap to grid", width-ypos, xpos, 0x60FF00);
+				Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("CTRL+Shift+R to reset the layout", width - ypos, xpos + 10, 0xEE8100);
+				
+				if (isCtrlKeyDown() && isShiftKeyDown() && TASmodClient.virtual.isKeyDown(Keyboard.KEY_R)) {
+					resetLayout = true;
+					configuration = null;
+				}
 			}
 		}
 		ScaledResolution scaled = new ScaledResolution(Minecraft.getMinecraft());
@@ -453,7 +466,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 	 * Renders a Box with Text in it
 	 */
 	private void drawRectWithText(String text, int x, int y, boolean rect) {
-		if (rect) drawRect(x, y, x + Minecraft.getMinecraft().fontRenderer.getStringWidth(text) + 4, y + 14, 0x80000000);
+		if (rect) drawRect(x, y, x + Minecraft.getMinecraft().fontRenderer.getStringWidth(text) + 4, y + 14, 0x60000000);
 		Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(text, x + 2, y + 3, 0xFFFFFF);
 		GL11.glEnable(3042 /*GL_BLEND*/);
 	}
