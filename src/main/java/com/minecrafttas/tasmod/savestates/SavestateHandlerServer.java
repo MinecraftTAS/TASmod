@@ -736,11 +736,11 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 	}
 
 	@Override
-	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		// TODO Permissions
 		TASmodPackets packet = (TASmodPackets) id;
 		
-		EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUUID(clientID);
+		EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUsername(username);
 		Integer index = null;
 		
 		
@@ -962,10 +962,10 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 				
 				player.readFromNBT(nbttagcompound);
 				
-				LOGGER.debug(LoggerMarkers.Savestate, "Sending motion to {}", player.getUniqueID());
+				LOGGER.debug(LoggerMarkers.Savestate, "Sending motion to {}", player.getName());
 				
 				try {
-					TASmod.server.sendTo(player.getUniqueID(), new TASmodBufferBuilder(TASmodPackets.SAVESTATE_PLAYER).writeNBTTagCompound(nbttagcompound));
+					TASmod.server.sendTo(player, new TASmodBufferBuilder(TASmodPackets.SAVESTATE_PLAYER).writeNBTTagCompound(nbttagcompound));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

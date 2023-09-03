@@ -3,8 +3,7 @@ package com.minecrafttas.tasmod.events;
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
-import com.minecrafttas.tasmod.playback.TASstateClient;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
 
 import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.gui.GuiIngameMenu;
@@ -44,7 +43,7 @@ public class OpenGuiEvents {
 		if (TASmodClient.tickratechanger.ticksPerSecond == 0 || TASmodClient.tickratechanger.advanceTick) {
 			LOGGER.info("Pausing game during GuiControls");
 			TASmodClient.tickratechanger.pauseGame(false);
-			TASstateClient.setOrSend(stateWhenOpened);
+			TASmodClient.virtual.getContainer().setTASState(stateWhenOpened);
 			waszero = true;
 		}
 	}

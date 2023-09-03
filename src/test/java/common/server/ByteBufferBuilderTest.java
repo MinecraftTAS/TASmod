@@ -1,5 +1,6 @@
 package common.server;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -212,6 +213,21 @@ class ByteBufferBuilderTest {
 	}
 	
 	/**
+	 * Test
+	 */
+	@Test
+	void testByteArray() {
+		ByteBufferBuilder builder = new ByteBufferBuilder(TestPacketIDs.TESTID_1);
+		
+		builder.writeByteArray(new byte[] {1,1,0,0,1,1,0});
+		
+		ByteBuffer buf = builder.build();
+		buf.position(4);
+		
+		assertArrayEquals(new byte[] {1,1,0,0,1,1,0}, ByteBufferBuilder.readByteArray(buf));
+	}
+	
+	/**
 	 * Test creating a new ByteBuffer from a ByteBufferbuilder and getting a uuid
 	 */
 	@Test
@@ -225,7 +241,6 @@ class ByteBufferBuilderTest {
 		
 		assertEquals("b8abdafc-5002-40df-ab68-63206ea4c7e8", ByteBufferBuilder.readUUID(buf).toString());
 	}
-	
 	
 	// ====================================
 	

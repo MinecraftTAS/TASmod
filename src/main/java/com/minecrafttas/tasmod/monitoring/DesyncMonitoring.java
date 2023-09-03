@@ -8,7 +8,7 @@ import java.util.List;
 import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.killtherng.custom.CustomRandom;
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.playback.PlaybackController;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -27,13 +27,13 @@ public class DesyncMonitoring {
 	
 	private MonitorContainer currentValues;
 	
-	private PlaybackController controller;
+	private PlaybackControllerClient controller;
 	
 	/**
 	 * Creates an empty desync monitor
 	 * @param playbackController 
 	 */
-	public DesyncMonitoring(PlaybackController playbackController) {
+	public DesyncMonitoring(PlaybackControllerClient playbackController) {
 		controller = playbackController;
 	}
 	
@@ -42,7 +42,7 @@ public class DesyncMonitoring {
 	 * @param playbackController 
 	 * @param monitorLines
 	 */
-	public DesyncMonitoring(PlaybackController playbackController, List<String> monitorLines) throws IOException{
+	public DesyncMonitoring(PlaybackControllerClient playbackController, List<String> monitorLines) throws IOException{
 		this(playbackController);
 		container = loadFromFile(monitorLines);
 	}

@@ -7,7 +7,6 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.util.UUID;
 import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.Level;
@@ -31,7 +30,7 @@ public class Client {
 	private final ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
 	private Future<Integer> future;
 
-	private UUID clientID;
+	private String username;
 
 	private Side side;
 
@@ -48,7 +47,7 @@ public class Client {
 	 * @param uuid      The UUID of the client
 	 * @throws Exception Unable to connect
 	 */
-	public Client(String host, int port, PacketID[] packetIDs, UUID uuid) throws Exception {
+	public Client(String host, int port, PacketID[] packetIDs, String name) throws Exception {
 		Common.LOGGER.info("Connecting server to {}:{}", host, port);
 		this.socket = AsynchronousSocketChannel.open();
 		this.socket.connect(new InetSocketAddress(host, port)).get();
@@ -59,7 +58,7 @@ public class Client {
 		this.createHandlers();
 		Common.LOGGER.info("Connected to server");
 
-		authenticate(uuid);
+		authenticate(name);
 	}
 
 	/**
@@ -157,21 +156,18 @@ public class Client {
 	 * @param id Unique ID
 	 * @throws Exception Unable to send packet
 	 */
-	private void authenticate(UUID id) throws Exception {
-		this.clientID = id;
+	private void authenticate(String id) throws Exception {
+		this.username = id;
 		Common.LOGGER.info("Authenticating with UUID {}", id.toString());
-		this.send(new ByteBufferBuilder(-1).writeUUID(id));
+		this.send(new ByteBufferBuilder(-1).writeString(id));
 	}
 
 	private void completeAuthentication(ByteBuffer buf) throws Exception {
-		if (this.clientID != null) {
+		if (this.username != null) {
 			throw new Exception("The client tried to authenticate while being authenticated already");
 		}
 
-		long mostSignificant = buf.getLong();
-		long leastSignificant = buf.getLong();
-
-		this.clientID = new UUID(mostSignificant, leastSignificant);
+		this.username = ByteBufferBuilder.readString(buf);
 	}
 
 	private void handle(ByteBuffer buf) {
@@ -182,7 +178,7 @@ public class Client {
 				return;
 			}
 			PacketID packet = getPacketFromID(id);
-			PacketHandlerRegistry.handle(side, packet, buf, this.clientID);
+			PacketHandlerRegistry.handle(side, packet, buf, this.username);
 		} catch (PacketNotImplementedException | WrongSideException e) {
 			Common.LOGGER.throwing(Level.ERROR, e);
 		} catch (Exception e) {
@@ -191,8 +187,8 @@ public class Client {
 
 	}
 
-	public UUID getId() {
-		return this.clientID;
+	public String getId() {
+		return this.username;
 	}
 
 	private PacketID getPacketFromID(int id) throws InvalidPacketException {

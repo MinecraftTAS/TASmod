@@ -3,7 +3,6 @@ package com.minecrafttas.tasmod.tickratechanger;
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
@@ -213,7 +212,7 @@ public class TickrateChangerClient implements ClientPacketHandler {
 	}
 
 	@Override
-	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public void onClientPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
 
 		switch (packet) {

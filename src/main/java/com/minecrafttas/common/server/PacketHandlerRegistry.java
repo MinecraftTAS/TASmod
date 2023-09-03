@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import com.minecrafttas.common.Common;
 import com.minecrafttas.common.server.Client.Side;
@@ -40,9 +39,9 @@ public class PacketHandlerRegistry {
 		}
 	}
 
-	public static void handle(Side side, PacketID packet, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public static void handle(Side side, PacketID packet, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		if (side != null && side == packet.getSide()) {
-			packet.getLambda().onPacket(buf, clientID);
+			packet.getLambda().onPacket(buf, username);
 			return;
 		}
 
@@ -51,11 +50,11 @@ public class PacketHandlerRegistry {
 			if (Arrays.stream(handler.getAcceptedPacketIDs()).anyMatch(packet::equals)) {
 				if (side == Side.CLIENT && handler instanceof ClientPacketHandler) {
 					ClientPacketHandler clientHandler = (ClientPacketHandler) handler;
-					clientHandler.onClientPacket(packet, buf, clientID);
+					clientHandler.onClientPacket(packet, buf, username);
 					isImplemented = true;
 				} else if (side == Side.SERVER && handler instanceof ServerPacketHandler) {
 					ServerPacketHandler serverHandler = (ServerPacketHandler) handler;
-					serverHandler.onServerPacket(packet, buf, clientID);
+					serverHandler.onServerPacket(packet, buf, username);
 					isImplemented = true;
 				}
 			}

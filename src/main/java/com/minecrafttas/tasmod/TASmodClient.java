@@ -5,7 +5,6 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.lwjgl.input.Keyboard;
 
@@ -26,10 +25,9 @@ import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 import com.minecrafttas.tasmod.handlers.LoadingScreenHandler;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
-import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
-import com.minecrafttas.tasmod.savestates.SavestateHandlerClient;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
-import com.minecrafttas.tasmod.playback.TASstateClient;
+import com.minecrafttas.tasmod.savestates.SavestateHandlerClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 import com.minecrafttas.tasmod.util.Scheduler;
@@ -115,6 +113,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		
 		virtual=new VirtualInput(fileOnStart);
 		EventListenerRegistry.register(virtual);
+		PacketHandlerRegistry.register(virtual.getContainer());
 		
 		hud = new InfoHud();
 		EventListenerRegistry.register(hud);
@@ -128,7 +127,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		ticksyncClient = new TickSyncClient();
 		EventListenerRegistry.register(ticksyncClient);
 		PacketHandlerRegistry.register(ticksyncClient);
-
+		
 		PacketHandlerRegistry.register(tickratechanger);
 		
 		PacketHandlerRegistry.register(savestateHandlerClient);
@@ -155,11 +154,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		EventListenerRegistry.register(hud);
 		
 		try {
-			UUID uuid = mc.getSession().getProfile().getId();
-			if (uuid == null) // dev environment
-				uuid = UUID.nameUUIDFromBytes(mc.getSession().getUsername().getBytes());
 			// connect to server and authenticate
-			client = new Client("127.0.0.1", TASmod.networkingport, TASmodPackets.values(), uuid);
+			client = new Client("127.0.0.1", TASmod.networkingport, TASmodPackets.values(), mc.getSession().getUsername());
 		} catch (Exception e) {
 			LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 		}
@@ -171,7 +167,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		List<KeyBinding> blockedKeybindings = new ArrayList<>();
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Tickrate 0 Key", "TASmod", Keyboard.KEY_F8, () -> TASmodClient.tickratechanger.togglePause())));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Advance Tick", "TASmod", Keyboard.KEY_F9, () -> TASmodClient.tickratechanger.advanceTick())));
-		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Recording/Playback Stop", "TASmod", Keyboard.KEY_F10, () -> TASstateClient.setOrSend(TASstate.NONE))));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Recording/Playback Stop", "TASmod", Keyboard.KEY_F10, () -> TASmodClient.virtual.getContainer().setTASState(TASstate.NONE))));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Create Savestate", "TASmod", Keyboard.KEY_J, () -> {
 			try {
 				TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_SAVE).writeInt(-1));

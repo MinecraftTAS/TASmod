@@ -3,7 +3,6 @@ package com.minecrafttas.tasmod.ticksync;
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
@@ -40,7 +39,7 @@ public class TickSyncClient implements ClientPacketHandler, EventClientTickPost{
 	 * @param tick Current tick of the server
 	 */
 	@Override
-	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) {
+	public void onClientPacket(PacketID id, ByteBuffer buf, String username) {
 		shouldTick.set(true);
 	}
 

@@ -1,6 +1,16 @@
 package com.minecrafttas.tasmod.playback;
 
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.CLEAR_INNPUTS;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_FULLPLAY;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_FULLRECORD;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_LOAD;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_PLAYUNTIL;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_RESTARTANDPLAY;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_SAVE;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_TELEPORT;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.STATESYNC;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.STATESYNC_INITIAL;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +19,6 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.lwjgl.opengl.Display;
 
@@ -28,6 +37,7 @@ import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
+import com.minecrafttas.tasmod.util.Scheduler.Task;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
@@ -61,7 +71,7 @@ import net.minecraft.util.text.TextFormatting;
  * @author Scribble
  *
  */
-public class PlaybackController implements ServerPacketHandler, ClientPacketHandler {
+public class PlaybackControllerClient implements ServerPacketHandler, ClientPacketHandler {
 
 	/**
 	 * The current state of the controller.
@@ -130,13 +140,30 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	private Integer playUntil = null;
 
 	/**
+	 * Sets the current {@link TASstate}
+	 * 
+	 * First sends the state to the server.
+	 * 
+	 * To set the client state, see {@link #setTASStateClient(TASstate)}
+	 * 
+	 * @param stateIn The new state for all players
+	 */
+	public void setTASState(TASstate stateIn) {
+		try {
+			TASmodClient.client.send(new TASmodBufferBuilder(STATESYNC).writeTASState(stateIn));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Starts or stops a recording/playback
 	 * 
 	 * @param stateIn stateIn The desired state of the container
 	 * @return
 	 */
-	public String setTASState(TASstate stateIn) {
-		return setTASState(stateIn, true);
+	public String setTASStateClient(TASstate stateIn) {
+		return setTASStateClient(stateIn, true);
 	}
 
 	/**
@@ -146,7 +173,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	 * @param verbose Whether the output should be printed in the chat
 	 * @return The message printed in the chat
 	 */
-	public String setTASState(TASstate stateIn, boolean verbose) {
+	public String setTASStateClient(TASstate stateIn, boolean verbose) {
 		ControlByteHandler.reset();
 		if (state == stateIn) {
 			switch (stateIn) {
@@ -263,9 +290,9 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	 */
 	public TASstate togglePause() {
 		if (state != TASstate.PAUSED) {
-			setTASState(TASstate.PAUSED);
+			setTASStateClient(TASstate.PAUSED);
 		} else {
-			setTASState(tempPause);
+			setTASStateClient(tempPause);
 		}
 		return state;
 	}
@@ -279,11 +306,11 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		LOGGER.trace(LoggerMarkers.Playback, "Pausing {}", pause);
 		if (pause) {
 			if (state != TASstate.NONE) {
-				setTASState(TASstate.PAUSED, false);
+				setTASStateClient(TASstate.PAUSED, false);
 			}
 		} else {
 			if (state == TASstate.PAUSED) {
-				setTASState(tempPause, false);
+				setTASStateClient(tempPause, false);
 			}
 		}
 	}
@@ -385,7 +412,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 
 		if (player != null && player.addedToChunk) {
 			if (isPaused() && tempPause != TASstate.NONE) {
-				TASstateClient.setOrSend(tempPause); // The recording is paused in LoadWorldEvents#startLaunchServer
+				setTASState(tempPause); // The recording is paused in LoadWorldEvents#startLaunchServer
 				pause(false);
 				printCredits();
 			}
@@ -417,7 +444,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe,
 									// secondly as potential exploit protection
 			LOGGER.info(LoggerMarkers.Playback, "Stopping a {} since the user tabbed out of the game", state);
-			setTASState(TASstate.NONE);
+			setTASStateClient(TASstate.NONE);
 		}
 
 		index++; // Increase the index and load the next inputs
@@ -426,19 +453,19 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		if (playUntil != null && playUntil == index) {
 			TASmodClient.tickratechanger.pauseGame(true);
 			playUntil = null;
-			TASstateClient.setOrSend(TASstate.NONE);
+			setTASState(TASstate.NONE);
 			for (long i = inputs.size() - 1; i >= index; i--) {
 				inputs.remove(i);
 			}
 			index--;
-			TASstateClient.setOrSend(TASstate.RECORDING);
+			setTASState(TASstate.RECORDING);
 			return;
 		}
 
 		/* Stop condition */
 		if (index == inputs.size()) {
 			unpressContainer();
-			TASstateClient.setOrSend(TASstate.NONE);
+			setTASState(TASstate.NONE);
 		}
 		/* Continue condition */
 		else {
@@ -647,7 +674,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 		float anglePitch = Float.parseFloat(section[4]);
 
 		try {
-			TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_TELEPORT).writeDouble(x).writeDouble(y).writeDouble(z).writeFloat(angleYaw).writeFloat(anglePitch));
+			TASmodClient.client.send(new TASmodBufferBuilder(PLAYBACK_TELEPORT).writeDouble(x).writeDouble(y).writeDouble(z).writeFloat(angleYaw).writeFloat(anglePitch));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -787,12 +814,12 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 
 	public void setStateWhenOpened(TASstate state) {
 		TASmodClient.openMainMenuScheduler.add(() -> {
-			PlaybackController container = TASmodClient.virtual.getContainer();
+			PlaybackControllerClient container = TASmodClient.virtual.getContainer();
 			if (state == TASstate.RECORDING) {
 				long seed = TASmod.ktrngHandler.getGlobalSeedClient();
 				container.setStartSeed(seed);
 			}
-			TASstateClient.setOrSend(state);
+			setTASState(state);
 		});
 	}
 
@@ -800,13 +827,22 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
-		return new TASmodPackets[] { TASmodPackets.PLAYBACK_SAVE, TASmodPackets.PLAYBACK_LOAD, TASmodPackets.PLAYBACK_FULLPLAY, TASmodPackets.PLAYBACK_FULLRECORD, TASmodPackets.PLAYBACK_RESTARTANDPLAY, TASmodPackets.PLAYBACK_PLAYUNTIL, TASmodPackets.PLAYBACK_TELEPORT, TASmodPackets.CLEAR_INNPUTS
-
+		return new TASmodPackets[] { 
+				PLAYBACK_SAVE, 
+				PLAYBACK_LOAD, 
+				PLAYBACK_FULLPLAY, 
+				PLAYBACK_FULLRECORD, 
+				PLAYBACK_RESTARTANDPLAY, 
+				PLAYBACK_PLAYUNTIL, 
+				PLAYBACK_TELEPORT, 
+				CLEAR_INNPUTS,
+				STATESYNC_INITIAL,
+				STATESYNC
 		};
 	}
 
 	@Override
-	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public void onClientPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
 		String name = null;
 		Minecraft mc = Minecraft.getMinecraft();
@@ -900,6 +936,36 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 
 			case PLAYBACK_TELEPORT:
 				throw new WrongSideException(packet, Side.CLIENT);
+				
+			case STATESYNC_INITIAL:
+				throw new WrongSideException(id, Side.CLIENT);
+				
+			case STATESYNC:
+				TASstate networkState = TASmodBufferBuilder.readTASState(buf);
+				boolean verbose = TASmodBufferBuilder.readBoolean(buf);
+				Task task = ()->{
+					PlaybackControllerClient container = TASmodClient.virtual.getContainer();
+					if (networkState != container.getState()) {
+						
+						String message = container.setTASStateClient(networkState, verbose);
+						
+						if (!message.isEmpty()) {
+							if(Minecraft.getMinecraft().world != null)
+								Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(message));
+							else
+								LOGGER.debug(LoggerMarkers.Playback, message);
+						} 
+					}
+					
+				};
+				
+				
+				if((networkState == TASstate.RECORDING || networkState == TASstate.PLAYBACK) && TASmodClient.tickratechanger.ticksPerSecond != 0) {
+					TASmodClient.tickSchedulerClient.add(task);	// Starts a recording in the next tick
+				} else {
+					TASmodClient.gameLoopSchedulerClient.add(task);	// Starts a recording in the next frame
+				}
+				break;
 
 			default:
 				throw new PacketNotImplementedException(packet, this.getClass(), Side.CLIENT);
@@ -907,7 +973,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 	}
 
 	@Override
-	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
 
 		// TODO #181 Permissions
@@ -920,7 +986,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 				float angleYaw = TASmodBufferBuilder.readFloat(buf);
 				float anglePitch = TASmodBufferBuilder.readFloat(buf);
 
-				EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUUID(clientID);
+				EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUsername(username);
 				player.getServerWorld().addScheduledTask(() -> {
 					player.rotationPitch = anglePitch;
 					player.rotationYaw = angleYaw;
@@ -930,7 +996,7 @@ public class PlaybackController implements ServerPacketHandler, ClientPacketHand
 				break;
 
 			case CLEAR_INNPUTS:
-				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.CLEAR_INNPUTS));
+				TASmod.server.sendToAll(new TASmodBufferBuilder(CLEAR_INNPUTS));
 
 			case PLAYBACK_FULLPLAY:
 			case PLAYBACK_FULLRECORD:
