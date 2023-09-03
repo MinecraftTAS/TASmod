@@ -94,7 +94,7 @@ class ServerTest {
 		}
 
 		@Override
-		public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+		public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 			TestPacketIDs packet = (TestPacketIDs) id;
 			switch (packet) {
 			case TEST_INTERFACE_INT:
@@ -113,7 +113,7 @@ class ServerTest {
 		}
 
 		@Override
-		public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+		public void onClientPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 			TestPacketIDs packet = (TestPacketIDs) id;
 			switch (packet) {
 			case TEST_INTERFACE_INT:
@@ -147,10 +147,9 @@ class ServerTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		UUID uuid = UUID.fromString("b8abdafc-5002-40df-ab68-63206ea4c7e8");
 
 		try {
-			client = new Client("127.0.0.1", 25566, TestPacketIDs.values(), uuid);
+			client = new Client("127.0.0.1", 25566, TestPacketIDs.values(), "TASBot");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -223,7 +222,7 @@ class ServerTest {
 	@Test
 	void testSendToClientInterface() {
 		try {
-			server.sendTo(UUID.fromString("b8abdafc-5002-40df-ab68-63206ea4c7e8"), new ByteBufferBuilder(TestPacketIDs.TEST_INTERFACE_INT).writeInt(3));
+			server.sendTo("TASBot", new ByteBufferBuilder(TestPacketIDs.TEST_INTERFACE_INT).writeInt(3));
 		} catch (Exception e) {
 			fail(e);
 			return;
@@ -309,7 +308,7 @@ class ServerTest {
 	@Test
 	void testSendToClientLambda() {
 		try {
-			server.sendTo(UUID.fromString("b8abdafc-5002-40df-ab68-63206ea4c7e8"), new ByteBufferBuilder(TestPacketIDs.TEST_LAMBDA_CLIENT).writeInt(6));
+			server.sendTo("TASBot", new ByteBufferBuilder(TestPacketIDs.TEST_LAMBDA_CLIENT).writeInt(6));
 		} catch (Exception e) {
 			fail(e);
 			return;

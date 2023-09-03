@@ -1,7 +1,6 @@
 package com.minecrafttas.tasmod.tickratechanger;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 
@@ -212,7 +211,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 			log("Sending the current tickrate (" + ticksPerSecond + ") to " + player.getName());
 
 			try {
-				TASmod.server.sendTo(player.getUniqueID(), new TASmodBufferBuilder(TASmodPackets.TICKRATE_CHANGE).writeFloat(ticksPerSecond));
+				TASmod.server.sendTo(player, new TASmodBufferBuilder(TASmodPackets.TICKRATE_CHANGE).writeFloat(ticksPerSecond));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -277,7 +276,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 	}
 
 	@Override
-	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
 
 		switch (packet) {

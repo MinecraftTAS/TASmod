@@ -7,7 +7,7 @@ import com.minecrafttas.common.events.EventClient.EventDoneLoadingWorld;
 import com.minecrafttas.common.events.EventClient.EventLaunchIntegratedServer;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.playback.PlaybackController;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.client.Minecraft;
@@ -27,7 +27,7 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 	@Override
 	public void onLaunchIntegratedServer() {
 		LOGGER.debug(LoggerMarkers.Event, "Starting the integrated server");
-		PlaybackController container = TASmodClient.virtual.getContainer();
+		PlaybackControllerClient container = TASmodClient.virtual.getContainer();
 		if (!container.isNothingPlaying() && !container.isPaused()) {
 			container.pause(true);
 		}

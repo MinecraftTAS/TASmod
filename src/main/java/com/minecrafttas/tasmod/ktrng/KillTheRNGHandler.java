@@ -3,7 +3,6 @@ package com.minecrafttas.tasmod.ktrng;
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
 import com.minecrafttas.common.events.EventServer.EventServerTick;
@@ -19,7 +18,7 @@ import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
-import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -181,7 +180,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	}
 
 	@Override
-	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		long seed = TASmodBufferBuilder.readLong(buf);
 		TASmodPackets packet = (TASmodPackets) id;
 
@@ -202,7 +201,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	}
 
 	@Override
-	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public void onClientPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		long seed = TASmodBufferBuilder.readLong(buf);
 		TASmodPackets packet = (TASmodPackets) id;
 

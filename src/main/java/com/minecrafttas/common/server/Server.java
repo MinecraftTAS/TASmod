@@ -69,28 +69,28 @@ public class Server {
 	}
 
 	/**
-	 * Send a packet to the specified uuid
+	 * Send a packet to the specified username
 	 * 
-	 * @param uuid    The UUID to send to
+	 * @param username The username to send the packet to
 	 * @param builder The packet contents
 	 * @throws Exception Networking exception
 	 */
-	public void sendTo(UUID uuid, ByteBufferBuilder builder) throws Exception {
-		Client client = getClient(uuid);
+	public void sendTo(String username, ByteBufferBuilder builder) throws Exception {
+		Client client = getClient(username);
 		client.send(builder);
 	}
 
 	/**
 	 * Send a packet to a specified player
 	 * 
-	 * Similar to {@link #sendTo(UUID, ByteBufferBuilder)}
+	 * Similar to {@link #sendTo(String, ByteBufferBuilder)}
 	 * 
 	 * @param player  The player to send to
 	 * @param builder The packet contents
 	 * @throws Exception Networking exception
 	 */
 	public void sendTo(EntityPlayer player, ByteBufferBuilder builder) throws Exception {
-		sendTo(player.getUniqueID(), builder);
+		sendTo(player.getName(), builder);
 	}
 
 	/**
@@ -112,13 +112,13 @@ public class Server {
 	}
 
 	/**
-	 * Get client from UUID
+	 * Get client from username
 	 * 
-	 * @param uniqueID UUID
+	 * @param name Username
 	 */
-	private Client getClient(UUID uniqueID) {
+	private Client getClient(String name) {
 		for (Client client : this.clients)
-			if (client.getId().equals(uniqueID))
+			if (client.getId().equals(name))
 				return client;
 
 		return null;

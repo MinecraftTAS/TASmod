@@ -7,7 +7,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
@@ -27,7 +26,7 @@ import net.minecraft.server.MinecraftServer;
  */
 public class TickSyncServer implements ServerPacketHandler, EventServerTickPost {
 	
-	private static List<UUID> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+	private static List<String> synchronizedList = Collections.synchronizedList(new ArrayList<>());
 
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
@@ -43,10 +42,10 @@ public class TickSyncServer implements ServerPacketHandler, EventServerTickPost 
 	 * @param tick Current tick of the player
 	 */
 	@Override
-	public void onServerPacket(PacketID id, ByteBuffer buf, UUID uuid) {
+	public void onServerPacket(PacketID id, ByteBuffer buf, String username) {
 		synchronized (synchronizedList) {
-			if(!synchronizedList.contains(uuid)) {
-				synchronizedList.add(uuid);
+			if(!synchronizedList.contains(username)) {
+				synchronizedList.add(username);
 			}
 		}
 	}

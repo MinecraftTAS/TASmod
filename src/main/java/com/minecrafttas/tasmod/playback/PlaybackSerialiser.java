@@ -15,7 +15,7 @@ import org.apache.commons.io.FileUtils;
 import com.dselent.bigarraylist.BigArrayList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
-import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;
 import com.minecrafttas.tasmod.util.FileThread;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.virtual.VirtualKey;
@@ -26,7 +26,7 @@ import com.minecrafttas.tasmod.virtual.VirtualSubticks;
 import com.mojang.realmsclient.util.Pair;
 
 /**
- * Saves a given {@linkplain PlaybackController} to a file. Is also able to read an input container from a file. <br>
+ * Saves a given {@linkplain PlaybackControllerClient} to a file. Is also able to read an input container from a file. <br>
  * <br>
  * I plan to be backwards compatible so all the save functions have a V1 in their name by the time of writing this<br>
  * <br>
@@ -87,7 +87,7 @@ public class PlaybackSerialiser {
 	 * @param container The container to save
 	 * @throws IOException When the input container is empty
 	 */
-	public void saveToFileV1(File file, PlaybackController container) throws IOException {
+	public void saveToFileV1(File file, PlaybackControllerClient container) throws IOException {
 		saveToFileV1Until(file, container, -1);
 	}
 	
@@ -98,7 +98,7 @@ public class PlaybackSerialiser {
 	 * @param index index until the inputs get saved
 	 * @throws IOException When the input container is empty
 	 */
-	public void saveToFileV1Until(File file, PlaybackController container, int index) throws IOException{
+	public void saveToFileV1Until(File file, PlaybackControllerClient container, int index) throws IOException{
 		LOGGER.debug(LoggerMarkers.Playback, "Saving playback controller to file {}", file);
 		if (container.size() == 0) {
 			throw new IOException("There are no inputs to save to a file");
@@ -182,7 +182,7 @@ public class PlaybackSerialiser {
 		return 0;
 	}
 
-	public PlaybackController fromEntireFileV1(File file) throws IOException {
+	public PlaybackControllerClient fromEntireFileV1(File file) throws IOException {
 		LOGGER.debug(LoggerMarkers.Playback, "Loading playback controller to file {}", file);
 		List<String> lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
 		
@@ -197,7 +197,7 @@ public class PlaybackSerialiser {
 		}
 		boolean oldmonfileLoaded=!monitorLines.isEmpty();
 
-		PlaybackController controller = new PlaybackController();
+		PlaybackControllerClient controller = new PlaybackControllerClient();
 
 		String author = "Insert author here";
 

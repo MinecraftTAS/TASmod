@@ -10,9 +10,9 @@ import java.util.List;
 
 import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.playback.PlaybackController;
-import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
-import com.minecrafttas.tasmod.playback.PlaybackController.TickInputContainer;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;
 import com.minecrafttas.tasmod.util.PointerNormalizer;
 
 import net.minecraft.client.Minecraft;
@@ -90,7 +90,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	 * The container where all inputs get stored during recording or stored and
 	 * ready to be played back
 	 */
-	private PlaybackController container = new PlaybackController();
+	private PlaybackControllerClient container = new PlaybackControllerClient();
 
 	// ===========================Keyboard=================================
 
@@ -420,7 +420,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 
 	// =====================================Container===========================================
 
-	public PlaybackController getContainer() {
+	public PlaybackControllerClient getContainer() {
 		return container;
 	}
 
@@ -439,7 +439,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	 * 
 	 * @param container to replace the current one
 	 */
-	public void setContainer(PlaybackController container) {
+	public void setContainer(PlaybackControllerClient container) {
 		this.container = container;
 	}
 
@@ -449,11 +449,11 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	 * Loads and preloads the inputs from the new InputContainer to
 	 * {@link #container}
 	 * 
-	 * Saving a savestate is done via {@linkplain com.minecrafttas.tasmod.playback.PlaybackSerialiser#saveToFileV1(File, PlaybackController)} in {@linkplain com.minecrafttas.tasmod.savestates.SavestateHandlerClient#savestate(String)}
+	 * Saving a savestate is done via {@linkplain com.minecrafttas.tasmod.playback.PlaybackSerialiser#saveToFileV1(File, PlaybackControllerClient)} in {@linkplain com.minecrafttas.tasmod.savestates.SavestateHandlerClient#savestate(String)}
 	 * 
 	 * @param savestatecontainer The container that should be loaded.
 	 */
-	public void loadClientSavestate(PlaybackController savestatecontainer) {
+	public void loadClientSavestate(PlaybackControllerClient savestatecontainer) {
 
 		if (container.isPlayingback()) {
 			preloadInput(container, savestatecontainer.size() - 1); // Preloading from the current container and
@@ -486,7 +486,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 				} catch (IndexOutOfBoundsException e) {
 					e.printStackTrace();
 				}
-				savestatecontainer.setTASState(TASstate.PLAYBACK);
+				savestatecontainer.setTASStateClient(TASstate.PLAYBACK);
 				savestatecontainer.setStartLocation(start);
 				container = savestatecontainer;
 			}
@@ -506,7 +506,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 				e.printStackTrace();
 			}
 			
-			savestatecontainer.setTASState(TASstate.RECORDING);
+			savestatecontainer.setTASStateClient(TASstate.RECORDING);
 			savestatecontainer.setStartLocation(start);
 			container = savestatecontainer; // Replace the current container with the savestated container
 		}
@@ -520,7 +520,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	 * @param index     The index of the container from which the inputs should be
 	 *                  loaded
 	 */
-	private void preloadInput(PlaybackController container, int index) {
+	private void preloadInput(PlaybackControllerClient container, int index) {
 		TickInputContainer tickcontainer = container.get(index);
 
 		if (tickcontainer != null) {

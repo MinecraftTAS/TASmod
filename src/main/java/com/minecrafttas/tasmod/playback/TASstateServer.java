@@ -3,7 +3,6 @@ package com.minecrafttas.tasmod.playback;
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
@@ -13,7 +12,7 @@ import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
-import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -49,7 +48,7 @@ public class TASstateServer implements ServerPacketHandler{
 	}
 
 	@Override
-	public void onServerPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
 		TASstate networkState = TASmodBufferBuilder.readTASState(buf);
 		
@@ -59,7 +58,7 @@ public class TASstateServer implements ServerPacketHandler{
 				setState(networkState);
 				shouldChange = false;
 			} else {
-				TASmod.server.sendTo(clientID, new TASmodBufferBuilder(TASmodPackets.STATESYNC_INITIAL).writeTASState(networkState));
+				TASmod.server.sendTo(username, new TASmodBufferBuilder(TASmodPackets.STATESYNC_INITIAL).writeTASState(networkState));
 			}
 			break;
 
@@ -97,7 +96,7 @@ public class TASstateServer implements ServerPacketHandler{
 		if (state != stateIn) {
 			if (state == TASstate.RECORDING && stateIn == TASstate.PLAYBACK || state == TASstate.PLAYBACK && stateIn == TASstate.RECORDING)
 				return;
-			if(state==TASstate.NONE&&state==TASstate.PAUSED) {
+			if (state == TASstate.NONE && state == TASstate.PAUSED) {
 				return;
 			}
 			this.state = stateIn;

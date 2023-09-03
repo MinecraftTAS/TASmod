@@ -5,7 +5,6 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
@@ -16,8 +15,8 @@ import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
-import com.minecrafttas.tasmod.playback.PlaybackController;
-import com.minecrafttas.tasmod.playback.PlaybackController.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
 import com.minecrafttas.tasmod.savestates.SavestateHandlerServer.PlayerHandler.MotionData;
 import com.minecrafttas.tasmod.savestates.exceptions.SavestateException;
 import com.minecrafttas.tasmod.savestates.gui.GuiSavestateSavingScreen;
@@ -120,7 +119,7 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 
 		File targetfile = new File(SavestateHandlerClient.savestateDirectory, nameOfSavestate + ".mctas");
 
-		PlaybackController container = TASmodClient.virtual.getContainer();
+		PlaybackControllerClient container = TASmodClient.virtual.getContainer();
 		if (container.isRecording()) {
 			TASmodClient.serialiser.saveToFileV1(targetfile, container); // If the container is recording, store it entirely
 		} else if (container.isPlayingback()) {
@@ -147,13 +146,13 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".mctas");
 
-		PlaybackController container = TASmodClient.virtual.getContainer();
+		PlaybackControllerClient container = TASmodClient.virtual.getContainer();
 		if (!container.isNothingPlaying()) { // If the file exists and the container is recording or playing, load the
 												// clientSavestate
 			if (targetfile.exists()) {
 				TASmodClient.virtual.loadClientSavestate(TASmodClient.serialiser.fromEntireFileV1(targetfile));
 			} else {
-				TASmodClient.virtual.getContainer().setTASState(TASstate.NONE, false);
+				TASmodClient.virtual.getContainer().setTASStateClient(TASstate.NONE, false);
 				Minecraft.getMinecraft().player.sendMessage(new TextComponentString(ChatFormatting.YELLOW + "Inputs could not be loaded for this savestate, since the file doesn't exist. Stopping!"));
 				LOGGER.warn(LoggerMarkers.Savestate, "Inputs could not be loaded for this savestate, since the file doesn't exist.");
 			}
@@ -230,7 +229,7 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 	}
 
 	@Override
-	public void onClientPacket(PacketID id, ByteBuffer buf, UUID clientID) throws PacketNotImplementedException, WrongSideException, Exception {
+	public void onClientPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
 		String name = null;
 		Minecraft mc = Minecraft.getMinecraft();
@@ -246,7 +245,6 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				break;
 			case SAVESTATE_LOAD:
 				// Load client savestate
 				name = TASmodBufferBuilder.readString(buf);
@@ -257,13 +255,20 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 				}
 				break;
 			case SAVESTATE_PLAYER:
+				NBTTagCompound compound;
+				try {
+					compound = TASmodBufferBuilder.readNBTTagCompound(buf);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return;
+				}
+				/*
+				  Fair warning: Do NOT read the buffer inside an addScheduledTask.
+				  Read it before that. The buffer will have the wrong limit,
+				  when the task is executed.
+				  This is probably due to the buffers being reused.
+				 */
 				Minecraft.getMinecraft().addScheduledTask(()->{
-					NBTTagCompound compound = null;
-					try {
-						compound = TASmodBufferBuilder.readNBTTagCompound(buf);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
 					SavestateHandlerClient.loadPlayer(compound);
 				});
 				break;

@@ -70,6 +70,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	public void onServerInit(MinecraftServer server) {
 		serverInstance = server;
 		containerStateServer=new TASstateServer();
+		PacketHandlerRegistry.register(containerStateServer);
 		// Command handling
 		
 		CommandRegistry.registerServerCommand(new CommandTickrate(), server);
