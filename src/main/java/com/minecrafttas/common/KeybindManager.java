@@ -13,6 +13,7 @@ import net.minecraft.client.settings.KeyBinding;
 
 /**
  * Keybind manager
+ * @author Pancake
  */
 public abstract class KeybindManager implements EventClientGameLoop {
 
@@ -62,7 +63,7 @@ public abstract class KeybindManager implements EventClientGameLoop {
 	/**
 	 * Register new keybind
 	 * 
-	 * @param keybind Keybind
+	 * @param keybind Keybind to register
 	 */
 	public KeyBinding registerKeybind(Keybind keybind) {
 		this.keybindings.add(keybind);

@@ -121,26 +121,31 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	@Override
 	public void onInitialize() {
 		
-		// Events
 		LOGGER.info("Initializing TASmod");
-		EventListenerRegistry.register(this);
 		
+		// Start ticksync
 		ticksyncServer = new TickSyncServer();
-		EventListenerRegistry.register(ticksyncServer);
-		PacketHandlerRegistry.register(ticksyncServer);
 		
+		// Initilize KillTheRNG
 		LOGGER.info("Testing connection with KillTheRNG");
 		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
+		
+		// Initialize TickrateChanger
+		tickratechanger = new TickrateChangerServer(LOGGER);
+		
+		// Register event listeners
+		EventListenerRegistry.register(this);
+		EventListenerRegistry.register(ticksyncServer);
+		EventListenerRegistry.register(tickratechanger);
 		EventListenerRegistry.register(ktrngHandler);
+		
+		// Register packet handlers
+		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers");
+		PacketHandlerRegistry.register(ticksyncServer);
+		PacketHandlerRegistry.register(tickratechanger);
 		PacketHandlerRegistry.register(ktrngHandler);
 		
-		tickratechanger = new TickrateChangerServer(LOGGER);
-		EventListenerRegistry.register(tickratechanger);
-		PacketHandlerRegistry.register(tickratechanger);
-		
-		// Networking
-		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers");
-		
+		// Starting custom server instance
 		try {
 			server = new Server(networkingport, TASmodPackets.values());
 		} catch (Exception e) {
