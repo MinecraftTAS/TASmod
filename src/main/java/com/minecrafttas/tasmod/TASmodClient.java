@@ -30,6 +30,7 @@ import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 import com.minecrafttas.tasmod.savestates.SavestateHandlerClient;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.Scheduler;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
@@ -97,41 +98,32 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	@Override
 	public void onInitializeClient() {
-		EventListenerRegistry.register(this);
+		
+		// Check if dev environment
 		isDevEnvironment = FabricLoaderImpl.INSTANCE.isDevelopmentEnvironment();
 		
+		// Load config
 		Minecraft mc = Minecraft.getMinecraft();
 		config = new Configuration("TASmod configuration", new File(mc.mcDataDir, "config/tasmod.cfg"));
 		
+		// Execute /restartandplay. Load the file to start from the config. If it exists load the playback file on start.
 		String fileOnStart = config.get(ConfigOptions.FileToOpen);
-		
 		if (fileOnStart.isEmpty()) {
 			fileOnStart = null;
 		} else {
 			config.reset(ConfigOptions.FileToOpen);
 		}
-		
 		virtual=new VirtualInput(fileOnStart);
-		EventListenerRegistry.register(virtual);
-		PacketHandlerRegistry.register(virtual.getContainer());
 		
+		// Initialize InfoHud
 		hud = new InfoHud();
-		EventListenerRegistry.register(hud);
-		
+		// Initialize shield downloader
 		shieldDownloader = new ShieldDownloader();
-		EventListenerRegistry.register(shieldDownloader);
-		
+		// Initialize loading screen handler
 		loadingScreenHandler = new LoadingScreenHandler();
-		EventListenerRegistry.register(loadingScreenHandler);
-		
+		// Initialize Ticksync
 		ticksyncClient = new TickSyncClient();
-		EventListenerRegistry.register(ticksyncClient);
-		PacketHandlerRegistry.register(ticksyncClient);
-		
-		PacketHandlerRegistry.register(tickratechanger);
-		
-		PacketHandlerRegistry.register(savestateHandlerClient);
-		
+		// Initialize keybind manager
 		keybindManager = new KeybindManager() {
 			
 			protected boolean isKeyDown(KeyBinding i) {
@@ -139,11 +131,16 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			};
 			
 		};
+		
+		// Register event listeners
+		EventListenerRegistry.register(this);
+		EventListenerRegistry.register(virtual);
+		EventListenerRegistry.register(hud);
+		EventListenerRegistry.register(shieldDownloader);
+		EventListenerRegistry.register(loadingScreenHandler);
+		EventListenerRegistry.register(ticksyncClient);
 		EventListenerRegistry.register(keybindManager);
-		
 		EventListenerRegistry.register(interpolation);
-		
-		
 		EventListenerRegistry.register((EventOpenGui)(gui -> {
 			if(gui instanceof GuiMainMenu) {
 				openMainMenuScheduler.runAllTasks();
@@ -151,7 +148,13 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			return gui;
 		}));
 		
-		EventListenerRegistry.register(hud);
+		// Register packet handlers
+		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers on client");
+		PacketHandlerRegistry.register(virtual.getContainer());	//TODO Move container/playbackcontroller out of virtual package
+		PacketHandlerRegistry.register(ticksyncClient);
+		PacketHandlerRegistry.register(tickratechanger);
+		PacketHandlerRegistry.register(savestateHandlerClient);
+		
 		
 		try {
 			// connect to server and authenticate
