@@ -234,45 +234,27 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 		}
 	}
 
+	/**
+	 * Enum for sending paused states for the tickratechanger
+	 */
 	public static enum TickratePauseState {
 		/**
 		 * Set's the game to tickrate 0
 		 */
-		PAUSE((short) 1),
+		PAUSE,
 		/**
 		 * Set's the game to "tickrate saved"
 		 */
-		UNPAUSE((short) 2),
+		UNPAUSE,
 		/**
 		 * Toggles between {@link #PAUSE} and {@link #UNPAUSE}
 		 */
-		TOGGLE((short) 0);
-
-		private short id;
-
-		TickratePauseState(short i) {
-			id = i;
-		}
-
-		public short toShort() {
-			return id;
-		}
-
-		public static TickratePauseState fromShort(short i) {
-			switch (i) {
-				case 1:
-					return PAUSE;
-				case 2:
-					return UNPAUSE;
-				default:
-					return TOGGLE;
-			}
-		}
+		TOGGLE;
 	}
 
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
-		return new TASmodPackets[] { TASmodPackets.TICKRATE_CHANGE, TASmodPackets.TICKRATE_ADVANCE, TASmodPackets.TICKRATE_ZERO, };
+		return new TASmodPackets[] { TASmodPackets.TICKRATE_CHANGE, TASmodPackets.TICKRATE_ADVANCE, TASmodPackets.TICKRATE_ZERO };
 	}
 
 	@Override
