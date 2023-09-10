@@ -54,7 +54,7 @@ public class CommandRestartAndPlay extends CommandBase{
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				TASmod.containerStateServer.setServerState(TASstate.PLAYBACK);
+				TASmod.playbackControllerServer.setServerState(TASstate.PLAYBACK);
 				try {
 					TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_RESTARTANDPLAY).writeString(args[0]));
 				} catch (Exception e) {

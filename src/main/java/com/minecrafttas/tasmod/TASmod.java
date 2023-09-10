@@ -26,7 +26,7 @@ import com.minecrafttas.tasmod.commands.CommandSavestate;
 import com.minecrafttas.tasmod.commands.CommandTickrate;
 import com.minecrafttas.tasmod.ktrng.KillTheRNGHandler;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
-import com.minecrafttas.tasmod.playback.TASstateServer;
+import com.minecrafttas.tasmod.playback.PlaybackControllerServer;
 import com.minecrafttas.tasmod.savestates.SavestateHandlerServer;
 import com.minecrafttas.tasmod.savestates.files.SavestateTrackerFile;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
@@ -50,7 +50,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	
 	public static final Logger LOGGER = LogManager.getLogger("TASmod");
 	
-	public static TASstateServer containerStateServer;
+	public static PlaybackControllerServer playbackControllerServer;
 	
 	public static SavestateHandlerServer savestateHandlerServer;
 	
@@ -67,10 +67,46 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	public static int networkingport = 8999;
 	
 	@Override
+	public void onInitialize() {
+		
+		LOGGER.info("Initializing TASmod");
+		
+		// Start ticksync
+		ticksyncServer = new TickSyncServer();
+		
+		// Initilize KillTheRNG
+		LOGGER.info("Testing connection with KillTheRNG");
+		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
+		
+		// Initialize TickrateChanger
+		tickratechanger = new TickrateChangerServer(LOGGER);
+		
+		// Register event listeners
+		EventListenerRegistry.register(this);
+		EventListenerRegistry.register(ticksyncServer);
+		EventListenerRegistry.register(tickratechanger);
+		EventListenerRegistry.register(ktrngHandler);
+		
+		// Register packet handlers
+		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers");
+		PacketHandlerRegistry.register(ticksyncServer);
+		PacketHandlerRegistry.register(tickratechanger);
+		PacketHandlerRegistry.register(ktrngHandler);
+		
+		// Starting custom server instance
+		try {
+			server = new Server(networkingport, TASmodPackets.values());
+		} catch (Exception e) {
+			LOGGER.error("Unable to launch TASmod server: {}", e.getMessage());
+		}
+	}
+	
+	@Override
 	public void onServerInit(MinecraftServer server) {
 		serverInstance = server;
-		containerStateServer=new TASstateServer();
-		PacketHandlerRegistry.register(containerStateServer);
+		playbackControllerServer=new PlaybackControllerServer();
+		PacketHandlerRegistry.register(playbackControllerServer);
+		
 		// Command handling
 		
 		CommandRegistry.registerServerCommand(new CommandTickrate(), server);
@@ -118,38 +154,4 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		return serverInstance;
 	}
 
-	@Override
-	public void onInitialize() {
-		
-		LOGGER.info("Initializing TASmod");
-		
-		// Start ticksync
-		ticksyncServer = new TickSyncServer();
-		
-		// Initilize KillTheRNG
-		LOGGER.info("Testing connection with KillTheRNG");
-		ktrngHandler=new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
-		
-		// Initialize TickrateChanger
-		tickratechanger = new TickrateChangerServer(LOGGER);
-		
-		// Register event listeners
-		EventListenerRegistry.register(this);
-		EventListenerRegistry.register(ticksyncServer);
-		EventListenerRegistry.register(tickratechanger);
-		EventListenerRegistry.register(ktrngHandler);
-		
-		// Register packet handlers
-		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers");
-		PacketHandlerRegistry.register(ticksyncServer);
-		PacketHandlerRegistry.register(tickratechanger);
-		PacketHandlerRegistry.register(ktrngHandler);
-		
-		// Starting custom server instance
-		try {
-			server = new Server(networkingport, TASmodPackets.values());
-		} catch (Exception e) {
-			LOGGER.error("Unable to launch TASmod server: {}", e.getMessage());
-		}
-	}
 }

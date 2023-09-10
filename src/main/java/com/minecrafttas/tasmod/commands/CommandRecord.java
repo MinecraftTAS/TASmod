@@ -42,7 +42,7 @@ public class CommandRecord extends CommandBase {
 			return;
 		}
 		if (args.length < 1) {
-			TASmod.containerStateServer.toggleRecording();
+			TASmod.playbackControllerServer.toggleRecording();
 			TASmod.tickSchedulerServer.add(() ->{
 				TASmod.ktrngHandler.broadcastStartSeed();
 			});

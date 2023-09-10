@@ -131,7 +131,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	@Override
 	public void onServerTick(MinecraftServer server) {
 		if (isLoaded()) {
-			if (TASmod.containerStateServer.getState() != TASstate.PAUSED)
+			if (TASmod.playbackControllerServer.getState() != TASstate.PAUSED)
 				try {
 					TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.KILLTHERNG_SEED).writeLong(advanceGlobalSeedServer()));
 				} catch (Exception e) {
