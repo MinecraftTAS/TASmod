@@ -40,7 +40,7 @@ public class CommandFullPlay extends CommandBase{
 		} finally {
 			TASmod.savestateHandlerServer.state=SavestateState.NONE;
 		}
-		TASmod.containerStateServer.setServerState(TASstate.PLAYBACK);
+		TASmod.playbackControllerServer.setServerState(TASstate.PLAYBACK);
 		try {
 			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_FULLPLAY));
 		} catch (Exception e) {

@@ -40,7 +40,7 @@ public class CommandFullRecord extends CommandBase {
 		} finally {
 			TASmod.savestateHandlerServer.state = SavestateState.NONE;
 		}
-		TASmod.containerStateServer.setServerState(TASstate.RECORDING);
+		TASmod.playbackControllerServer.setServerState(TASstate.RECORDING);
 		try {
 			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_FULLRECORD));
 		} catch (Exception e) {

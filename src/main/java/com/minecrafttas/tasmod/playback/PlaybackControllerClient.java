@@ -71,7 +71,7 @@ import net.minecraft.util.text.TextFormatting;
  * @author Scribble
  *
  */
-public class PlaybackControllerClient implements ServerPacketHandler, ClientPacketHandler {
+public class PlaybackControllerClient implements ClientPacketHandler {
 
 	/**
 	 * The current state of the controller.
@@ -969,45 +969,6 @@ public class PlaybackControllerClient implements ServerPacketHandler, ClientPack
 
 			default:
 				throw new PacketNotImplementedException(packet, this.getClass(), Side.CLIENT);
-		}
-	}
-
-	@Override
-	public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
-		TASmodPackets packet = (TASmodPackets) id;
-
-		// TODO #181 Permissions
-		switch (packet) {
-
-			case PLAYBACK_TELEPORT:
-				double x = TASmodBufferBuilder.readDouble(buf);
-				double y = TASmodBufferBuilder.readDouble(buf);
-				double z = TASmodBufferBuilder.readDouble(buf);
-				float angleYaw = TASmodBufferBuilder.readFloat(buf);
-				float anglePitch = TASmodBufferBuilder.readFloat(buf);
-
-				EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUsername(username);
-				player.getServerWorld().addScheduledTask(() -> {
-					player.rotationPitch = anglePitch;
-					player.rotationYaw = angleYaw;
-
-					player.setPositionAndUpdate(x, y, z);
-				});
-				break;
-
-			case CLEAR_INNPUTS:
-				TASmod.server.sendToAll(new TASmodBufferBuilder(CLEAR_INNPUTS));
-
-			case PLAYBACK_FULLPLAY:
-			case PLAYBACK_FULLRECORD:
-			case PLAYBACK_RESTARTANDPLAY:
-			case PLAYBACK_PLAYUNTIL:
-			case PLAYBACK_SAVE:
-			case PLAYBACK_LOAD:
-				TASmod.server.sendToAll(new TASmodBufferBuilder(buf));
-				break;
-			default:
-				throw new PacketNotImplementedException(packet, this.getClass(), Side.SERVER);
 		}
 	}
 }

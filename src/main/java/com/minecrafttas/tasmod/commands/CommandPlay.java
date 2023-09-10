@@ -42,7 +42,7 @@ public class CommandPlay extends CommandBase {
 			return;
 		}
 		if (args.length < 1) {
-			TASmod.containerStateServer.togglePlayback();
+			TASmod.playbackControllerServer.togglePlayback();
 		} else if (args.length > 1) {
 			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments. " + getUsage(sender)));
 		}
