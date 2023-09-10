@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -101,6 +102,11 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			try {
 				x = Integer.parseInt(configuration.getProperty(label.displayName + "_x"));
 				y = Integer.parseInt(configuration.getProperty(label.displayName + "_y"));
+				
+				Pair<Integer, Integer> newPos = getScreenOffset(x, y, label);
+				
+				x = newPos.getLeft();
+				y = newPos.getRight();
 			} catch (NumberFormatException e) {
 				configuration.setProperty(label.displayName + "_x", "0");
 				configuration.setProperty(label.displayName + "_y", "0");
@@ -438,8 +444,17 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 		int ypos=190;
 		for (InfoLabel label : lists) {
 			label.tick();
+			
+			int lx = label.x;
+			int ly = label.y;
+
+			Pair<Integer, Integer> newPos = getScreenOffset(lx, ly, label);
+			
+			lx = newPos.getLeft();
+			ly = newPos.getRight();
+			
 			if (label.visible) {
-				drawRectWithText(label.renderText, label.x, label.y, label.renderRect);
+				drawRectWithText(label.renderText, lx, ly, label.renderRect);
 			} else if (Minecraft.getMinecraft().currentScreen != null) {
 				if (Minecraft.getMinecraft().currentScreen.getClass().getSimpleName().contains("InfoHud")) {
 		         	Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(label.renderText, label.x + 2, label.y + 3, 0x60FFFFFF);
@@ -493,6 +508,33 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			return out1+out2;
 		}
 		return "";
+	}
+	
+	private Pair<Integer, Integer> getScreenOffset(int x, int y, InfoLabel label){
+		ScaledResolution scaled = new ScaledResolution(Minecraft.getMinecraft());
+		
+		int marginX = 5;
+		int marginY = 5;
+		
+		if (getBBRight(x, label.renderText) > scaled.getScaledWidth()) {
+			int offset = getBBRight(x, label.renderText);
+			x = x - (offset - scaled.getScaledWidth()) - marginX;
+		}
+
+		if (getBBDown(y) > scaled.getScaledHeight()) {
+			int offset = getBBDown(y);
+			y = y - (offset - scaled.getScaledHeight()) - marginY;
+		}
+		
+		return Pair.of(x, y);
+	}
+
+	private int getBBRight(int x, String text) {
+		return x + Minecraft.getMinecraft().fontRenderer.getStringWidth(text);
+	}
+
+	private int getBBDown(int y) {
+		return y + 14;
 	}
 	
 }
