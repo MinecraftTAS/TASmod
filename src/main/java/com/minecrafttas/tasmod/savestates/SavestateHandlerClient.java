@@ -160,35 +160,42 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 	}
 
 	public static void loadPlayer(NBTTagCompound compound) {
+		LOGGER.trace(LoggerMarkers.Savestate, "Loading client player from NBT");
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayerSP player = mc.player;
 
 		player.readFromNBT(compound);
 		NBTTagCompound motion = compound.getCompoundTag("clientMotion");
+		
+		if(motion.hasNoTags()) {
+			LOGGER.warn(LoggerMarkers.Savestate, "Could not load the motion from the savestate. Savestate seems to be created manually or by a different mod");
+		} else {
+			LOGGER.trace(LoggerMarkers.Savestate, "Loading client motion from NBT");
+			double x = motion.getDouble("x");
+			double y = motion.getDouble("y");
+			double z = motion.getDouble("z");
+			player.motionX = x;
+			player.motionY = y;
+			player.motionZ = z;
+			
+			float rx = motion.getFloat("RelativeX");
+			float ry = motion.getFloat("RelativeY");
+			float rz = motion.getFloat("RelativeZ");
+			player.moveForward = rx;
+			player.moveVertical = ry;
+			player.moveStrafing = rz;
+			
+			boolean sprinting = motion.getBoolean("Sprinting");
+			float jumpVector = motion.getFloat("JumpFactor");
+			player.setSprinting(sprinting);
+			player.jumpMovementFactor = jumpVector;
+		}
 
-		double x = motion.getDouble("x");
-		double y = motion.getDouble("y");
-		double z = motion.getDouble("z");
-		player.motionX = x;
-		player.motionY = y;
-		player.motionZ = z;
-
-		float rx = motion.getFloat("RelativeX");
-		float ry = motion.getFloat("RelativeY");
-		float rz = motion.getFloat("RelativeZ");
-		player.moveForward = rx;
-		player.moveVertical = ry;
-		player.moveStrafing = rz;
-
-		boolean sprinting = motion.getBoolean("Sprinting");
-		float jumpVector = motion.getFloat("JumpFactor");
-		player.setSprinting(sprinting);
-		player.jumpMovementFactor = jumpVector;
-
+		LOGGER.trace(LoggerMarkers.Savestate, "Setting client gamemode");
 		// #86
 		int gamemode = compound.getInteger("playerGameType");
 		GameType type = GameType.getByID(gamemode);
-		Minecraft.getMinecraft().playerController.setGameType(type);
+		mc.playerController.setGameType(type);
 
 		// #?? Player rotation does not change when loading a savestate
 //		CameraInterpolationEvents.rotationPitch = player.rotationPitch;

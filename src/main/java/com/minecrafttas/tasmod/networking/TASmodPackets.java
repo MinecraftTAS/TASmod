@@ -4,6 +4,9 @@ import com.minecrafttas.common.events.CompactPacketHandler;
 import com.minecrafttas.common.server.Client.Side;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.commands.CommandFolder;
+import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.TickratePauseState;
+
+import net.minecraft.nbt.NBTTagCompound;
 
 /**
  * PacketIDs and handlers specifically for TASmod
@@ -31,17 +34,46 @@ public enum TASmodPackets implements PacketID {
 	/**
 	 * <p>Sets the tickrate to 0, pausing the game. Also unpauses the game
 	 * 
+	 * <p>SIDE: Both<br>
+	 * ARGS: {@link TickratePauseState} state The paused state
 	 */
 	TICKRATE_ZERO,
+	/**
+	 * <p>While in tickrate 0, advances the game by one tick
+	 * 
+	 * <p>SIDE: Both<br>
+	 * ARGS: None
+	 */
 	TICKRATE_ADVANCE,
-	SAVESTATE_LOAD,
+	/**
+	 * <p>Creates a savestate
+	 * 
+	 * <p>SIDE: Both<br>
+	 * ARGS: <br>
+	 * <strong>Client->Server:</strong> int The index of the savestate that should be created. -1 to create the latest savestate, might overwrite existing savestates.<br>
+	 * <strong>Server->Client:</strong> String The name of the savestate that is created for the clientside
+	 */
 	SAVESTATE_SAVE,
+	/**
+	 * <p>Loads a savestate
+	 * 
+	 * <p>SIDE: Both<br>
+	 * ARGS: <br>
+	 * <strong>Client->Server</strong> int The index of the savestate that should be loaded<br>
+	 * <strong>Server->Client</strong> String The name of the savestate that is loaded for the clientside
+	 */
+	SAVESTATE_LOAD,
 	/**
 	 * <p>Opens or closes the savestate screen on the client
 	 * <p>SIDE: Client<br>
 	 * ARGS: none
 	 */
 	SAVESTATE_SCREEN,
+	/**
+	 * <p>Sends the playerdata of the player to the client, inluding the motion
+	 * <p>SIDE: Client<br>
+	 * ARGS: {@link NBTTagCompound} compound The playerdata
+	 */
 	SAVESTATE_PLAYER,
 	SAVESTATE_REQUEST_MOTION,
 	SAVESTATE_UNLOAD_CHUNKS,

@@ -795,7 +795,6 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			break;
 
 		case SAVESTATE_REQUEST_MOTION:
-			System.out.println("Ahh");
 			MotionData data = TASmodBufferBuilder.readMotionData(buf);
 			PlayerHandler.getMotion().put(player, data);
 			break;
