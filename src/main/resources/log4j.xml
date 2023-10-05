@@ -18,16 +18,29 @@
 					<pattern>%style{[%d{HH:mm:ss}]}{blue} %highlight{[%t/%level]}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=green, TRACE=blue} %style{(%logger{1}%notEmpty{/%marker})}{cyan} %highlight{%msg%n}{FATAL=red, ERROR=red, WARN=normal, INFO=normal, DEBUG=normal, TRACE=normal}</pattern>
 			</PatternLayout>
 		</Console>
+		
+		<Queue name="ServerGuiConsole" ignoreExceptions="true">
+			<PatternLayout disableAnsi="${sys:fabric.log.disableAnsi:-true}">
+				<LoggerNamePatternSelector defaultPattern="%style{[%d{HH:mm:ss}]}{blue} %highlight{[%t/%level]}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=green, TRACE=blue} %style{(%logger{1}%notEmpty{/%marker})}{cyan} %highlight{%msg%n}{FATAL=red, ERROR=red, WARN=normal, INFO=normal, DEBUG=normal, TRACE=normal}">
+					<!-- Dont show the logger name for minecraft classes-->
+					<PatternMatch key="net.minecraft.,com.mojang." pattern="[%d{HH:mm:ss} %level] %msg{nolookups}%n"/>
+				</LoggerNamePatternSelector>
+			</PatternLayout>
+		</Queue>
+		
 	</Appenders>
 	<Loggers>
 		<Logger level="${sys:tasmod.log.level:-info}" name="TASmod" additivity="false">
 			<AppenderRef ref="SysOut2" level="${sys:tasmod.log.level:-info}"/>
+			<AppenderRef ref="ServerGuiConsole" level="${sys:tasmod.log.level:-info}"/>
 		</Logger>
 		<Logger level="${sys:common.log.level:-info}" name="Common" additivity="false">
 			<AppenderRef ref="SysOut2" level="${sys:common.log.level:-info}"/>
+			<AppenderRef ref="ServerGuiConsole" level="${sys:tasmod.log.level:-info}"/>
 		</Logger>
-				<Logger level="${sys:server.log.level:-info}" name="PacketServer" additivity="false">
+		<Logger level="${sys:server.log.level:-info}" name="PacketServer" additivity="false">
 			<AppenderRef ref="SysOut2" level="${sys:common.log.level:-info}"/>
+			<AppenderRef ref="ServerGuiConsole" level="${sys:tasmod.log.level:-info}"/>
 		</Logger>
 	</Loggers>
 </Configuration>
