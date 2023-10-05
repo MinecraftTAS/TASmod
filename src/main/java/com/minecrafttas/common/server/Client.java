@@ -31,6 +31,8 @@ public class Client {
 	private Future<Integer> future;
 
 	private String username;
+	private String ip;
+	private int port;
 
 	private Side side;
 
@@ -52,6 +54,9 @@ public class Client {
 		this.socket = AsynchronousSocketChannel.open();
 		this.socket.connect(new InetSocketAddress(host, port)).get();
 
+		ip = host;
+		this.port = port;
+		
 		this.side = Side.CLIENT;
 		this.packetIDs = packetIDs;
 
@@ -203,4 +208,9 @@ public class Client {
 	public boolean isClosed() {
 		return this.socket == null || !this.socket.isOpen();
 	}
+	
+	public String getRemote() throws IOException {
+		return ip+":"+port;
+	}
+	
 }
