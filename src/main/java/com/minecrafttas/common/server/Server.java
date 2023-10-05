@@ -7,7 +7,6 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.minecrafttas.common.Common;
 import com.minecrafttas.common.server.interfaces.PacketID;

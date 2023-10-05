@@ -64,12 +64,15 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	
 	public static Server server;
 
-	public static int networkingport = 8999;
+	public static final int networkingport = 8999;
+
+	public static final boolean isDevEnvironment = FabricLoaderImpl.INSTANCE.isDevelopmentEnvironment();
 	
 	@Override
 	public void onInitialize() {
 		
 		LOGGER.info("Initializing TASmod");
+		
 		
 		// Start ticksync
 		ticksyncServer = new TickSyncServer();
@@ -93,16 +96,11 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		PacketHandlerRegistry.register(tickratechanger);
 		PacketHandlerRegistry.register(ktrngHandler);
 		
-		// Starting custom server instance
-		try {
-			server = new Server(networkingport, TASmodPackets.values());
-		} catch (Exception e) {
-			LOGGER.error("Unable to launch TASmod server: {}", e.getMessage());
-		}
 	}
 	
 	@Override
 	public void onServerInit(MinecraftServer server) {
+		LOGGER.info("Initializing server");
 		serverInstance = server;
 		playbackControllerServer=new PlaybackControllerServer();
 		PacketHandlerRegistry.register(playbackControllerServer);
@@ -136,6 +134,13 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		if(!server.isDedicatedServer()) {
 			TASmod.tickratechanger.ticksPerSecond=0F;
 			TASmod.tickratechanger.tickrateSaved=20F;
+		} else {
+			// Starting custom server instance
+			try {
+				TASmod.server = new Server(networkingport, TASmodPackets.values());
+			} catch (Exception e) {
+				LOGGER.error("Unable to launch TASmod server: {}", e.getMessage());
+			}
 		}
 	}
 	

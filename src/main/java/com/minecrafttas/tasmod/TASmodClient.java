@@ -3,6 +3,7 @@ package com.minecrafttas.tasmod;
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import com.minecrafttas.common.events.EventClient.EventPlayerLeaveClientSide;
 import com.minecrafttas.common.events.EventListenerRegistry;
 import com.minecrafttas.common.server.Client;
 import com.minecrafttas.common.server.PacketHandlerRegistry;
+import com.minecrafttas.common.server.Server;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.gui.InfoHud;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
@@ -45,8 +47,6 @@ import net.minecraft.client.settings.KeyBinding;
 
 public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventPlayerLeaveClientSide{
 
-
-	public static boolean isDevEnvironment;
 
 	public static VirtualInput virtual;
 
@@ -98,9 +98,6 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	@Override
 	public void onInitializeClient() {
-		
-		// Check if dev environment
-		isDevEnvironment = FabricLoaderImpl.INSTANCE.isDevelopmentEnvironment();
 		
 		// Load config
 		Minecraft mc = Minecraft.getMinecraft();
@@ -155,10 +152,17 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		PacketHandlerRegistry.register(tickratechanger);
 		PacketHandlerRegistry.register(savestateHandlerClient);
 		
+		// Starting local server instance
+		try {
+			TASmod.server = new Server(TASmod.networkingport-1, TASmodPackets.values());
+		} catch (Exception e) {
+			LOGGER.error("Unable to launch TASmod server: {}", e.getMessage());
+		}
 		
+		// Connecting to local server instance
 		try {
 			// connect to server and authenticate
-			client = new Client("127.0.0.1", TASmod.networkingport, TASmodPackets.values(), mc.getSession().getUsername());
+			client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername());
 		} catch (Exception e) {
 			LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 		}
@@ -220,6 +224,33 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		 *  Will be obsolete once we have a networking system that starts in the main menu. Then we can sync the state from there
 		*/
 		// TASmodClient.packetClient.sendToServer(new InitialSyncStatePacket(TASmodClient.virtual.getContainer().getState()));
+		Minecraft mc = Minecraft.getMinecraft();
+		String full = mc.getCurrentServerData().serverIP;
+		String ip = full.split(":")[0];
+		
+		String connectedIP = null;
+		try {
+			connectedIP = client.getRemote();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println(full);
+		System.out.println(connectedIP);
+		
+		if(!(ip+TASmod.networkingport).equals(full)) {
+			try {
+				client.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				// connect to server and authenticate
+				client = new Client(ip, TASmod.networkingport, TASmodPackets.values(), mc.getSession().getUsername());
+			} catch (Exception e) {
+				LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
+			}
+		}
 	}
 
 	@Override
