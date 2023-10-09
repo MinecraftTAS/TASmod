@@ -43,6 +43,7 @@ import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.settings.KeyBinding;
 
 public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventPlayerLeaveClientSide{
@@ -212,21 +213,20 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	@Override
 	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
-		// FIXME: ask how this works
-		
-		/* == Scribble ==
-		 * The playback state (Playing, Recording, Paused, None) of the client may be different from the server state, 
-		 * since we allow the fact that the player can start a playback in the main menu.
-		 * 
-		 *  So when joining the world, the player sends their current state over to the server. If another player is already on the server,
-		 *  then the server sends back the current server state, so everyone has the same playback state.
-		 *  
-		 *  Will be obsolete once we have a networking system that starts in the main menu. Then we can sync the state from there
-		*/
 		// TASmodClient.packetClient.sendToServer(new InitialSyncStatePacket(TASmodClient.virtual.getContainer().getState()));
 		Minecraft mc = Minecraft.getMinecraft();
-		String full = mc.getCurrentServerData().serverIP;
-		String ip = full.split(":")[0];
+		ServerData data = mc.getCurrentServerData();
+		
+		String ip = null;
+		int port;
+		
+		if(data==null) {
+			ip = "localhost";
+			port = TASmod.networkingport-1;
+		} else {
+			ip = data.serverIP.split(":")[0];
+			port = TASmod.networkingport;
+		}
 		
 		String connectedIP = null;
 		try {
@@ -235,18 +235,17 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			e.printStackTrace();
 		}
 		
-		System.out.println(full);
-		System.out.println(connectedIP);
 		
-		if(!(ip+TASmod.networkingport).equals(full)) {
+		if(!(ip+":"+port).equals(connectedIP)) {
 			try {
+				LOGGER.info("Closing current client connection!");
 				client.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			try {
 				// connect to server and authenticate
-				client = new Client(ip, TASmod.networkingport, TASmodPackets.values(), mc.getSession().getUsername());
+				client = new Client(ip, port, TASmodPackets.values(), mc.getSession().getUsername());
 			} catch (Exception e) {
 				LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 			}

@@ -1,10 +1,14 @@
 package com.minecrafttas.common.server;
 
 import static com.minecrafttas.common.server.SecureList.BUFFER_SIZE;
+import static com.minecrafttas.common.Common.LOGGER;
+import static com.minecrafttas.common.Common.Client;
+import static com.minecrafttas.common.Common.Server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Future;
@@ -50,7 +54,7 @@ public class Client {
 	 * @throws Exception Unable to connect
 	 */
 	public Client(String host, int port, PacketID[] packetIDs, String name) throws Exception {
-		Common.LOGGER.info("Connecting server to {}:{}", host, port);
+		LOGGER.info(Client, "Connecting server to {}:{}", host, port);
 		this.socket = AsynchronousSocketChannel.open();
 		this.socket.connect(new InetSocketAddress(host, port)).get();
 
@@ -61,7 +65,7 @@ public class Client {
 		this.packetIDs = packetIDs;
 
 		this.createHandlers();
-		Common.LOGGER.info("Connected to server");
+		LOGGER.info(Client, "Connected to server");
 
 		authenticate(name);
 	}
@@ -103,13 +107,17 @@ public class Client {
 					readBuffer.clear().limit(4);
 					socket.read(readBuffer, null, this);
 				} catch (Throwable exc) {
-					Common.LOGGER.error("Unable to read packet!", exc);
+					LOGGER.error("Unable to read packet!", exc);
 				}
 			}
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
-				Common.LOGGER.error("Unable to read packet!", exc);
+				if(exc instanceof AsynchronousCloseException) {
+					LOGGER.warn(side==Side.CLIENT? Client:Server, "Connection was closed");
+				} else {
+					LOGGER.error(side==Side.CLIENT? Client:Server, "Unable to read packet!", exc);
+				}
 			}
 
 		});
@@ -148,7 +156,7 @@ public class Client {
 	 */
 	public void close() throws IOException {
 		if (this.socket == null || !this.socket.isOpen()) {
-			Common.LOGGER.warn("Tried to close dead socket");
+			Common.LOGGER.warn(side==Side.CLIENT? Client:Server, "Tried to close dead socket");
 			return;
 		}
 
@@ -163,7 +171,7 @@ public class Client {
 	 */
 	private void authenticate(String id) throws Exception {
 		this.username = id;
-		Common.LOGGER.info("Authenticating with UUID {}", id.toString());
+		Common.LOGGER.info(side==Side.CLIENT? Client:Server, "Authenticating with UUID {}", id.toString());
 		this.send(new ByteBufferBuilder(-1).writeString(id));
 	}
 

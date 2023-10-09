@@ -1,7 +1,11 @@
 package com.minecrafttas.common.server;
 
+import static com.minecrafttas.common.Common.LOGGER;
+import static com.minecrafttas.common.Common.Server;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -31,7 +35,7 @@ public class Server {
 	 */
 	public Server(int port, PacketID[] packetIDs) throws Exception {
 		// create connection
-		Common.LOGGER.info("Creating server on port {}", port);
+		LOGGER.info(Server, "Creating server on port {}", port);
 		this.socket = AsynchronousServerSocketChannel.open();
 		this.socket.bind(new InetSocketAddress(port));
 
@@ -47,11 +51,15 @@ public class Server {
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
-				Common.LOGGER.error("Unable to accept client!", exc);
+				if(exc instanceof AsynchronousCloseException) {
+					LOGGER.info(Server, "Connection to the player was closed!");
+				} else {
+					Common.LOGGER.error(Server, "Unable to accept client!", exc);
+				}
 			}
 		});
 
-		Common.LOGGER.info("Server created");
+		Common.LOGGER.info(Server, "Server created");
 	}
 
 	/**
@@ -76,7 +84,11 @@ public class Server {
 	 */
 	public void sendTo(String username, ByteBufferBuilder builder) throws Exception {
 		Client client = getClient(username);
-		client.send(builder);
+		if(client != null && !client.isClosed()) {
+			client.send(builder);
+		} else {
+			Common.LOGGER.warn(Server, "Buffer with id {} could not be sent to the client {}: The client is closed", builder.getId(), username);
+		}
 	}
 
 	/**
@@ -99,7 +111,7 @@ public class Server {
 	 */
 	public void close() throws IOException {
 		if (this.socket == null || !this.socket.isOpen()) {
-			Common.LOGGER.warn("Tried to close dead socket");
+			Common.LOGGER.warn(Server, "Tried to close dead socket on server");
 			return;
 		}
 
