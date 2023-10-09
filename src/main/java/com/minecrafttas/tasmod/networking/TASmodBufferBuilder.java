@@ -110,4 +110,5 @@ public class TASmodBufferBuilder extends ByteBufferBuilder{
 		
 		return new MotionData(x, y, z, rx, ry, rz, sprinting, jumpMovementVector);
 	}
+	
 }

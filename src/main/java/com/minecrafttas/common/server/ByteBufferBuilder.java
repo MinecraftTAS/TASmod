@@ -13,10 +13,12 @@ import com.minecrafttas.common.server.interfaces.PacketID;
  */
 public class ByteBufferBuilder {
 
+	private int bufferId;
 	private int bufferIndex;
 	protected ByteBuffer buffer;
 
 	public ByteBufferBuilder(int id) {
+		bufferId = id;
 		bufferIndex = SecureList.POOL.available();
 		buffer = SecureList.POOL.lock(bufferIndex);
 		buffer.putInt(id);
@@ -172,5 +174,9 @@ public class ByteBufferBuilder {
 		byte[] array = new byte[length];
 		buf.get(array);
 		return array;
+	}
+	
+	public int getId(){
+		return bufferId;
 	}
 }
