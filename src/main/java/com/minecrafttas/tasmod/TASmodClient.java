@@ -45,6 +45,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.server.MinecraftServer;
 
 public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventPlayerLeaveClientSide{
 
@@ -218,14 +219,14 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	@Override
 	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
-		// TASmodClient.packetClient.sendToServer(new InitialSyncStatePacket(TASmodClient.virtual.getContainer().getState()));
 		Minecraft mc = Minecraft.getMinecraft();
 		ServerData data = mc.getCurrentServerData();
+		MinecraftServer server = TASmod.getServerInstance();
 		
 		String ip = null;
 		int port;
 		
-		if(data==null) {
+		if(server!=null) {
 			ip = "localhost";
 			port = TASmod.networkingport-1;
 		} else {
@@ -260,6 +261,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 				}
 			});
 		}
+//		 TASmod.server.sendToServer(new InitialSyncStatePacket(TASmodClient.virtual.getContainer().getState()));
 	}
 
 	@Override
