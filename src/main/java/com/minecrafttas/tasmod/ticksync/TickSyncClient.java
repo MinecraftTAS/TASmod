@@ -52,7 +52,7 @@ public class TickSyncClient implements ClientPacketHandler, EventClientTickPost{
 	 */
 	@Override
 	public void onClientTickPost(Minecraft mc) {
-		if (mc.player == null) {
+		if (TASmodClient.client == null || TASmodClient.client.isClosed()) {
 			return;
 		}
 		

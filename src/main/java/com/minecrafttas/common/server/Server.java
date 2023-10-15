@@ -24,7 +24,7 @@ import net.minecraft.entity.player.EntityPlayer;
  */
 public class Server {
 
-	private final AsynchronousServerSocketChannel socket;
+	private final AsynchronousServerSocketChannel serverSocket;
 	private final List<Client> clients;
 
 	/**
@@ -36,17 +36,26 @@ public class Server {
 	public Server(int port, PacketID[] packetIDs) throws Exception {
 		// create connection
 		LOGGER.info(Server, "Creating server on port {}", port);
-		this.socket = AsynchronousServerSocketChannel.open();
-		this.socket.bind(new InetSocketAddress(port));
+		this.serverSocket = AsynchronousServerSocketChannel.open();
+		this.serverSocket.bind(new InetSocketAddress(port));
 
 		// create connection handler
 		this.clients = new ArrayList<>();
-		this.socket.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>() {
+		this.serverSocket.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>() {
 
 			@Override
 			public void completed(AsynchronousSocketChannel clientSocket, Object attachment) {
+				cleanClients();
 				clients.add(new Client(clientSocket, packetIDs));
-				socket.accept(null, this);
+				serverSocket.accept(null, this);
+			}
+
+			private void cleanClients() {
+				for(Client client : clients) {
+					if(client.isClosed()) {
+						clients.remove(client);
+					}
+				}
 			}
 
 			@Override
@@ -54,12 +63,12 @@ public class Server {
 				if(exc instanceof AsynchronousCloseException) {
 					LOGGER.info(Server, "Connection to the player was closed!");
 				} else {
-					Common.LOGGER.error(Server, "Unable to accept client!", exc);
+					LOGGER.error(Server, "Unable to accept client!", exc);
 				}
 			}
 		});
 
-		Common.LOGGER.info(Server, "Server created");
+		LOGGER.info(Server, "Server created");
 	}
 
 	/**
@@ -110,16 +119,16 @@ public class Server {
 	 * @throws IOException Unable to close
 	 */
 	public void close() throws IOException {
-		if (this.socket == null || !this.socket.isOpen()) {
+		if (this.serverSocket == null || !this.serverSocket.isOpen()) {
 			Common.LOGGER.warn(Server, "Tried to close dead socket on server");
 			return;
 		}
 
-		this.socket.close();
+		this.serverSocket.close();
 	}
 
 	public boolean isClosed() {
-		return this.socket == null || !this.socket.isOpen();
+		return this.serverSocket == null || !this.serverSocket.isOpen();
 	}
 
 	/**
@@ -140,7 +149,7 @@ public class Server {
 	}
 
 	public AsynchronousServerSocketChannel getAsynchronousSocketChannel() {
-		return this.socket;
+		return this.serverSocket;
 	}
 
 }

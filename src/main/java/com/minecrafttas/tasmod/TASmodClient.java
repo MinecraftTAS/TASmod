@@ -193,13 +193,18 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Open InfoGui Editor", "TASmod", Keyboard.KEY_F6, () -> Minecraft.getMinecraft().displayGuiScreen(TASmodClient.hud))));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Buffer View", "TASmod", Keyboard.KEY_NUMPAD0, () -> InputContainerView.startBufferView())));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing", "TASmod", Keyboard.KEY_F12, () -> {
-			TASmod.tickSchedulerServer.add(() -> {
-				try {
-					Thread.sleep(1000L);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			});
+			try {
+				TASmodClient.client.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		})));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing2", "TASmod", Keyboard.KEY_F7, () -> {
+			try {
+				TASmodClient.client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getProfile().getName());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		})));
 		blockedKeybindings.forEach(VirtualKeybindings::registerBlockedKeyBinding);
 		
@@ -238,17 +243,22 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		
 		if(!(ip+":"+port).equals(connectedIP)) {
 			try {
-				LOGGER.info("Closing current client connection!");
+				LOGGER.info("Closing client connection: {}", client.getRemote());
 				client.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			try {
-				// connect to server and authenticate
-				client = new Client(ip, port, TASmodPackets.values(), mc.getSession().getUsername());
-			} catch (Exception e) {
-				LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
-			}
+			final String IP = ip;
+			final int PORT = port;
+			gameLoopSchedulerClient.add(()->{
+				try {
+					// connect to server and authenticate
+					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername());
+				} catch (Exception e) {
+					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
+					e.printStackTrace();
+				}
+			});
 		}
 	}
 
