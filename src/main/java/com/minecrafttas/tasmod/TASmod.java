@@ -147,11 +147,13 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	@Override
 	public void onServerStop(MinecraftServer mcserver) {
 		serverInstance=null;
-		try {
-			if (server != null) server.close();
-		} catch (IOException e) {
-			LOGGER.error("Unable to close TASmod server: {}", e);
-			e.printStackTrace();
+		if(mcserver.isDedicatedServer()) {
+			try {
+				if (server != null) server.close();
+			} catch (IOException e) {
+				LOGGER.error("Unable to close TASmod server: {}", e);
+				e.printStackTrace();
+			}
 		}
 	}
 	

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.minecrafttas.common.events.EventServer.EventClientCompleteAuthentication;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
@@ -24,7 +25,7 @@ import net.minecraft.server.MinecraftServer;
  *
  * @author Pancake
  */
-public class TickSyncServer implements ServerPacketHandler, EventServerTickPost {
+public class TickSyncServer implements ServerPacketHandler, EventServerTickPost, EventClientCompleteAuthentication {
 	
 	private static List<String> synchronizedList = Collections.synchronizedList(new ArrayList<>());
 
@@ -48,6 +49,9 @@ public class TickSyncServer implements ServerPacketHandler, EventServerTickPost 
 				synchronizedList.add(username);
 			}
 		}
+		if(TASmod.getServerInstance()==null) { // If the server is null, keep the clients ticking
+			sendToClients();
+		}
 	}
 
 	public boolean shouldTick() {
@@ -62,20 +66,21 @@ public class TickSyncServer implements ServerPacketHandler, EventServerTickPost 
 		}
 	}
 	
-	/**
-	 * Called after a server tick. This will send a packet
-	 * to all clients making them tick
-	 */
-	public void serverPostTick() {
-
-	}
-
 	public static void clearList() {
 		synchronizedList.clear();
 	}
 
 	@Override
 	public void onServerTickPost(MinecraftServer server) {
+		sendToClients();
+	}
+
+	@Override
+	public void onClientCompleteAuthentication(String username) {
+		sendToClients();
+	}
+	
+	private void sendToClients() {
 		try {
 			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKSYNC));
 		} catch (Exception e) {

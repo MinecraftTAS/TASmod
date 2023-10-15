@@ -195,6 +195,9 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 	 * Saves the Configuration
 	 */
 	private void saveConfig() {
+		if(!(Minecraft.getMinecraft().currentScreen instanceof InfoHud) || configuration == null) {
+			return;
+		}
 		try {
 			File tasmodDir = new File(Minecraft.getMinecraft().mcDataDir, "tasmod");
 			tasmodDir.mkdir();

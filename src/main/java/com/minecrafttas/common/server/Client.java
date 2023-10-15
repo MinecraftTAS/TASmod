@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import org.apache.logging.log4j.Level;
 
 import com.minecrafttas.common.Common;
+import com.minecrafttas.common.events.EventServer.EventClientCompleteAuthentication;
 import com.minecrafttas.common.server.exception.InvalidPacketException;
 import com.minecrafttas.common.server.exception.PacketNotImplementedException;
 import com.minecrafttas.common.server.exception.WrongSideException;
@@ -88,10 +89,18 @@ public class Client {
 	private void createHandlers() {
 		// create input handler
 		this.readBuffer.limit(4);
+		if(socket == null || !socket.isOpen()) {
+			LOGGER.info(side==Side.CLIENT? Client:Server, "Connection was closed");
+			return;
+		}
 		this.socket.read(this.readBuffer, null, new CompletionHandler<Integer, Object>() {
 
 			@Override
 			public void completed(Integer result, Object attachment) {
+				if(result == -1) {
+					LOGGER.info(side==Side.CLIENT? Client:Server, "Stream was closed");
+					return;
+				}
 				try {
 					// read rest of packet
 					readBuffer.flip();
@@ -113,10 +122,10 @@ public class Client {
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
-				if(exc instanceof AsynchronousCloseException) {
-					LOGGER.warn(side==Side.CLIENT? Client:Server, "Connection was closed");
+				if(exc instanceof AsynchronousCloseException || exc instanceof IOException) {
+					LOGGER.warn(side==Side.CLIENT? Client:Server, "Connection was closed!");
 				} else {
-					LOGGER.error(side==Side.CLIENT? Client:Server, "Unable to read packet!", exc);
+					LOGGER.error(side==Side.CLIENT? Client:Server, "Something went wrong!", exc);
 				}
 			}
 
@@ -159,6 +168,7 @@ public class Client {
 			Common.LOGGER.warn(side==Side.CLIENT? Client:Server, "Tried to close dead socket");
 			return;
 		}
+		this.future=null;
 
 		this.socket.close();
 	}
@@ -181,6 +191,7 @@ public class Client {
 		}
 
 		this.username = ByteBufferBuilder.readString(buf);
+		EventClientCompleteAuthentication.fireClientCompleteAuthentication(username);
 	}
 
 	private void handle(ByteBuffer buf) {

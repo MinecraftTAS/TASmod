@@ -140,4 +140,22 @@ public interface EventServer {
 			}
 		}
 	}
+	
+	public static interface EventClientCompleteAuthentication extends EventBase {
+		
+		/**
+		 * Fired when  authentication was successful on the server side
+		 */
+		public void onClientCompleteAuthentication(String username);
+		
+		public static void fireClientCompleteAuthentication(String username) {
+			Common.LOGGER.trace(Common.Event, "Firing ClientCompleteAuthenticationEvent");
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
+				if (eventListener instanceof EventClientCompleteAuthentication) {
+					EventClientCompleteAuthentication event = (EventClientCompleteAuthentication) eventListener;
+					event.onClientCompleteAuthentication(username);
+				}
+			}
+		}
+	}
 }
