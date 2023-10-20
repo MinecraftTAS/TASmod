@@ -97,8 +97,6 @@ public abstract class MixinMinecraft {
 
 	@Inject(method = "runTick", at = @At(value = "HEAD"))
 	public void injectRunTick(CallbackInfo ci) throws IOException {
-		
-		InputContainerView.update(TASmodClient.virtual);
 		if (SavestateHandlerServer.wasLoading) {
 			SavestateHandlerServer.wasLoading = false;
 			

@@ -181,12 +181,11 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 	 * Sends a {@link AdvanceTickratePacket} to all clients
 	 */
 	private void advanceClientTick() {
-		if (ticksPerSecond == 0) {
-			try {
-				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_ADVANCE));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		// Do not check for ticksPerSecond==0 here, because at this point, ticksPerSecond is 20 for one tick!
+		try {
+			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_ADVANCE));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
