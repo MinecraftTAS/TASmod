@@ -45,17 +45,8 @@ public class Server {
 
 			@Override
 			public void completed(AsynchronousSocketChannel clientSocket, Object attachment) {
-				cleanClients();
 				clients.add(new Client(clientSocket, packetIDs));
 				serverSocket.accept(null, this);
-			}
-
-			private void cleanClients() {
-				for(Client client : clients) {
-					if(client.isClosed()) {
-						clients.remove(client);
-					}
-				}
 			}
 
 			@Override
@@ -97,6 +88,7 @@ public class Server {
 			client.send(builder);
 		} else {
 			Common.LOGGER.warn(Server, "Buffer with id {} could not be sent to the client {}: The client is closed", builder.getId(), username);
+			removeClient(client);
 		}
 	}
 
@@ -152,4 +144,7 @@ public class Server {
 		return this.serverSocket;
 	}
 
+	private void removeClient(Client client) {
+		getClients().remove(client);
+	}
 }

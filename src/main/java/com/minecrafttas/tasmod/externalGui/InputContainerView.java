@@ -16,12 +16,16 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import com.minecrafttas.common.events.EventClient.EventClientTick;
+import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 
+import net.minecraft.client.Minecraft;
+
 @Deprecated
-public class InputContainerView extends JFrame {
+public class InputContainerView extends JFrame implements EventClientTick{
 
 	private static final long serialVersionUID = -1823965270972132025L;
 	private JPanel contentPane;
@@ -174,5 +178,10 @@ public class InputContainerView extends JFrame {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void onClientTick(Minecraft mc) {
+		update(TASmodClient.virtual);
 	}
 }

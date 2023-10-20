@@ -7,6 +7,7 @@ import static com.minecrafttas.common.Common.Server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -58,6 +59,8 @@ public class Client {
 		LOGGER.info(Client, "Connecting server to {}:{}", host, port);
 		this.socket = AsynchronousSocketChannel.open();
 		this.socket.connect(new InetSocketAddress(host, port)).get();
+		this.socket.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
+		this.socket.setOption(StandardSocketOptions.TCP_NODELAY, true);
 
 		ip = host;
 		this.port = port;
@@ -78,6 +81,12 @@ public class Client {
 	 */
 	public Client(AsynchronousSocketChannel socket, PacketID[] packetIDs) {
 		this.socket = socket;
+		try {
+			this.socket.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
+			this.socket.setOption(StandardSocketOptions.TCP_NODELAY, true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		this.packetIDs = packetIDs;
 		this.createHandlers();
 		this.side = Side.SERVER;

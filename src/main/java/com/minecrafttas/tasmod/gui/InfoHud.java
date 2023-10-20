@@ -478,6 +478,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 		}
 		ScaledResolution scaled = new ScaledResolution(Minecraft.getMinecraft());
 		drawCenteredString(Minecraft.getMinecraft().fontRenderer, "TASmod is still in development! Major issues may arise!", scaled.getScaledWidth() / 2, scaled.getScaledHeight() - 50, 0xFF8400);
+//		drawCenteredString(Minecraft.getMinecraft().fontRenderer, Float.toString(TASmod.tickratechanger.ticksPerSecond), scaled.getScaledWidth() / 2, scaled.getScaledHeight() - 36, 0xFFFFFF);
 	}
 	
 	/**
