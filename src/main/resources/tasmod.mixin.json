@@ -44,7 +44,6 @@
 		
 		//Join and leave game event on the client
 		"events.MixinGuiMainMenu",
-		"events.MixinGuiControls",
 		"events.MixinGuiIngame",
 		
 		//Playbackhooks
