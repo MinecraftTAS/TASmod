@@ -41,6 +41,7 @@ import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.ServerData;
@@ -269,6 +270,19 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 				} catch (Exception e) {
 					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 				}
+			}
+		}
+		else if(gui instanceof GuiControls) {
+			TASmodClient.virtual.getContainer().setTASState(TASstate.NONE); // Set the TASState to nothing to avoid collisions
+			if(TASmodClient.tickratechanger.ticksPerSecond==0) {
+				TASmodClient.tickratechanger.pauseClientGame(false); // Unpause the game
+				waszero = true;
+			}
+		}
+		else if(!(gui instanceof GuiControls)) {
+			if(waszero) {
+				waszero = false;
+				TASmodClient.tickratechanger.pauseClientGame(true);
 			}
 		}
 		return gui;
