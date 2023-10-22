@@ -4,6 +4,7 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.io.File;
 
+import com.minecrafttas.common.events.EventListenerRegistry;
 import com.minecrafttas.common.events.EventListenerRegistry.EventBase;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
@@ -110,4 +111,26 @@ public interface EventServer {
 		}
 	}
 
+	
+	/**
+	 * Fired when the tickrate changes on the server side
+	 * @author Scribble
+	 *
+	 */
+	public static interface EventServerTickrateChange extends EventBase{
+		
+		/**
+		 * Fired at the end of a client tick
+		 */
+		public void onServerTickrateChange(float tickrate);
+		
+		public static void fireOnServerTickrateChange(float tickrate) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
+				if(eventListener instanceof EventServerTickrateChange) {
+					EventServerTickrateChange event = (EventServerTickrateChange) eventListener;
+					event.onServerTickrateChange(tickrate);
+				}
+			}
+		}
+	}
 }

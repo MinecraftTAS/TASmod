@@ -132,6 +132,12 @@ public class Server {
 		}
 	}
 	
+	public void setTimeoutTime(long timeout) {
+		for (Client client : getClients()) {
+			client.setTimeoutTime(timeout);
+		}
+	}
+	
 	/**
 	 * Try to close socket
 	 * 

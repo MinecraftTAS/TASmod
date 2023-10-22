@@ -12,6 +12,7 @@ import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.events.EventServer.EventServerTickrateChange;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
@@ -126,6 +127,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 			}
 		}
 		ticksPerSecond = tickrate;
+		EventServerTickrateChange.fireOnServerTickrateChange(tickrate);
 		if (log) {
 			log("Setting the server tickrate to " + ticksPerSecond);
 		}

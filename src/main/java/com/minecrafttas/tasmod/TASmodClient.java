@@ -260,13 +260,15 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	@Override
 	public GuiScreen onOpenGui(GuiScreen gui) {
-		if(gui instanceof GuiMainMenu && client == null) {
-			Minecraft mc = Minecraft.getMinecraft();
-			try {
-				// connect to server and authenticate
-				client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername(), 10000);
-			} catch (Exception e) {
-				LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
+		if(gui instanceof GuiMainMenu) {
+			if(client == null) {
+				Minecraft mc = Minecraft.getMinecraft();
+				try {
+					// connect to server and authenticate
+					client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername(), 10000);
+				} catch (Exception e) {
+					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
+				}
 			}
 		}
 		return gui;
