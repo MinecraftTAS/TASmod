@@ -13,4 +13,6 @@ public class Common {
 	public static final Marker Server = MarkerManager.getMarker("Server");
 	
 	public static final Marker Client = MarkerManager.getMarker("Client");
+	
+	public static final Marker Timeout = MarkerManager.getMarker("Timeout");
 }
