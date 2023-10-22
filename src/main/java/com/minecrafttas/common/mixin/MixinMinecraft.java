@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -50,7 +49,7 @@ public class MixinMinecraft {
 	@Shadow
 	private GuiScreen currentScreen;
 	
-	@Redirect(method = "displayGuiScreen", at = @At(value = "FIELD", target = "currentScreen:Lnet/minecraft/client/gui/GuiScreen;", opcode = Opcodes.PUTFIELD))
+	@Redirect(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", opcode = Opcodes.PUTFIELD))
 	public void modify_displayGuiScreen(Minecraft mc, GuiScreen guiScreen) {
 		guiScreen = EventOpenGui.fireOpenGuiEvent(guiScreen);
 		currentScreen = guiScreen;
