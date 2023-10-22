@@ -25,6 +25,7 @@ import com.minecrafttas.tasmod.commands.CommandSaveTAS;
 import com.minecrafttas.tasmod.commands.CommandSavestate;
 import com.minecrafttas.tasmod.commands.CommandTickrate;
 import com.minecrafttas.tasmod.ktrng.KillTheRNGHandler;
+import com.minecrafttas.tasmod.networking.ServerModifications;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackControllerServer;
 import com.minecrafttas.tasmod.savestates.SavestateHandlerServer;
@@ -62,6 +63,8 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	
 	public static final Scheduler tickSchedulerServer = new Scheduler();
 	
+	public static final ServerModifications servermod = new ServerModifications();
+	
 	public static Server server;
 
 	public static final int networkingport = 8999;
@@ -89,6 +92,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		EventListenerRegistry.register(ticksyncServer);
 		EventListenerRegistry.register(tickratechanger);
 		EventListenerRegistry.register(ktrngHandler);
+		EventListenerRegistry.register(servermod);
 		
 		// Register packet handlers
 		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers");

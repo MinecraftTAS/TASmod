@@ -10,6 +10,7 @@ import com.minecrafttas.common.server.exception.WrongSideException;
 import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.common.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.events.EventClient.EventClientTickrateChange;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.TickratePauseState;
@@ -87,6 +88,7 @@ public class TickrateChangerClient implements ClientPacketHandler {
 			mc.timer.tickLength = Float.MAX_VALUE;
 		}
 		ticksPerSecond = tickrate;
+		EventClientTickrateChange.fireOnClientTickrateChange(tickrate);
 		if (log)
 			log("Setting the client tickrate to " + ticksPerSecond);
 	}
@@ -114,15 +116,11 @@ public class TickrateChangerClient implements ClientPacketHandler {
 	 * Toggles between tickrate 0 and tickrate > 0
 	 */
 	public void togglePause() {
-		if (Minecraft.getMinecraft().world != null) {
-			try {
-				// request tickrate change
-				TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.TICKRATE_ZERO).writeTickratePauseState(TickratePauseState.TOGGLE));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			togglePauseClient();
+		try {
+			// request tickrate change
+			TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.TICKRATE_ZERO).writeTickratePauseState(TickratePauseState.TOGGLE));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

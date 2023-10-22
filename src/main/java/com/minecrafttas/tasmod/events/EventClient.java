@@ -49,4 +49,26 @@ public interface EventClient {
 			}
 		}
 	}
+	
+	/**
+	 * Fired when the tickrate changes on the client side
+	 * @author Scribble
+	 *
+	 */
+	public static interface EventClientTickrateChange extends EventBase{
+		
+		/**
+		 * Fired at the end of a client tick
+		 */
+		public void onClientTickrateChange(float tickrate);
+		
+		public static void fireOnClientTickrateChange(float tickrate) {
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
+				if(eventListener instanceof EventClientTickrateChange) {
+					EventClientTickrateChange event = (EventClientTickrateChange) eventListener;
+					event.onClientTickrateChange(tickrate);
+				}
+			}
+		}
+	}
 }

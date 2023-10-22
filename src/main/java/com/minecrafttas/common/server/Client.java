@@ -346,6 +346,7 @@ public class Client {
 	}
 	
 	public void setTimeoutTime(long timeout) {
+		this.timeAtLastPacket = System.currentTimeMillis();
 		this.timeout = timeout;
 	}
 	
