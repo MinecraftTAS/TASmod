@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.minecrafttas.common.Common;
+import com.minecrafttas.common.events.EventServer.EventDisconnectServer;
+import com.minecrafttas.common.server.Client.ClientCallback;
 import com.minecrafttas.common.server.interfaces.PacketID;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -45,7 +47,16 @@ public class Server {
 
 			@Override
 			public void completed(AsynchronousSocketChannel clientSocket, Object attachment) {
-				clients.add(new Client(clientSocket, packetIDs));
+				
+				ClientCallback callback = (client) -> {
+					EventDisconnectServer.fireDisconnectServer(client);
+					clients.remove(client);
+					LOGGER.debug(Server, "Disconnecting player from server. Server now has {} connections", getClients().size());
+				};
+				
+				Client newclient = new Client(clientSocket, packetIDs, 10000, callback);
+				clients.add(newclient);
+				
 				serverSocket.accept(null, this);
 			}
 
@@ -105,6 +116,22 @@ public class Server {
 		sendTo(player.getName(), builder);
 	}
 
+	
+	public void disconnect(String username) {
+		Client client = getClient(username);
+		client.disconnect();
+	}
+	
+	public void disconnect(EntityPlayer player) {
+		disconnect(player.getName());
+	}
+	
+	public void disconnectAll() {
+		for (Client client : getClients()) {
+			client.disconnect();
+		}
+	}
+	
 	/**
 	 * Try to close socket
 	 * 

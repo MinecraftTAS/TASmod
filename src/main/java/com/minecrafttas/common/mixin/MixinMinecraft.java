@@ -1,9 +1,12 @@
 package com.minecrafttas.common.mixin;
 
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.common.events.EventClient.EventClientGameLoop;
@@ -44,9 +47,12 @@ public class MixinMinecraft {
 		EventDoneLoadingWorld.fireOnDoneLoadingWorld();
 	}
 	
-	@ModifyVariable(method = "displayGuiScreen", at = @At(value = "STORE"))
-	public GuiScreen inject_displayGuiScreen(GuiScreen guiScreen) {
+	@Shadow
+	private GuiScreen currentScreen;
+	
+	@Redirect(method = "displayGuiScreen", at = @At(value = "FIELD", target = "currentScreen:Lnet/minecraft/client/gui/GuiScreen;", opcode = Opcodes.PUTFIELD))
+	public void modify_displayGuiScreen(Minecraft mc, GuiScreen guiScreen) {
 		guiScreen = EventOpenGui.fireOpenGuiEvent(guiScreen);
-		return guiScreen;
+		currentScreen = guiScreen;
 	}
 }

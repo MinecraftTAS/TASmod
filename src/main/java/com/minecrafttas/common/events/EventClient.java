@@ -2,6 +2,7 @@ package com.minecrafttas.common.events;
 
 import com.minecrafttas.common.Common;
 import com.minecrafttas.common.events.EventListenerRegistry.EventBase;
+import com.minecrafttas.common.server.Client;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.Minecraft;
@@ -279,6 +280,25 @@ public interface EventClient {
 				}
 			}
 		}
-
+		
+	}
+	
+	public static interface EventDisconnectClient extends EventBase {
+		
+		public void onDisconnectClient(Client client);
+		
+		/**
+		 * Fired when the connection to the custom server was closed on the client side.
+		 * @param client The client that is disconnecting
+		 */
+		public static void fireDisconnectClient(Client client) {
+			Common.LOGGER.trace(Common.Event, "Firing EventDisconnectClient");
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
+				if(eventListener instanceof EventDisconnectClient) {
+					EventDisconnectClient event = (EventDisconnectClient) eventListener;
+					event.onDisconnectClient(client);
+				}
+			}
+		}
 	}
 }

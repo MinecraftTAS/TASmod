@@ -86,7 +86,7 @@ public abstract class MixinMinecraft {
 		try {
 			if (TASmodClient.client != null) {
 				TASmodClient.tickratechanger.changeTickrate(20);
-				TASmodClient.client.close();
+				TASmodClient.client.disconnect();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

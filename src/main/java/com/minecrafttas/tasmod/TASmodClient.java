@@ -42,11 +42,12 @@ import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.server.MinecraftServer;
 
-public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventPlayerLeaveClientSide{
+public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventPlayerLeaveClientSide, EventOpenGui{
 
 
 	public static VirtualInput virtual;
@@ -160,13 +161,6 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			LOGGER.error("Unable to launch TASmod server: {}", e.getMessage());
 		}
 		
-		// Connecting to local server instance
-		try {
-			// connect to server and authenticate
-			client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername());
-		} catch (Exception e) {
-			LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
-		}
 	}
 
 	@Override
@@ -193,15 +187,11 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Open InfoGui Editor", "TASmod", Keyboard.KEY_F6, () -> Minecraft.getMinecraft().displayGuiScreen(TASmodClient.hud))));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Buffer View", "TASmod", Keyboard.KEY_NUMPAD0, () -> InputContainerView.startBufferView())));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing", "TASmod", Keyboard.KEY_F12, () -> {
-			try {
-				TASmodClient.client.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			TASmodClient.client.disconnect();
 		})));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing2", "TASmod", Keyboard.KEY_F7, () -> {
 			try {
-				TASmodClient.client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getProfile().getName());
+				TASmodClient.client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getProfile().getName(), 10000);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -244,7 +234,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		if(!(ip+":"+port).equals(connectedIP)) {
 			try {
 				LOGGER.info("Closing client connection: {}", client.getRemote());
-				client.close();
+				client.disconnect();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -253,7 +243,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			gameLoopSchedulerClient.add(()->{
 				try {
 					// connect to server and authenticate
-					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername());
+					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), 10000); //TODO set timeout by tickrate
 				} catch (Exception e) {
 					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 					e.printStackTrace();
@@ -266,6 +256,20 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	@Override
 	public void onPlayerLeaveClientSide(EntityPlayerSP player) {
 		
+	}
+
+	@Override
+	public GuiScreen onOpenGui(GuiScreen gui) {
+		if(gui instanceof GuiMainMenu && client == null) {
+			Minecraft mc = Minecraft.getMinecraft();
+			try {
+				// connect to server and authenticate
+				client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername(), 10000);
+			} catch (Exception e) {
+				LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
+			}
+		}
+		return gui;
 	}
 	
 }
