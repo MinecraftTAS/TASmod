@@ -192,7 +192,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		})));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing2", "TASmod", Keyboard.KEY_F7, () -> {
 			try {
-				TASmodClient.client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getProfile().getName(), 10000);
+				TASmodClient.client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getProfile().getName(), 10000, true);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -215,13 +215,15 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		
 		String ip = null;
 		int port;
-		
+		boolean local;
 		if(server!=null) {
 			ip = "localhost";
 			port = TASmod.networkingport-1;
+			local = true;
 		} else {
 			ip = data.serverIP.split(":")[0];
 			port = TASmod.networkingport;
+			local = false;
 		}
 		
 		String connectedIP = null;
@@ -244,11 +246,12 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			gameLoopSchedulerClient.add(()->{
 				try {
 					// connect to server and authenticate
-					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), 10000); //TODO set timeout by tickrate
+					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), 10000, local); //TODO set timeout by tickrate
 				} catch (Exception e) {
 					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 					e.printStackTrace();
 				}
+				ticksyncClient.setEnabled(true);
 			});
 		}
 //		 TASmod.server.sendToServer(new InitialSyncStatePacket(TASmodClient.virtual.getContainer().getState()));
@@ -266,10 +269,11 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 				Minecraft mc = Minecraft.getMinecraft();
 				try {
 					// connect to server and authenticate
-					client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername(), 10000);
+					client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername(), 10000, true);
 				} catch (Exception e) {
 					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 				}
+				ticksyncClient.setEnabled(false);
 			}
 		}
 		else if(gui instanceof GuiControls) {

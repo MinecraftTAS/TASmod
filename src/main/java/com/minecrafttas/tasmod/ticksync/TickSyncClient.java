@@ -25,6 +25,8 @@ public class TickSyncClient implements ClientPacketHandler, EventClientTickPost{
 
 	public static final AtomicBoolean shouldTick = new AtomicBoolean(true);
 	
+	private boolean enabled = true;
+	
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
 		return new TASmodPackets[] {TASmodPackets.TICKSYNC};
@@ -52,7 +54,7 @@ public class TickSyncClient implements ClientPacketHandler, EventClientTickPost{
 	 */
 	@Override
 	public void onClientTickPost(Minecraft mc) {
-		if (TASmodClient.client == null || TASmodClient.client.isClosed()) {
+		if (TASmodClient.client == null || TASmodClient.client.isClosed() || !enabled) {
 			return;
 		}
 		
@@ -61,5 +63,13 @@ public class TickSyncClient implements ClientPacketHandler, EventClientTickPost{
 		} catch (Exception e) {
 			LOGGER.error("Unable to send packet to server:", e);
 		}
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 }

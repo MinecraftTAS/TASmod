@@ -28,6 +28,8 @@ import net.minecraft.server.MinecraftServer;
 public class TickSyncServer implements ServerPacketHandler, EventServerTickPost, EventClientCompleteAuthentication {
 	
 	private static List<String> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+	
+	private boolean enabled = true;
 
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
@@ -90,4 +92,11 @@ public class TickSyncServer implements ServerPacketHandler, EventServerTickPost,
 			synchronizedList.clear();
 	}
 
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 }
