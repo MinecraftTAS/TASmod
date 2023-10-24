@@ -54,7 +54,7 @@ public class Server {
 					LOGGER.debug(Server, "Disconnecting player from server. Server now has {} connections", getClients().size());
 				};
 				
-				Client newclient = new Client(clientSocket, packetIDs, 10000, callback);
+				Client newclient = new Client(clientSocket, packetIDs, callback);
 				clients.add(newclient);
 				
 				serverSocket.accept(null, this);
@@ -129,12 +129,6 @@ public class Server {
 	public void disconnectAll() {
 		for (Client client : getClients()) {
 			client.disconnect();
-		}
-	}
-	
-	public void setTimeoutTime(long timeout) {
-		for (Client client : getClients()) {
-			client.setTimeoutTime(timeout);
 		}
 	}
 	
