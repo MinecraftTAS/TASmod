@@ -149,7 +149,7 @@ class ServerTest {
 		}
 
 		try {
-			client = new Client("127.0.0.1", 25566, TestPacketIDs.values(), "TASBot", 3000);
+			client = new Client("127.0.0.1", 25566, TestPacketIDs.values(), "TASBot", 3000, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

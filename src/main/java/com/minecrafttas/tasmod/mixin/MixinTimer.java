@@ -42,7 +42,7 @@ public class MixinTimer {
 	
 	@Inject(method = "updateTimer", at = @At("HEAD"), cancellable = true)
 	public void inject_tick(CallbackInfo ci) {
-		if (TASmodClient.client != null && !TASmodClient.client.isClosed()) {
+		if (TASmodClient.client != null && !TASmodClient.client.isClosed() && TASmodClient.ticksyncClient.isEnabled()) {
 			lastSyncSysClock = Minecraft.getSystemTime(); // update the tick tracker so that after returning to scheduling the client won't catch up all ticks (max 10)
 			this.elapsedTicks = 0; // do not do any ticks
 			long newGameLoop = Minecraft.getSystemTime();
