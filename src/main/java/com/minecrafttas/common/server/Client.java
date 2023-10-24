@@ -14,6 +14,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.Level;
@@ -46,13 +47,6 @@ public class Client {
 
 	private Side side;
 
-	/* =Timeout checking= */
-	private long timeout;
-	private TimerTask timertask;
-	/**
-	 * Timestamp of the last packet that was received
-	 */
-	private long timeAtLastPacket;
 	private ClientCallback callback;
 	/**
 	 * True, if the client is connected to a local "integrated" server. Special
@@ -72,13 +66,11 @@ public class Client {
 	 * @param host      Host
 	 * @param port      Port
 	 * @param packetIDs A list of PacketIDs which are registered
-	 * @param uuid      The UUID of the client
-	 * @param timout    Time since last packet when the client should disconnect
 	 * @param local     Property to check, if the server is a local server. If yes,
 	 *                  special conditions may apply
 	 * @throws Exception Unable to connect
 	 */
-	public Client(String host, int port, PacketID[] packetIDs, String name, long timeout, boolean local) throws Exception {
+	public Client(String host, int port, PacketID[] packetIDs, String name, boolean local) throws Exception {
 		LOGGER.info(Client, "Connecting server to {}:{}", host, port);
 		this.socket = AsynchronousSocketChannel.open();
 		this.socket.connect(new InetSocketAddress(host, port)).get();
@@ -93,7 +85,6 @@ public class Client {
 
 		this.createHandlers();
 
-		this.timeout = timeout;
 		this.callback = (client) -> {
 			EventDisconnectClient.fireDisconnectClient(client);
 		};
@@ -113,10 +104,9 @@ public class Client {
 	 * 
 	 * @param socket Socket
 	 */
-	public Client(AsynchronousSocketChannel socket, PacketID[] packetIDs, long timeout, ClientCallback callback) {
+	public Client(AsynchronousSocketChannel socket, PacketID[] packetIDs, ClientCallback callback) {
 		this.socket = socket;
 		this.callback = callback;
-		this.timeout = timeout;
 		try {
 			this.socket.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
 			this.socket.setOption(StandardSocketOptions.TCP_NODELAY, true);
@@ -125,7 +115,6 @@ public class Client {
 		}
 		this.packetIDs = packetIDs;
 		this.createHandlers();
-//		this.registerTimeoutTask(100);
 		this.side = Side.SERVER;
 	}
 
@@ -187,20 +176,35 @@ public class Client {
 					readBuffer.clear().limit(4);
 					socket.read(readBuffer, null, this);
 				} catch (Throwable exc) {
-					LOGGER.error("Unable to read packet!", exc);
+					if(exc instanceof ExecutionException && !isClosed()) {
+						LOGGER.debug(getLoggerMarker(), "{} terminated the connection!", getOppositeSide().name());
+						try {
+							close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						return;
+					}
+					LOGGER.error(getLoggerMarker(), "Unable to read packet!", exc);
 				}
 			}
 
 			@Override
 			public void failed(Throwable exc, Object attachment) {
 				if (exc instanceof AsynchronousCloseException || exc instanceof IOException) {
-					LOGGER.warn(getLoggerMarker(), "{} terminated the connection!", (side == Side.CLIENT ? Side.CLIENT : Side.SERVER).name());
+					if(isClosed()) {
+						return;
+					}
+					LOGGER.debug(getLoggerMarker(), "{} terminated the connection!", getOppositeSide().name());
 					try {
 						close();
 					} catch (IOException e) {
 						LOGGER.error(getLoggerMarker(), "Attempted to close connection but failed", e);
 					}
 				} else {
+					if(isClosed()) {
+						return;
+					}
 					LOGGER.error(getLoggerMarker(), "Something went wrong, terminating connection!", exc);
 					try {
 						close();
@@ -256,12 +260,15 @@ public class Client {
 			callback.onClose(this);
 		}
 
-		this.timertask.cancel();
 		this.socket.close();
 	}
 
 	private Marker getLoggerMarker() {
 		return side == Side.CLIENT ? Client : Server;
+	}
+	
+	private Side getOppositeSide() {
+		return side == Side.CLIENT ? Side.SERVER : Side.CLIENT;
 	}
 
 	/**
@@ -293,11 +300,10 @@ public class Client {
 				completeAuthentication(buf);
 				return;
 			} else if (id == -2) {
-				LOGGER.debug(getLoggerMarker(), "Disconnected by the {}", side.name(), (side == Side.CLIENT ? Side.CLIENT : Side.SERVER).name());
+				LOGGER.info(getLoggerMarker(), "Disconnected by the {}", getOppositeSide().name());
 				close();
 				return;
 			}
-			timeAtLastPacket = System.currentTimeMillis();
 			PacketID packet = getPacketFromID(id);
 			PacketHandlerRegistry.handle(side, packet, buf, this.username);
 		} catch (PacketNotImplementedException | WrongSideException e) {
@@ -327,54 +333,6 @@ public class Client {
 
 	public String getRemote() throws IOException {
 		return ip + ":" + port;
-	}
-
-	/**
-	 * Registers a task for the timer, that checks if this socket is timed out.
-	 * 
-	 * <p>
-	 * The interval is 1 second
-	 * 
-	 */
-	private void registerTimeoutTask(long delay) {
-		TimerTask task = new TimerTask() {
-
-			@Override
-			public void run() {
-				if (checkTimeout()) {
-					disconnect();
-				}
-			}
-
-		};
-		this.timertask = task;
-		timeAtLastPacket = System.currentTimeMillis();
-		timeoutTimer.scheduleAtFixedRate(task, delay, 1000);
-	}
-
-	private boolean checkTimeout() {
-		long timeSinceLastPacket = System.currentTimeMillis() - timeAtLastPacket;
-
-		System.out.println(timeSinceLastPacket);
-
-		if (timeSinceLastPacket > timeout) {
-			LOGGER.warn(getLoggerMarker(), "Client {} timed out after {}ms", getId(), timeSinceLastPacket);
-			return true;
-		} else if (timeSinceLastPacket < 0) {
-			LOGGER.error(getLoggerMarker(), "Time ran backwards? Timing out client {}: {}ms", getId(), timeSinceLastPacket);
-			return true;
-		}
-
-		return false;
-	}
-
-	public void setTimeoutTime(long timeout) {
-		this.timeAtLastPacket = System.currentTimeMillis();
-		this.timeout = timeout;
-	}
-
-	public long getTimeoutTime() {
-		return this.timeout;
 	}
 
 	public boolean isLocal() {

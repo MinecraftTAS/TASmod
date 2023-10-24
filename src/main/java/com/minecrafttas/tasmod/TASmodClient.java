@@ -192,7 +192,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		})));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing2", "TASmod", Keyboard.KEY_F7, () -> {
 			try {
-				TASmodClient.client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getProfile().getName(), 10000, true);
+				TASmodClient.client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getProfile().getName(), true);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -246,7 +246,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			gameLoopSchedulerClient.add(()->{
 				try {
 					// connect to server and authenticate
-					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), 10000, local); //TODO set timeout by tickrate
+					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), local); //TODO set timeout by tickrate
 				} catch (Exception e) {
 					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 					e.printStackTrace();
@@ -269,7 +269,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 				Minecraft mc = Minecraft.getMinecraft();
 				try {
 					// connect to server and authenticate
-					client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername(), 10000, true);
+					client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername(), true);
 				} catch (Exception e) {
 					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 				}
