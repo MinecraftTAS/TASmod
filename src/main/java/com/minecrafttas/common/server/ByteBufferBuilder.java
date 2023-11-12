@@ -1,6 +1,7 @@
 package com.minecrafttas.common.server;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import com.minecrafttas.common.server.interfaces.PacketID;
@@ -13,12 +14,15 @@ import com.minecrafttas.common.server.interfaces.PacketID;
  */
 public class ByteBufferBuilder {
 
-	private int bufferId;
 	private int bufferIndex;
 	protected ByteBuffer buffer;
 
+	/* Debug PacketName */
+	private PacketID bufferPacketId;
+	/* Debug PacketContent */
+	private ArrayList<String> bufferContent = new ArrayList<>();
+
 	public ByteBufferBuilder(int id) {
-		bufferId = id;
 		bufferIndex = SecureList.POOL.available();
 		buffer = SecureList.POOL.lock(bufferIndex);
 		buffer.putInt(id);
@@ -26,17 +30,20 @@ public class ByteBufferBuilder {
 
 	public ByteBufferBuilder(PacketID packet) {
 		this(packet.getID());
+		this.bufferPacketId = packet;
 	}
-	
+
 	public ByteBufferBuilder(ByteBuffer buf) {
 		bufferIndex = SecureList.POOL.available();
 		buffer = SecureList.POOL.lock(bufferIndex);
 		buffer.put(buf);
 	}
 
-	private ByteBufferBuilder(int bufferIndex, ByteBuffer buffer) {
+	private ByteBufferBuilder(int bufferIndex, ByteBuffer buffer, PacketID bufferName, ArrayList<String> bufferContent) {
 		this.bufferIndex = bufferIndex;
 		this.buffer = buffer;
+		this.bufferPacketId = bufferName;
+		this.bufferContent = new ArrayList<>(bufferContent);
 	}
 
 	public ByteBuffer build() {
@@ -49,6 +56,7 @@ public class ByteBufferBuilder {
 		if (buffer == null)
 			throw new IllegalStateException("This buffer is already closed");
 		buffer.putInt(value);
+		bufferContent.add("int " + value);
 		return this;
 	}
 
@@ -56,6 +64,7 @@ public class ByteBufferBuilder {
 		if (buffer == null)
 			throw new IllegalStateException("This buffer is already closed");
 		buffer.putDouble(value);
+		bufferContent.add("double " + value);
 		return this;
 	}
 
@@ -63,6 +72,7 @@ public class ByteBufferBuilder {
 		if (buffer == null)
 			throw new IllegalStateException("This buffer is already closed");
 		buffer.putFloat(value);
+		bufferContent.add("float " + value);
 		return this;
 	}
 
@@ -70,6 +80,7 @@ public class ByteBufferBuilder {
 		if (buffer == null)
 			throw new IllegalStateException("This buffer is already closed");
 		buffer.putLong(value);
+		bufferContent.add("long " + value);
 		return this;
 	}
 
@@ -77,6 +88,7 @@ public class ByteBufferBuilder {
 		if (buffer == null)
 			throw new IllegalStateException("This buffer is already closed");
 		buffer.putShort(value);
+		bufferContent.add("short " + value);
 		return this;
 	}
 
@@ -84,6 +96,7 @@ public class ByteBufferBuilder {
 		if (buffer == null)
 			throw new IllegalStateException("This buffer is already closed");
 		buffer.put((byte) (value ? 1 : 0));
+		bufferContent.add("boolean " + value);
 		return this;
 	}
 
@@ -93,6 +106,7 @@ public class ByteBufferBuilder {
 		byte[] stringbytes = value.getBytes();
 		buffer.putInt(stringbytes.length);
 		buffer.put(stringbytes);
+		bufferContent.add("String " + value);
 		return this;
 	}
 
@@ -101,12 +115,15 @@ public class ByteBufferBuilder {
 			throw new IllegalStateException("This buffer is already closed");
 		buffer.putLong(uuid.getMostSignificantBits());
 		buffer.putLong(uuid.getLeastSignificantBits());
+		bufferContent.add("UUID " + uuid);
 		return this;
 	}
-	
+
 	public ByteBufferBuilder writeByteArray(byte[] value) {
 		buffer.putInt(value.length);
 		buffer.put(value);
+
+		bufferContent.add("ByteArray length(" + value.length + ")");
 		return this;
 	}
 
@@ -125,14 +142,14 @@ public class ByteBufferBuilder {
 		int current = this.buffer.position();
 		int sid = SecureList.POOL.available();
 		ByteBuffer clone = SecureList.POOL.lock(sid);
-		
+
 		this.buffer.limit(current).position(0);
-		
+
 		clone.put(this.buffer);
-		
+
 		this.buffer.position(current);
-		
-		return new ByteBufferBuilder(sid, clone);
+
+		return new ByteBufferBuilder(sid, clone, this.bufferPacketId, this.bufferContent);
 	}
 
 	public static int readInt(ByteBuffer buf) {
@@ -158,7 +175,7 @@ public class ByteBufferBuilder {
 	public static boolean readBoolean(ByteBuffer buf) {
 		return buf.get() == 1 ? true : false;
 	}
-	
+
 	public static UUID readUUID(ByteBuffer buf) {
 		return new UUID(buf.getLong(), buf.getLong());
 	}
@@ -168,15 +185,29 @@ public class ByteBufferBuilder {
 		buf.get(nameBytes);
 		return new String(nameBytes);
 	}
-	
+
 	public static byte[] readByteArray(ByteBuffer buf) {
 		int length = buf.getInt();
 		byte[] array = new byte[length];
 		buf.get(array);
 		return array;
 	}
-	
-	public int getId(){
-		return bufferId;
+
+	/**
+	 * Debug packetname
+	 * 
+	 * @return
+	 */
+	public PacketID getPacketID() {
+		return bufferPacketId;
+	}
+
+	public String getPacketContent() {
+		return String.join("\n", this.bufferContent);
+	}
+
+	@Override
+	public String toString() {
+		return getPacketID().getName() + getPacketContent();
 	}
 }

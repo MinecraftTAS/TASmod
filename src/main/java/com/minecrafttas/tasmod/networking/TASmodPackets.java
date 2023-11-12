@@ -23,7 +23,7 @@ public enum TASmodPackets implements PacketID {
 	 * <p>SIDE: Both<br>
 	 * ARGS: None
 	 */
-	TICKSYNC,
+	TICKSYNC(false),
 	/**
 	 * <p>Sets the tickrate/gamespeed
 	 * 
@@ -115,13 +115,23 @@ public enum TASmodPackets implements PacketID {
 
 	private Side side;
 	private CompactPacketHandler lambda;
+	private boolean shouldTrace = true;
 	
 	private TASmodPackets() {
 	}
 	
+	private TASmodPackets(boolean shouldTrace) {
+		this.shouldTrace = shouldTrace;
+	}
+	
 	private TASmodPackets(Side side, CompactPacketHandler lambda) {
+		this(side, lambda, true);
+	}
+	
+	private TASmodPackets(Side side, CompactPacketHandler lambda, boolean shouldTrace) {
 		this.side = side;
 		this.lambda = lambda;
+		this.shouldTrace = shouldTrace;
 	}
 	
 	@Override
@@ -144,4 +154,8 @@ public enum TASmodPackets implements PacketID {
 		return this.name();
 	}
 	
+	@Override
+	public boolean shouldTrace() {
+		return shouldTrace;
+	}
 }

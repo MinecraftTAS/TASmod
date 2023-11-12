@@ -11,4 +11,6 @@ public interface PacketID {
 	public Side getSide();
 	
 	public String getName();
+	
+	public boolean shouldTrace();
 }

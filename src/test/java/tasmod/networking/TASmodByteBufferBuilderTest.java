@@ -52,6 +52,11 @@ class TASmodByteBufferBuilderTest {
 		public String getName() {
 			return this.name();
 		}
+
+		@Override
+		public boolean shouldTrace() {
+			return false;
+		}
 		
 	}
 	

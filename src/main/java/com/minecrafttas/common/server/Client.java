@@ -225,6 +225,8 @@ public class Client {
 	 * @throws Exception Networking exception
 	 */
 	public void send(ByteBufferBuilder bufferBuilder) throws Exception {
+		if(bufferBuilder.getPacketID() != null && bufferBuilder.getPacketID().shouldTrace())
+			LOGGER.trace(getLoggerMarker(), "Sending a {} packet to the {} with content:\n{}", bufferBuilder.getPacketID(), getOppositeSide(), bufferBuilder.getPacketContent());
 		// wait for previous buffer to send
 		if (this.future != null && !this.future.isDone())
 			this.future.get();
