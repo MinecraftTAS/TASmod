@@ -10,7 +10,6 @@ import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_RESTARTA
 import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_SAVE;
 import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_TELEPORT;
 import static com.minecrafttas.tasmod.networking.TASmodPackets.STATESYNC;
-import static com.minecrafttas.tasmod.networking.TASmodPackets.STATESYNC_INITIAL;
 
 import java.io.File;
 import java.io.IOException;
@@ -442,7 +441,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 		if (!Display.isActive()) { // Stops the playback when you tab out of minecraft, for once as a failsafe,
 									// secondly as potential exploit protection
 			LOGGER.info(LoggerMarkers.Playback, "Stopping a {} since the user tabbed out of the game", state);
-			setTASStateClient(TASstate.NONE);
+			setTASState(TASstate.NONE);
 		}
 
 		index++; // Increase the index and load the next inputs
@@ -834,7 +833,6 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 				PLAYBACK_PLAYUNTIL, 
 				PLAYBACK_TELEPORT, 
 				CLEAR_INNPUTS,
-				STATESYNC_INITIAL,
 				STATESYNC
 		};
 	}
@@ -934,9 +932,6 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 
 			case PLAYBACK_TELEPORT:
 				throw new WrongSideException(packet, Side.CLIENT);
-				
-			case STATESYNC_INITIAL:
-				throw new WrongSideException(id, Side.CLIENT);
 				
 			case STATESYNC:
 				TASstate networkState = TASmodBufferBuilder.readTASState(buf);

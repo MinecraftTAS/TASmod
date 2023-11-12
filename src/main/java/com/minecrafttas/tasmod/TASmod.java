@@ -50,7 +50,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	
 	public static final Logger LOGGER = LogManager.getLogger("TASmod");
 	
-	public static PlaybackControllerServer playbackControllerServer;
+	public static PlaybackControllerServer playbackControllerServer=new PlaybackControllerServer();;
 	
 	public static SavestateHandlerServer savestateHandlerServer;
 	
@@ -95,15 +95,13 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		PacketHandlerRegistry.register(ticksyncServer);
 		PacketHandlerRegistry.register(tickratechanger);
 		PacketHandlerRegistry.register(ktrngHandler);
-		
+		PacketHandlerRegistry.register(playbackControllerServer);
 	}
 	
 	@Override
 	public void onServerInit(MinecraftServer server) {
 		LOGGER.info("Initializing server");
 		serverInstance = server;
-		playbackControllerServer=new PlaybackControllerServer();
-		PacketHandlerRegistry.register(playbackControllerServer);
 		
 		// Command handling
 		
@@ -127,8 +125,8 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		savestateHandlerServer=new SavestateHandlerServer(server, LOGGER);
+
+		savestateHandlerServer = new SavestateHandlerServer(server, LOGGER);
 		PacketHandlerRegistry.register(savestateHandlerServer);
 		
 		if(!server.isDedicatedServer()) {
@@ -147,6 +145,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 	@Override
 	public void onServerStop(MinecraftServer mcserver) {
 		serverInstance=null;
+		
 		if(mcserver.isDedicatedServer()) {
 			try {
 				if (server != null) server.close();
@@ -154,6 +153,11 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 				LOGGER.error("Unable to close TASmod server: {}", e);
 				e.printStackTrace();
 			}
+		}
+		
+		if(savestateHandlerServer != null) {
+			PacketHandlerRegistry.unregister(savestateHandlerServer);	// Unregistering the savestatehandler, as a new instance is registered in onServerStart()
+			savestateHandlerServer = null;
 		}
 	}
 	

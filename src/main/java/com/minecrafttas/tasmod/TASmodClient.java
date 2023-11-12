@@ -48,7 +48,7 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.server.MinecraftServer;
 
-public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventPlayerLeaveClientSide, EventOpenGui{
+public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventOpenGui{
 
 
 	public static VirtualInput virtual;
@@ -254,12 +254,6 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 				ticksyncClient.setEnabled(true);
 			});
 		}
-//		 TASmod.server.sendToServer(new InitialSyncStatePacket(TASmodClient.virtual.getContainer().getState()));
-	}
-
-	@Override
-	public void onPlayerLeaveClientSide(EntityPlayerSP player) {
-		
 	}
 
 	@Override
@@ -271,9 +265,9 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 					// connect to server and authenticate
 					client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername(), true);
 				} catch (Exception e) {
-					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
+					LOGGER.error("Unable to connect TASmod client: {}", e);
 				}
-				ticksyncClient.setEnabled(false);
+				ticksyncClient.setEnabled(true);
 			}
 		}
 		else if(gui instanceof GuiControls) {

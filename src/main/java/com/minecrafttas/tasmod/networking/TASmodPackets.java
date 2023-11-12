@@ -85,7 +85,6 @@ public enum TASmodPackets implements PacketID {
 	PLAYBACK_LOAD,
 	PLAYBACK_PLAYUNTIL,
 	PLAYBACK_TELEPORT,
-	STATESYNC_INITIAL,
 	STATESYNC,
 	/**
 	 * <p>Opens a TASmod related folder on the file system

@@ -21,6 +21,12 @@ public class PacketHandlerRegistry {
 		if(handler==null) {
 			throw new NullPointerException("Tried to register a handler with value null");
 		}
+		
+		if(containsClass(handler)) {
+			Common.LOGGER.warn("Trying to register packet handler {}, but another instance of this class is already registered!", handler.getClass().getName());
+			return;
+		}
+		
 		if (!REGISTRY.contains(handler)) {
 			REGISTRY.add(handler);
 		} else {
@@ -62,5 +68,14 @@ public class PacketHandlerRegistry {
 		if(!isImplemented) {
 			throw new PacketNotImplementedException(packet, side);
 		}
+	}
+	
+	private static boolean containsClass(PacketHandlerBase handler) {
+		for(PacketHandlerBase packethandler : REGISTRY) {
+			if(packethandler.getClass().equals(handler.getClass())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

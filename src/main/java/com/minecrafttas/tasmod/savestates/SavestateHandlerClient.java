@@ -252,6 +252,7 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				break;
 			case SAVESTATE_LOAD:
 				// Load client savestate
 				name = TASmodBufferBuilder.readString(buf);
@@ -270,12 +271,11 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 					return;
 				}
 				/*
-				  Fair warning: Do NOT read the buffer inside an addScheduledTask.
-				  Read it before that. The buffer will have the wrong limit,
-				  when the task is executed.
-				  This is probably due to the buffers being reused.
+				 * Fair warning: Do NOT read the buffer inside an addScheduledTask. Read it
+				 * before that. The buffer will have the wrong limit, when the task is executed.
+				 * This is probably due to the buffers being reused.
 				 */
-				Minecraft.getMinecraft().addScheduledTask(()->{
+				Minecraft.getMinecraft().addScheduledTask(() -> {
 					SavestateHandlerClient.loadPlayer(compound);
 				});
 				break;
@@ -313,7 +313,7 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 				break;
 
 			case SAVESTATE_UNLOAD_CHUNKS:
-				Minecraft.getMinecraft().addScheduledTask(()-> {
+				Minecraft.getMinecraft().addScheduledTask(() -> {
 					SavestateHandlerClient.unloadAllClientChunks();
 				});
 				break;
