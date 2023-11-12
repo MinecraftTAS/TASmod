@@ -7,6 +7,10 @@ import net.minecraft.client.resources.I18n;
 
 public class GuiSavestateLoadingScreen extends GuiScreen {
 
+	public GuiSavestateLoadingScreen() {
+		this.mc=Minecraft.getMinecraft();
+	}
+	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		this.drawDefaultBackground();
