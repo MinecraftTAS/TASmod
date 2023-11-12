@@ -51,7 +51,7 @@ public class Server {
 				ClientCallback callback = (client) -> {
 					EventDisconnectServer.fireDisconnectServer(client);
 					clients.remove(client);
-					LOGGER.debug(Server, "Disconnecting player from server. Server now has {} connections", getClients().size());
+					LOGGER.debug(Server, "Disconnecting player from server");
 				};
 				
 				Client newclient = new Client(clientSocket, packetIDs, callback);
@@ -98,7 +98,7 @@ public class Server {
 		if(client != null && !client.isClosed()) {
 			client.send(builder);
 		} else {
-			Common.LOGGER.warn(Server, "Buffer with id {} could not be sent to the client {}: The client is closed", builder.getId(), username);
+			Common.LOGGER.warn(Server, "Buffer with id {} could not be sent to the client {}: The client is closed", builder.getPacketID(), username);
 			removeClient(client);
 		}
 	}

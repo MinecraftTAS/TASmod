@@ -82,6 +82,11 @@ class ServerTest {
 			return this.name();
 		}
 
+		@Override
+		public boolean shouldTrace() {
+			return false;
+		}
+
 	}
 
 	private static Client.Side side = null;
