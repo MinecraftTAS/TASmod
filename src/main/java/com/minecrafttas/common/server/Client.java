@@ -12,8 +12,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -54,7 +52,6 @@ public class Client {
 	 */
 	private boolean local = false;
 
-	private static Timer timeoutTimer = new Timer("Timeout Timer", true);
 
 	public enum Side {
 		CLIENT, SERVER;
@@ -91,7 +88,6 @@ public class Client {
 
 		this.local = local;
 
-//		this.registerTimeoutTask(100);
 		LOGGER.info(Client, "Connected to server");
 
 		username = name;

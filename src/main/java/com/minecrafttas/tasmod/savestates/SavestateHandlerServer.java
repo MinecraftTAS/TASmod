@@ -349,7 +349,7 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		if (savestateIndex != 0) {
 			try {
 				// loadstate inputs client
-				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_LOAD).writeString(getSavestateName(savestateIndex)));
+				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_LOAD).writeString(getSavestateName(indexToLoad)));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -416,6 +416,12 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			TASmod.tickratechanger.pauseGame(false);
 		}
 
+		
+		TASmod.tickSchedulerServer.add(()->{
+			EventCompleteLoadstate.fireLoadstateComplete();
+			state = SavestateState.NONE;
+		});
+		
 		// Unlock loadstating
 		state = SavestateState.WASLOADING;
 	}
@@ -739,71 +745,61 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 	public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		// TODO Permissions
 		TASmodPackets packet = (TASmodPackets) id;
-		
+
 		EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUsername(username);
 		Integer index = null;
-		
-		
+
 		switch (packet) {
-		case SAVESTATE_SAVE:
-			index = TASmodBufferBuilder.readInt(buf);
-//			if (player!=null && !player.canUseCommand(2, "savestate")) {
-//				player.sendMessage(new TextComponentString(TextFormatting.RED+"You don't have permission to do that"));
-//				return;
-//			}
-			try {
-				TASmod.savestateHandlerServer.saveState(index, true);
-			} catch (SavestateException e) {
-				if (player != null)
-					player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to create a savestate: " + e.getMessage()));
-
-				LOGGER.error(LoggerMarkers.Savestate, "Failed to create a savestate: " + e.getMessage());
-			} catch (Exception e) {
-				if (player != null)
-					player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to create a savestate: " + e.getCause().toString()));
-
-				LOGGER.error(e);
-			} finally {
-				TASmod.savestateHandlerServer.state = SavestateState.NONE;
-			}
-			break;
-			
-		case SAVESTATE_LOAD:
-			int indexing = TASmodBufferBuilder.readInt(buf);
-			TASmod.tickSchedulerServer.add(() -> {
-				// if (player!=null && !player.canUseCommand(2, "loadstate")) {
-				// player.sendMessage(new TextComponentString(TextFormatting.RED+"You don't have
-				// permission to do that"));
-				// return;
-				// }
+			case SAVESTATE_SAVE:
+				index = TASmodBufferBuilder.readInt(buf);
 				try {
-					TASmod.savestateHandlerServer.loadState(indexing, true);
-				} catch (LoadstateException e) {
+					TASmod.savestateHandlerServer.saveState(index, true);
+				} catch (SavestateException e) {
 					if (player != null)
-						player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getMessage()));
+						player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to create a savestate: " + e.getMessage()));
 
 					LOGGER.error(LoggerMarkers.Savestate, "Failed to create a savestate: " + e.getMessage());
 				} catch (Exception e) {
 					if (player != null)
-						player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getCause().toString()));
+						player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to create a savestate: " + e.getCause().toString()));
 
 					LOGGER.error(e);
 				} finally {
 					TASmod.savestateHandlerServer.state = SavestateState.NONE;
 				}
-			});
-			break;
+				break;
 
-		case SAVESTATE_REQUEST_MOTION:
-			MotionData data = TASmodBufferBuilder.readMotionData(buf);
-			PlayerHandler.getMotion().put(player, data);
-			break;
-		case SAVESTATE_PLAYER:
-		case SAVESTATE_SCREEN:
-		case SAVESTATE_UNLOAD_CHUNKS:
-			throw new WrongSideException(id, Side.SERVER);
-		default:
-			throw new PacketNotImplementedException(packet, this.getClass(), Side.SERVER);
+			case SAVESTATE_LOAD:
+				int indexing = TASmodBufferBuilder.readInt(buf);
+				player.getServerWorld().addScheduledTask(() -> {
+					try {
+						TASmod.savestateHandlerServer.loadState(indexing, true);
+					} catch (LoadstateException e) {
+						if (player != null)
+							player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getMessage()));
+
+						LOGGER.error(LoggerMarkers.Savestate, "Failed to create a savestate: " + e.getMessage());
+						TASmod.savestateHandlerServer.state = SavestateState.NONE;
+					} catch (Exception e) {
+						if (player != null)
+							player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getCause().toString()));
+
+						LOGGER.error(e);
+						TASmod.savestateHandlerServer.state = SavestateState.NONE;
+					}
+				});
+				break;
+
+			case SAVESTATE_REQUEST_MOTION:
+				MotionData data = TASmodBufferBuilder.readMotionData(buf);
+				PlayerHandler.getMotion().put(player, data);
+				break;
+			case SAVESTATE_PLAYER:
+			case SAVESTATE_SCREEN:
+			case SAVESTATE_UNLOAD_CHUNKS:
+				throw new WrongSideException(id, Side.SERVER);
+			default:
+				throw new PacketNotImplementedException(packet, this.getClass(), Side.SERVER);
 		}
 	}
 

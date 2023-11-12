@@ -11,9 +11,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.events.EventServer.EventCompleteLoadstate;
 import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;
-import com.minecrafttas.tasmod.savestates.SavestateHandlerServer.SavestateState;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -71,11 +69,6 @@ public abstract class MixinMinecraftServer {
 		if( (TASmod.ticksyncServer.shouldTick() && TASmod.tickratechanger.ticksPerSecond != 0) || TASmod.tickratechanger.advanceTick) {
 			long timeBeforeTick = System.currentTimeMillis();
 			
-			if (TASmod.savestateHandlerServer.state == SavestateState.WASLOADING) {
-				TASmod.savestateHandlerServer.state = SavestateState.NONE;
-				EventCompleteLoadstate.fireLoadstateComplete();
-			}
-
 			this.tick();
 			TASmod.tickSchedulerServer.runAllTasks();
 			
