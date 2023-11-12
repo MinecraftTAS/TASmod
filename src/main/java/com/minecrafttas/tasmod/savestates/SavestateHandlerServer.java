@@ -754,23 +754,23 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 			try {
 				TASmod.savestateHandlerServer.saveState(index, true);
 			} catch (SavestateException e) {
-				if(player!=null)
-					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getMessage()));
+				if (player != null)
+					player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to create a savestate: " + e.getMessage()));
 
-				LOGGER.error(LoggerMarkers.Savestate, "Failed to create a savestate: "+ e.getMessage());
+				LOGGER.error(LoggerMarkers.Savestate, "Failed to create a savestate: " + e.getMessage());
 			} catch (Exception e) {
-				if(player!=null)
-					player.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to create a savestate: "+ e.getCause().toString()));
-				
+				if (player != null)
+					player.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to create a savestate: " + e.getCause().toString()));
+
 				LOGGER.error(e);
 			} finally {
-				TASmod.savestateHandlerServer.state=SavestateState.NONE;
+				TASmod.savestateHandlerServer.state = SavestateState.NONE;
 			}
 			break;
 			
 		case SAVESTATE_LOAD:
+			int indexing = TASmodBufferBuilder.readInt(buf);
 			TASmod.tickSchedulerServer.add(() -> {
-				int indexing = TASmodBufferBuilder.readInt(buf);
 				// if (player!=null && !player.canUseCommand(2, "loadstate")) {
 				// player.sendMessage(new TextComponentString(TextFormatting.RED+"You don't have
 				// permission to do that"));

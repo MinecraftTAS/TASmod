@@ -25,7 +25,7 @@ public class TickSyncClient implements ClientPacketHandler, EventClientTickPost{
 
 	public static final AtomicBoolean shouldTick = new AtomicBoolean(true);
 	
-	private boolean enabled = true;
+	private boolean enabled = false;
 	
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {

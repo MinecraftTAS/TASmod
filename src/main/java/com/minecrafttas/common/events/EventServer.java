@@ -65,6 +65,9 @@ public interface EventServer {
 
 		/**
 		 * Fired when the server is about to stop
+		 * <h2>WARNING!</h2>
+		 * This method may run twice!<br><br>
+		 * 
 		 * @param server The stopping server
 		 */
 		public void onServerStop(MinecraftServer server);

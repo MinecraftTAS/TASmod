@@ -1,6 +1,7 @@
 package com.minecrafttas.tasmod.playback;
 
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
+import static com.minecrafttas.tasmod.util.LoggerMarkers.*;
 import static com.minecrafttas.tasmod.networking.TASmodPackets.*;
 
 import java.nio.ByteBuffer;
@@ -16,7 +17,6 @@ import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
 
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 
 /**
  * The playback controller on the server side.<br>
@@ -29,18 +29,10 @@ public class PlaybackControllerServer implements ServerPacketHandler {
 
 	private TASstate state;
 
-	private boolean shouldChange = true;
-
-	public PlaybackControllerServer() {
-		state = TASstate.NONE;
-		shouldChange = true;
-	}
-
 	@Override
 	public PacketID[] getAcceptedPacketIDs() {
 		return new TASmodPackets[] 
 				{ 
-				STATESYNC_INITIAL,
 				STATESYNC,
 				PLAYBACK_TELEPORT,
 				CLEAR_INNPUTS,
@@ -58,18 +50,9 @@ public class PlaybackControllerServer implements ServerPacketHandler {
 		TASmodPackets packet = (TASmodPackets) id;
 
 		switch (packet) {
-			case STATESYNC_INITIAL:
-				TASstate networkState = TASmodBufferBuilder.readTASState(buf);
-				if (/* TODO Permissions && */ shouldChange) {
-					setState(networkState);
-					shouldChange = false;
-				} else {
-					TASmod.server.sendTo(username, new TASmodBufferBuilder(TASmodPackets.STATESYNC_INITIAL).writeTASState(networkState));
-				}
-				break;
 
 			case STATESYNC:
-				networkState = TASmodBufferBuilder.readTASState(buf);
+				TASstate networkState = TASmodBufferBuilder.readTASState(buf);
 				/* TODO Permissions */
 				setState(networkState);
 				break;
@@ -107,16 +90,6 @@ public class PlaybackControllerServer implements ServerPacketHandler {
 		}
 	}
 
-	public void leaveServer(EntityPlayerMP player) {
-		MinecraftServer server = TASmod.getServerInstance();
-		if (server != null) {
-			if (server.getPlayerList().getPlayers().size() == 1) {
-				state = TASstate.NONE;
-				shouldChange = true;
-			}
-		}
-	}
-
 	public void setState(TASstate stateIn) {
 		setServerState(stateIn);
 		try {
@@ -134,7 +107,7 @@ public class PlaybackControllerServer implements ServerPacketHandler {
 				return;
 			}
 			this.state = stateIn;
-			LOGGER.info(String.format("Set the server state to %s", stateIn.toString()));
+			LOGGER.info(Playback, "Set the server state to {}", stateIn.toString());
 		}
 	}
 
