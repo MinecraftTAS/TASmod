@@ -75,7 +75,7 @@ import net.minecraft.world.storage.WorldInfo;
  * @author Scribble
  *
  */
-public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPacketHandler {
+public class SavestateHandlerServer implements ServerPacketHandler {
 
 	private MinecraftServer server;
 	private File savestateDirectory;
@@ -419,12 +419,13 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		
 		TASmod.tickSchedulerServer.add(()->{
 			EventCompleteLoadstate.fireLoadstateComplete();
+			onLoadstateComplete();
+			
+			// Unlock savestating
 			state = SavestateState.NONE;
 		});
-		
-		// Unlock loadstating
-		state = SavestateState.WASLOADING;
 	}
+		
 
 	/**
 	 * Creates the savestate directory in case the user deletes it between
@@ -683,9 +684,8 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		return currentIndex;
 	}
 
-	@Override
 	public void onLoadstateComplete() {
-		logger.trace(LoggerMarkers.Event, "Running loadstate complete event");
+		logger.trace(LoggerMarkers.Savestate, "Running loadstate complete event");
 		PlayerList playerList = TASmod.getServerInstance().getPlayerList();
 		for (EntityPlayerMP player : playerList.getPlayers()) {
 			NBTTagCompound nbttagcompound = playerList.readPlayerDataFromFile(player);
@@ -725,7 +725,6 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 	public static enum SavestateState {
 		SAVING,
 		LOADING,
-		WASLOADING,
 		NONE
 	}
 
@@ -1070,7 +1069,6 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		 */
 		public static void addPlayersToChunkMap(MinecraftServer server) {
 			List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
-			//Vanilla
 			WorldServer[] worlds=server.worlds;
 			for (EntityPlayerMP player : players) {
 				LOGGER.trace(LoggerMarkers.Savestate, "Add player {} to the chunk map", player.getName());
@@ -1100,7 +1098,6 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		 */
 		public static void disconnectPlayersFromChunkMap(MinecraftServer server) {
 			List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
-			//Vanilla
 			WorldServer[] worlds=server.worlds;
 			for (WorldServer world : worlds) {
 				for (EntityPlayerMP player : players) {
@@ -1118,7 +1115,6 @@ public class SavestateHandlerServer implements EventCompleteLoadstate, ServerPac
 		 */
 		public static void unloadAllServerChunks(MinecraftServer server) {
 			LOGGER.trace(LoggerMarkers.Savestate, "Unloading all server chunks");
-			//Vanilla
 			WorldServer[] worlds=server.worlds;
 			
 			for (WorldServer world:worlds) {

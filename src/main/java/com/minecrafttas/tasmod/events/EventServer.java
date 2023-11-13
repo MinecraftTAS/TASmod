@@ -101,7 +101,7 @@ public interface EventServer {
 		public void onServerTickPost(MinecraftServer minecraftServer);
 		
 		public static void fireServerTickPost(MinecraftServer minecraftServer) {
-			LOGGER.trace(LoggerMarkers.Event, "ServerTickPostEvent");
+//			LOGGER.trace(LoggerMarkers.Event, "ServerTickPostEvent");
 			for (EventBase eventListener : TASmodEventListener.getEventListeners()) {
 				if(eventListener instanceof EventServerTickPost) {
 					EventServerTickPost event = (EventServerTickPost) eventListener;
