@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 
 import com.minecrafttas.common.Configuration;
@@ -258,27 +259,43 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	@Override
 	public GuiScreen onOpenGui(GuiScreen gui) {
-		if(gui instanceof GuiMainMenu) {
-			if(client == null) {
+		if (gui instanceof GuiMainMenu) {
+			if (client == null) {
 				Minecraft mc = Minecraft.getMinecraft();
+
+				String IP = "localhost";
+				int PORT = TASmod.networkingport - 1;
+				
+				// Get the connection on startup from config
+				String configAddress = config.get(ConfigOptions.ServerConnection);
+				if(configAddress != null && !configAddress.isEmpty()) {
+					String[] ipSplit = configAddress.split(":");
+					IP = ipSplit[0];
+					try {
+						PORT = Integer.parseInt(ipSplit[1]);
+					} catch (Exception e) {
+						LOGGER.catching(Level.ERROR, e);
+						IP = "localhost";
+						PORT = TASmod.networkingport - 1;
+					}
+				}
+				
 				try {
 					// connect to server and authenticate
-					client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getUsername(), true);
+					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), true);
 				} catch (Exception e) {
 					LOGGER.error("Unable to connect TASmod client: {}", e);
 				}
 				ticksyncClient.setEnabled(true);
 			}
-		}
-		else if(gui instanceof GuiControls) {
+		} else if (gui instanceof GuiControls) {
 			TASmodClient.virtual.getContainer().setTASState(TASstate.NONE); // Set the TASState to nothing to avoid collisions
-			if(TASmodClient.tickratechanger.ticksPerSecond==0) {
+			if (TASmodClient.tickratechanger.ticksPerSecond == 0) {
 				TASmodClient.tickratechanger.pauseClientGame(false); // Unpause the game
 				waszero = true;
 			}
-		}
-		else if(!(gui instanceof GuiControls)) {
-			if(waszero) {
+		} else if (!(gui instanceof GuiControls)) {
+			if (waszero) {
 				waszero = false;
 				TASmodClient.tickratechanger.pauseClientGame(true);
 			}
