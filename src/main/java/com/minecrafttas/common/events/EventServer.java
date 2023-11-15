@@ -145,10 +145,14 @@ public interface EventServer {
 		}
 	}
 	
+	/**
+	 * Fired when  authentication was successful on the server side
+	 */
 	public static interface EventClientCompleteAuthentication extends EventBase {
 		
 		/**
 		 * Fired when  authentication was successful on the server side
+		 * @param username The username of the client that is connecting
 		 */
 		public void onClientCompleteAuthentication(String username);
 		
@@ -163,14 +167,17 @@ public interface EventServer {
 		}
 	}
 	
+	/**
+	 * Fired when the connection to the custom server was closed on the server side.
+	 */
 	public static interface EventDisconnectServer extends EventBase {
-		
-		public void onDisconnectServer(Client client);
 		
 		/**
 		 * Fired when the connection to the custom server was closed on the server side.
 		 * @param client The client that is disconnecting
 		 */
+		public void onDisconnectServer(Client client);
+		
 		public static void fireDisconnectServer(Client client) {
 			Common.LOGGER.trace(Common.Event, "Firing CustomServerClientDisconnect");
 			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
