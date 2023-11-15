@@ -118,7 +118,8 @@ public class Configuration {
 	}
 	
 	public static enum ConfigOptions{
-		FileToOpen("fileToOpen", "");
+		FileToOpen("fileToOpen", ""),
+		ServerConnection("serverConnection", "");
 		
 		private String configKey;
 		private String defaultValue;
