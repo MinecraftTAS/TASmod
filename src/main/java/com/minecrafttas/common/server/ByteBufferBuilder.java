@@ -28,11 +28,19 @@ public class ByteBufferBuilder {
 		buffer.putInt(id);
 	}
 
+	/**
+	 * Creates a new ByteBufferBuilder with a packetId
+	 * @param packet The address to which the packet is sent. Usually an enum.
+	 */
 	public ByteBufferBuilder(PacketID packet) {
 		this(packet.getID());
 		this.bufferPacketId = packet;
 	}
 
+	/**
+	 * Creates a ByteBufferBuilder from an existing buffer. Useful for sending the same buffer back.
+	 * @param buf 
+	 */
 	public ByteBufferBuilder(ByteBuffer buf) {
 		bufferIndex = SecureList.POOL.available();
 		buffer = SecureList.POOL.lock(bufferIndex);
