@@ -26,8 +26,17 @@ public interface EventClient {
 		public GuiScreen onOpenGui(GuiScreen gui);
 		
 		public static GuiScreen fireOpenGuiEvent(GuiScreen gui) {
-			Common.LOGGER.trace(Common.Event, "Firing LaunchIntegratedServer");
-			return (GuiScreen) EventBase.fireEvent(EventOpenGui.class, gui);
+			Common.LOGGER.trace(Common.Event, "Firing OpenGuiEvent");
+			for (EventBase eventListener : EventListenerRegistry.getEventListeners()) {
+				if(eventListener instanceof EventOpenGui) {
+					EventOpenGui event = (EventOpenGui) eventListener;
+					GuiScreen newGui = event.onOpenGui(gui);
+					if(newGui != gui) {
+						return newGui;
+					}
+				}
+			}
+			return gui;
 		}
 	}
 	
