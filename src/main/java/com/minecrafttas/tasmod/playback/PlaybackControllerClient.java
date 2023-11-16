@@ -1,7 +1,7 @@
 package com.minecrafttas.tasmod.playback;
 
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
-import static com.minecrafttas.tasmod.networking.TASmodPackets.CLEAR_INNPUTS;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_CLEAR_INPUTS;
 import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_FULLPLAY;
 import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_FULLRECORD;
 import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_LOAD;
@@ -9,7 +9,7 @@ import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_PLAYUNTI
 import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_RESTARTANDPLAY;
 import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_SAVE;
 import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_TELEPORT;
-import static com.minecrafttas.tasmod.networking.TASmodPackets.STATESYNC;
+import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_STATE;
 
 import java.io.File;
 import java.io.IOException;
@@ -147,7 +147,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 	 */
 	public void setTASState(TASstate stateIn) {
 		try {
-			TASmodClient.client.send(new TASmodBufferBuilder(STATESYNC).writeTASState(stateIn));
+			TASmodClient.client.send(new TASmodBufferBuilder(PLAYBACK_STATE).writeTASState(stateIn));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -171,7 +171,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 	 * @return The message printed in the chat
 	 */
 	public String setTASStateClient(TASstate stateIn, boolean verbose) {
-		ControlByteHandler.reset();
+		ControlByteHandler.reset();	// FIXME Controlbytes are resetting when loading a world, due to "Paused" state being active during loading... Fix Paused state shenanigans?
 		if (state == stateIn) {
 			switch (stateIn) {
 				case PLAYBACK:
@@ -832,8 +832,8 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 				PLAYBACK_RESTARTANDPLAY, 
 				PLAYBACK_PLAYUNTIL, 
 				PLAYBACK_TELEPORT, 
-				CLEAR_INNPUTS,
-				STATESYNC
+				PLAYBACK_CLEAR_INPUTS,
+				PLAYBACK_STATE
 		};
 	}
 
@@ -926,14 +926,14 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 				TASmodClient.virtual.getContainer().setPlayUntil(until);
 				break;
 
-			case CLEAR_INNPUTS:
+			case PLAYBACK_CLEAR_INPUTS:
 				TASmodClient.virtual.getContainer().clear();
 				break;
 
 			case PLAYBACK_TELEPORT:
 				throw new WrongSideException(packet, Side.CLIENT);
 				
-			case STATESYNC:
+			case PLAYBACK_STATE:
 				TASstate networkState = TASmodBufferBuilder.readTASState(buf);
 				boolean verbose = TASmodBufferBuilder.readBoolean(buf);
 				Task task = ()->{

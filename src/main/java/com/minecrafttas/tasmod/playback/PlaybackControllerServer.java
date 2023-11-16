@@ -33,9 +33,9 @@ public class PlaybackControllerServer implements ServerPacketHandler {
 	public PacketID[] getAcceptedPacketIDs() {
 		return new TASmodPackets[] 
 				{ 
-				STATESYNC,
+				PLAYBACK_STATE,
 				PLAYBACK_TELEPORT,
-				CLEAR_INNPUTS,
+				PLAYBACK_CLEAR_INPUTS,
 				PLAYBACK_FULLPLAY,
 				PLAYBACK_FULLRECORD,
 				PLAYBACK_RESTARTANDPLAY,
@@ -51,7 +51,7 @@ public class PlaybackControllerServer implements ServerPacketHandler {
 
 		switch (packet) {
 
-			case STATESYNC:
+			case PLAYBACK_STATE:
 				TASstate networkState = TASmodBufferBuilder.readTASState(buf);
 				/* TODO Permissions */
 				setState(networkState);
@@ -73,9 +73,9 @@ public class PlaybackControllerServer implements ServerPacketHandler {
 				});
 				break;
 
-			case CLEAR_INNPUTS:
-				TASmod.server.sendToAll(new TASmodBufferBuilder(CLEAR_INNPUTS));
-
+			case PLAYBACK_CLEAR_INPUTS:
+				TASmod.server.sendToAll(new TASmodBufferBuilder(PLAYBACK_CLEAR_INPUTS));
+				break;
 			case PLAYBACK_FULLPLAY:
 			case PLAYBACK_FULLRECORD:
 			case PLAYBACK_RESTARTANDPLAY:
@@ -93,7 +93,7 @@ public class PlaybackControllerServer implements ServerPacketHandler {
 	public void setState(TASstate stateIn) {
 		setServerState(stateIn);
 		try {
-			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.STATESYNC).writeTASState(state).writeBoolean(true));
+			TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_STATE).writeTASState(state).writeBoolean(true));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
