@@ -26,7 +26,7 @@ public class CommandClearInputs extends CommandBase{
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(sender instanceof EntityPlayer) {
 			try {
-				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.CLEAR_INNPUTS));
+				TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_CLEAR_INPUTS));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
