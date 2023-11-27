@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.minecrafttas.common.events.EventServer.EventClientCompleteAuthentication;
-import com.minecrafttas.common.server.interfaces.PacketID;
-import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
+import com.minecrafttas.mctcommon.events.EventServer.EventClientCompleteAuthentication;
+import com.minecrafttas.mctcommon.server.interfaces.PacketID;
+import com.minecrafttas.mctcommon.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;

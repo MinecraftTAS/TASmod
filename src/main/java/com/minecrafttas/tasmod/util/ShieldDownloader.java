@@ -17,8 +17,8 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 import com.google.common.collect.Maps;
-import com.minecrafttas.common.events.EventClient.EventOtherPlayerJoinedClientSide;
-import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
+import com.minecrafttas.mctcommon.events.EventClient.EventOtherPlayerJoinedClientSide;
+import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.Minecraft;

@@ -7,8 +7,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.common.server.ByteBufferBuilder;
-import com.minecrafttas.common.server.interfaces.PacketID;
+import com.minecrafttas.mctcommon.server.ByteBufferBuilder;
+import com.minecrafttas.mctcommon.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
 import com.minecrafttas.tasmod.savestates.SavestateHandlerServer.PlayerHandler.MotionData;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.TickratePauseState;

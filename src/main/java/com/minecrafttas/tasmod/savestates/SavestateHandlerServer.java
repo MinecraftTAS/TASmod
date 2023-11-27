@@ -19,11 +19,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Maps;
-import com.minecrafttas.common.server.Client.Side;
-import com.minecrafttas.common.server.exception.PacketNotImplementedException;
-import com.minecrafttas.common.server.exception.WrongSideException;
-import com.minecrafttas.common.server.interfaces.PacketID;
-import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
+import com.minecrafttas.mctcommon.server.Client.Side;
+import com.minecrafttas.mctcommon.server.exception.PacketNotImplementedException;
+import com.minecrafttas.mctcommon.server.exception.WrongSideException;
+import com.minecrafttas.mctcommon.server.interfaces.PacketID;
+import com.minecrafttas.mctcommon.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventCompleteLoadstate;
 import com.minecrafttas.tasmod.events.EventServer.EventLoadstate;

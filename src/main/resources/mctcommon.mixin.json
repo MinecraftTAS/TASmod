@@ -1,0 +1,18 @@
+{
+    "required": true,
+    "minVersion": "0.8.5",
+    "package": "com.minecrafttas.mctcommon.mixin",
+    "refmap": "tasmod.refmap.json",
+    "compatibilityLevel": "JAVA_8",
+    "mixins": [
+        "MixinMinecraftServer",
+        "MixinPlayerList"
+    ],
+    "client": [
+    	"AccessorKeyBinding",
+    	"MixinMinecraft",
+    	"MixinNetHandlerPlayClient",
+    	"MixinWorldClient",
+    	"MixinEntityRenderer"
+	]
+}

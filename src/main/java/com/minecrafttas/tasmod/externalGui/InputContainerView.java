@@ -16,7 +16,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import com.minecrafttas.common.events.EventClient.EventClientTick;
+import com.minecrafttas.mctcommon.events.EventClient.EventClientTick;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;

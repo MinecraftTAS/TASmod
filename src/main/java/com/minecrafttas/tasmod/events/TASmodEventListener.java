@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.common.events.EventListenerRegistry;
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 
 public class TASmodEventListener extends EventListenerRegistry{
 }

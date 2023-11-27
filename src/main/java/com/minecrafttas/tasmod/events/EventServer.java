@@ -4,8 +4,8 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.io.File;
 
-import com.minecrafttas.common.events.EventListenerRegistry;
-import com.minecrafttas.common.events.EventListenerRegistry.EventBase;
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.mctcommon.events.EventListenerRegistry.EventBase;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.server.MinecraftServer;

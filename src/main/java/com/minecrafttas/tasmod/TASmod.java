@@ -6,12 +6,12 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.minecrafttas.common.CommandRegistry;
-import com.minecrafttas.common.events.EventListenerRegistry;
-import com.minecrafttas.common.events.EventServer.EventServerInit;
-import com.minecrafttas.common.events.EventServer.EventServerStop;
-import com.minecrafttas.common.server.PacketHandlerRegistry;
-import com.minecrafttas.common.server.Server;
+import com.minecrafttas.mctcommon.CommandRegistry;
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.mctcommon.events.EventServer.EventServerInit;
+import com.minecrafttas.mctcommon.events.EventServer.EventServerStop;
+import com.minecrafttas.mctcommon.server.PacketHandlerRegistry;
+import com.minecrafttas.mctcommon.server.Server;
 import com.minecrafttas.tasmod.commands.CommandClearInputs;
 import com.minecrafttas.tasmod.commands.CommandFolder;
 import com.minecrafttas.tasmod.commands.CommandFullPlay;

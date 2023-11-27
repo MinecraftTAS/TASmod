@@ -14,7 +14,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import com.minecrafttas.common.events.EventClient.EventClientTick;
+import com.minecrafttas.mctcommon.events.EventClient.EventClientTick;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventClient.EventDrawHotbar;

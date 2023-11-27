@@ -1,8 +1,8 @@
 package com.minecrafttas.tasmod.networking;
 
-import com.minecrafttas.common.events.CompactPacketHandler;
-import com.minecrafttas.common.server.Client.Side;
-import com.minecrafttas.common.server.interfaces.PacketID;
+import com.minecrafttas.mctcommon.events.CompactPacketHandler;
+import com.minecrafttas.mctcommon.server.Client.Side;
+import com.minecrafttas.mctcommon.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.commands.CommandFolder;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;

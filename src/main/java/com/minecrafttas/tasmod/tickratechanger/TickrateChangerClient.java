@@ -4,11 +4,11 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.common.server.Client.Side;
-import com.minecrafttas.common.server.exception.PacketNotImplementedException;
-import com.minecrafttas.common.server.exception.WrongSideException;
-import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
-import com.minecrafttas.common.server.interfaces.PacketID;
+import com.minecrafttas.mctcommon.server.Client.Side;
+import com.minecrafttas.mctcommon.server.exception.PacketNotImplementedException;
+import com.minecrafttas.mctcommon.server.exception.WrongSideException;
+import com.minecrafttas.mctcommon.server.interfaces.ClientPacketHandler;
+import com.minecrafttas.mctcommon.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventClient.EventClientTickrateChange;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;

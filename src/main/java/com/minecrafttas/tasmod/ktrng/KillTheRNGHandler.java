@@ -4,16 +4,16 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
-import com.minecrafttas.common.events.EventServer.EventServerTick;
-import com.minecrafttas.common.server.Client.Side;
-import com.minecrafttas.common.server.exception.PacketNotImplementedException;
-import com.minecrafttas.common.server.exception.WrongSideException;
-import com.minecrafttas.common.server.interfaces.ClientPacketHandler;
-import com.minecrafttas.common.server.interfaces.PacketID;
-import com.minecrafttas.common.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.killtherng.KillTheRNG;
 import com.minecrafttas.killtherng.SeedingModes;
+import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
+import com.minecrafttas.mctcommon.events.EventServer.EventServerTick;
+import com.minecrafttas.mctcommon.server.Client.Side;
+import com.minecrafttas.mctcommon.server.exception.PacketNotImplementedException;
+import com.minecrafttas.mctcommon.server.exception.WrongSideException;
+import com.minecrafttas.mctcommon.server.interfaces.ClientPacketHandler;
+import com.minecrafttas.mctcommon.server.interfaces.PacketID;
+import com.minecrafttas.mctcommon.server.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;

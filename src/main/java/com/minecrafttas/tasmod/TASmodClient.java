@@ -10,18 +10,17 @@ import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 
-import com.minecrafttas.common.Configuration;
-import com.minecrafttas.common.Configuration.ConfigOptions;
-import com.minecrafttas.common.KeybindManager;
-import com.minecrafttas.common.KeybindManager.Keybind;
-import com.minecrafttas.common.events.EventClient.EventClientInit;
-import com.minecrafttas.common.events.EventClient.EventOpenGui;
-import com.minecrafttas.common.events.EventClient.EventPlayerJoinedClientSide;
-import com.minecrafttas.common.events.EventClient.EventPlayerLeaveClientSide;
-import com.minecrafttas.common.events.EventListenerRegistry;
-import com.minecrafttas.common.server.Client;
-import com.minecrafttas.common.server.PacketHandlerRegistry;
-import com.minecrafttas.common.server.Server;
+import com.minecrafttas.mctcommon.Configuration;
+import com.minecrafttas.mctcommon.Configuration.ConfigOptions;
+import com.minecrafttas.mctcommon.KeybindManager;
+import com.minecrafttas.mctcommon.KeybindManager.Keybind;
+import com.minecrafttas.mctcommon.events.EventClient.EventClientInit;
+import com.minecrafttas.mctcommon.events.EventClient.EventOpenGui;
+import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.mctcommon.server.Client;
+import com.minecrafttas.mctcommon.server.PacketHandlerRegistry;
+import com.minecrafttas.mctcommon.server.Server;
 import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.gui.InfoHud;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
@@ -105,7 +104,12 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		
 		// Load config
 		Minecraft mc = Minecraft.getMinecraft();
-		config = new Configuration("TASmod configuration", new File(mc.mcDataDir, "config/tasmod.cfg"));
+		
+		File configDir = new File(mc.mcDataDir, "config");
+		if(!configDir.exists()) {
+			configDir.mkdir();
+		}
+		config = new Configuration("TASmod configuration", new File(configDir, "tasmod.cfg"));
 		
 		// Execute /restartandplay. Load the file to start from the config. If it exists load the playback file on start.
 		String fileOnStart = config.get(ConfigOptions.FileToOpen);

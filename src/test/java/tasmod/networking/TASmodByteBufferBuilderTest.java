@@ -10,9 +10,9 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.minecrafttas.common.events.CompactPacketHandler;
-import com.minecrafttas.common.server.Client.Side;
-import com.minecrafttas.common.server.interfaces.PacketID;
+import com.minecrafttas.mctcommon.events.CompactPacketHandler;
+import com.minecrafttas.mctcommon.server.Client.Side;
+import com.minecrafttas.mctcommon.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 
 import net.minecraft.nbt.NBTTagCompound;

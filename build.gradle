@@ -44,6 +44,7 @@ configurations {
 dependencies {
     // tasmod dependencies
     embed group: 'com.dselent', name: 'bigarraylist', version: '1.0'
+    
     compileOnly group: 'com.minecrafttas', name: 'killtherng', version: '2.0'
     downloadMod group: 'com.minecrafttas', name: 'killtherng-full', version: '2.0' // for downloadKTRNG task
 
