@@ -22,7 +22,6 @@ public class LanguageManager {
     private static final Pattern PATTERN = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]");
 
     public static void onResourceManagerReload(Map<String, String> original, IResourceManager iResourceManager, List<String> languageList) {
-
         for (String language : languageList) { // Go through all loaded languages
             language = language.toLowerCase(); // Set everything to lowercase which prevents headaches in 1.10.2 and below
             for (String modid : modids) {      // Iterate through all registered modids
@@ -72,7 +71,14 @@ public class LanguageManager {
         return out;
     }
 
-    public static void registerModForLanguageManager(String modid) {
+    /**
+     * Registers your mod to be processed by the language manager<br>
+     * This will allow you to add .json and/or .lang files to assets/modid/lang<br>
+     * with en_us.lang/en_us.json (<strong>lowercase!</strong>)
+     * 
+     * @param modid The modid of your mod
+     */
+    public static void registerMod(String modid) {
         modids.add(modid);
     }
 

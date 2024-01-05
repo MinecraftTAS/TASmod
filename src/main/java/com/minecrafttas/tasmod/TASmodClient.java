@@ -1,16 +1,6 @@
 package com.minecrafttas.tasmod;
 
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.minecrafttas.common.LanguageManager;
-import org.apache.logging.log4j.Level;
-import org.lwjgl.input.Keyboard;
-
 import com.minecrafttas.mctcommon.Configuration;
 import com.minecrafttas.mctcommon.Configuration.ConfigOptions;
 import com.minecrafttas.mctcommon.KeybindManager;
@@ -38,7 +28,6 @@ import com.minecrafttas.tasmod.util.Scheduler;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -48,6 +37,15 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.server.MinecraftServer;
+import org.apache.logging.log4j.Level;
+import org.lwjgl.input.Keyboard;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventOpenGui{
 
@@ -112,7 +110,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		}
 		config = new Configuration("TASmod configuration", new File(configDir, "tasmod.cfg"));
 		
-		LanguageManager.registerModForLanguageManager("tasmod");
+		LanguageManager.registerMod("tasmod");
 
 		// Execute /restartandplay. Load the file to start from the config. If it exists load the playback file on start.
 		String fileOnStart = config.get(ConfigOptions.FileToOpen);
