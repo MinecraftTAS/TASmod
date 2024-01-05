@@ -19,6 +19,6 @@ public class MixinLocale {
     private Map<String, String> properties;
     @Inject(method="loadLocaleDataFiles", at = @At("RETURN"))
     private void inject_loadLocalDataFiles(IResourceManager iResourceManager, List<String> list, CallbackInfo ci){
-        properties.putAll(LanguageManager.onResourceManagerReload(iResourceManager, list));
+        LanguageManager.onResourceManagerReload(properties, iResourceManager, list);
     }
 }
