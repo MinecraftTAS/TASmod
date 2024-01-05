@@ -13,6 +13,7 @@
     	"MixinMinecraft",
     	"MixinNetHandlerPlayClient",
     	"MixinWorldClient",
-    	"MixinEntityRenderer"
+    	"MixinEntityRenderer",
+        "MixinLocale"
 	]
 }

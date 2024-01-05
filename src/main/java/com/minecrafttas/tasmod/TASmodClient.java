@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.minecrafttas.common.LanguageManager;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 
@@ -111,6 +112,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		}
 		config = new Configuration("TASmod configuration", new File(configDir, "tasmod.cfg"));
 		
+		LanguageManager.registerModForLanguageManager("tasmod");
+
 		// Execute /restartandplay. Load the file to start from the config. If it exists load the playback file on start.
 		String fileOnStart = config.get(ConfigOptions.FileToOpen);
 		if (fileOnStart.isEmpty()) {

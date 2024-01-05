@@ -1,0 +1,4 @@
+{
+  "tickratechanger.tasmod.command.show": "Current tickrate: %s",
+  "tickratechanger.tasmod.command.usage": "/tickrate <ticks per second>"
+}
