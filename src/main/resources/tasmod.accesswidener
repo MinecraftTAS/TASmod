@@ -14,3 +14,6 @@ accessible field net/minecraft/world/WorldServer pendingTickListEntriesHashSet L
 accessible method net/minecraft/world/storage/SaveHandler setSessionLock ()V
 
 accessible field net/minecraft/client/settings/KeyBinding CATEGORY_ORDER Ljava/util/Map;
+
+#KillTheRNG
+accessible field net/minecraft/entity/Entity rand Ljava/util/Random;

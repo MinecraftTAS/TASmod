@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "com.minecrafttas.killtherng.mixin",
+  "refmap": "tasmod.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+
+  ],
+  "client": [
+    "MixinRender"
+  ]
+}
