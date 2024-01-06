@@ -152,7 +152,7 @@ public enum VirtualKey2 {
         this(keycode, null);
     }
 
-    private VirtualKey2(int keycode, Character unicode){
+    private VirtualKey2(int keycode, Character unicode) {
         this.keycode = keycode;
         this.unicode = unicode;
     }
@@ -161,7 +161,9 @@ public enum VirtualKey2 {
         return keycode;
     }
 
-    public Character getUnicode() { return unicode; }
+    public Character getUnicode() {
+        return unicode;
+    }
 
     public static Integer getKeycode(String keyname) {
         VirtualKey2 key = get(keyname);
@@ -177,21 +179,19 @@ public enum VirtualKey2 {
         return Integer.toString(keycode);
     }
 
-    public static Character getUnicode(int keycode){
+    public static Character getUnicode(int keycode) {
         VirtualKey2 key = get(keycode);
-        if(key!=null)
+        if (key != null)
             return key.getUnicode();
         return null;
     }
 
-    public static Character getUnicode(String keyname){
+    public static Character getUnicode(String keyname) {
         VirtualKey2 key = get(keyname);
-        if(key!=null)
+        if (key != null)
             return key.getUnicode();
         return null;
     }
-
-
 
     public static VirtualKey2 get(int keycode) {
         for (VirtualKey2 key : values()) {

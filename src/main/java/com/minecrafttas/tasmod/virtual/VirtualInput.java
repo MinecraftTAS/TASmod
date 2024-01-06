@@ -397,10 +397,10 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 
 	// ======================================Subticks===========================================
 
-	VirtualSubticks currentSubtick = new VirtualSubticks(0, 0);
+	VirtualCamera currentSubtick = new VirtualCamera(0, 0);
 
 	public void updateSubtick(float pitch, float yaw) {
-		currentSubtick = TASmodClient.controller.addSubticksToContainer(new VirtualSubticks(pitch, yaw));
+		currentSubtick = TASmodClient.controller.addSubticksToContainer(new VirtualCamera(pitch, yaw));
 	}
 
 	public float getSubtickPitch() {
@@ -542,9 +542,9 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 		public int tick;
 		public List<VirtualKeyboardEvent> keyboardevent;
 		public List<VirtualMouseEvent> mouseEvent;
-		public VirtualSubticks subticks;
+		public VirtualCamera subticks;
 
-		public InputEvent(int tick, List<VirtualKeyboardEvent> keyboardevent, List<VirtualMouseEvent> mouseEvent, VirtualSubticks subticks) {
+		public InputEvent(int tick, List<VirtualKeyboardEvent> keyboardevent, List<VirtualMouseEvent> mouseEvent, VirtualCamera subticks) {
 			this.tick = tick;
 			this.keyboardevent = keyboardevent;
 			this.mouseEvent = mouseEvent;

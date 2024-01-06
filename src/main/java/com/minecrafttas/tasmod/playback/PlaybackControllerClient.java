@@ -39,7 +39,7 @@ import com.minecrafttas.tasmod.util.Scheduler.Task;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
-import com.minecrafttas.tasmod.virtual.VirtualSubticks;
+import com.minecrafttas.tasmod.virtual.VirtualCamera;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.mojang.realmsclient.util.Pair;
 
@@ -88,7 +88,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 
 	private VirtualMouse mouse = new VirtualMouse();
 
-	private VirtualSubticks subticks = new VirtualSubticks();
+	private VirtualCamera subticks = new VirtualCamera();
 
 	public final File directory = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "saves" + File.separator + "tasfiles");
 
@@ -379,7 +379,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 	 * @param subticks Subticks to add
 	 * @return Subticks to retrieve
 	 */
-	public VirtualSubticks addSubticksToContainer(VirtualSubticks subticks) {
+	public VirtualCamera addSubticksToContainer(VirtualCamera subticks) {
 		if (state == TASstate.RECORDING) {
 			this.subticks = subticks.clone();
 		} else if (state == TASstate.PLAYBACK) {
@@ -734,9 +734,9 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 
 		private VirtualMouse mouse;
 
-		private VirtualSubticks subticks;
+		private VirtualCamera subticks;
 
-		public TickInputContainer(int tick, VirtualKeyboard keyboard, VirtualMouse mouse, VirtualSubticks subticks) {
+		public TickInputContainer(int tick, VirtualKeyboard keyboard, VirtualMouse mouse, VirtualCamera subticks) {
 			this.tick = tick;
 			this.keyboard = keyboard;
 			this.mouse = mouse;
@@ -747,7 +747,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 			this.tick = tick;
 			this.keyboard = new VirtualKeyboard();
 			this.mouse = new VirtualMouse();
-			this.subticks = new VirtualSubticks(0, 0);
+			this.subticks = new VirtualCamera(0, 0);
 		}
 
 		@Override
@@ -763,7 +763,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 			return mouse;
 		}
 
-		public VirtualSubticks getSubticks() {
+		public VirtualCamera getSubticks() {
 			return subticks;
 		}
 

@@ -9,7 +9,7 @@ public class VirtualEvent {
         this.keystate = keystate;
     }
 
-    public VirtualEvent(VirtualEvent event){
+    public VirtualEvent(VirtualEvent event) {
         this.keycode = event.keycode;
         this.keystate = event.keystate;
     }

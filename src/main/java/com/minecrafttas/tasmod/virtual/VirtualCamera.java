@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 
-public class VirtualSubticks implements Serializable{
+public class VirtualCamera implements Serializable{
 	/**
 	 * 
 	 */
@@ -12,12 +12,12 @@ public class VirtualSubticks implements Serializable{
 	private float pitch;
 	private float yaw;
 
-	public VirtualSubticks() {
+	public VirtualCamera() {
 		pitch = 0;
 		yaw = 0;
 	}
 
-	public VirtualSubticks(float pitch, float yaw) {
+	public VirtualCamera(float pitch, float yaw) {
 		this.pitch = pitch;
 		this.yaw = yaw;
 	}
@@ -31,8 +31,8 @@ public class VirtualSubticks implements Serializable{
 	}
 
 	@Override
-	public VirtualSubticks clone() {
-		return new VirtualSubticks(pitch, yaw);
+	public VirtualCamera clone() {
+		return new VirtualCamera(pitch, yaw);
 	}
 	
 	@Override

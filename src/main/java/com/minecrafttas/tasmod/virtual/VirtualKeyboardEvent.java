@@ -7,7 +7,8 @@ public class VirtualKeyboardEvent extends VirtualEvent {
         super(keycode, keystate);
         this.character = character;
     }
-    public VirtualKeyboardEvent(VirtualEvent event, char character){
+
+    public VirtualKeyboardEvent(VirtualEvent event, char character) {
         super(event);
         this.character = character;
     }
