@@ -286,7 +286,7 @@ public class VirtualKeyboard implements Serializable {
 			return '\u21E4';
 		case 200: // Arrow Up
 			return '\u2191';
-		case 201: // Next
+		case 201: // Prior
 			return '\u21E7';
 		case 203: // Arrow Left
 			return '\u2190';

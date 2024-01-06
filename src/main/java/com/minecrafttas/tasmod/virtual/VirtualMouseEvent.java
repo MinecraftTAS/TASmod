@@ -6,7 +6,6 @@ package com.minecrafttas.tasmod.virtual;
  * @author ScribbleLP
  *
  */
-@Deprecated
 public class VirtualMouseEvent {
 	private int keycode;
 	private boolean state;

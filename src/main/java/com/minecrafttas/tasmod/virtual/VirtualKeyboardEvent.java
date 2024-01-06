@@ -1,27 +1,23 @@
 package com.minecrafttas.tasmod.virtual;
 
-@Deprecated
-public class VirtualKeyboardEvent {
-	private int keycode;
-	private boolean keystate;
-	private char character;
-	public VirtualKeyboardEvent(int keycode, boolean keystate, char character) {
-		this.keycode=keycode;
-		this.keystate=keystate;
-		this.character=character;
-	}
-	public int getKeyCode() {
-		return keycode;
-	}
-	public boolean isState() {
-		return keystate;
-	}
-	public char getCharacter() {
-		return character;
-	}
-	
-	@Override
-	public String toString() {
-		return keycode+", "+keystate+", "+character;
-	}
+public class VirtualKeyboardEvent extends VirtualEvent {
+    private final Character character;
+
+    public VirtualKeyboardEvent(int keycode, boolean keystate, Character character) {
+        super(keycode, keystate);
+        this.character = character;
+    }
+    public VirtualKeyboardEvent(VirtualEvent event, char character){
+        super(event);
+        this.character = character;
+    }
+
+    public char getCharacter() {
+        return character;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s, %s", super.toString(), character != null ? character : Character.MIN_VALUE);
+    }
 }
