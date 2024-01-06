@@ -27,7 +27,7 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 	@Override
 	public void onLaunchIntegratedServer() {
 		LOGGER.debug(LoggerMarkers.Event, "Starting the integrated server");
-		PlaybackControllerClient container = TASmodClient.virtual.getContainer();
+		PlaybackControllerClient container = TASmodClient.controller;
 		if (!container.isNothingPlaying() && !container.isPaused()) {
 			container.pause(true);
 		}

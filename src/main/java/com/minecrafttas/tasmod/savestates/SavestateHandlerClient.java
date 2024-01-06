@@ -119,7 +119,7 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 
 		File targetfile = new File(SavestateHandlerClient.savestateDirectory, nameOfSavestate + ".mctas");
 
-		PlaybackControllerClient container = TASmodClient.virtual.getContainer();
+		PlaybackControllerClient container = TASmodClient.controller;
 		if (container.isRecording()) {
 			TASmodClient.serialiser.saveToFileV1(targetfile, container); // If the container is recording, store it entirely
 		} else if (container.isPlayingback()) {
@@ -146,13 +146,13 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 
 		File targetfile = new File(savestateDirectory, nameOfSavestate + ".mctas");
 
-		PlaybackControllerClient container = TASmodClient.virtual.getContainer();
+		PlaybackControllerClient container = TASmodClient.controller;
 		if (!container.isNothingPlaying()) { // If the file exists and the container is recording or playing, load the
 												// clientSavestate
 			if (targetfile.exists()) {
 				TASmodClient.virtual.loadClientSavestate(TASmodClient.serialiser.fromEntireFileV1(targetfile));
 			} else {
-				TASmodClient.virtual.getContainer().setTASStateClient(TASstate.NONE, false);
+				TASmodClient.controller.setTASStateClient(TASstate.NONE, false);
 				Minecraft.getMinecraft().player.sendMessage(new TextComponentString(ChatFormatting.YELLOW + "Inputs could not be loaded for this savestate,"));
 				Minecraft.getMinecraft().player.sendMessage(new TextComponentString(ChatFormatting.YELLOW + "since the file doesn't exist. Stopping!"));
 				LOGGER.warn(LoggerMarkers.Savestate, "Inputs could not be loaded for this savestate, since the file doesn't exist.");

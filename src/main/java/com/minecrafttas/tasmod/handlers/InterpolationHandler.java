@@ -22,8 +22,8 @@ public class InterpolationHandler implements EventCamera {
 
 	@Override
 	public CameraData onCameraEvent(CameraData dataIn) {
-		if (TASmodClient.virtual.getContainer().isPlayingback() && ControlByteHandler.shouldInterpolate) {
-			TickInputContainer input = TASmodClient.virtual.getContainer().get();
+		if (TASmodClient.controller.isPlayingback() && ControlByteHandler.shouldInterpolate) {
+			TickInputContainer input = TASmodClient.controller.get();
 			if (input == null)
 				return dataIn;
 			float nextPitch = input.getSubticks().getPitch();

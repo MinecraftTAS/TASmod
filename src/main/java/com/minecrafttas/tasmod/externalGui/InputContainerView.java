@@ -118,23 +118,23 @@ public class InputContainerView extends JFrame implements EventClientTick{
 		if (model == null) {
 			return;
 		}
-		PlaybackControllerClient container = input.getContainer();
-		if (container == null || container.isEmpty()) {
+		PlaybackControllerClient controller = TASmodClient.controller;
+		if (controller == null || controller.isEmpty()) {
 			return;
 		}
-		if (prevCount != container.size()) {
-			prevCount = container.size();
+		if (prevCount != controller.size()) {
+			prevCount = controller.size();
 			model.getDataVector().clear();
 
-			for (int i = 0; i < container.size(); i++) {
-				TickInputContainer tickContainer = container.get(i);
+			for (int i = 0; i < controller.size(); i++) {
+				TickInputContainer tickContainer = controller.get(i);
 				addRow(i + 1, tickContainer.getKeyboard().toString(), tickContainer.getMouse().toString(),
 						tickContainer.getSubticks().getPitch(), tickContainer.getSubticks().getYaw());
 			}
-			selectRow(container.index());
+			selectRow(controller.index());
 		}
-		if (!container.isNothingPlaying()) {
-			selectRow(container.index());
+		if (!controller.isNothingPlaying()) {
+			selectRow(controller.index());
 		}
 
 //		selectRow(container.index()+1);

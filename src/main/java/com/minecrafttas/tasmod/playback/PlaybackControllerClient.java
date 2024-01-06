@@ -811,7 +811,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 
 	public void setStateWhenOpened(TASstate state) {
 		TASmodClient.openMainMenuScheduler.add(() -> {
-			PlaybackControllerClient container = TASmodClient.virtual.getContainer();
+			PlaybackControllerClient container = TASmodClient.controller;
 			if (state == TASstate.RECORDING) {
 				long seed = TASmod.ktrngHandler.getGlobalSeedClient();
 				container.setStartSeed(seed);
@@ -895,7 +895,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 			case PLAYBACK_FULLRECORD:
 				setStateWhenOpened(TASstate.RECORDING); // Set the state to RECORDING when the main menu is opened
 
-				TASmodClient.virtual.getContainer().clear(); // Clear inputs
+				TASmodClient.controller.clear(); // Clear inputs
 
 				// Schedule code to be executed on the next tick
 				TASmodClient.tickSchedulerClient.add(() -> {
@@ -923,11 +923,11 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 
 			case PLAYBACK_PLAYUNTIL:
 				int until = ByteBufferBuilder.readInt(buf);
-				TASmodClient.virtual.getContainer().setPlayUntil(until);
+				TASmodClient.controller.setPlayUntil(until);
 				break;
 
 			case PLAYBACK_CLEAR_INPUTS:
-				TASmodClient.virtual.getContainer().clear();
+				TASmodClient.controller.clear();
 				break;
 
 			case PLAYBACK_TELEPORT:
@@ -937,7 +937,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 				TASstate networkState = TASmodBufferBuilder.readTASState(buf);
 				boolean verbose = TASmodBufferBuilder.readBoolean(buf);
 				Task task = ()->{
-					PlaybackControllerClient container = TASmodClient.virtual.getContainer();
+					PlaybackControllerClient container = TASmodClient.controller;
 					if (networkState != container.getState()) {
 						
 						String message = container.setTASStateClient(networkState, verbose);

@@ -78,7 +78,7 @@ public class MixinGuiScreen implements GuiScreenDuck {
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", remap = false))
 	public boolean redirectGetEventButtonState() {
-		if (TASmodClient.virtual.getContainer().isPlayingback()) {
+		if (TASmodClient.controller.isPlayingback()) {
 			Mouse.setCursorPosition(uncalcX(TASmodClient.virtual.getEventCursorX()), uncalcY(TASmodClient.virtual.getEventCursorY()));
 		}
 		return TASmodClient.virtual.getEventMouseState();

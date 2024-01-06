@@ -218,6 +218,6 @@ public abstract class MixinMinecraft {
 	
 	@Inject(method = "runTick", at = @At(value = "RETURN"))
 	public void injectRunTickReturn(CallbackInfo ci) {
-		TASmodClient.virtual.getContainer().nextTick();
+		TASmodClient.controller.nextTick();
 	}
 }

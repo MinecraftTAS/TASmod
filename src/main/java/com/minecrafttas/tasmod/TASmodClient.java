@@ -18,6 +18,7 @@ import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 import com.minecrafttas.tasmod.handlers.LoadingScreenHandler;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 import com.minecrafttas.tasmod.savestates.SavestateHandlerClient;
@@ -83,7 +84,12 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	public static SavestateHandlerClient savestateHandlerClient = new SavestateHandlerClient();
 	
 	public static Client client;
-	
+	/**
+	 * The container where all inputs get stored during recording or stored and
+	 * ready to be played back
+	 */
+	public static PlaybackControllerClient controller = new PlaybackControllerClient();
+
 	public static void createTASDir() {
 		File tasDir=new File(tasdirectory);
 		if(!tasDir.exists()) {
@@ -156,7 +162,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		
 		// Register packet handlers
 		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers on client");
-		PacketHandlerRegistry.register(virtual.getContainer());	//TODO Move container/playbackcontroller out of virtual package
+		PacketHandlerRegistry.register(controller);	//TODO Move container/playbackcontroller out of virtual package
 		PacketHandlerRegistry.register(ticksyncClient);
 		PacketHandlerRegistry.register(tickratechanger);
 		PacketHandlerRegistry.register(savestateHandlerClient);
@@ -176,7 +182,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		List<KeyBinding> blockedKeybindings = new ArrayList<>();
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Tickrate 0 Key", "TASmod", Keyboard.KEY_F8, () -> TASmodClient.tickratechanger.togglePause())));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Advance Tick", "TASmod", Keyboard.KEY_F9, () -> TASmodClient.tickratechanger.advanceTick())));
-		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Recording/Playback Stop", "TASmod", Keyboard.KEY_F10, () -> TASmodClient.virtual.getContainer().setTASState(TASstate.NONE))));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Recording/Playback Stop", "TASmod", Keyboard.KEY_F10, () -> TASmodClient.controller.setTASState(TASstate.NONE))));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Create Savestate", "TASmod", Keyboard.KEY_J, () -> {
 			try {
 				TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_SAVE).writeInt(-1));
@@ -294,7 +300,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 				ticksyncClient.setEnabled(true);
 			}
 		} else if (gui instanceof GuiControls) {
-			TASmodClient.virtual.getContainer().setTASState(TASstate.NONE); // Set the TASState to nothing to avoid collisions
+			TASmodClient.controller.setTASState(TASstate.NONE); // Set the TASState to nothing to avoid collisions
 			if (TASmodClient.tickratechanger.ticksPerSecond == 0) {
 				TASmodClient.tickratechanger.pauseClientGame(false); // Unpause the game
 				waszero = true;

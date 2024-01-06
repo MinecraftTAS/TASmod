@@ -1,6 +1,13 @@
 package com.minecrafttas.tasmod.virtual;
 
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
+import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
+import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;
+import com.minecrafttas.tasmod.util.PointerNormalizer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,15 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
-import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
-import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
-import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;
-import com.minecrafttas.tasmod.util.PointerNormalizer;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 /**
  * One of the core classes of this mod <br>
@@ -84,14 +83,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
  * @author Scribble
  *
  */
-@Deprecated
 public class VirtualInput implements EventPlayerJoinedClientSide{
-
-	/**
-	 * The container where all inputs get stored during recording or stored and
-	 * ready to be played back
-	 */
-	private PlaybackControllerClient container = new PlaybackControllerClient();
 
 	// ===========================Keyboard=================================
 
@@ -131,7 +123,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 		if (fileToLoad != null) {
 			try {
 				loadInputs(fileToLoad);
-				container.setStateWhenOpened(TASstate.PLAYBACK);
+				TASmodClient.controller.setStateWhenOpened(TASstate.PLAYBACK);
 			} catch (IOException e) {
 				LOGGER.error("Cannot load inputs from the start of the TAS: {}", e.getMessage());
 			}
@@ -248,8 +240,8 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	public List<String> getNextKeyboardPresses() {
 
 		List<String> out = new ArrayList<String>();
-		if (container.isPlayingback() && container.get(container.index()) != null) {
-			container.get(container.index()).getKeyboard().getKeyList().forEach((keycodes, virtualkeys) -> {
+		if (TASmodClient.controller.isPlayingback() && TASmodClient.controller.get(TASmodClient.controller.index()) != null) {
+			TASmodClient.controller.get(TASmodClient.controller.index()).getKeyboard().getKeyList().forEach((keycodes, virtualkeys) -> {
 				if (virtualkeys.isKeyDown()) {
 					out.add(virtualkeys.getName());
 				}
@@ -376,8 +368,8 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	public List<String> getNextMousePresses() {
 		List<String> out = new ArrayList<String>();
 
-		if (container.isPlayingback() && container.get(container.index()) != null) {
-			container.get(container.index()).getMouse().getKeyList().forEach((keycodes, virtualkeys) -> {
+		if (TASmodClient.controller.isPlayingback() && TASmodClient.controller.get(TASmodClient.controller.index()) != null) {
+			TASmodClient.controller.get(TASmodClient.controller.index()).getMouse().getKeyList().forEach((keycodes, virtualkeys) -> {
 				if (virtualkeys.isKeyDown()) {
 					out.add(virtualkeys.getName());
 				}
@@ -394,7 +386,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	}
 
 	public void unpressEverything() {
-		container.unpressContainer();
+		TASmodClient.controller.unpressContainer();
 		unpressNext();
 	}
 	
@@ -408,7 +400,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	VirtualSubticks currentSubtick = new VirtualSubticks(0, 0);
 
 	public void updateSubtick(float pitch, float yaw) {
-		currentSubtick = container.addSubticksToContainer(new VirtualSubticks(pitch, yaw));
+		currentSubtick = TASmodClient.controller.addSubticksToContainer(new VirtualSubticks(pitch, yaw));
 	}
 
 	public float getSubtickPitch() {
@@ -421,34 +413,30 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 
 	// =====================================Container===========================================
 
-	public PlaybackControllerClient getContainer() {
-		return container;
-	}
-
 	/**
 	 * Updates the input container and the {@link #nextKeyboard} as well as
 	 * {@link #nextMouse}<br>
 	 * Gets executed each game tick
 	 */
 	public void updateContainer() {
-		nextKeyboard = container.addKeyboardToContainer(nextKeyboard);
-		nextMouse = container.addMouseToContainer(nextMouse);
+		nextKeyboard = TASmodClient.controller.addKeyboardToContainer(nextKeyboard);
+		nextMouse = TASmodClient.controller.addMouseToContainer(nextMouse);
 	}
 
 	/**
-	 * Replaces the {@link #container}, used in
+	 * Replaces the {@link TASmodClient#controller}, used in
 	 * 
 	 * @param container to replace the current one
 	 */
 	public void setContainer(PlaybackControllerClient container) {
-		this.container = container;
+		TASmodClient.controller = container;
 	}
 
 	// =====================================Savestates===========================================
 
 	/**
 	 * Loads and preloads the inputs from the new InputContainer to
-	 * {@link #container}
+	 * {@link TASmodClient#controller}
 	 * 
 	 * Saving a savestate is done via {@linkplain com.minecrafttas.tasmod.playback.PlaybackSerialiser#saveToFileV1(File, PlaybackControllerClient)} in {@linkplain com.minecrafttas.tasmod.savestates.SavestateHandlerClient#savestate(String)}
 	 * 
@@ -456,8 +444,8 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	 */
 	public void loadClientSavestate(PlaybackControllerClient savestatecontainer) {
 
-		if (container.isPlayingback()) {
-			preloadInput(container, savestatecontainer.size() - 1); // Preloading from the current container and
+		if (TASmodClient.controller.isPlayingback()) {
+			preloadInput(TASmodClient.controller, savestatecontainer.size() - 1); // Preloading from the current container and
 																			// from the second to last index of
 																			// the savestatecontainer. Since this is
 																			// executed during playback,
@@ -467,11 +455,11 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 																			// that the playback would immediately end
 																			// when you replace the container.
 			
-			if (container.size() >= savestatecontainer.size()) { // Check if the current container is bigger than the
+			if (TASmodClient.controller.size() >= savestatecontainer.size()) { // Check if the current container is bigger than the
 																	// savestated one.
 
 				try {
-					container.setIndex(savestatecontainer.size()); // Set the "playback" index of the current
+					TASmodClient.controller.setIndex(savestatecontainer.size()); // Set the "playback" index of the current
 																	// container to the latest index of the
 																	// savestatecontainer. Meaning this index will
 																	// be played next
@@ -489,10 +477,10 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 				}
 				savestatecontainer.setTASStateClient(TASstate.PLAYBACK);
 				savestatecontainer.setStartLocation(start);
-				container = savestatecontainer;
+				TASmodClient.controller = savestatecontainer;
 			}
 
-		} else if (container.isRecording()) {
+		} else if (TASmodClient.controller.isRecording()) {
 			String start = savestatecontainer.getStartLocation();
 			preloadInput(savestatecontainer, savestatecontainer.size() - 1); // Preload the input of the savestate
 
@@ -509,7 +497,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 			
 			savestatecontainer.setTASStateClient(TASstate.RECORDING);
 			savestatecontainer.setStartLocation(start);
-			container = savestatecontainer; // Replace the current container with the savestated container
+			TASmodClient.controller = savestatecontainer; // Replace the current container with the savestated container
 		}
 	}
 
@@ -540,12 +528,12 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	
 	public void loadInputs(String filename) throws IOException {
 		setContainer(TASmodClient.serialiser.fromEntireFileV1(new File(TASmodClient.tasdirectory + "/" + filename + ".mctas")));
-		getContainer().fixTicks();
+		TASmodClient.controller.fixTicks();
 	}
 	
 	public void saveInputs(String filename) throws IOException {
 		TASmodClient.createTASDir();
-		TASmodClient.serialiser.saveToFileV1(new File(TASmodClient.tasdirectory + "/" + filename + ".mctas"), TASmodClient.virtual.getContainer());
+		TASmodClient.serialiser.saveToFileV1(new File(TASmodClient.tasdirectory + "/" + filename + ".mctas"), TASmodClient.controller);
 	}
 
 	// =====================================Debug===========================================
@@ -573,7 +561,7 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	 * corresponding input events from that, but it does it only when you are
 	 * playing back or recording.<br>
 	 * <br>
-	 * This however runs through the {@link VirtualInput#container} and generates
+	 * This however runs through the {@link TASmodClient#controller} and generates
 	 * the input events on for debug purposes.
 	 * 
 	 * @return
@@ -582,10 +570,10 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 
 		List<InputEvent> main = new ArrayList<>();
 
-		for (int i = 0; i < container.size(); i++) {
+		for (int i = 0; i < TASmodClient.controller.size(); i++) {
 
-			TickInputContainer tick = container.get(i);
-			TickInputContainer nextTick = container.get(i + 1);
+			TickInputContainer tick = TASmodClient.controller.get(i);
+			TickInputContainer nextTick = TASmodClient.controller.get(i + 1);
 
 			if (nextTick == null) {
 				nextTick = new TickInputContainer(i + 1); // Fills the last tick in the container with an empty TickInputContainer

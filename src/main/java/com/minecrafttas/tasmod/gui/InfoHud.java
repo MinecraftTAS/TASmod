@@ -324,7 +324,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 				if (Minecraft.getMinecraft().currentScreen == this) {
 					return "State";
 				} else {
-					TASstate state = TASmodClient.virtual.getContainer().getState();
+					TASstate state = TASmodClient.controller.getState();
 					ChatFormatting format = ChatFormatting.WHITE;
 					String out = "";
 					if (state == TASstate.PLAYBACK) {
@@ -377,7 +377,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync";
-				DesyncMonitoring dMonitor=TASmodClient.virtual.getContainer().desyncMonitor;
+				DesyncMonitoring dMonitor=TASmodClient.controller.desyncMonitor;
 				return dMonitor.getStatus(Minecraft.getMinecraft().player);
 			}));
 			
@@ -386,7 +386,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Motion";
-				DesyncMonitoring dMonitor=TASmodClient.virtual.getContainer().desyncMonitor;
+				DesyncMonitoring dMonitor=TASmodClient.controller.desyncMonitor;
 				return dMonitor.getMotion();
 			}));
 			
@@ -395,7 +395,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Position";
-				DesyncMonitoring dMonitor=TASmodClient.virtual.getContainer().desyncMonitor;
+				DesyncMonitoring dMonitor=TASmodClient.controller.desyncMonitor;
 				return dMonitor.getPos();
 			}));
 			
@@ -404,7 +404,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync KTRNG";
-				DesyncMonitoring dMonitor=TASmodClient.virtual.getContainer().desyncMonitor;
+				DesyncMonitoring dMonitor=TASmodClient.controller.desyncMonitor;
 				return dMonitor.getSeed();
 			}));
 
@@ -414,7 +414,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y, true);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "PlaybackIndex";
-				return Integer.toString(TASmodClient.virtual.getContainer().index());
+				return Integer.toString(TASmodClient.controller.index());
 			}));
 			
 			y = height - 14;
@@ -437,10 +437,10 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 	@Override
 	public void onDrawHotbar() {
 		// render custom info box if control byte is set
-		if (!ControlByteHandler.hideInfoBox && TASmodClient.virtual.getContainer().isPlayingback())
+		if (!ControlByteHandler.hideInfoBox && TASmodClient.controller.isPlayingback())
 			drawRectWithText(ControlByteHandler.text, 10, 10, true);
 		// skip rendering of control byte is set
-		if (!ControlByteHandler.shouldRenderHud && TASmodClient.virtual.getContainer().isPlayingback())
+		if (!ControlByteHandler.shouldRenderHud && TASmodClient.controller.isPlayingback())
 			return;
 		int xpos=40;
 		int ypos=190;
