@@ -1,4 +1,4 @@
-package com.minecrafttas.common.mixin;
+package com.minecrafttas.mctcommon.mixin;
 
 import com.minecrafttas.common.LanguageManager;
 import net.minecraft.client.resources.IResourceManager;
