@@ -22,7 +22,7 @@ import com.minecrafttas.tasmod.virtual.VirtualKey;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
 import com.minecrafttas.tasmod.virtual.VirtualMouse.PathNode;
-import com.minecrafttas.tasmod.virtual.VirtualCamera;
+import com.minecrafttas.tasmod.virtual.VirtualCameraAngle;
 import com.mojang.realmsclient.util.Pair;
 
 /**
@@ -432,7 +432,7 @@ public class PlaybackSerialiser {
 		return path;
 	}
 	
-	private VirtualCamera readSubtick(String section, int linenumber) throws IOException {
+	private VirtualCameraAngle readSubtick(String section, int linenumber) throws IOException {
 		section = section.replace("Camera:", "");
 		String[] split=section.split(";");
 		
@@ -446,7 +446,7 @@ public class PlaybackSerialiser {
 			throw new IOException(split[0]+" or/and "+split[1]+" are not float numbers in line "+ linenumber);
 		}
 		
-		return new VirtualCamera(x, y);
+		return new VirtualCameraAngle(x, y);
 	}
 	
 	

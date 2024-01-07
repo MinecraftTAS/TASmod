@@ -31,7 +31,6 @@ import net.minecraft.client.settings.KeyBinding;
  * @author Scribble
  *
  */
-@Deprecated
 public class VirtualKeybindings {
 	private static Minecraft mc = Minecraft.getMinecraft();
 	private static long cooldown = 50*5;

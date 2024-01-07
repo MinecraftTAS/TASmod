@@ -1,13 +1,43 @@
 package com.minecrafttas.tasmod.virtual;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable {
 
-    private List<Character> charList;
+    /**
+     * The list of characters that were pressed on this keyboard.
+     */
+    private final List<Character> charList;
+
+    /**
+     * A queue of characters used in {@link #getDifference(VirtualPeripheral)}.<br>
+     * Used for distributing characters to {@link VirtualKeyboardEvent}s in an order.
+     */
+    private final ConcurrentLinkedQueue<Character> charQueue = new ConcurrentLinkedQueue<>();
+
+    /**
+     * Creates a keyboard with all keys unpressed
+     */
+    public VirtualKeyboard2() {
+        super();
+        this.charList = new ArrayList<>();
+    }
+
+    /**
+     * Creates a keyboard from existing variables
+     * @param pressedKeys The existing list of pressed keycodes
+     * @param charList The existing list of characters
+     */
+    public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList) {
+        super(pressedKeys);
+        this.charList = charList;
+    }
 
     @Override
     public void setPressed(int keycode, boolean keystate) {
@@ -20,17 +50,17 @@ public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable 
     protected <T extends VirtualPeripheral> List<? extends VirtualEvent> getDifference(T nextPeripheral) {
         List<VirtualKeyboardEvent> eventList = new ArrayList<>();
 
-        ConcurrentLinkedQueue<Character> chars = new ConcurrentLinkedQueue<>(charList);
+        charQueue.addAll(charList);
 
-        /* Calculate symmetric difference */
+        /* Calculate symmetric difference of keycodes */
 
         /*
-         * Calculate unpressed keys
-         * this: W A S
-         * next: W   S D
-         * -------------
-         *         A     <- unpressed
-         * */
+            Calculate unpressed keys
+            this: W A S
+            next: W   S D
+            -------------
+                    A     <- unpressed
+         */
         this.pressedKeys.forEach(key -> {
             if (!nextPeripheral.pressedKeys.contains(key)) {
                 eventList.add(new VirtualKeyboardEvent(key, false, Character.MIN_VALUE));
@@ -46,7 +76,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable 
 		 */
         nextPeripheral.pressedKeys.forEach(key -> {
             if (!this.pressedKeys.contains(key)) {
-                eventList.add(new VirtualKeyboardEvent(key, true, chars.poll()));
+                eventList.add(new VirtualKeyboardEvent(key, true, getOrDefault(charQueue.poll())));
             }
         });
 
@@ -60,28 +90,47 @@ public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable 
 			This makes it easier to write words when working only with the TASfile,
 			otherwise you'd either need to add a keycode for each char or write it in new lines
 		 */
-        while (!chars.isEmpty()) {
-            eventList.add(new VirtualKeyboardEvent(VirtualKey2.ZERO.getKeycode(), true, chars.poll()));
+        while (!charQueue.isEmpty()) {
+            eventList.add(new VirtualKeyboardEvent(0, false, getOrDefault(charQueue.poll())));
         }
 
         return eventList;
     }
 
+    private char getOrDefault(Character charr){
+        if(charr==null){
+            charr = Character.MIN_VALUE;
+        }
+        return charr;
+    }
+
+    /**
+     * Add a character to the {@link #charList}<br>
+     * Null characters will be discarded;
+     * @param character The character to add
+     */
     public void addChar(char character) {
-        charList.add(character);
-    }
-
-    private void clearCharacters() {
-        charList.clear();
-    }
-
-    public void clear() {
-        super.clearPressedKeys();
-        clearCharacters();
+        if(character != Character.MIN_VALUE)
+            charList.add(character);
     }
 
     @Override
     public String toString() {
-        return super.toString();
+        String charString = "";
+        if (!charList.isEmpty()) {
+            for (Character charr : charList) {
+                charString = charString.concat(Character.toString(charr));
+            }
+            charString = StringUtils.replace(charString, "\r", "\\n");
+            charString = StringUtils.replace(charString, "\n", "\\n");
+        }
+
+        return String.format("%s;%s", super.toString(), charString);
     }
+
+    @Override
+    protected VirtualKeyboard2 clone() throws CloneNotSupportedException {
+        return new VirtualKeyboard2(this.pressedKeys, this.charList);
+    }
+
 }

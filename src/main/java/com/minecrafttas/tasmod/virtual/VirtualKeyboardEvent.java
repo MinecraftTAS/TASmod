@@ -1,9 +1,9 @@
 package com.minecrafttas.tasmod.virtual;
 
 public class VirtualKeyboardEvent extends VirtualEvent {
-    private final Character character;
+    private final char character;
 
-    public VirtualKeyboardEvent(int keycode, boolean keystate, Character character) {
+    public VirtualKeyboardEvent(int keycode, boolean keystate, char character) {
         super(keycode, keystate);
         this.character = character;
     }
@@ -19,6 +19,6 @@ public class VirtualKeyboardEvent extends VirtualEvent {
 
     @Override
     public String toString() {
-        return String.format("%s, %s", super.toString(), character != null ? character : Character.MIN_VALUE);
+        return String.format("%s, %s", super.toString(), character);
     }
 }

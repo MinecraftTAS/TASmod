@@ -306,7 +306,7 @@ public class VirtualKeyboard implements Serializable {
 	public VirtualKeyboardEvent decodeUnicode(char character) {
 		switch (character) {
 		case '\b':
-			return new VirtualKeyboardEvent(14, true, character);
+			return new VirtualKeyboardEvent(14, true, Character.MIN_VALUE);
 		case '\u21A6':
 			return new VirtualKeyboardEvent(15, true, Character.MIN_VALUE);
 		case '\u2907':

@@ -6,11 +6,11 @@ package com.minecrafttas.tasmod.virtual;
  * @author Scribble
  */
 public class VirtualMouseEvent extends VirtualEvent {
-    private int scrollwheel;
-    private int mouseX;
-    private int mouseY;
+    private final int scrollwheel;
+    private final Integer mouseX;
+    private final Integer mouseY;
 
-    public VirtualMouseEvent(int keycode, boolean state, int scrollwheel, int mouseX, int mouseY) {
+    public VirtualMouseEvent(int keycode, boolean state, int scrollwheel, Integer mouseX, Integer mouseY) {
         super(keycode, state);
         this.scrollwheel = scrollwheel;
         this.mouseX = mouseX;
@@ -21,16 +21,16 @@ public class VirtualMouseEvent extends VirtualEvent {
         return scrollwheel;
     }
 
-    public int getMouseX() {
+    public Integer getMouseX() {
         return mouseX;
     }
 
-    public int getMouseY() {
+    public Integer getMouseY() {
         return mouseY;
     }
 
     @Override
     public String toString() {
-        return String.format("%s, %s, %s, %s", super.toString(), scrollwheel, mouseX, mouseY);
+        return String.format("%s, %s, %s, %s", super.toString(), scrollwheel, mouseX != null ? mouseX : " ", mouseY != null ? mouseY : " ");
     }
 }

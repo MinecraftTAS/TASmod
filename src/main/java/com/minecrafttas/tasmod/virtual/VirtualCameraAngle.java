@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 
-public class VirtualCamera implements Serializable{
+public class VirtualCameraAngle implements Serializable{
 	/**
 	 * 
 	 */
@@ -12,12 +12,12 @@ public class VirtualCamera implements Serializable{
 	private float pitch;
 	private float yaw;
 
-	public VirtualCamera() {
+	public VirtualCameraAngle() {
 		pitch = 0;
 		yaw = 0;
 	}
 
-	public VirtualCamera(float pitch, float yaw) {
+	public VirtualCameraAngle(float pitch, float yaw) {
 		this.pitch = pitch;
 		this.yaw = yaw;
 	}
@@ -31,8 +31,8 @@ public class VirtualCamera implements Serializable{
 	}
 
 	@Override
-	public VirtualCamera clone() {
-		return new VirtualCamera(pitch, yaw);
+	public VirtualCameraAngle clone() {
+		return new VirtualCameraAngle(pitch, yaw);
 	}
 	
 	@Override

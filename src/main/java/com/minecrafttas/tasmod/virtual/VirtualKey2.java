@@ -16,8 +16,8 @@ public enum VirtualKey2 {
     KEY_0(11),
     MINUS(12),
     EQUALS(13),
-    BACK(14, '\b'),
-    TAB(15, '\u21A6'),
+    BACK(14),
+    TAB(15),
     Q(16),
     W(17),
     E(18),
@@ -113,14 +113,14 @@ public enum VirtualKey2 {
     PRINT(183),
     ALT_GR(184),
     PAUSE(197),
-    HOME(199, '\u21E4'),
-    UP(200, '\u2191'),
-    PRIOR(201, '\u21E7'),
-    LEFT(203, '\u2190'),
-    RIGHT(205, '\u2192'),
-    END(207, '\u21E5'),
-    DOWN(208, '\u2193'),
-    NEXT(209, '\u21E9'),
+    HOME(199),
+    UP(200),
+    PRIOR(201),
+    LEFT(203),
+    RIGHT(205),
+    END(207),
+    DOWN(208),
+    NEXT(209),
     INSERT(210),
     DELETE(211),
     WIN(219),
@@ -146,23 +146,13 @@ public enum VirtualKey2 {
     MBUTTON16(-85);
 
     private final int keycode;
-    private final Character unicode;
 
     private VirtualKey2(int keycode) {
-        this(keycode, null);
-    }
-
-    private VirtualKey2(int keycode, Character unicode) {
         this.keycode = keycode;
-        this.unicode = unicode;
     }
 
     public int getKeycode() {
         return keycode;
-    }
-
-    public Character getUnicode() {
-        return unicode;
     }
 
     public static Integer getKeycode(String keyname) {
@@ -177,20 +167,6 @@ public enum VirtualKey2 {
         if (key != null)
             return key.name();
         return Integer.toString(keycode);
-    }
-
-    public static Character getUnicode(int keycode) {
-        VirtualKey2 key = get(keycode);
-        if (key != null)
-            return key.getUnicode();
-        return null;
-    }
-
-    public static Character getUnicode(String keyname) {
-        VirtualKey2 key = get(keyname);
-        if (key != null)
-            return key.getUnicode();
-        return null;
     }
 
     public static VirtualKey2 get(int keycode) {
