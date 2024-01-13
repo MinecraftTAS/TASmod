@@ -2,9 +2,9 @@ package com.minecrafttas.tasmod.virtual;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 
 public class VirtualMouse2 extends VirtualPeripheral implements Serializable {
 
@@ -29,10 +29,7 @@ public class VirtualMouse2 extends VirtualPeripheral implements Serializable {
 	 * Creates a mouse with no buttons pressed and no data
 	 */
 	public VirtualMouse2(){
-		super();
-		this.scrollWheel = 0;
-		this.cursorX = null;
-		this.cursorY = null;
+		this(new HashSet<>(), 0, null, null);
 	}
 
 	/**
@@ -74,7 +71,7 @@ public class VirtualMouse2 extends VirtualPeripheral implements Serializable {
                      RC     <- unpressed
          */
 		for(int keycode : pressedKeys) {
-			if (!nextPeripheral.pressedKeys.contains(keycode)) {
+			if (!nextPeripheral.getPressedKeys().contains(keycode)) {
 				eventList.add(new VirtualMouseEvent(keycode, false, scrollWheelCopy, cursorXCopy, cursorYCopy));
 				scrollWheelCopy = 0;
 				cursorXCopy = null;
@@ -89,7 +86,7 @@ public class VirtualMouse2 extends VirtualPeripheral implements Serializable {
 		 	-------------
 		 	            MC <- pressed
 		 */
-		for(int keycode : nextPeripheral.pressedKeys) {
+		for(int keycode : nextPeripheral.getPressedKeys()) {
 			if (!this.pressedKeys.contains(keycode)) {
 				eventList.add(new VirtualMouseEvent(keycode, true, scrollWheelCopy, cursorXCopy, cursorYCopy));
 			}
@@ -104,7 +101,7 @@ public class VirtualMouse2 extends VirtualPeripheral implements Serializable {
 	}
 
 	@Override
-	protected VirtualMouse2 clone() throws CloneNotSupportedException {
+	protected VirtualMouse2 clone() {
 		return new VirtualMouse2(this.pressedKeys, scrollWheel, cursorX, cursorY);
 	}
 }

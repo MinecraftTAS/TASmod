@@ -5,10 +5,6 @@ import java.io.Serializable;
 import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
 
 public class VirtualCameraAngle implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2038332459318568985L;
 	private float pitch;
 	private float yaw;
 

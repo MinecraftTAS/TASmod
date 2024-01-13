@@ -1,8 +1,9 @@
 package com.minecrafttas.tasmod.virtual;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,13 +23,6 @@ public abstract class VirtualPeripheral implements Serializable {
      * The list of keycodes that are currently pressed on this peripheral.
      */
     protected final Set<Integer> pressedKeys;
-
-    /**
-     * Create an empty peripheral with all keys unpressed
-     */
-    protected VirtualPeripheral() {
-        this.pressedKeys = new HashSet<>();
-    }
 
     /**
      * Create a peripheral with already existing pressed keys
@@ -86,5 +80,12 @@ public abstract class VirtualPeripheral implements Serializable {
     @Override
     public String toString() {
         return String.join(",", getCurrentPresses());
+    }
+
+    /**
+     * @return An immutable set of pressed keycodes
+     */
+    public Set<Integer> getPressedKeys(){
+        return ImmutableSet.copyOf(pressedKeys);
     }
 }
