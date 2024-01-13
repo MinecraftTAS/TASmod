@@ -1,29 +1,33 @@
 package com.minecrafttas.tasmod.virtual;
 
 public class VirtualEvent {
-    protected final int keycode;
-    protected final boolean keystate;
 
-    public VirtualEvent(int keycode, boolean keystate) {
-        this.keycode = keycode;
-        this.keystate = keystate;
-    }
+	public static class VirtualButtonEvent extends VirtualEvent{
 
-    public VirtualEvent(VirtualEvent event) {
-        this.keycode = event.keycode;
-        this.keystate = event.keystate;
-    }
+		protected final int keycode;
+		protected final boolean keystate;
+		
+		public VirtualButtonEvent(int keycode, boolean keystate) {
+			this.keycode = keycode;
+			this.keystate = keystate;
+		}
 
-    public int getKeyCode() {
-        return keycode;
-    }
+		public VirtualButtonEvent(VirtualButtonEvent event) {
+			this.keycode = event.keycode;
+			this.keystate = event.keystate;
+		}
 
-    public boolean isState() {
-        return keystate;
-    }
+		public int getKeyCode() {
+			return keycode;
+		}
 
-    @Override
-    public String toString() {
-        return String.format("%s, %s", keycode, keystate);
-    }
+		public boolean isState() {
+			return keystate;
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("%s, %s", keycode, keystate);
+		}
+	}
 }

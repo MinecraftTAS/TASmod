@@ -1,12 +1,13 @@
 package com.minecrafttas.tasmod.virtual;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
-public class VirtualMouse2 extends VirtualPeripheral implements Serializable {
+public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements Serializable {
 
 	/**
 	 * The direction of the scrollWheel<br>
@@ -34,10 +35,11 @@ public class VirtualMouse2 extends VirtualPeripheral implements Serializable {
 
 	/**
 	 * Creates a mouse from existing values
+	 * 
 	 * @param pressedKeys The list o {@link #pressedKeys}
 	 * @param scrollWheel The {@link #scrollWheel}
-	 * @param cursorX The {@link #cursorX}
-	 * @param cursorY The {@link #cursorY}
+	 * @param cursorX     The {@link #cursorX}
+	 * @param cursorY     The {@link #cursorY}
 	 */
 	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY) {
 		super(pressedKeys);
@@ -48,14 +50,14 @@ public class VirtualMouse2 extends VirtualPeripheral implements Serializable {
 
 	@Override
 	protected void setPressed(int keycode, boolean keystate) {
-		if(keycode < 0){
+		if (keycode < 0) {
 			super.setPressed(keycode, keystate);
 		}
 	}
 
 	@Override
-	protected <T extends VirtualPeripheral> List<? extends VirtualEvent> getDifference(T nextPeripheral) {
-		List<VirtualMouseEvent> eventList = new ArrayList<>();
+	protected Queue<VirtualMouseEvent> getDifference(VirtualMouse2 nextPeripheral) {
+		Queue<VirtualMouseEvent> eventList = new ConcurrentLinkedQueue<>();
 
 		int scrollWheelCopy = scrollWheel;
 		Integer cursorXCopy = cursorX;
@@ -96,12 +98,39 @@ public class VirtualMouse2 extends VirtualPeripheral implements Serializable {
 	}
 
 	@Override
-	public String toString() {
-		return String.format("%s;%s,%s,%s", super.toString(), scrollWheel, cursorX, cursorY);
+	protected Queue<VirtualMouseEvent> getVirtualEvents(VirtualMouse2 nextPeripheral) {
+		Queue<VirtualMouseEvent> eventList = new ConcurrentLinkedQueue<>();
+
+		getSubticks().forEach(keyboard -> {
+			eventList.addAll(keyboard.getDifference(nextPeripheral));
+		});
+
+		return eventList;
 	}
 
 	@Override
-	protected VirtualMouse2 clone() {
+	public String toString() {
+		if (isParent()) {
+			return getSubticks().stream().map(element -> element.toString()).collect(Collectors.joining("\n"));
+		} else {
+			return String.format("%s;%s,%s,%s", super.toString(), scrollWheel, cursorX, cursorY);
+		}
+	}
+
+	@Override
+	public VirtualMouse2 clone() {
 		return new VirtualMouse2(this.pressedKeys, scrollWheel, cursorX, cursorY);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof VirtualMouse2) {
+			VirtualMouse2 mouse = (VirtualMouse2) obj;
+			return super.equals(obj) && 
+					scrollWheel == mouse.scrollWheel &&
+					cursorX == mouse.cursorX &&
+					cursorY == mouse.cursorY;
+		}
+		return super.equals(obj);
 	}
 }

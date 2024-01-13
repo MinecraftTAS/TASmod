@@ -1,14 +1,17 @@
 package com.minecrafttas.tasmod.virtual;
 
-import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * A state of the virtual keyboard at a given time.<br>
@@ -29,11 +32,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * <br>
  * The character "w" coming from that keyboard event is added to the {@link #charList}.<br>
  * If shift were to be pressed while pressing the key,<br>
- * then the resulting keyboard event would hold a capitalized "W" as the character.<br>
- * <br>
- *
+ * then the resulting keyboard event would hold a capitalized "W" as the character.
+ * TODO Write Difference and VirtualKey once complete
+ * 
+ * @author Scribble
  */
-public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable {
+public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implements Serializable {
 
     /**
      * The list of characters that were pressed on this keyboard.
@@ -45,15 +49,6 @@ public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable 
      * Used for distributing characters to {@link VirtualKeyboardEvent}s in an order.
      */
     private final ConcurrentLinkedQueue<Character> charQueue = new ConcurrentLinkedQueue<>();
-
-    /**
-     * A list of subtick keyboards.<br>
-     * If subtickKeyboards is initialized, the object can be considered as a <em>parent</em> keyboard,<br>
-     * able to house subtickKeyboards.<br>
-     * <br>
-     * If subtickKeyboards is null then the object is a "child"/subtickKeyboard stored in a parent list
-     */
-    private final List<VirtualKeyboard2> subtickKeyboards;
 
     /**
      * Creates an empty parent keyboard with all keys unpressed
@@ -76,12 +71,26 @@ public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable 
      * @param pressedKeys The existing list of pressed keycodes
      * @param charList The existing list of characters
      */
-    public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList, List<VirtualKeyboard2> subtickKeyboards) {
-        super(pressedKeys);
+    public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList, List<VirtualKeyboard2> subtick) {
+        super(pressedKeys, subtick);
         this.charList = charList;
-        this.subtickKeyboards = subtickKeyboards;
     }
 
+    /**
+     * Updates the keyboard, adds a new subtick to this keyboard
+     * @param keycode The keycode of this key
+     * @param keystate The keystate of this key, true for pressed
+     * @param character The character that is associated with that key. Can change between keyboards or whenever shift is held in combination.
+     */
+    public void update(int keycode, boolean keystate, char character) {
+    	setPressed(keycode, keystate);
+    	addChar(character);
+    	
+    	if(isParent()) {
+    		addSubtick(clone());
+    	}
+    }
+    
     @Override
     public void setPressed(int keycode, boolean keystate) {
         if (keycode >= 0) {    // Keyboard keys always have a keycode larger or equal than 0
@@ -90,8 +99,8 @@ public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable 
     }
 
     @Override
-    protected <T extends VirtualPeripheral> List<? extends VirtualEvent> getDifference(T nextPeripheral) {
-        List<VirtualKeyboardEvent> eventList = new ArrayList<>();
+    protected Queue<VirtualKeyboardEvent> getDifference(VirtualKeyboard2 nextPeripheral) {
+        Queue<VirtualKeyboardEvent> eventList = new ConcurrentLinkedQueue<>();
 
         charQueue.addAll(charList);
 
@@ -140,6 +149,17 @@ public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable 
         return eventList;
     }
 
+    @Override
+    protected Queue<? extends VirtualEvent> getVirtualEvents(VirtualKeyboard2 nextPeripheral) {
+    	Queue<VirtualKeyboardEvent> eventList = new ConcurrentLinkedQueue<>();
+    	
+    	getSubticks().forEach(keyboard -> {
+    		eventList.addAll(keyboard.getDifference(nextPeripheral));
+    	});
+    	
+    	return eventList;
+    }
+    
     private char getOrDefault(Character charr){
         if(charr==null){
             charr = Character.MIN_VALUE;
@@ -161,48 +181,54 @@ public class VirtualKeyboard2 extends VirtualPeripheral implements Serializable 
         charList.clear();
     }
 
+	@Override
+	public String toString() {
+		if (isParent()) {
+			return getSubticks().stream().map(element -> element.toString()).collect(Collectors.joining("\n"));
+		} else {
+			return String.format("%s;%s", super.toString(), charListToString(charList));
+		}
+	}
+	
+	private String charListToString(List<Character> charList) {
+		String charString = "";
+		if (!charList.isEmpty()) {
+			charString = charList.stream().map(element -> element.toString()).collect(Collectors.joining());
+			charString = StringUtils.replace(charString, "\r", "\\n");
+			charString = StringUtils.replace(charString, "\n", "\\n");
+		}
+		return charString;
+	}
+
+	/**
+	 * Clones this VirtualKeyboard <strong>without</strong> subticks
+	 */
     @Override
-    public String toString() {
-        if(subtickKeyboards == null){
-            String charString = "";
-            if (!charList.isEmpty()) {
-                for (Character charr : charList) {
-                    charString = charString.concat(Character.toString(charr));
-                }
-                charString = StringUtils.replace(charString, "\r", "\\n");
-                charString = StringUtils.replace(charString, "\n", "\\n");
-            }
-
-            return String.format("%s;%s", super.toString(), charString);
-        }
-        else {
-            String charString = "";
-            if (!charList.isEmpty()) {
-                for (Character charr : charList) {
-                    charString = charString.concat(Character.toString(charr));
-                }
-                charString = StringUtils.replace(charString, "\r", "\\n");
-                charString = StringUtils.replace(charString, "\n", "\\n");
-            }
-
-            String out = String.format("%s;%s", super.toString(), charString);
-            for(VirtualKeyboard2 child : subtickKeyboards){
-                out=out.concat("\n\t"+child.toString());
-            }
-            return out;
-        }
-    }
-
-    @Override
-    protected VirtualKeyboard2 clone() {
+	public VirtualKeyboard2 clone() {
         return new VirtualKeyboard2(this.pressedKeys, this.charList);
     }
 
-    public boolean isParent(){
-        return subtickKeyboards!=null;
-    }
 
     public List<Character> getCharList() {
         return ImmutableList.copyOf(charList);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+    	if(obj instanceof VirtualKeyboard2) {
+    		VirtualKeyboard2 keyboard = (VirtualKeyboard2) obj;
+    		
+    		if(charList.size() != keyboard.charList.size()) {
+    			return false;
+    		}
+    		
+    		for (int i = 0; i < charList.size(); i++) {
+				if(charList.get(i)!=keyboard.charList.get(i)) {
+					return false;
+				}
+			}
+    		return super.equals(obj);
+    	}
+    	return super.equals(obj);
     }
 }

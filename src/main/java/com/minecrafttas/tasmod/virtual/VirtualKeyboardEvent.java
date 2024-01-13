@@ -1,6 +1,8 @@
 package com.minecrafttas.tasmod.virtual;
 
-public class VirtualKeyboardEvent extends VirtualEvent {
+import com.minecrafttas.tasmod.virtual.VirtualEvent.VirtualButtonEvent;
+
+public class VirtualKeyboardEvent extends VirtualButtonEvent {
     private final char character;
 
     public VirtualKeyboardEvent(int keycode, boolean keystate, char character) {
@@ -8,7 +10,7 @@ public class VirtualKeyboardEvent extends VirtualEvent {
         this.character = character;
     }
 
-    public VirtualKeyboardEvent(VirtualEvent event, char character) {
+    public VirtualKeyboardEvent(VirtualButtonEvent event, char character) {
         super(event);
         this.character = character;
     }
