@@ -41,15 +41,14 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	 * @param isLoaded If the KillTheRNG mod is loaded
 	 */
 	public KillTheRNGHandler(boolean isLoaded) {
-
 		this.isLoaded = isLoaded;
 
 		if (isLoaded) {
-			KillTheRNG.LOGGER.info("Connection established with TASmod");
-			KillTheRNG.isLibrary = true;
-			KillTheRNG.mode = SeedingModes.TickChange;
-
-			KillTheRNG.annotations.register(new KTRNGMonitor());
+//			KillTheRNG.LOGGER.info("Connection established with TASmod");
+//			KillTheRNG.isLibrary = true;
+//			KillTheRNG.mode = SeedingModes.TickChange;
+//
+//			KillTheRNG.annotations.register(new KTRNGMonitor());
 		} else {
 			LOGGER.info("KillTheRNG doesn't appear to be loaded");
 		}
