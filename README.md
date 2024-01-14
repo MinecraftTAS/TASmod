@@ -1,3 +1,5 @@
+> [!WARNING]
+> This mod is in **early-development** and is not ready for use yet. If you wish to download the early testing releases, be prepared to encounter various bugs and desyncs!
 # TASmod  
 A Tool-Assisted Speedrun-Mod for Minecraft 1.12.2.  
 Is able to capture inputs and play them back, by pretending to be a keyboard.
