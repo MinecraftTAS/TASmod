@@ -1,4 +1,4 @@
-package com.minecrafttas.common;
+package com.minecrafttas.mctcommon;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;

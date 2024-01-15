@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod;
 
-import com.minecrafttas.common.LanguageManager;
+import com.minecrafttas.mctcommon.LanguageManager;
 import com.minecrafttas.mctcommon.Configuration;
 import com.minecrafttas.mctcommon.Configuration.ConfigOptions;
 import com.minecrafttas.mctcommon.KeybindManager;
