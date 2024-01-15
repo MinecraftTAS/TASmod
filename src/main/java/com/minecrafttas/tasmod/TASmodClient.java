@@ -162,7 +162,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		
 		// Register packet handlers
 		LOGGER.info(LoggerMarkers.Networking, "Registering network handlers on client");
-		PacketHandlerRegistry.register(controller);	//TODO Move container/playbackcontroller out of virtual package
+		PacketHandlerRegistry.register(controller);
 		PacketHandlerRegistry.register(ticksyncClient);
 		PacketHandlerRegistry.register(tickratechanger);
 		PacketHandlerRegistry.register(savestateHandlerClient);
@@ -258,7 +258,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			gameLoopSchedulerClient.add(()->{
 				try {
 					// connect to server and authenticate
-					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), local); //TODO set timeout by tickrate
+					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), local);
 				} catch (Exception e) {
 					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 					e.printStackTrace();

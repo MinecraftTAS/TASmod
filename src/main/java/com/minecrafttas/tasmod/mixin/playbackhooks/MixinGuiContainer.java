@@ -1,11 +1,14 @@
 package com.minecrafttas.tasmod.mixin.playbackhooks;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.TASmodClient;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiContainer;
 
 @Mixin(GuiContainer.class)
@@ -20,8 +23,12 @@ public class MixinGuiContainer {
 		return TASmodClient.virtual.isKeyDown(i);
 	}
 
-//	@Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/settings/KeyBinding;isActiveAndMatches(I)Z", remap = false)) //TODO Fix if #67 occurs
-//	public boolean redirectIsActiveAndMatches(KeyBinding keyBindInventory, int keyCode) {
-//		return keyBindInventory.isActiveAndMatches(keyCode) && !((GuiContainer)(Object)this).isFocused();
-//	}
+	@Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V"))
+	public void redirectCloseScreen(EntityPlayerSP player) {
+		Minecraft mc = Minecraft.getMinecraft();
+		if(TASmodClient.virtual.isKeyDown(mc.gameSettings.keyBindInventory.getKeyCode()) && ((GuiContainer)(Object)this).isFocused()) {
+			return;
+		}
+		player.closeScreen();
+	}
 }
