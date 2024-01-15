@@ -14,17 +14,17 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	 * <br>
 	 * If the number is positive or negative depending on scroll direction.
 	 */
-	private final int scrollWheel;
+	private int scrollWheel;
 	/**
 	 * X coordinate of the on-screen cursor, used in GUI screens.<br>
 	 * When null, no change to the cursor is applied.
 	 */
-	private final Integer cursorX;
+	private Integer cursorX;
 	/**
 	 * Y coordinate of the on-screen cursor, used in GUI screens.<br>
 	 * When null, no change to the cursor is applied.
 	 */
-	private final Integer cursorY;
+	private Integer cursorY;
 
 	/**
 	 * Creates a mouse with no buttons pressed and no data
@@ -122,6 +122,14 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		return new VirtualMouse2(this.pressedKeys, scrollWheel, cursorX, cursorY);
 	}
 
+	@Override
+	protected void copyFrom(VirtualMouse2 mouse) {
+		super.copyFrom(mouse);
+		this.scrollWheel = mouse.scrollWheel;
+		this.cursorX = mouse.cursorX;
+		this.cursorY = mouse.cursorY;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof VirtualMouse2) {

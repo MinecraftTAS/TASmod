@@ -207,8 +207,15 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	public VirtualKeyboard2 clone() {
         return new VirtualKeyboard2(this.pressedKeys, this.charList);
     }
+    
 
-
+    @Override
+    public void copyFrom(VirtualKeyboard2 keyboard) {
+    	super.copyFrom(keyboard);
+    	clearCharList();
+    	charList.addAll(keyboard.charList);
+    }
+    
     public List<Character> getCharList() {
         return ImmutableList.copyOf(charList);
     }

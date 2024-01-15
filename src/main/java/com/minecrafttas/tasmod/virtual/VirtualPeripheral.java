@@ -141,4 +141,13 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 		}
 		return super.equals(obj);
 	}
+	
+    /**
+     * Copies the data from another virtual peripheral into this peripheral without creating a new objects.
+     * @param keyboard
+     */
+	protected void copyFrom(T peripheral) {
+		this.pressedKeys.clear();
+		this.pressedKeys.addAll(peripheral.pressedKeys);
+	}
 }

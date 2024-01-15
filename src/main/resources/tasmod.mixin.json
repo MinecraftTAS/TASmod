@@ -47,6 +47,7 @@
 		"events.MixinGuiIngame",
 		
 		//Playbackhooks
+		"playbackhooks.MixinMinecraft",
 		"playbackhooks.MixinGameSettings",
 		"playbackhooks.MixinGuiChat",
 		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",
