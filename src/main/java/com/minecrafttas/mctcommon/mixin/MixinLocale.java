@@ -1,6 +1,6 @@
 package com.minecrafttas.mctcommon.mixin;
 
-import com.minecrafttas.common.LanguageManager;
+import com.minecrafttas.mctcommon.LanguageManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.Locale;
 import org.spongepowered.asm.mixin.Mixin;

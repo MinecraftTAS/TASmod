@@ -1,5 +1,6 @@
 > [!WARNING]
-> This mod is in **early-development** and is not ready for use yet. If you wish to download the early testing releases, be prepared to encounter various bugs and desyncs!
+> This mod is in **early-development** and is not ready for use yet. If you wish to download the early testing releases, be prepared to encounter various bugs and desyncs!  
+> For a more stable mod, without input recording and playback, check [LoTAS](https://github.com/MinecraftTAS/LoTAS)
 # TASmod  
 A Tool-Assisted Speedrun-Mod for Minecraft 1.12.2.  
 Is able to capture inputs and play them back, by pretending to be a keyboard.
@@ -9,9 +10,9 @@ To reduce complexity, all aspects of RNG-Manipulation have been externalized to 
 > [!IMPORTANT]
 > We are currently shifting over to **[Legacy-Fabric 1.12.2](https://legacyfabric.net/)**. The development branch currently works with Legacy-Fabric while the release branch is on **Forge** 1.12.2
 >
-> This means all Alpha Releases currently only work for Forge.
+> This means all **Alpha** releases only work for Forge.
 >
-> Future Beta releases will be on Legacy-Fabric.
+> Future **Beta** releases will be on Legacy-Fabric.
 
 # Credits  
 Author of the original mod: [tr7zw](https://github.com/tr7zw/MC-TASmod)  
