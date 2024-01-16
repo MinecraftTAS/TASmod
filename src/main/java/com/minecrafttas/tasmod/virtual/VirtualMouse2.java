@@ -117,9 +117,12 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		}
 	}
 
+	/**
+	 * Clones this VirtualMouse <strong>without</strong> subticks
+	 */
 	@Override
 	public VirtualMouse2 clone() {
-		return new VirtualMouse2(this.pressedKeys, scrollWheel, cursorX, cursorY);
+		return new VirtualMouse2(new HashSet<>(this.pressedKeys), scrollWheel, cursorX, cursorY);
 	}
 
 	@Override

@@ -23,4 +23,13 @@ public class VirtualKeyboardEvent extends VirtualButtonEvent {
     public String toString() {
         return String.format("%s, %s", super.toString(), character);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof VirtualKeyboardEvent){
+            VirtualKeyboardEvent e = (VirtualKeyboardEvent) obj;
+            return keycode == e.keycode && keystate == e.keystate && character == e.character;
+        }
+        return super.equals(obj);
+    }
 }

@@ -45,7 +45,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     private final List<Character> charList;
 
     /**
-     * A queue of characters used in {@link #getDifference(VirtualPeripheral)}.<br>
+     * A queue of characters used in {@link #getDifference(VirtualKeyboard2)}.<br>
      * Used for distributing characters to {@link VirtualKeyboardEvent}s in an order.
      */
     private final ConcurrentLinkedQueue<Character> charQueue = new ConcurrentLinkedQueue<>();
@@ -58,7 +58,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     }
 
     /**
-     * Creates a subtick keyboard with {@link #subtickKeyboards} uninitialized
+     * Creates a subtick keyboard with {@link #subtickList} uninitialized
      * @param pressedKeys The new list of pressed keycodes for this subtickKeyboard
      * @param charList A list of characters for this subtickKeyboard
      */
@@ -99,10 +99,10 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     }
 
     @Override
-    protected Queue<VirtualKeyboardEvent> getDifference(VirtualKeyboard2 nextPeripheral) {
+    public Queue<VirtualKeyboardEvent> getDifference(VirtualKeyboard2 nextPeripheral) {
         Queue<VirtualKeyboardEvent> eventList = new ConcurrentLinkedQueue<>();
 
-        charQueue.addAll(charList);
+        charQueue.addAll(nextPeripheral.charList);
 
         /* Calculate symmetric difference of keycodes */
 
@@ -150,7 +150,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     }
 
     @Override
-    protected Queue<? extends VirtualEvent> getVirtualEvents(VirtualKeyboard2 nextPeripheral) {
+    public Queue<? extends VirtualEvent> getVirtualEvents(VirtualKeyboard2 nextPeripheral) {
     	Queue<VirtualKeyboardEvent> eventList = new ConcurrentLinkedQueue<>();
     	
     	getSubticks().forEach(keyboard -> {
@@ -205,7 +205,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	 */
     @Override
 	public VirtualKeyboard2 clone() {
-        return new VirtualKeyboard2(this.pressedKeys, this.charList);
+        return new VirtualKeyboard2(new HashSet<>(this.pressedKeys), new ArrayList<>(this.charList));
     }
     
 
