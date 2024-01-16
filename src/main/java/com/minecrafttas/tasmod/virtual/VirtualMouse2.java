@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements Serializable {
@@ -55,9 +54,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		}
 	}
 
-	@Override
-	protected Queue<VirtualMouseEvent> getDifference(VirtualMouse2 nextPeripheral) {
-		Queue<VirtualMouseEvent> eventList = new ConcurrentLinkedQueue<>();
+	public void getDifference(VirtualMouse2 nextPeripheral, Queue<VirtualMouseEvent> reference) {
 
 		int scrollWheelCopy = scrollWheel;
 		Integer cursorXCopy = cursorX;
@@ -74,7 +71,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
          */
 		for(int keycode : pressedKeys) {
 			if (!nextPeripheral.getPressedKeys().contains(keycode)) {
-				eventList.add(new VirtualMouseEvent(keycode, false, scrollWheelCopy, cursorXCopy, cursorYCopy));
+				reference.add(new VirtualMouseEvent(keycode, false, scrollWheelCopy, cursorXCopy, cursorYCopy));
 				scrollWheelCopy = 0;
 				cursorXCopy = null;
 				cursorYCopy = null;
@@ -90,24 +87,31 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		 */
 		for(int keycode : nextPeripheral.getPressedKeys()) {
 			if (!this.pressedKeys.contains(keycode)) {
-				eventList.add(new VirtualMouseEvent(keycode, true, scrollWheelCopy, cursorXCopy, cursorYCopy));
+				reference.add(new VirtualMouseEvent(keycode, true, scrollWheelCopy, cursorXCopy, cursorYCopy));
 			}
 		};
+	}
 
-		return eventList;
+	public void getVirtualEvents(VirtualMouse2 nextPeripheral, Queue<VirtualMouseEvent> reference) {
+		getSubticks().forEach(mouse -> {
+			mouse.getDifference(nextPeripheral, reference);
+		});
 	}
 
 	@Override
-	protected Queue<VirtualMouseEvent> getVirtualEvents(VirtualMouse2 nextPeripheral) {
-		Queue<VirtualMouseEvent> eventList = new ConcurrentLinkedQueue<>();
-
-		getSubticks().forEach(keyboard -> {
-			eventList.addAll(keyboard.getDifference(nextPeripheral));
-		});
-
-		return eventList;
+	protected void clear() {
+		super.clear();
+		clearMouseData();
+		
 	}
-
+	
+	private void clearMouseData() {
+		scrollWheel = 0;
+		cursorX = null;
+		cursorY = null;
+	}
+	
+	
 	@Override
 	public String toString() {
 		if (isParent()) {
@@ -126,11 +130,12 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	}
 
 	@Override
-	protected void copyFrom(VirtualMouse2 mouse) {
-		super.copyFrom(mouse);
+	protected void moveFrom(VirtualMouse2 mouse) {
+		super.moveFrom(mouse);
 		this.scrollWheel = mouse.scrollWheel;
 		this.cursorX = mouse.cursorX;
 		this.cursorY = mouse.cursorY;
+		mouse.clear();
 	}
 	
 	@Override

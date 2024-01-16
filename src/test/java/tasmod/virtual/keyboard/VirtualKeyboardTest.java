@@ -1,15 +1,24 @@
 package tasmod.virtual.keyboard;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.junit.jupiter.api.Test;
+
 import com.minecrafttas.tasmod.virtual.VirtualKey2;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard2;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboardEvent;
-import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class VirtualKeyboardTest {
 
@@ -100,25 +109,11 @@ public class VirtualKeyboardTest {
      * Test adding a character to the keyboard
      */
     @Test
-    void addCharacter(){
+    void testAddCharacter(){
         VirtualKeyboard2 test = new VirtualKeyboard2();
         test.addChar('w');
 
         assertIterableEquals(Arrays.asList('w'), test.getCharList());
-    }
-
-    /**
-     * Test clearing all characters
-     */
-    @Test
-    void clearCharacters(){
-        List<Character> testCharList = new ArrayList<>();
-        testCharList.add('w');
-        testCharList.add('s');
-        VirtualKeyboard2 test = new VirtualKeyboard2(new HashSet<>(), testCharList);
-        test.clearCharList();
-
-        assertTrue(test.getCharList().isEmpty());
     }
 
     /**
@@ -209,32 +204,29 @@ public class VirtualKeyboardTest {
     }
 
     /**
-     * Test copy from method
+     * Test move from method
      */
     @Test
-    void testCopyFrom(){
-        Set<Integer> testKeycodeSet = new HashSet<>();
-        testKeycodeSet.add(VirtualKey2.W.getKeycode());
-        testKeycodeSet.add(VirtualKey2.S.getKeycode());
+    void testMoveFrom(){
+    	VirtualKeyboard2 moveFrom = new VirtualKeyboard2();
+    	VirtualKeyboard2 actual = new VirtualKeyboard2();
+    	
+    	moveFrom.update(VirtualKey2.W.getKeycode(), true, 'w');
+    	moveFrom.update(VirtualKey2.A.getKeycode(), true, 'a');
+    	
+    	VirtualKeyboard2 expected = moveFrom.clone();
+    	
+    	actual.update(VirtualKey2.S.getKeycode(), true, 's');
+    	actual.update(VirtualKey2.D.getKeycode(), true, 'd');
+    	
+    	
+        actual.moveFrom(moveFrom);
 
-        List<Character> testCharList = new ArrayList<>();
-        testCharList.add('w');
-        testCharList.add('s');
-        VirtualKeyboard2 copyFrom = new VirtualKeyboard2(testKeycodeSet, testCharList);
-
-        Set<Integer> testKeycodeSet2 = new HashSet<>();
-        testKeycodeSet.add(VirtualKey2.A.getKeycode());
-        testKeycodeSet.add(VirtualKey2.D.getKeycode());
-
-        List<Character> testCharList2 = new ArrayList<>();
-        testCharList.add('a');
-        testCharList.add('d');
-        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet2, testCharList2);
-
-        test.copyFrom(copyFrom);
-
-        assertIterableEquals(test.getPressedKeys(), copyFrom.getPressedKeys());
-        assertIterableEquals(test.getCharList(), copyFrom.getCharList());
+        assertIterableEquals(expected.getPressedKeys(), actual.getPressedKeys());
+        assertIterableEquals(expected.getCharList(), actual.getCharList());
+        
+        assertEquals(new VirtualKeyboard2(), moveFrom);
+        assertTrue(moveFrom.getSubticks().isEmpty());
     }
 
     /**
@@ -247,8 +239,8 @@ public class VirtualKeyboardTest {
         test.update(VirtualKey2.A.getKeycode(), true, 'A');
 
         List<VirtualKeyboard2> expected = new ArrayList<>();
-        expected.add(new VirtualKeyboard2(Set.of(VirtualKey2.W.getKeycode()), List.of('w')));
-        expected.add(new VirtualKeyboard2(Set.of(VirtualKey2.W.getKeycode(), VirtualKey2.A.getKeycode()), List.of('w', 'A')));
+        expected.add(new VirtualKeyboard2(new HashSet<Integer>(Arrays.asList(VirtualKey2.W.getKeycode())), Arrays.asList('w')));
+        expected.add(new VirtualKeyboard2(new HashSet<Integer>(Arrays.asList(VirtualKey2.W.getKeycode(), VirtualKey2.A.getKeycode())), Arrays.asList('w', 'A')));
 
         assertIterableEquals(expected, test.getSubticks());
     }
@@ -258,11 +250,11 @@ public class VirtualKeyboardTest {
      */
     @Test
     void testGetDifference(){
-        VirtualKeyboard2 test = new VirtualKeyboard2(Set.of(VirtualKey2.W.getKeycode()), List.of('w'));
-        VirtualKeyboard2 test2 = new VirtualKeyboard2(Set.of(VirtualKey2.W.getKeycode(), VirtualKey2.S.getKeycode()), List.of('S'));
-
-        Queue<VirtualKeyboardEvent> actual = test.getDifference(test2);
-        Queue<VirtualKeyboardEvent> expected = new ConcurrentLinkedQueue<>(List.of(new VirtualKeyboardEvent(VirtualKey2.S.getKeycode(), true, 'S')));
+        VirtualKeyboard2 test = new VirtualKeyboard2(new HashSet<>(Arrays.asList(VirtualKey2.W.getKeycode())), Arrays.asList('w'));
+        VirtualKeyboard2 test2 = new VirtualKeyboard2(new HashSet<>(Arrays.asList(VirtualKey2.W.getKeycode(), VirtualKey2.S.getKeycode())), Arrays.asList('S'));
+        Queue<VirtualKeyboardEvent> actual = new ConcurrentLinkedQueue<>();
+        test.getDifference(test2, actual);
+        Queue<VirtualKeyboardEvent> expected = new ConcurrentLinkedQueue<>(Arrays.asList(new VirtualKeyboardEvent(VirtualKey2.S.getKeycode(), true, 'S')));
 
         assertIterableEquals(expected, actual);
     }

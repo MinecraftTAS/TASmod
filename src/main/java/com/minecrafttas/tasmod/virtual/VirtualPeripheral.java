@@ -3,7 +3,6 @@ package com.minecrafttas.tasmod.virtual;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
@@ -32,7 +31,7 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 	 * <br>
 	 * If subtickKeyboards is null then the object is a "child"/subtickKeyboard stored in a parent list
 	 */
-	private final List<T> subtickList;
+	protected final List<T> subtickList;
 	
     /**
      * Create a peripheral with already existing pressed keys
@@ -86,28 +85,6 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
         return out;
     }
 
-	/**
-	 * Calculates the difference between 2 peripherals via symmetric difference <br>
-	 * and returns a list of the changes between in form of {@link VirtualEvent}s
-	 *
-	 * @param nextPeripheral The peripheral that is comes after this one.<br>
-	 *                       If this one is loaded at tick 15, the nextPeripheral
-	 *                       should be the one from tick 16
-	 * @return A list of {@link VirtualEvent}s
-	 */
-	protected abstract Queue<? extends VirtualEvent> getDifference(T nextPeripheral);
-
-	/**
-	 * Calculates a list of {@link VirtualEvent}s to the next peripheral including
-	 * the subticks.
-	 * 
-	 * @param nextPeripheral The peripheral that is comes after this one.<br>
-	 *                       If this one is loaded at tick 15, the nextPeripheral
-	 *                       should be the one from tick 16
-	 * @return A list of {@link VirtualEvent}s
-	 */
-	protected abstract Queue<? extends VirtualEvent> getVirtualEvents(T nextPeripheral);
-    
     @Override
     public String toString() {
         return String.join(",", getCurrentPresses());
@@ -128,6 +105,19 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 		return subtickList != null;
 	}
 	
+	public boolean isKeyDown(int keycode) {
+		return pressedKeys.contains(keycode);
+	}
+	
+	public boolean isKeyDown(String keyname) {
+		return pressedKeys.contains(VirtualKey2.getKeycode(keyname));
+	}
+	
+	protected void clear() {
+		pressedKeys.clear();
+		subtickList.clear();
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof VirtualPeripheral) {
@@ -143,10 +133,10 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 	}
 	
     /**
-     * Copies the data from another virtual peripheral into this peripheral without creating a new object.
-     * @param peripheral The peripheral to copy from
+     * Moves the data from another virtual peripheral into this peripheral without creating a new object.
+     * @param peripheral The peripheral to move from
      */
-	protected void copyFrom(T peripheral) {
+	protected void moveFrom(T peripheral) {
 		this.pressedKeys.clear();
 		this.pressedKeys.addAll(peripheral.pressedKeys);
 	}

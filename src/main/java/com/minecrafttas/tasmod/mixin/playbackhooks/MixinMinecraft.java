@@ -11,6 +11,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.util.Ducks.GuiScreenDuck;
+import com.minecrafttas.tasmod.virtual.VirtualInput;
+import com.minecrafttas.tasmod.virtual.VirtualInput2;
+import com.minecrafttas.tasmod.virtual.VirtualKeyboardEvent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -21,50 +24,95 @@ public class MixinMinecraft {
 	@Shadow
 	private GuiScreen currentScreen;
 	
+	/**
+	 * Runs every frame. Polls all the keys from LWJGL and updates {@link VirtualInput2} accordingly
+	 * @param ci CBI
+	 */
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void playback_injectRunGameLoop(CallbackInfo ci) {
 		while (Keyboard.next()) {
-			TASmodClient.virtual.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
+			TASmodClient.virtual.updateNextKeyboard(
+					Keyboard.getEventKey(), 
+					Keyboard.getEventKeyState(), 
+					Keyboard.getEventCharacter());
 		}
 		while (Mouse.next()) {
 			if(this.currentScreen == null) {
-				TASmodClient.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), Mouse.getEventX(), Mouse.getEventY(), TASmodClient.tickratechanger.ticksPerSecond==0);
+				TASmodClient.virtual.updateNextMouse(
+						Mouse.getEventButton(),
+						Mouse.getEventButtonState(),
+						Mouse.getEventDWheel(),
+						Mouse.getEventX(),
+						Mouse.getEventY(),
+						TASmodClient.tickratechanger.ticksPerSecond==0);
 			} else {
 				GuiScreenDuck screen = (GuiScreenDuck) currentScreen;
-				TASmodClient.virtual.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()), TASmodClient.tickratechanger.ticksPerSecond==0);
+				TASmodClient.virtual.updateNextMouse(
+						Mouse.getEventButton(),
+						Mouse.getEventButtonState(),
+						Mouse.getEventDWheel(),
+						screen.calcX(Mouse.getEventX()),
+						screen.calcY(Mouse.getEventY()),
+						TASmodClient.tickratechanger.ticksPerSecond==0); //TODO Remove and put into VirtualInput itself
 			}
 		}
 	}
 	
+	/**
+	 * Run at the start of run tick keyboard. Runs every tick
+	 * @param ci CBI
+	 */
 	@Inject(method = "runTickKeyboard", at = @At(value = "HEAD"))
 	public void playback_injectRunTickKeyboard(CallbackInfo ci) {
 		TASmodClient.virtual.updateCurrentKeyboard();
 	}
 	
+	/**
+	 * Redirects a {@link Keyboard#next()}. Starts running every tick and continues as long as there are {@link VirtualKeyboardEvent}s in {@link VirtualInput}
+	 * @return If {@link VirtualKeyboardEvent}s are present in {@link VirtualInput2}
+	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z", remap = false))
 	public boolean playback_redirectKeyboardNext() {
 		return TASmodClient.virtual.nextKeyboardEvent();
 	}
 	
+	/**
+	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link Keyboard#getEventKeyState()}
+	 * @return The keycode for the current event in {@link VirtualInput2}
+	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int playback_redirectKeyboardGetEventKey() {
 		return TASmodClient.virtual.getEventKeyboardKey();
 	}
 	
+	/**
+	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link Keyboard#getEventCharacter()}
+	 * @return The character for the current event in {@link VirtualInput2}
+	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
 	public char playback_redirectKeyboardGetEventCharacter() {
 		return TASmodClient.virtual.getEventKeyboardCharacter();
 	}
 	
+	/**
+	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link Keyboard#getEventKeyState()}
+	 * @return Whether the key is down in {@link VirtualInput2}
+	 */
+	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
+	public boolean playback_redirectGetEventState() {
+		return TASmodClient.virtual.getEventKeyboardState();
+	}
+	
+	/**
+	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link Keyboard#isKeyDown(int)}
+	 * @return Whether the key is down in {@link VirtualInput2}
+	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
 	public boolean playback_redirectIsKeyDown(int keyCode) {
 		return TASmodClient.virtual.isKeyDown(keyCode);
 	}
 	
-	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
-	public boolean playback_redirectGetEventState() {
-		return TASmodClient.virtual.getEventKeyboardState();
-	}
+	// ============================ Mouse
 	
 	@Inject(method = "runTickMouse", at = @At(value = "HEAD"))
 	public void playback_injectRunTickMouse(CallbackInfo ci) {

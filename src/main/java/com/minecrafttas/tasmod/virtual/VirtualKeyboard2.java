@@ -98,11 +98,18 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
         }
     }
 
-    @Override
-    public Queue<VirtualKeyboardEvent> getDifference(VirtualKeyboard2 nextPeripheral) {
-        Queue<VirtualKeyboardEvent> eventList = new ConcurrentLinkedQueue<>();
+	/**
+	 * Calculates the difference between 2 keyboards via symmetric difference <br>
+	 * and returns a list of the changes between them in form of {@link VirtualKeyboardEvent}s
+	 *
+	 * @param nextKeyboard The keyboard that is comes after this one.<br>
+	 *                       If this one is loaded at tick 15, the nextPeripheral
+	 *                       should be the one from tick 16
+	 * @param reference The queue to fill. Passed in by reference.
+	 */
+    public void getDifference(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
 
-        charQueue.addAll(nextPeripheral.charList);
+        charQueue.addAll(nextKeyboard.charList);
 
         /* Calculate symmetric difference of keycodes */
 
@@ -114,8 +121,8 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
                     A     <- unpressed
          */
         this.pressedKeys.forEach(key -> {
-            if (!nextPeripheral.getPressedKeys().contains(key)) {
-                eventList.add(new VirtualKeyboardEvent(key, false, Character.MIN_VALUE));
+            if (!nextKeyboard.getPressedKeys().contains(key)) {
+            	reference.add(new VirtualKeyboardEvent(key, false, Character.MIN_VALUE));
             }
         });
 
@@ -126,9 +133,9 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 		 	-------------
 		 	            D <- pressed
 		 */
-        nextPeripheral.getPressedKeys().forEach(key -> {
+        nextKeyboard.getPressedKeys().forEach(key -> {
             if (!this.pressedKeys.contains(key)) {
-                eventList.add(new VirtualKeyboardEvent(key, true, getOrDefault(charQueue.poll())));
+            	reference.add(new VirtualKeyboardEvent(key, true, getOrMinChar(charQueue.poll())));
             }
         });
 
@@ -143,30 +150,35 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 			otherwise you'd either need to add a keycode for each char or write it in new lines
 		 */
         while (!charQueue.isEmpty()) {
-            eventList.add(new VirtualKeyboardEvent(0, false, getOrDefault(charQueue.poll())));
+        	reference.add(new VirtualKeyboardEvent(0, false, getOrMinChar(charQueue.poll())));
         }
 
-        return eventList;
-    }
-
-    @Override
-    public Queue<? extends VirtualEvent> getVirtualEvents(VirtualKeyboard2 nextPeripheral) {
-    	Queue<VirtualKeyboardEvent> eventList = new ConcurrentLinkedQueue<>();
-    	
-    	getSubticks().forEach(keyboard -> {
-    		eventList.addAll(keyboard.getDifference(nextPeripheral));
-    	});
-    	
-    	return eventList;
     }
     
-    private char getOrDefault(Character charr){
+    private char getOrMinChar(Character charr){
         if(charr==null){
             charr = Character.MIN_VALUE;
         }
         return charr;
     }
 
+	/**
+	 * Calculates a list of {@link VirtualKeyboardEvent}s to the next peripheral, including
+	 * the subticks.
+	 * 
+	 * @see VirtualKeyboard2#getDifference(VirtualKeyboard2, Queue)
+	 * 
+	 * @param nextKeyboard The peripheral that is comes after this one.<br>
+	 *                       If this one is loaded at tick 15, the nextPeripheral
+	 *                       should be the one from tick 16
+	 * @param reference The queue to fill. Passed in by reference.
+	 */
+    public void getVirtualEvents(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
+    	getSubticks().forEach(keyboard -> {
+    		keyboard.getDifference(nextKeyboard, reference);
+    	});
+    }
+    
     /**
      * Add a character to the {@link #charList}<br>
      * Null characters will be discarded;
@@ -177,10 +189,12 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
             charList.add(character);
     }
 
-    public void clearCharList(){
+    @Override
+    protected void clear(){
+    	super.clear();
         charList.clear();
     }
-
+    
 	@Override
 	public String toString() {
 		if (isParent()) {
@@ -210,16 +224,17 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     
 
     @Override
-    public void copyFrom(VirtualKeyboard2 keyboard) {
-    	super.copyFrom(keyboard);
-    	clearCharList();
+    public void moveFrom(VirtualKeyboard2 keyboard) {
+    	super.moveFrom(keyboard);
+    	charList.clear();
     	charList.addAll(keyboard.charList);
+    	keyboard.clear();
     }
     
     public List<Character> getCharList() {
         return ImmutableList.copyOf(charList);
     }
-
+    
     @Override
     public boolean equals(Object obj) {
     	if(obj instanceof VirtualKeyboard2) {
