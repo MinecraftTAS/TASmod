@@ -113,13 +113,13 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 
         /* Calculate symmetric difference of keycodes */
 
-        /*
-            Calculate unpressed keys
-            this: W A S
-            next: W   S D
-            -------------
-                    A     <- unpressed
-         */
+		/*
+		    Calculate unpressed keys
+		    this: W A S
+		    next: W   S D
+		    -------------
+		            A     <- unpressed
+		 */
         this.pressedKeys.forEach(key -> {
             if (!nextKeyboard.getPressedKeys().contains(key)) {
             	reference.add(new VirtualKeyboardEvent(key, false, Character.MIN_VALUE));

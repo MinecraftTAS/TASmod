@@ -61,7 +61,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * Run at the start of run tick keyboard. Runs every tick
+	 * Run at the start of run tick keyboard. Runs every tick.
 	 * @param ci CBI
 	 */
 	@Inject(method = "runTickKeyboard", at = @At(value = "HEAD"))
@@ -71,6 +71,7 @@ public class MixinMinecraft {
 	
 	/**
 	 * Redirects a {@link Keyboard#next()}. Starts running every tick and continues as long as there are {@link VirtualKeyboardEvent}s in {@link VirtualInput}
+	 * @see com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#nextKeyboardSubtick()
 	 * @return If {@link VirtualKeyboardEvent}s are present in {@link VirtualInput2}
 	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z", remap = false))
@@ -80,7 +81,7 @@ public class MixinMinecraft {
 	
 	/**
 	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link Keyboard#getEventKeyState()}
-	 * @return The keycode for the current event in {@link VirtualInput2}
+	 * @return The keycode for the current event in {@link VirtualInput2.VirtualKeyboardInput}
 	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int playback_redirectKeyboardGetEventKey() {

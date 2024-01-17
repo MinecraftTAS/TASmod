@@ -25,6 +25,12 @@ public class VirtualInput2 {
 		this(new VirtualKeyboard2(), new VirtualMouse2(), new VirtualCameraAngle(0, 0));
 	}
 
+	/**
+	 * Creates a virtual input with pre-loaded values
+	 * @param preloadedKeyboard
+	 * @param preloadedMouse
+	 * @param preloadedCamera
+	 */
 	public VirtualInput2(VirtualKeyboard2 preloadedKeyboard, VirtualMouse2 preloadedMouse, VirtualCameraAngle preloadedCamera) {
 		keyboardInput = new VirtualKeyboardInput(preloadedKeyboard);
 		mouseInput = new VirtualMouseInput(preloadedMouse);
@@ -82,45 +88,67 @@ public class VirtualInput2 {
 	 * <br>
 	 * Vanilla keyboard handling looks something like this:
 	 * <pre>
-	 *		public void runTickKeyboard()  { // Executed every tick in runTick()
-	 *			while({@linkplain Keyboard#next()}){		// Polls KeyEvents from the keyboard
-	 *				int keycode = {@linkplain Keyboard#getEventKey()};	// Get the keycode for this KeyEvent
-	 *				boolean keystate = {@linkplain Keyboard#getEventKey()};	// Get the keystate (true for pressed, false for unpressed) for this keycode
-	 *				char character = {@linkplain Keyboard#getEventCharacter()}	// Get the character associated with the keycode.
+	 *	public void runTickKeyboard()  { // Executed every tick in runTick()
+	 *		while({@linkplain Keyboard#next()}){
+	 *			int keycode = {@linkplain Keyboard#getEventKey()};
+	 *			boolean keystate = {@linkplain Keyboard#getEventKey()};
+	 *			char character = {@linkplain Keyboard#getEventCharacter()}
 	 *
-	 *				Keybindings.updateKeybind(keycode, keystate, character) // Update vanilla keybindings which then run the logic.
-	 *			}
+	 *			Keybindings.updateKeybind(keycode, keystate, character)
 	 *		}
+	 *	}
 	 * </pre>
 	 * After redirecting the calls in {@link MixinMinecraft}, the resulting logic now looks like this:
 	 * <pre>
-	 *		public void runTickKeyboard()  {
-	 *			{@linkplain #nextKeyboardTick()}
-	 *			while({@linkplain #nextKeyboardSubtick()}){
-	 *				int keycode = {@linkplain #getEventKeyboardKey()}};
-	 *				boolean keystate = {@linkplain #getEventKeyboardState()};
-	 *				char character = {@linkplain #getEventKeyboardCharacter()}
+	 *	public void runTickKeyboard()  {
+	 *		{@linkplain #nextKeyboardTick()}
+	 *		while({@linkplain #nextKeyboardSubtick()}){
+	 *			int keycode = {@linkplain #getEventKeyboardKey()}};
+	 *			boolean keystate = {@linkplain #getEventKeyboardState()};
+	 *			char character = {@linkplain #getEventKeyboardCharacter()}
 	 *
-	 *				Keybindings.updateKeybind(keycode, keystate, character)
-	 *			}
+	 *			Keybindings.updateKeybind(keycode, keystate, character)
 	 *		}
+	 *	}
 	 * </pre>
 	 *
 	 */
 	private static class VirtualKeyboardInput {
+		/**
+		 * The keyboard "state" that is currently recognized by the game,<br>
+		 * meaning it is a direct copy of the vanilla keybindings. Updated every <em>tick</em>.<br>
+		 * Updated in {@link #nextKeyboardTick()}
+		 */
 		private final VirtualKeyboard2 currentKeyboard;
+		/**
+		 * The "state" of the real physical keyboard.<br>
+		 * This is updated every <em>frame</em>.<br>
+		 * Updates {@link #currentKeyboard} in {@link #nextKeyboardTick()}
+		 */
 		private final VirtualKeyboard2 nextKeyboard = new VirtualKeyboard2();
+		/**
+		 * Queue for keyboard events.<br>
+		 * Is filled in {@link #nextKeyboardTick()} and read in {@link #nextKeyboardSubtick()}
+		 */
 		private final Queue<VirtualKeyboardEvent> keyboardEventQueue = new ConcurrentLinkedQueue<VirtualKeyboardEvent>();
+		/**
+		 * The current keyboard event where the vanilla keybindings are reading from.<br>
+		 * Updated in {@link #nextKeyboardSubtick()} and read out in {@link #getEventKeyboardKey()}, {@link #getEventKeyboardState()} and {@link #getEventKeyboardCharacter()}
+		 */
 		private VirtualKeyboardEvent currentKeyboardEvent = new VirtualKeyboardEvent();
 
-		public VirtualKeyboardInput(){
-			this(new VirtualKeyboard2());
-		}
 
 		public VirtualKeyboardInput(VirtualKeyboard2 preloadedKeyboard){
 			currentKeyboard = preloadedKeyboard;
 		}
 
+		/**
+		 * Updates the next keyboard
+		 * @see VirtualInput2#update(GuiScreen)
+		 * @param keycode The keycode of this event
+		 * @param keystate The keystate of this event
+		 * @param character The character of this event
+		 */
 		public void updateNextKeyboard(int keycode, boolean keystate, char character) {
 			nextKeyboard.update(keycode, keystate, character);
 		}
@@ -135,18 +163,32 @@ public class VirtualInput2 {
 			currentKeyboard.moveFrom(nextKeyboard);
 		}
 
+		/**
+		 * Runs in a while loop. Used for updating {@link #currentKeyboardEvent} and ending the while loop.
+		 * @see MixinMinecraft#playback_redirectKeyboardNext()
+		 * @return If a keyboard event is in {@link #keyboardEventQueue}
+		 */
 		public boolean nextKeyboardSubtick() {
 			return (currentKeyboardEvent = keyboardEventQueue.poll()) != null;
 		}
-
+		
+		/**
+		 * @return The keycode of {@link #currentKeyboardEvent}
+		 */
 		public int getEventKeyboardKey() {
 			return currentKeyboardEvent.getKeyCode();
 		}
 
+		/**
+		 * @return The keystate of {@link #currentKeyboardEvent}
+		 */
 		public boolean getEventKeyboardState() {
 			return currentKeyboardEvent.isState();
 		}
 
+		/**
+		 * @return The character(s) of {@link #currentKeyboardEvent}
+		 */
 		public char getEventKeyboardCharacter() {
 			return currentKeyboardEvent.getCharacter();
 		}
