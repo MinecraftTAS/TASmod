@@ -25,11 +25,13 @@ public class MixinMinecraft {
 	private GuiScreen currentScreen;
 	
 	/**
-	 * Runs every frame. Polls all the keys from LWJGL and updates {@link VirtualInput2} accordingly
+	 * Runs every frame.
+	 * @see VirtualInput2#update(GuiScreen)
 	 * @param ci CBI
 	 */
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void playback_injectRunGameLoop(CallbackInfo ci) {
+//		TASmodClient.virtual.update(currentScreen);
 		while (Keyboard.next()) {
 			TASmodClient.virtual.updateNextKeyboard(
 					Keyboard.getEventKey(), 

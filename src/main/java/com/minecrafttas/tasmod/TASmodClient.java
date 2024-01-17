@@ -1,10 +1,10 @@
 package com.minecrafttas.tasmod;
 
-import com.minecrafttas.mctcommon.LanguageManager;
 import com.minecrafttas.mctcommon.Configuration;
 import com.minecrafttas.mctcommon.Configuration.ConfigOptions;
 import com.minecrafttas.mctcommon.KeybindManager;
 import com.minecrafttas.mctcommon.KeybindManager.Keybind;
+import com.minecrafttas.mctcommon.LanguageManager;
 import com.minecrafttas.mctcommon.events.EventClient.EventClientInit;
 import com.minecrafttas.mctcommon.events.EventClient.EventOpenGui;
 import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
@@ -28,6 +28,7 @@ import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.Scheduler;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
+import com.minecrafttas.tasmod.virtual.VirtualInput2;
 import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.Minecraft;

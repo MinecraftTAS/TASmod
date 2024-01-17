@@ -12,6 +12,9 @@ public class VirtualMouseEvent extends VirtualButtonEvent {
     private final Integer mouseX;
     private final Integer mouseY;
 
+    public VirtualMouseEvent(){
+        this(0, false, 0, null, null);
+    }
     public VirtualMouseEvent(int keycode, boolean state, int scrollwheel, Integer mouseX, Integer mouseY) {
         super(keycode, state);
         this.scrollwheel = scrollwheel;

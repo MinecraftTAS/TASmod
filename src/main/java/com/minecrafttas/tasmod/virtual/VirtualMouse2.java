@@ -47,6 +47,17 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		this.cursorY = cursorY;
 	}
 
+	public void update(int keycode, boolean keystate, int scrollwheel, Integer cursorX, Integer cursorY) {
+		setPressed(keycode, keystate);
+		this.scrollWheel = scrollwheel;
+		this.cursorX = cursorX;
+		this.cursorY = cursorY;
+
+		if(isParent()) {
+			addSubtick(clone());
+		}
+	}
+
 	@Override
 	protected void setPressed(int keycode, boolean keystate) {
 		if (keycode < 0) {
