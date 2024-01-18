@@ -244,4 +244,5 @@ public class VirtualInput2 {
 	}
 
 	private VirtualCameraAngle cameraAngle;
+	
 }
