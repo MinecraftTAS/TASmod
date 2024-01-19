@@ -45,7 +45,9 @@ public class VirtualCameraAngle2 implements Serializable {
 	}
 	
 	public void getCameraAngleSubticks(Queue<VirtualCameraAngle2> reference) {
-		reference.addAll(subtickList);
+		if(isParent()) {
+			reference.addAll(subtickList);
+		}
 	}
 
 	@Override

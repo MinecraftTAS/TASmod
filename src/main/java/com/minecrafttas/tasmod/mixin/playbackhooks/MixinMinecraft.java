@@ -89,15 +89,6 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link Keyboard#getEventCharacter()}
-	 * @return The character for the current event in {@link VirtualInput2}
-	 */
-	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
-	public char playback_redirectKeyboardGetEventCharacter() {
-		return TASmodClient.virtual.getEventKeyboardCharacter();
-	}
-	
-	/**
 	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link Keyboard#getEventKeyState()}
 	 * @return Whether the key is down in {@link VirtualInput2}
 	 */
@@ -107,12 +98,36 @@ public class MixinMinecraft {
 	}
 	
 	/**
+	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link Keyboard#getEventCharacter()}
+	 * @return The character for the current event in {@link VirtualInput2}
+	 */
+	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
+	public char playback_redirectKeyboardGetEventCharacter() {
+		return TASmodClient.virtual.getEventKeyboardCharacter();
+	}
+	
+	/**
 	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link Keyboard#isKeyDown(int)}
 	 * @return Whether the key is down in {@link VirtualInput2}
 	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
 	public boolean playback_redirectIsKeyDown(int keyCode) {
 		return TASmodClient.virtual.isKeyDown(keyCode);
+	}
+	
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
+	public int playback_redirectGetEventKeyDPK() {
+		return TASmodClient.virtual.getEventKeyboardKey();
+	}
+	
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
+	public boolean playback_redirectGetEventKeyStateDPK() {
+		return TASmodClient.virtual.getEventKeyboardState();
+	}
+	
+	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
+	public char playback_redirectGetEventCharacterDPK() {
+		return TASmodClient.virtual.getEventKeyboardCharacter();
 	}
 	
 	// ============================ Mouse
@@ -146,18 +161,4 @@ public class MixinMinecraft {
 		return TASmodClient.virtual.getEventMouseScrollWheel();
 	}
 	
-	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
-	public int playback_redirectGetEventKeyDPK() {
-		return TASmodClient.virtual.getEventKeyboardKey();
-	}
-	
-	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
-	public char playback_redirectGetEventCharacterDPK() {
-		return TASmodClient.virtual.getEventKeyboardCharacter();
-	}
-	
-	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
-	public boolean playback_redirectGetEventKeyStateDPK() {
-		return TASmodClient.virtual.getEventKeyboardState();
-	}
 }

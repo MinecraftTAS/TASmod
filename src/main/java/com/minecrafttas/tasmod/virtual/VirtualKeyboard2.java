@@ -173,11 +173,13 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	 *                       should be the one from tick 16
 	 * @param reference The queue to fill. Passed in by reference.
 	 */
-    public void getVirtualEvents(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
-    	getSubticks().forEach(keyboard -> {
-    		keyboard.getDifference(nextKeyboard, reference);
-    	});
-    }
+	public void getVirtualEvents(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
+		if (isParent()) {
+			getSubticks().forEach(keyboard -> {
+				keyboard.getDifference(nextKeyboard, reference);
+			});
+		}
+	}
     
     /**
      * Add a character to the {@link #charList}<br>

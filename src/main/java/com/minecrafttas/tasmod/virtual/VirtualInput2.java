@@ -14,12 +14,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Main component for redirecting inputs.<br>
  * <br>
- * This class mimics the LWJGL classes {@link org.lwjgl.input.Keyboard} and {@link org.lwjgl.input.Mouse}.<br>
+ * This class mimics the LWJGL classes {@link org.lwjgl.input.Keyboard} and
+ * {@link org.lwjgl.input.Mouse}.<br>
  * <br>
  */
 public class VirtualInput2 {
 	private final VirtualKeyboardInput keyboardInput;
 	private final VirtualMouseInput mouseInput;
+	private final VirtualCameraAngleInput cameraAngleInput;
 
 	public VirtualInput2() {
 		this(new VirtualKeyboard2(), new VirtualMouse2(), new VirtualCameraAngle(0, 0));
@@ -27,6 +29,7 @@ public class VirtualInput2 {
 
 	/**
 	 * Creates a virtual input with pre-loaded values
+	 * 
 	 * @param preloadedKeyboard
 	 * @param preloadedMouse
 	 * @param preloadedCamera
@@ -34,39 +37,29 @@ public class VirtualInput2 {
 	public VirtualInput2(VirtualKeyboard2 preloadedKeyboard, VirtualMouse2 preloadedMouse, VirtualCameraAngle preloadedCamera) {
 		keyboardInput = new VirtualKeyboardInput(preloadedKeyboard);
 		mouseInput = new VirtualMouseInput(preloadedMouse);
-		this.cameraAngle = preloadedCamera;
+		cameraAngleInput = new VirtualCameraAngleInput(preloadedCamera);
 	}
 
 	/**
-	 * Updates the logic for {@link #keyboardInput}, {@link #mouseInput} and {@link #cameraAngle}<br>
+	 * Updates the logic for {@link #keyboardInput}, {@link #mouseInput} and
+	 * {@link #cameraAngle}<br>
 	 * Runs every frame
+	 * 
 	 * @see MixinMinecraft#playback_injectRunGameLoop(CallbackInfo)
-	 * @param currentScreen The current screen from Minecraft.class.
-	 *                      Used for checking if the mouse logic should be adapted to GUIScreens
+	 * @param currentScreen The current screen from Minecraft.class. Used for
+	 *                      checking if the mouse logic should be adapted to
+	 *                      GUIScreens
 	 */
-	public void update(GuiScreen currentScreen){
+	public void update(GuiScreen currentScreen) {
 		while (Keyboard.next()) {
-			keyboardInput.updateNextKeyboard(
-					Keyboard.getEventKey(),
-					Keyboard.getEventKeyState(),
-					Keyboard.getEventCharacter());
+			keyboardInput.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
 		while (Mouse.next()) {
-			if(currentScreen == null) {
-				mouseInput.updateNextMouse(
-						Mouse.getEventButton(),
-						Mouse.getEventButtonState(),
-						Mouse.getEventDWheel(),
-						null,
-						null);
+			if (currentScreen == null) {
+				mouseInput.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), null, null);
 			} else {
 				Ducks.GuiScreenDuck screen = (Ducks.GuiScreenDuck) currentScreen;
-				mouseInput.updateNextMouse(
-						Mouse.getEventButton(),
-						Mouse.getEventButtonState(),
-						Mouse.getEventDWheel(),
-						screen.calcX(Mouse.getEventX()),
-						screen.calcY(Mouse.getEventY()));
+				mouseInput.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()));
 			}
 		}
 	}
@@ -79,14 +72,15 @@ public class VirtualInput2 {
 		return mouseInput;
 	}
 
-	public VirtualCameraAngle getCameraAngle() {
-		return cameraAngle;
+	public VirtualCameraAngleInput getCameraAngle() {
+		return cameraAngleInput;
 	}
 
 	/**
 	 * Subclass of {@link VirtualInput} handling keyboard logic.<br>
 	 * <br>
 	 * Vanilla keyboard handling looks something like this:
+	 * 
 	 * <pre>
 	 *	public void runTickKeyboard()  { // Executed every tick in runTick()
 	 *		while({@linkplain Keyboard#next()}){
@@ -98,7 +92,10 @@ public class VirtualInput2 {
 	 *		}
 	 *	}
 	 * </pre>
-	 * After redirecting the calls in {@link MixinMinecraft}, the resulting logic now looks like this:
+	 * 
+	 * After redirecting the calls in {@link MixinMinecraft}, the resulting logic
+	 * now looks like this:
+	 * 
 	 * <pre>
 	 *	public void runTickKeyboard()  {
 	 *		{@linkplain #nextKeyboardTick()}
@@ -116,7 +113,8 @@ public class VirtualInput2 {
 	private static class VirtualKeyboardInput {
 		/**
 		 * The keyboard "state" that is currently recognized by the game,<br>
-		 * meaning it is a direct copy of the vanilla keybindings. Updated every <em>tick</em>.<br>
+		 * meaning it is a direct copy of the vanilla keybindings. Updated every
+		 * <em>tick</em>.<br>
 		 * Updated in {@link #nextKeyboardTick()}
 		 */
 		private final VirtualKeyboard2 currentKeyboard;
@@ -128,25 +126,29 @@ public class VirtualInput2 {
 		private final VirtualKeyboard2 nextKeyboard = new VirtualKeyboard2();
 		/**
 		 * Queue for keyboard events.<br>
-		 * Is filled in {@link #nextKeyboardTick()} and read in {@link #nextKeyboardSubtick()}
+		 * Is filled in {@link #nextKeyboardTick()} and read in
+		 * {@link #nextKeyboardSubtick()}
 		 */
 		private final Queue<VirtualKeyboardEvent> keyboardEventQueue = new ConcurrentLinkedQueue<VirtualKeyboardEvent>();
 		/**
-		 * The current keyboard event where the vanilla keybindings are reading from.<br>
-		 * Updated in {@link #nextKeyboardSubtick()} and read out in {@link #getEventKeyboardKey()}, {@link #getEventKeyboardState()} and {@link #getEventKeyboardCharacter()}
+		 * The current keyboard event where the vanilla keybindings are reading
+		 * from.<br>
+		 * Updated in {@link #nextKeyboardSubtick()} and read out in
+		 * {@link #getEventKeyboardKey()}, {@link #getEventKeyboardState()} and
+		 * {@link #getEventKeyboardCharacter()}
 		 */
 		private VirtualKeyboardEvent currentKeyboardEvent = new VirtualKeyboardEvent();
 
-
-		public VirtualKeyboardInput(VirtualKeyboard2 preloadedKeyboard){
+		public VirtualKeyboardInput(VirtualKeyboard2 preloadedKeyboard) {
 			currentKeyboard = preloadedKeyboard;
 		}
 
 		/**
 		 * Updates the next keyboard
+		 * 
 		 * @see VirtualInput2#update(GuiScreen)
-		 * @param keycode The keycode of this event
-		 * @param keystate The keystate of this event
+		 * @param keycode   The keycode of this event
+		 * @param keystate  The keystate of this event
 		 * @param character The character of this event
 		 */
 		public void updateNextKeyboard(int keycode, boolean keystate, char character) {
@@ -155,7 +157,9 @@ public class VirtualInput2 {
 
 		/**
 		 * Runs when the next keyboard tick is about to occur.<br>
-		 * Used to load {@link #nextKeyboard} into {@link #currentKeyboard}, creating {@link VirtualKeyboardEvent}s in the process.
+		 * Used to load {@link #nextKeyboard} into {@link #currentKeyboard}, creating
+		 * {@link VirtualKeyboardEvent}s in the process.
+		 * 
 		 * @see MixinMinecraft#playback_injectRunTickKeyboard(org.spongepowered.asm.mixin.injection.callback.CallbackInfo)
 		 */
 		public void nextKeyboardTick() {
@@ -164,14 +168,16 @@ public class VirtualInput2 {
 		}
 
 		/**
-		 * Runs in a while loop. Used for updating {@link #currentKeyboardEvent} and ending the while loop.
+		 * Runs in a while loop. Used for updating {@link #currentKeyboardEvent} and
+		 * ending the while loop.
+		 * 
 		 * @see MixinMinecraft#playback_redirectKeyboardNext()
 		 * @return If a keyboard event is in {@link #keyboardEventQueue}
 		 */
 		public boolean nextKeyboardSubtick() {
 			return (currentKeyboardEvent = keyboardEventQueue.poll()) != null;
 		}
-		
+
 		/**
 		 * @return The keycode of {@link #currentKeyboardEvent}
 		 */
@@ -200,11 +206,11 @@ public class VirtualInput2 {
 		private final Queue<VirtualMouseEvent> mouseEventQueue = new ConcurrentLinkedQueue<>();
 		private VirtualMouseEvent currentMouseEvent = new VirtualMouseEvent();
 
-		public VirtualMouseInput(){
+		public VirtualMouseInput() {
 			this(new VirtualMouse2());
 		}
 
-		public VirtualMouseInput(VirtualMouse2 preloadedMouse){
+		public VirtualMouseInput(VirtualMouse2 preloadedMouse) {
 			currentMouse = preloadedMouse;
 		}
 
@@ -243,6 +249,13 @@ public class VirtualInput2 {
 
 	}
 
-	private VirtualCameraAngle cameraAngle;
-	
+	private static class VirtualCameraAngleInput {
+
+		private VirtualCameraAngle cameraAngle;
+
+		public VirtualCameraAngleInput(VirtualCameraAngle preloadedCamera) {
+			cameraAngle = preloadedCamera;
+		}
+
+	}
 }
