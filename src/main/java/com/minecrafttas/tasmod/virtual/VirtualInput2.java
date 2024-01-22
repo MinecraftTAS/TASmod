@@ -24,7 +24,7 @@ public class VirtualInput2 {
 	private final VirtualCameraAngleInput cameraAngleInput;
 
 	public VirtualInput2() {
-		this(new VirtualKeyboard2(), new VirtualMouse2(), new VirtualCameraAngle(0, 0));
+		this(new VirtualKeyboard2(), new VirtualMouse2(), new VirtualCameraAngle2());
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class VirtualInput2 {
 	 * @param preloadedMouse
 	 * @param preloadedCamera
 	 */
-	public VirtualInput2(VirtualKeyboard2 preloadedKeyboard, VirtualMouse2 preloadedMouse, VirtualCameraAngle preloadedCamera) {
+	public VirtualInput2(VirtualKeyboard2 preloadedKeyboard, VirtualMouse2 preloadedMouse, VirtualCameraAngle2 preloadedCamera) {
 		keyboardInput = new VirtualKeyboardInput(preloadedKeyboard);
 		mouseInput = new VirtualMouseInput(preloadedMouse);
 		cameraAngleInput = new VirtualCameraAngleInput(preloadedCamera);
@@ -251,10 +251,22 @@ public class VirtualInput2 {
 
 	private static class VirtualCameraAngleInput {
 
-		private VirtualCameraAngle cameraAngle;
+		private VirtualCameraAngle2 cameraAngle;
 
-		public VirtualCameraAngleInput(VirtualCameraAngle preloadedCamera) {
+		public VirtualCameraAngleInput(VirtualCameraAngle2 preloadedCamera) {
 			cameraAngle = preloadedCamera;
+		}
+		
+		public void updateCameraAngle(float pitch, float yaw) {
+			cameraAngle.update(pitch, yaw);
+		}
+		
+		public float getPitch() {
+			return cameraAngle.getPitch();
+		}
+		
+		public float getYaw() {
+			return cameraAngle.getYaw();
 		}
 
 	}

@@ -161,4 +161,6 @@ public class MixinMinecraft {
 		return TASmodClient.virtual.getEventMouseScrollWheel();
 	}
 	
+	// ============================ Camera Angle
+	
 }

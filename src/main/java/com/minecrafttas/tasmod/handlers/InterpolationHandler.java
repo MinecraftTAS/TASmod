@@ -1,7 +1,6 @@
 package com.minecrafttas.tasmod.handlers;
 
 import com.minecrafttas.mctcommon.events.EventClient.EventCamera;
-import com.minecrafttas.mctcommon.events.EventClient.EventCamera.CameraData;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.ControlByteHandler;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;
