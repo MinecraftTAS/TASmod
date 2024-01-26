@@ -116,9 +116,9 @@ public class MixinEntityRenderer implements SubtickDuck {
 				smoothCamPitch = 0.0F;
 				mc.player.turn(f2, f3 * (float) i);
 			}
-			TASmodClient.virtual.updateSubtick(mc.player.rotationPitch, mc.player.rotationYaw);
-			mc.player.rotationPitch = TASmodClient.virtual.getSubtickPitch();
-			mc.player.rotationYaw = TASmodClient.virtual.getSubtickYaw();
+			TASmodClient.virtual.CAMERA_ANGLE.updateCameraAngle(mc.player.rotationPitch, mc.player.rotationYaw);
+			mc.player.rotationPitch = TASmodClient.virtual.CAMERA_ANGLE.getPitch();
+			mc.player.rotationYaw = TASmodClient.virtual.CAMERA_ANGLE.getYaw();
 			InterpolationHandler.rotationPitch = mc.player.rotationPitch;
 			InterpolationHandler.rotationYaw = 180f + mc.player.rotationYaw;
 		}

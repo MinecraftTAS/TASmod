@@ -150,7 +150,7 @@ public class SavestateHandlerClient implements ClientPacketHandler {
 		if (!container.isNothingPlaying()) { // If the file exists and the container is recording or playing, load the
 												// clientSavestate
 			if (targetfile.exists()) {
-				TASmodClient.virtual.loadClientSavestate(TASmodClient.serialiser.fromEntireFileV1(targetfile));
+//				TASmodClient.virtual.loadClientSavestate(TASmodClient.serialiser.fromEntireFileV1(targetfile)); TODO Move to PlaybackController
 			} else {
 				TASmodClient.controller.setTASStateClient(TASstate.NONE, false);
 				Minecraft.getMinecraft().player.sendMessage(new TextComponentString(ChatFormatting.YELLOW + "Inputs could not be loaded for this savestate,"));

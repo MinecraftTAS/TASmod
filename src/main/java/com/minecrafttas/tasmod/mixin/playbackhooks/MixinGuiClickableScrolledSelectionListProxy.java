@@ -12,6 +12,6 @@ import net.minecraft.client.gui.GuiClickableScrolledSelectionListProxy;
 public class MixinGuiClickableScrolledSelectionListProxy {
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", ordinal = 0, remap = false))
 	public boolean redirectHandleMouseInput() {
-		return TASmodClient.virtual.getEventMouseState();
+		return TASmodClient.virtual.MOUSE.getEventMouseState();
 	}
 }

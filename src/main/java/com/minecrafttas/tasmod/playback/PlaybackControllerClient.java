@@ -232,7 +232,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 					return verbose ? TextFormatting.GREEN + "Pausing a recording" : "";
 				case NONE:
 					LOGGER.debug(LoggerMarkers.Playback, "Stopping a recording");
-					TASmodClient.virtual.unpressEverything();
+					TASmodClient.virtual.unpress();
 					state = TASstate.NONE;
 					return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
 			}
@@ -246,12 +246,12 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 					LOGGER.debug(LoggerMarkers.Playback, "Pausing a playback");
 					state = TASstate.PAUSED;
 					tempPause = TASstate.PLAYBACK;
-					TASmodClient.virtual.unpressEverything();
+					TASmodClient.virtual.unpress();
 					return verbose ? TextFormatting.GREEN + "Pausing a playback" : "";
 				case NONE:
 					LOGGER.debug(LoggerMarkers.Playback, "Stopping a playback");
 					Minecraft.getMinecraft().gameSettings.chatLinks = true;
-					TASmodClient.virtual.unpressEverything();
+					TASmodClient.virtual.unpress();
 					state = TASstate.NONE;
 					return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";
 			}
@@ -847,15 +847,15 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 
 			case PLAYBACK_SAVE:
 				name = TASmodBufferBuilder.readString(buf);
-				try {
-					TASmodClient.virtual.saveInputs(name);
-				} catch (IOException e) {
-					if (mc.world != null)
-						mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
-					else
-						e.printStackTrace();
-					return;
-				}
+//				try {
+//					TASmodClient.virtual.saveInputs(name); TODO Move to PlaybackController
+//				} catch (IOException e) {
+//					if (mc.world != null)
+//						mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
+//					else
+//						e.printStackTrace();
+//					return;
+//				}
 				if (mc.world != null)
 					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Saved inputs to " + name + ".mctas"));
 				else
@@ -864,15 +864,15 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 
 			case PLAYBACK_LOAD:
 				name = TASmodBufferBuilder.readString(buf);
-				try {
-					TASmodClient.virtual.loadInputs(name);
-				} catch (IOException e) {
-					if (mc.world != null)
-						mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
-					else
-						e.printStackTrace();
-					return;
-				}
+//				try {
+//					TASmodClient.virtual.loadInputs(name); TODO Move to PlaybackController
+//				} catch (IOException e) {
+//					if (mc.world != null)
+//						mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
+//					else
+//						e.printStackTrace();
+//					return;
+//				}
 				if (mc.world != null)
 					mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(TextFormatting.GREEN + "Loaded inputs from " + name + ".mctas"));
 				else

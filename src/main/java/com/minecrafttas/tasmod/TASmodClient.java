@@ -1,5 +1,15 @@
 package com.minecrafttas.tasmod;
 
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.logging.log4j.Level;
+import org.lwjgl.input.Keyboard;
+
 import com.minecrafttas.mctcommon.Configuration;
 import com.minecrafttas.mctcommon.Configuration.ConfigOptions;
 import com.minecrafttas.mctcommon.KeybindManager;
@@ -12,7 +22,6 @@ import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import com.minecrafttas.mctcommon.server.Client;
 import com.minecrafttas.mctcommon.server.PacketHandlerRegistry;
 import com.minecrafttas.mctcommon.server.Server;
-import com.minecrafttas.tasmod.externalGui.InputContainerView;
 import com.minecrafttas.tasmod.gui.InfoHud;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 import com.minecrafttas.tasmod.handlers.LoadingScreenHandler;
@@ -27,9 +36,9 @@ import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.Scheduler;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
-import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualInput2;
 import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -39,20 +48,11 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.server.MinecraftServer;
-import org.apache.logging.log4j.Level;
-import org.lwjgl.input.Keyboard;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventOpenGui{
 
 
-	public static VirtualInput virtual;
+	public static VirtualInput2 virtual;
 
 	public static TickSyncClient ticksyncClient;
 	
@@ -126,7 +126,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		} else {
 			config.reset(ConfigOptions.FileToOpen);
 		}
-		virtual=new VirtualInput(fileOnStart);
+//		virtual=new VirtualInput2(fileOnStart); TODO Move fileOnStart to PlaybackController
 		
 		// Initialize InfoHud
 		hud = new InfoHud();
@@ -147,7 +147,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		
 		// Register event listeners
 		EventListenerRegistry.register(this);
-		EventListenerRegistry.register(virtual);
+//		EventListenerRegistry.register(virtual); TODO Remove if unnecessary
 		EventListenerRegistry.register(hud);
 		EventListenerRegistry.register(shieldDownloader);
 		EventListenerRegistry.register(loadingScreenHandler);
@@ -199,7 +199,6 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			}
 		})));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Open InfoGui Editor", "TASmod", Keyboard.KEY_F6, () -> Minecraft.getMinecraft().displayGuiScreen(TASmodClient.hud))));
-		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Buffer View", "TASmod", Keyboard.KEY_NUMPAD0, () -> InputContainerView.startBufferView())));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing", "TASmod", Keyboard.KEY_F12, () -> {
 			TASmodClient.client.disconnect();
 		})));

@@ -83,6 +83,7 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
  * @author Scribble
  *
  */
+@Deprecated
 public class VirtualInput implements EventPlayerJoinedClientSide{
 
 	// ===========================Keyboard=================================

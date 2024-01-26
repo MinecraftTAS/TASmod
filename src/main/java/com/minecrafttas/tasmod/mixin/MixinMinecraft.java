@@ -48,7 +48,6 @@ public abstract class MixinMinecraft {
 
 	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;runTick()V"))
 	public void redirectRunTick(Minecraft mc) {
-		TASmodClient.virtual.updateContainer();
 		if (TASmodClient.tickratechanger.ticksPerSecond != 0) {
 			((SubtickDuck) this.entityRenderer).runSubtick(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
 		}

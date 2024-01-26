@@ -19,9 +19,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * <br>
  */
 public class VirtualInput2 {
-	private final VirtualKeyboardInput keyboardInput;
-	private final VirtualMouseInput mouseInput;
-	private final VirtualCameraAngleInput cameraAngleInput;
+	public final VirtualKeyboardInput KEYBOARD;
+	public final VirtualMouseInput MOUSE;
+	public final VirtualCameraAngleInput CAMERA_ANGLE;
 
 	public VirtualInput2() {
 		this(new VirtualKeyboard2(), new VirtualMouse2(), new VirtualCameraAngle2());
@@ -35,13 +35,13 @@ public class VirtualInput2 {
 	 * @param preloadedCamera
 	 */
 	public VirtualInput2(VirtualKeyboard2 preloadedKeyboard, VirtualMouse2 preloadedMouse, VirtualCameraAngle2 preloadedCamera) {
-		keyboardInput = new VirtualKeyboardInput(preloadedKeyboard);
-		mouseInput = new VirtualMouseInput(preloadedMouse);
-		cameraAngleInput = new VirtualCameraAngleInput(preloadedCamera);
+		KEYBOARD = new VirtualKeyboardInput(preloadedKeyboard);
+		MOUSE = new VirtualMouseInput(preloadedMouse);
+		CAMERA_ANGLE = new VirtualCameraAngleInput(preloadedCamera);
 	}
 
 	/**
-	 * Updates the logic for {@link #keyboardInput}, {@link #mouseInput} and
+	 * Updates the logic for {@link #KEYBOARD}, {@link #MOUSE} and
 	 * {@link #cameraAngle}<br>
 	 * Runs every frame
 	 * 
@@ -52,30 +52,39 @@ public class VirtualInput2 {
 	 */
 	public void update(GuiScreen currentScreen) {
 		while (Keyboard.next()) {
-			keyboardInput.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
+			KEYBOARD.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
 		}
 		while (Mouse.next()) {
 			if (currentScreen == null) {
-				mouseInput.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), null, null);
+				MOUSE.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), null, null);
 			} else {
 				Ducks.GuiScreenDuck screen = (Ducks.GuiScreenDuck) currentScreen;
-				mouseInput.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()));
+				MOUSE.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()));
 			}
 		}
 	}
 
-	public VirtualKeyboardInput getKeyboardInput() {
-		return keyboardInput;
+	public boolean isKeyDown(int keycode) {
+		if(keycode >= 0) {
+			return KEYBOARD.isKeyDown(keycode);
+		} else {
+			return MOUSE.isKeyDown(keycode);
+		}
 	}
-
-	public VirtualMouseInput getMouseInput() {
-		return mouseInput;
+	
+	public boolean willKeyBeDown(int keycode) {
+		if(keycode >= 0) {
+			return KEYBOARD.willKeyBeDown(keycode);
+		} else {
+			return MOUSE.willKeyBeDown(keycode);
+		}
 	}
-
-	public VirtualCameraAngleInput getCameraAngle() {
-		return cameraAngleInput;
+	
+	public void unpress() {
+		KEYBOARD.nextKeyboard.clear();
+		MOUSE.nextMouse.clear();
 	}
-
+	
 	/**
 	 * Subclass of {@link VirtualInput} handling keyboard logic.<br>
 	 * <br>
@@ -110,7 +119,7 @@ public class VirtualInput2 {
 	 * </pre>
 	 *
 	 */
-	private static class VirtualKeyboardInput {
+	public class VirtualKeyboardInput {
 		/**
 		 * The keyboard "state" that is currently recognized by the game,<br>
 		 * meaning it is a direct copy of the vanilla keybindings. Updated every
@@ -198,9 +207,17 @@ public class VirtualInput2 {
 		public char getEventKeyboardCharacter() {
 			return currentKeyboardEvent.getCharacter();
 		}
+		
+		public boolean isKeyDown(int keycode) {
+			return currentKeyboard.isKeyDown(keycode);
+		}
+		
+		public boolean willKeyBeDown(int keycode) {
+			return nextKeyboard.isKeyDown(keycode);
+		}
 	}
 
-	private static class VirtualMouseInput {
+	public class VirtualMouseInput {
 		private final VirtualMouse2 currentMouse;
 		private final VirtualMouse2 nextMouse = new VirtualMouse2();
 		private final Queue<VirtualMouseEvent> mouseEventQueue = new ConcurrentLinkedQueue<>();
@@ -247,9 +264,17 @@ public class VirtualInput2 {
 			return PointerNormalizer.getCoordsY(currentMouseEvent.getMouseY());
 		}
 
+		public boolean isKeyDown(int keycode) {
+			return currentMouse.isKeyDown(keycode);
+		}
+		
+		public boolean willKeyBeDown(int keycode) {
+			return nextMouse.isKeyDown(keycode);
+		}
+		
 	}
 
-	private static class VirtualCameraAngleInput {
+	public class VirtualCameraAngleInput {
 
 		private VirtualCameraAngle2 cameraAngle;
 

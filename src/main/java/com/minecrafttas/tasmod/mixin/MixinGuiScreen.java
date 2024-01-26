@@ -22,56 +22,56 @@ public class MixinGuiScreen implements GuiScreenDuck {
 
 	@Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isCreated()Z", shift = Shift.AFTER, remap = false))
 	public void injectAfterKeyboardCreated(CallbackInfo ci) {
-		TASmodClient.virtual.updateCurrentKeyboard();
+		TASmodClient.virtual.KEYBOARD.nextKeyboardTick();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z", remap = false))
 	public boolean redirectKeyboardNext() {
-		return TASmodClient.virtual.nextKeyboardEvent();
+		return TASmodClient.virtual.KEYBOARD.nextKeyboardSubtick();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
 	public char redirectGetEventCharacter() {
-		return TASmodClient.virtual.getEventKeyboardCharacter();
+		return TASmodClient.virtual.KEYBOARD.getEventKeyboardCharacter();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int redirectGetEventKey() {
-		return TASmodClient.virtual.getEventKeyboardKey();
+		return TASmodClient.virtual.KEYBOARD.getEventKeyboardKey();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleKeyboardInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
 	public boolean redirectGetEventState() {
-		return TASmodClient.virtual.getEventKeyboardState();
+		return TASmodClient.virtual.KEYBOARD.getEventKeyboardState();
 	}
 
 	// =====================================================================================================================================
 
 	@Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;isCreated()Z", shift = Shift.AFTER, remap = false))
 	public void injectAfterMouseCreated(CallbackInfo ci) {
-		TASmodClient.virtual.updateCurrentMouseEvents();
+		TASmodClient.virtual.MOUSE.nextMouseTick();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z", remap = false))
 	public boolean redirectMouseNext() {
-		return TASmodClient.virtual.nextMouseEvent();
+		return TASmodClient.virtual.MOUSE.nextMouseSubtick();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
 	public int redirectGetEventButton() {
-		return TASmodClient.virtual.getEventMouseKey() + 100;
+		return TASmodClient.virtual.MOUSE.getEventMouseKey() + 100;
 	}
 
 	// =====================================================================================================================================
@@ -79,23 +79,23 @@ public class MixinGuiScreen implements GuiScreenDuck {
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", remap = false))
 	public boolean redirectGetEventButtonState() {
 		if (TASmodClient.controller.isPlayingback()) {
-			Mouse.setCursorPosition(uncalcX(TASmodClient.virtual.getEventCursorX()), uncalcY(TASmodClient.virtual.getEventCursorY()));
+			Mouse.setCursorPosition(uncalcX(TASmodClient.virtual.MOUSE.getEventCursorX()), uncalcY(TASmodClient.virtual.MOUSE.getEventCursorY()));
 		}
-		return TASmodClient.virtual.getEventMouseState();
+		return TASmodClient.virtual.MOUSE.getEventMouseState();
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventX()I", remap = false))
 	public int redirectGetEventX() {
-		return uncalcX(TASmodClient.virtual.getEventCursorX());
+		return uncalcX(TASmodClient.virtual.MOUSE.getEventCursorX());
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventY()I", remap = false))
 	public int redirectGetEventY() {
-		return uncalcY(TASmodClient.virtual.getEventCursorY());
+		return uncalcY(TASmodClient.virtual.MOUSE.getEventCursorY());
 	}
 
 	// =====================================================================================================================================

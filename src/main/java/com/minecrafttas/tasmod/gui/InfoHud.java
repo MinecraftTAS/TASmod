@@ -343,13 +343,13 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 				}
 			}));
 			
-			title = "cursor";
-			y += 14;
-			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-				if (Minecraft.getMinecraft().currentScreen == this) return "Mouse Position";
-				return String.format("Mouse Cursor: " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorX + " " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorY);
-			}));
+//			title = "cursor";
+//			y += 14;
+//			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+//			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+//				if (Minecraft.getMinecraft().currentScreen == this) return "Mouse Position";
+//				return String.format("Mouse Cursor: " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorX + " " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorY);
+//			})); TODO Remove?
 			
 			title = "trajectories";
 			y += 14;
@@ -490,26 +490,26 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 	}
 	
 	private String keystrokes() {
-		if (Display.isActive()) {
-			String out1 = ""+ChatFormatting.WHITE;
-			for (String mouse : TASmodClient.virtual.getCurrentMousePresses()) {
-				out1 = out1.concat(mouse + " ");
-			}
-			out1=out1.concat(""+ChatFormatting.GREEN);
-			for (String mouse : TASmodClient.virtual.getNextMousePresses()) {
-				out1 = out1.concat(mouse + " ");
-			}
-			
-			String out2 = ""+ChatFormatting.WHITE;
-			for (String key : TASmodClient.virtual.getCurrentKeyboardPresses()) {
-				out2 = out2.concat(key + " ");
-			}
-			out2=out2.concat(""+ChatFormatting.GREEN);
-			for (String key : TASmodClient.virtual.getNextKeyboardPresses()) {
-				out2 = out2.concat(key + " ");
-			}
-			return out1+out2;
-		}
+//		if (Display.isActive()) { //TODO Update
+//			String out1 = ""+ChatFormatting.WHITE;
+//			for (String mouse : TASmodClient.virtual.getCurrentMousePresses()) {
+//				out1 = out1.concat(mouse + " ");
+//			}
+//			out1=out1.concat(""+ChatFormatting.GREEN);
+//			for (String mouse : TASmodClient.virtual.getNextMousePresses()) {
+//				out1 = out1.concat(mouse + " ");
+//			}
+//			
+//			String out2 = ""+ChatFormatting.WHITE;
+//			for (String key : TASmodClient.virtual.getCurrentKeyboardPresses()) {
+//				out2 = out2.concat(key + " ");
+//			}
+//			out2=out2.concat(""+ChatFormatting.GREEN);
+//			for (String key : TASmodClient.virtual.getNextKeyboardPresses()) {
+//				out2 = out2.concat(key + " ");
+//			}
+//			return out1+out2;
+//		}
 		return "";
 	}
 	
