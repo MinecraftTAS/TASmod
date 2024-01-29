@@ -126,7 +126,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		} else {
 			config.reset(ConfigOptions.FileToOpen);
 		}
-//		virtual=new VirtualInput2(fileOnStart); TODO Move fileOnStart to PlaybackController
+		virtual=new VirtualInput2(); //TODO Move fileOnStart to PlaybackController
 		
 		// Initialize InfoHud
 		hud = new InfoHud();

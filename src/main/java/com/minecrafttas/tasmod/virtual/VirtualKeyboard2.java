@@ -83,6 +83,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * @param character The character that is associated with that key. Can change between keyboards or whenever shift is held in combination.
      */
     public void update(int keycode, boolean keystate, char character) {
+    	charList.clear();
     	setPressed(keycode, keystate);
     	addChar(character);
     	
@@ -175,9 +176,11 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	 */
 	public void getVirtualEvents(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
 		if (isParent()) {
-			getSubticks().forEach(keyboard -> {
-				keyboard.getDifference(nextKeyboard, reference);
-			});
+			VirtualKeyboard2 currentSubtick = this;
+			for(VirtualKeyboard2 subtick : nextKeyboard.getSubticks()) {
+				currentSubtick.getDifference(subtick, reference);
+				currentSubtick = subtick;
+			}
 		}
 	}
     
@@ -205,7 +208,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 			return String.format("%s;%s", super.toString(), charListToString(charList));
 		}
 	}
-	
+
 	private String charListToString(List<Character> charList) {
 		String charString = "";
 		if (!charList.isEmpty()) {

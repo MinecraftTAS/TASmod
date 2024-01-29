@@ -14,6 +14,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.minecrafttas.tasmod.virtual.VirtualKey2;
@@ -240,7 +241,7 @@ public class VirtualKeyboardTest {
 
         List<VirtualKeyboard2> expected = new ArrayList<>();
         expected.add(new VirtualKeyboard2(new HashSet<Integer>(Arrays.asList(VirtualKey2.W.getKeycode())), Arrays.asList('w')));
-        expected.add(new VirtualKeyboard2(new HashSet<Integer>(Arrays.asList(VirtualKey2.W.getKeycode(), VirtualKey2.A.getKeycode())), Arrays.asList('w', 'A')));
+        expected.add(new VirtualKeyboard2(new HashSet<Integer>(Arrays.asList(VirtualKey2.W.getKeycode(), VirtualKey2.A.getKeycode())), Arrays.asList('A')));
 
         assertIterableEquals(expected, test.getSubticks());
     }
@@ -257,5 +258,11 @@ public class VirtualKeyboardTest {
         Queue<VirtualKeyboardEvent> expected = new ConcurrentLinkedQueue<>(Arrays.asList(new VirtualKeyboardEvent(VirtualKey2.S.getKeycode(), true, 'S')));
 
         assertIterableEquals(expected, actual);
+    }
+    
+    @Test
+    @Disabled
+    void testGetVirtualEvents() {
+    	//TODO
     }
 }
