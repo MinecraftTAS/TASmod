@@ -103,11 +103,13 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		};
 	}
 
-	public void getVirtualEvents(VirtualMouse2 nextPeripheral, Queue<VirtualMouseEvent> reference) {
-		if(isParent()) {
-			nextPeripheral.getSubticks().forEach(mouse -> {
-				getDifference(mouse, reference);
-			});
+	public void getVirtualEvents(VirtualMouse2 nextMouse, Queue<VirtualMouseEvent> reference) {
+		if (isParent()) {
+			VirtualMouse2 currentSubtick = this;
+			for(VirtualMouse2 subtick : nextMouse.getAll()) {
+				currentSubtick.getDifference(subtick, reference);
+				currentSubtick = subtick;
+			}
 		}
 	}
 

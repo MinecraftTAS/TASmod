@@ -14,7 +14,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.minecrafttas.tasmod.virtual.VirtualKey2;
@@ -243,7 +242,7 @@ public class VirtualKeyboardTest {
         expected.add(new VirtualKeyboard2(new HashSet<Integer>(Arrays.asList(VirtualKey2.W.getKeycode())), Arrays.asList('w')));
         expected.add(new VirtualKeyboard2(new HashSet<Integer>(Arrays.asList(VirtualKey2.W.getKeycode(), VirtualKey2.A.getKeycode())), Arrays.asList('A')));
 
-        assertIterableEquals(expected, test.getSubticks());
+        assertIterableEquals(expected, test.getAll());
     }
 
     /**
@@ -260,9 +259,43 @@ public class VirtualKeyboardTest {
         assertIterableEquals(expected, actual);
     }
     
+    /**
+     * Tests generating virtual events going from an unpressed keyboard to a pressed keyboard state
+     */
     @Test
-    @Disabled
-    void testGetVirtualEvents() {
-    	//TODO
+    void testGetVirtualEventsPress() {
+    	VirtualKeyboard2 unpressed = new VirtualKeyboard2();
+    	
+    	VirtualKeyboard2 pressed = new VirtualKeyboard2();
+    	pressed.update(VirtualKey2.W.getKeycode(), true, 'w');
+    	
+    	// Load actual with the events
+    	Queue<VirtualKeyboardEvent> actual = new ConcurrentLinkedQueue<>();
+    	unpressed.getVirtualEvents(pressed, actual);
+    	
+    	// Load expected
+    	List<VirtualKeyboardEvent> expected = Arrays.asList(new VirtualKeyboardEvent(VirtualKey2.W.getKeycode(), true, 'w'));
+    	
+    	assertIterableEquals(expected, actual);
+    }
+    
+    /**
+     * Tests generating virtual events going from a pressed keyboard to an unpressed keyboard state
+     */
+    @Test
+    void testGetVirtualEventsUnpress() {
+    	VirtualKeyboard2 unpressed = new VirtualKeyboard2();
+    	
+    	VirtualKeyboard2 pressed = new VirtualKeyboard2();
+    	pressed.update(VirtualKey2.W.getKeycode(), true, 'w');
+    	
+    	// Load actual with the events
+    	Queue<VirtualKeyboardEvent> actual = new ConcurrentLinkedQueue<>();
+    	pressed.getVirtualEvents(unpressed, actual);
+    	
+    	// Load expected
+    	List<VirtualKeyboardEvent> expected = Arrays.asList(new VirtualKeyboardEvent(VirtualKey2.W.getKeycode(), false, Character.MIN_VALUE));
+    	
+    	assertIterableEquals(expected, actual);
     }
 }

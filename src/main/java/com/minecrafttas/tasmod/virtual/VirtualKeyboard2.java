@@ -49,7 +49,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * Used for distributing characters to {@link VirtualKeyboardEvent}s in an order.
      */
     private final ConcurrentLinkedQueue<Character> charQueue = new ConcurrentLinkedQueue<>();
-
+    
     /**
      * Creates an empty parent keyboard with all keys unpressed
      */
@@ -75,7 +75,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
         super(pressedKeys, subtick);
         this.charList = charList;
     }
-
+    
     /**
      * Updates the keyboard, adds a new subtick to this keyboard
      * @param keycode The keycode of this key
@@ -83,13 +83,12 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * @param character The character that is associated with that key. Can change between keyboards or whenever shift is held in combination.
      */
     public void update(int keycode, boolean keystate, char character) {
+    	if(isParent() && !ignoreFirstUpdate()) {
+    		addSubtick(clone());
+    	}
     	charList.clear();
     	setPressed(keycode, keystate);
     	addChar(character);
-    	
-    	if(isParent()) {
-    		addSubtick(clone());
-    	}
     }
     
     @Override
@@ -177,7 +176,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	public void getVirtualEvents(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
 		if (isParent()) {
 			VirtualKeyboard2 currentSubtick = this;
-			for(VirtualKeyboard2 subtick : nextKeyboard.getSubticks()) {
+			for(VirtualKeyboard2 subtick : nextKeyboard.getAll()) {
 				currentSubtick.getDifference(subtick, reference);
 				currentSubtick = subtick;
 			}
@@ -203,7 +202,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	@Override
 	public String toString() {
 		if (isParent()) {
-			return getSubticks().stream().map(element -> element.toString()).collect(Collectors.joining("\n"));
+			return getAll().stream().map(element -> element.toString()).collect(Collectors.joining("\n"));
 		} else {
 			return String.format("%s;%s", super.toString(), charListToString(charList));
 		}

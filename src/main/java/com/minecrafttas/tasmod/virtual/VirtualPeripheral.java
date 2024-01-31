@@ -33,6 +33,11 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 	 */
 	protected final List<T> subtickList;
 	
+	/**
+	 * When creating an empty
+	 */
+    private boolean ignoreFirstUpdate = false;
+	
     /**
      * Create a peripheral with already existing pressed keys
      * @param pressedKeys The existing pressedKeys
@@ -44,6 +49,7 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
     protected VirtualPeripheral(Set<Integer> pressedKeys, List<T> subtickList) {
         this.pressedKeys = pressedKeys;
         this.subtickList = subtickList;
+		ignoreFirstUpdate = subtickList != null && subtickList.isEmpty(); // TODO Change, to something more robust
     }
 
     /**
@@ -97,10 +103,28 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 		return ImmutableSet.copyOf(pressedKeys);
 	}
 
+	/**
+	 * @return An immutable list of subticks
+	 */
 	public List<T> getSubticks() {
 		return ImmutableList.copyOf(subtickList);
 	}
 
+	/**
+	 * Gets all peripheral states in an immutable list.<br>
+	 * <br>
+	 * This list is comprised of {@link #subtickList} and the current peripheral state added after that<br>
+	 * This will result in a list where the first element is the oldest state and the last being the current state.
+	 * @return An immutable list of keyboard states
+	 */
+	@SuppressWarnings("unchecked")
+	public List<T> getAll() {
+		return ImmutableList.<T>builder()
+				.addAll(subtickList)
+				.add((T)this)
+				.build();
+	}
+	
 	public boolean isParent() {
 		return subtickList != null;
 	}
@@ -139,5 +163,11 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 	protected void moveFrom(T peripheral) {
 		this.pressedKeys.clear();
 		this.pressedKeys.addAll(peripheral.pressedKeys);
+	}
+	
+	protected boolean ignoreFirstUpdate() {
+		boolean ignore = ignoreFirstUpdate;
+		ignoreFirstUpdate = false;
+		return ignore;
 	}
 }

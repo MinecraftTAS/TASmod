@@ -1,8 +1,10 @@
 package tasmod.virtual.keyboard;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.minecrafttas.tasmod.virtual.VirtualCameraAngle2;
@@ -29,9 +31,27 @@ class VirtualInputTest {
 	 * Tests if a keyboard can be preloaded
 	 */
 	@Test
-	@Disabled
-	void testPreloadedKeyboard() {
-		//TODO
+	void testPreloadedConstructor() {
+		VirtualKeyboard2 preloadedKeyboard = new VirtualKeyboard2();
+		VirtualMouse2 preloadedMouse = new VirtualMouse2();
+		VirtualCameraAngle2 preloadedCameraAngle = new VirtualCameraAngle2(1f, 2f);
+		
+		preloadedKeyboard.update(VirtualKey2.W.getKeycode(), true, 'w');
+		preloadedMouse.update(VirtualKey2.LC.getKeycode(), true, 15, null, null);
+		
+		
+		VirtualInput2 virtual = new VirtualInput2(preloadedKeyboard, preloadedMouse, preloadedCameraAngle);
+		
+		virtual.KEYBOARD.nextKeyboardTick();
+		assertTrue(virtual.KEYBOARD.nextKeyboardSubtick());
+		assertEquals(VirtualKey2.W.getKeycode(), virtual.KEYBOARD.getEventKeyboardKey());
+		
+//		virtual.MOUSE.nextMouseTick();
+//		assertTrue(virtual.MOUSE.nextMouseSubtick());
+//		assertEquals(VirtualKey2.LC.getKeycode(), virtual.MOUSE.getEventMouseKey());
+		
+		assertEquals(1f, virtual.CAMERA_ANGLE.getPitch());
+		assertEquals(2f, virtual.CAMERA_ANGLE.getYaw());
 	}
 	
 	/**
