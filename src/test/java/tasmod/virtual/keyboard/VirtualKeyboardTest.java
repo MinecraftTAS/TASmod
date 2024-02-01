@@ -85,7 +85,7 @@ public class VirtualKeyboardTest {
         Set<Integer> testKeycodeSet = new HashSet<>();
         testKeycodeSet.add(VirtualKey2.W.getKeycode());
         testKeycodeSet.add(VirtualKey2.S.getKeycode());
-        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, new ArrayList<>(), null);
+        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, new ArrayList<>());
         test.setPressed(VirtualKey2.W.getKeycode(), false);
 
         assertIterableEquals(Arrays.asList(VirtualKey2.S.getKeycode()), test.getPressedKeys());
@@ -99,7 +99,7 @@ public class VirtualKeyboardTest {
         Set<Integer> testKeycodeSet = new HashSet<>();
         testKeycodeSet.add(VirtualKey2.W.getKeycode());
         testKeycodeSet.add(VirtualKey2.S.getKeycode());
-        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, new ArrayList<>(), null);
+        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, new ArrayList<>());
         test.setPressed("S", false);
 
         assertIterableEquals(Arrays.asList(VirtualKey2.W.getKeycode()), test.getPressedKeys());
@@ -129,8 +129,8 @@ public class VirtualKeyboardTest {
         testCharList.add('w');
         testCharList.add('s');
 
-        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, testCharList, null);
-        VirtualKeyboard2 test2 = new VirtualKeyboard2(testKeycodeSet, new ArrayList<>(), null);
+        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, testCharList);
+        VirtualKeyboard2 test2 = new VirtualKeyboard2(testKeycodeSet, new ArrayList<>());
 
         assertEquals("W,S;ws", test.toString());
         assertEquals("W,S;", test2.toString());
@@ -149,8 +149,8 @@ public class VirtualKeyboardTest {
         testCharList.add('w');
         testCharList.add('s');
 
-        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, testCharList, null);
-        VirtualKeyboard2 test2 = new VirtualKeyboard2(testKeycodeSet, testCharList, null);
+        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, testCharList);
+        VirtualKeyboard2 test2 = new VirtualKeyboard2(testKeycodeSet, testCharList);
         
         assertEquals(test, test2);
     }
@@ -175,9 +175,9 @@ public class VirtualKeyboardTest {
         List<Character> testCharList3 = new ArrayList<>();
         testCharList3.add('w');
 
-        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, testCharList, null);
-        VirtualKeyboard2 test2 = new VirtualKeyboard2(testKeycodeSet, testCharList2, null);
-        VirtualKeyboard2 test3 = new VirtualKeyboard2(testKeycodeSet, testCharList3, null);
+        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, testCharList);
+        VirtualKeyboard2 test2 = new VirtualKeyboard2(testKeycodeSet, testCharList2);
+        VirtualKeyboard2 test3 = new VirtualKeyboard2(testKeycodeSet, testCharList3);
         
         assertNotEquals(test, test2);
         assertNotEquals(test, test3);
@@ -197,7 +197,7 @@ public class VirtualKeyboardTest {
         testCharList.add('w');
         testCharList.add('s');
 
-        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, testCharList, null);
+        VirtualKeyboard2 test = new VirtualKeyboard2(testKeycodeSet, testCharList);
         VirtualKeyboard2 test2 = test.clone();
         
         assertEquals(test, test2);

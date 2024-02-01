@@ -42,7 +42,7 @@ public class VirtualInput2 {
 
 	/**
 	 * Updates the logic for {@link #KEYBOARD}, {@link #MOUSE} and
-	 * {@link #cameraAngle}<br>
+	 * {@link #CAMERA_ANGLE}<br>
 	 * Runs every frame
 	 * 
 	 * @see MixinMinecraft#playback_injectRunGameLoop(CallbackInfo)
@@ -86,7 +86,7 @@ public class VirtualInput2 {
 	}
 	
 	/**
-	 * Subclass of {@link VirtualInput} handling keyboard logic.<br>
+	 * Subclass of {@link VirtualInput2} handling keyboard logic.<br>
 	 * <br>
 	 * Vanilla keyboard handling looks something like this:
 	 * 
@@ -276,7 +276,7 @@ public class VirtualInput2 {
 
 	public class VirtualCameraAngleInput {
 
-		private VirtualCameraAngle2 cameraAngle;
+		private final VirtualCameraAngle2 cameraAngle;
 
 		public VirtualCameraAngleInput(VirtualCameraAngle2 preloadedCamera) {
 			cameraAngle = preloadedCamera;

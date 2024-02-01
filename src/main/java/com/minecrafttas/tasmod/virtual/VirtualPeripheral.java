@@ -38,18 +38,10 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 	 */
     private boolean ignoreFirstUpdate = false;
 	
-    /**
-     * Create a peripheral with already existing pressed keys
-     * @param pressedKeys The existing pressedKeys
-     */
-	protected VirtualPeripheral(Set<Integer> pressedKeys) {
-		this(pressedKeys, null);
-	}
-	
-    protected VirtualPeripheral(Set<Integer> pressedKeys, List<T> subtickList) {
+    protected VirtualPeripheral(Set<Integer> pressedKeys, List<T> subtickList, boolean ignoreFirstUpdate) {
         this.pressedKeys = pressedKeys;
         this.subtickList = subtickList;
-		ignoreFirstUpdate = subtickList != null && subtickList.isEmpty(); // TODO Change, to something more robust
+		this.ignoreFirstUpdate = ignoreFirstUpdate;
     }
 
     /**
@@ -169,5 +161,9 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 		boolean ignore = ignoreFirstUpdate;
 		ignoreFirstUpdate = false;
 		return ignore;
+	}
+
+	protected boolean isIgnoreFirstUpdate(){
+		return ignoreFirstUpdate;
 	}
 }

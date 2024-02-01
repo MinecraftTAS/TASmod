@@ -45,7 +45,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     private final List<Character> charList;
 
     /**
-     * A queue of characters used in {@link #getDifference(VirtualKeyboard2)}.<br>
+     * A queue of characters used in {@link #getDifference(VirtualKeyboard2, Queue)}.<br>
      * Used for distributing characters to {@link VirtualKeyboardEvent}s in an order.
      */
     private final ConcurrentLinkedQueue<Character> charQueue = new ConcurrentLinkedQueue<>();
@@ -54,7 +54,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * Creates an empty parent keyboard with all keys unpressed
      */
     public VirtualKeyboard2() {
-        this(new HashSet<>(), new ArrayList<>(), new ArrayList<>());
+        this(new HashSet<>(), new ArrayList<>(), new ArrayList<>(), true);
     }
 
     /**
@@ -63,7 +63,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * @param charList A list of characters for this subtickKeyboard
      */
     public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList){
-        this(pressedKeys, charList, null);
+        this(pressedKeys, charList, null, false);
     }
 
     /**
@@ -71,8 +71,12 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * @param pressedKeys The existing list of pressed keycodes
      * @param charList The existing list of characters
      */
-    public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList, List<VirtualKeyboard2> subtick) {
-        super(pressedKeys, subtick);
+	public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList, boolean ignoreFirstUpdate) {
+		this(pressedKeys, charList, null, ignoreFirstUpdate);
+	}
+
+    public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList, List<VirtualKeyboard2> subtick, boolean ignoreFirstUpdate) {
+        super(pressedKeys, subtick, ignoreFirstUpdate);
         this.charList = charList;
     }
     
@@ -202,7 +206,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	@Override
 	public String toString() {
 		if (isParent()) {
-			return getAll().stream().map(element -> element.toString()).collect(Collectors.joining("\n"));
+			return getAll().stream().map(VirtualKeyboard2::toString).collect(Collectors.joining("\n"));
 		} else {
 			return String.format("%s;%s", super.toString(), charListToString(charList));
 		}
@@ -211,7 +215,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	private String charListToString(List<Character> charList) {
 		String charString = "";
 		if (!charList.isEmpty()) {
-			charString = charList.stream().map(element -> element.toString()).collect(Collectors.joining());
+			charString = charList.stream().map(Object::toString).collect(Collectors.joining());
 			charString = StringUtils.replace(charString, "\r", "\\n");
 			charString = StringUtils.replace(charString, "\n", "\\n");
 		}
@@ -223,7 +227,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	 */
     @Override
 	public VirtualKeyboard2 clone() {
-        return new VirtualKeyboard2(new HashSet<>(this.pressedKeys), new ArrayList<>(this.charList));
+        return new VirtualKeyboard2(new HashSet<>(this.pressedKeys), new ArrayList<>(this.charList), isIgnoreFirstUpdate());
     }
     
 

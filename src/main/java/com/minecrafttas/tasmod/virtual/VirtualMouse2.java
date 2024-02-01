@@ -2,6 +2,7 @@ package com.minecrafttas.tasmod.virtual;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +30,11 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	 * Creates a mouse with no buttons pressed and no data
 	 */
 	public VirtualMouse2(){
-		this(new HashSet<>(), 0, null, null);
+		this(new HashSet<>(), 0, null, null, null, true);
+	}
+
+	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse2> subtick){
+		this(pressedKeys, scrollWheel, cursorX, cursorY, subtick, false);
 	}
 
 	/**
@@ -40,8 +45,8 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	 * @param cursorX     The {@link #cursorX}
 	 * @param cursorY     The {@link #cursorY}
 	 */
-	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY) {
-		super(pressedKeys);
+	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse2> subtick, boolean ignoreFirstUpdate) {
+		super(pressedKeys, subtick, ignoreFirstUpdate);
 		this.scrollWheel = scrollWheel;
 		this.cursorX = cursorX;
 		this.cursorY = cursorY;
@@ -129,7 +134,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	@Override
 	public String toString() {
 		if (isParent()) {
-			return getSubticks().stream().map(element -> element.toString()).collect(Collectors.joining("\n"));
+			return getSubticks().stream().map(VirtualMouse2::toString).collect(Collectors.joining("\n"));
 		} else {
 			return String.format("%s;%s,%s,%s", super.toString(), scrollWheel, cursorX, cursorY);
 		}
@@ -140,7 +145,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	 */
 	@Override
 	public VirtualMouse2 clone() {
-		return new VirtualMouse2(new HashSet<>(this.pressedKeys), scrollWheel, cursorX, cursorY);
+		return new VirtualMouse2(new HashSet<>(this.pressedKeys), scrollWheel, cursorX, cursorY, null, ignoreFirstUpdate());
 	}
 
 	@Override
