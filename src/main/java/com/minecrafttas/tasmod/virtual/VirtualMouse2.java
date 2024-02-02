@@ -149,12 +149,11 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	}
 
 	@Override
-	protected void moveFrom(VirtualMouse2 mouse) {
-		super.moveFrom(mouse);
+	protected void copyFrom(VirtualMouse2 mouse) {
+		super.copyFrom(mouse);
 		this.scrollWheel = mouse.scrollWheel;
 		this.cursorX = mouse.cursorX;
 		this.cursorY = mouse.cursorY;
-		mouse.clear();
 	}
 	
 	@Override

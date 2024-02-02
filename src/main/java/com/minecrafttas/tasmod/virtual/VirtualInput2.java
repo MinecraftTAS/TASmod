@@ -173,7 +173,7 @@ public class VirtualInput2 {
 		 */
 		public void nextKeyboardTick() {
 			currentKeyboard.getVirtualEvents(nextKeyboard, keyboardEventQueue);
-			currentKeyboard.moveFrom(nextKeyboard);
+			currentKeyboard.copyFrom(nextKeyboard);
 		}
 
 		/**
@@ -237,7 +237,7 @@ public class VirtualInput2 {
 
 		public void nextMouseTick() {
 			currentMouse.getVirtualEvents(nextMouse, mouseEventQueue);
-			currentMouse.moveFrom(nextMouse);
+			currentMouse.copyFrom(nextMouse);
 		}
 
 		public boolean nextMouseSubtick() {

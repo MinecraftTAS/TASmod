@@ -149,10 +149,10 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 	}
 	
     /**
-     * Moves the data from another virtual peripheral into this peripheral without creating a new object.
+     * Copies the data from another virtual peripheral into this peripheral without creating a new object.
      * @param peripheral The peripheral to move from
      */
-	protected void moveFrom(T peripheral) {
+	protected void copyFrom(T peripheral) {
 		this.pressedKeys.clear();
 		this.pressedKeys.addAll(peripheral.pressedKeys);
 	}

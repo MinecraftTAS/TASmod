@@ -14,27 +14,57 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.ImmutableList;
 
 /**
- * A state of the virtual keyboard at a given time.<br>
+ * Stores keyboard specific values in a given timeframe.<br>
  * <br>
- * This class can be seen as a storage class,<br>
- * representing a state of the physical keyboard at a given time.<br>
+ * This keyboard mimics the {@link org.lwjgl.input.Keyboard} Minecraft is using.
+ * <h2>KeyboardEvent</h2>
+ * {@link org.lwjgl.input.Keyboard} has the following outputs, when a key is pressed or unpressed on the <em>physical</em> keyboard:
+ * <ul>
+ *     <li>int <strong>KeyCode</strong>: The unique keycode of the key</li>
+ *     <li>boolean <strong>KeyState</strong>: The new state of the key. True for pressed, false for unpressed</li>
+ *     <li>char <strong>KeyCharacter</strong>: The character associated for each key</li>
+ * </ul>
+ * While the keycode is the same between <em>physical</em> keyboards, the key character might differ.<br>
+ * It is also common that one keycode has multiple characters associated with it, e.g. <br>
+ * holding shift results in a capitalised character.<br>
  * <br>
- * This class aims to store the currently pressed keys and the list of characters that were entered in that time frame.<br>
- * <br>
- * A keyboard event coming from the physical keyboard may look like this:<br>
- * <br>
+ * These three outputs together are what we call a "KeyboardEvent" and might look like this:
  * <pre>
- * Keycode:17,Keystate:true,Character:w
+ *     17, true, w
  * </pre>
- * This indicates that the key "W" is currently pressed.<br>
- * Therefore, the keycode 17 will be added to the set of {@link #pressedKeys} in {@link VirtualPeripheral}.<br>
- * This behaviour is also present in the {@link VirtualMouse2}.<br>
+ * For <code>keycode, keystate, keycharacter</code><br>
  * <br>
- * The character "w" coming from that keyboard event is added to the {@link #charList}.<br>
- * If shift were to be pressed while pressing the key,<br>
- * then the resulting keyboard event would hold a capitalized "W" as the character.
- * TODO Write Difference and VirtualKey once complete
- * 
+ * <h2>Updating the keyboard</h2>
+ * This keyboard stores it's values in "states".<br>
+ * That means that all the keys that are currently pressed are stored in {@link #pressedKeys}.<br>
+ * And this list is updated via a keyboard event in {@link #update(int, boolean, char)}.<br>
+ * <h2>Difference</h2>
+ * When comparing 2 keyboard states, we can generate a list of differences from them in form of {@link VirtualKeyboardEvent}s.<br>
+ * <pre>
+ * 	this: W A S
+ *	next: W   S D
+ * </pre>
+ * Since there are 2 differences between this and the next keyboard,
+ * this will result in 2 {@link VirtualKeyboardEvent}s. And combined with the {@link #charList} we can also get the associated characters:
+ * <pre>
+ *	30, false, null // A is unpressed
+ * 	32, true, d 	// D is pressed
+ * </pre>
+ * <h2>Subticks</h2>
+ * Minecraft updates it's keyboard every tick. All the key events that occur inbetween are stored,<br>
+ * then read out when a new tick has started.<br> We call these "inbetween" ticks <em>subticks</em>.<br>
+ * <h3>Parent-Subtick</h3>
+ * In a previous version of this keyboard, subticks were bundeled and flattened into one keyboard state.<br>
+ * After all, Minecraft updates only occur once every tick, storing subticks seemed unnecessary.<br>
+ * <br>
+ * However this posed some usability issues when playing in a low game speed via {@link com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient}.<br>
+ * Now you had to hold the key until the next tick to get it recognised by the game.<br>
+ * <br>
+ * To fix this, now every subtick is stored as a keyboard state as well.<br>
+ * When updating the keyboard in {@link #update(int, boolean, char)}, a clone of itself is created and stored in {@link #subtickList},<br>
+ * with the difference that the subtick state has no {@link #subtickList}.<br>
+ * In a nutshell, the keyboard stores it's past changes in {@link #subtickList} with the first being the oldest change.
+ *
  * @author Scribble
  */
 public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implements Serializable {
@@ -84,15 +114,15 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * Updates the keyboard, adds a new subtick to this keyboard
      * @param keycode The keycode of this key
      * @param keystate The keystate of this key, true for pressed
-     * @param character The character that is associated with that key. Can change between keyboards or whenever shift is held in combination.
+     * @param keycharacter The character that is associated with that key. Can change between keyboards or whenever shift is held in combination.
      */
-    public void update(int keycode, boolean keystate, char character) {
+    public void update(int keycode, boolean keystate, char keycharacter) {
     	if(isParent() && !ignoreFirstUpdate()) {
     		addSubtick(clone());
     	}
     	charList.clear();
     	setPressed(keycode, keystate);
-    	addChar(character);
+    	addChar(keycharacter);
     }
     
     @Override
@@ -206,10 +236,14 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	@Override
 	public String toString() {
 		if (isParent()) {
-			return getAll().stream().map(VirtualKeyboard2::toString).collect(Collectors.joining("\n"));
+			return getAll().stream().map(VirtualKeyboard2::toStringWithCharlist).collect(Collectors.joining("\n"));
 		} else {
-			return String.format("%s;%s", super.toString(), charListToString(charList));
+			return toStringWithCharlist();
 		}
+	}
+
+	private String toStringWithCharlist(){
+		return String.format("%s;%s", super.toString(), charListToString(charList));
 	}
 
 	private String charListToString(List<Character> charList) {
@@ -232,11 +266,10 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     
 
     @Override
-    public void moveFrom(VirtualKeyboard2 keyboard) {
-    	super.moveFrom(keyboard);
+    public void copyFrom(VirtualKeyboard2 keyboard) {
+    	super.copyFrom(keyboard);
     	charList.clear();
     	charList.addAll(keyboard.charList);
-    	keyboard.clear();
     }
     
     public List<Character> getCharList() {

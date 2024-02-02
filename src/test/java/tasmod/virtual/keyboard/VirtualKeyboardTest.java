@@ -208,25 +208,23 @@ public class VirtualKeyboardTest {
      */
     @Test
     void testMoveFrom(){
-    	VirtualKeyboard2 moveFrom = new VirtualKeyboard2();
+    	VirtualKeyboard2 copyFrom = new VirtualKeyboard2();
     	VirtualKeyboard2 actual = new VirtualKeyboard2();
     	
-    	moveFrom.update(VirtualKey2.W.getKeycode(), true, 'w');
-    	moveFrom.update(VirtualKey2.A.getKeycode(), true, 'a');
+    	copyFrom.update(VirtualKey2.W.getKeycode(), true, 'w');
+    	copyFrom.update(VirtualKey2.A.getKeycode(), true, 'a');
     	
-    	VirtualKeyboard2 expected = moveFrom.clone();
+    	VirtualKeyboard2 expected = copyFrom.clone();
     	
     	actual.update(VirtualKey2.S.getKeycode(), true, 's');
     	actual.update(VirtualKey2.D.getKeycode(), true, 'd');
-    	
-    	
-        actual.moveFrom(moveFrom);
+
+        actual.copyFrom(copyFrom);
 
         assertIterableEquals(expected.getPressedKeys(), actual.getPressedKeys());
         assertIterableEquals(expected.getCharList(), actual.getCharList());
-        
-        assertEquals(new VirtualKeyboard2(), moveFrom);
-        assertTrue(moveFrom.getSubticks().isEmpty());
+
+        assertFalse(copyFrom.getSubticks().isEmpty());
     }
 
     /**
