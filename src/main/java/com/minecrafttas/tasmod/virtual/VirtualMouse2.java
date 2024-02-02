@@ -1,6 +1,7 @@
 package com.minecrafttas.tasmod.virtual;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
@@ -30,20 +31,43 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	 * Creates a mouse with no buttons pressed and no data
 	 */
 	public VirtualMouse2(){
-		this(new HashSet<>(), 0, null, null, null, true);
+		this(new HashSet<>(), 0, null, null, new ArrayList<>(), true);
 	}
 
-	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse2> subtick){
+	/**
+	 * Creates a subtick mouse with {@link VirtualPeripheral#subtickList} uninitialized
+	 * @param pressedKeys The new list of pressed keycodes for this subtickMouse
+	 * @param scrollWheel The scroll wheel direction for this subtickMouse
+	 * @param cursorX The X coordinate of the cursor for this subtickMouse
+	 * @param cursorY The Y coordinate of the cursor for this subtickMouse
+	 */
+	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY) {
+		this(pressedKeys, scrollWheel, cursorX, cursorY, null, false);
+	}
+
+	/**
+	 * Creates a mouse from existing values with
+	 * {@link VirtualPeripheral#ignoreFirstUpdate} set to false
+	 * 
+	 * @param pressedKeys	The list of {@link #pressedKeys}
+	 * @param scrollWheel	The {@link #scrollWheel}
+	 * @param cursorX		The {@link #cursorX}
+	 * @param cursorY		The {@link #cursorY}
+	 * @param subtick		The {@link VirtualPeripheral#subtickList}
+	 */
+	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse2> subtick) {
 		this(pressedKeys, scrollWheel, cursorX, cursorY, subtick, false);
 	}
 
 	/**
 	 * Creates a mouse from existing values
 	 * 
-	 * @param pressedKeys The list o {@link #pressedKeys}
-	 * @param scrollWheel The {@link #scrollWheel}
-	 * @param cursorX     The {@link #cursorX}
-	 * @param cursorY     The {@link #cursorY}
+	 * @param pressedKeys		The list of {@link #pressedKeys}
+	 * @param scrollWheel		The {@link #scrollWheel}
+	 * @param cursorX			The {@link #cursorX}
+	 * @param cursorY			The {@link #cursorY}
+	 * @param subtick			The {@link VirtualPeripheral#subtickList}
+	 * @param ignoreFirstUpdate	Whether the first call to {@link #update(int, boolean, int, Integer, Integer)} should create a new subtick
 	 */
 	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse2> subtick, boolean ignoreFirstUpdate) {
 		super(pressedKeys, subtick, ignoreFirstUpdate);
@@ -64,7 +88,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	}
 
 	@Override
-	protected void setPressed(int keycode, boolean keystate) {
+	public void setPressed(int keycode, boolean keystate) {
 		if (keycode < 0) {
 			super.setPressed(keycode, keystate);
 		}
@@ -118,6 +142,18 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		}
 	}
 
+	public int getScrollWheel() {
+		return scrollWheel;
+	}
+	
+	public Integer getCursorX() {
+		return cursorX;
+	}
+	
+	public Integer getCursorY() {
+		return cursorY;
+	}
+	
 	@Override
 	protected void clear() {
 		super.clear();

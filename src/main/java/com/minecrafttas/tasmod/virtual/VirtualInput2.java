@@ -64,6 +64,14 @@ public class VirtualInput2 {
 		}
 	}
 
+	/**
+	 * If the keyboard or mouse key is currently down.
+	 * If keycode >= 0 then {@link VirtualKeyboardInput#isKeyDown(int)} will be called,<br>
+	 * otherwise {@link VirtualMouseInput#isKeyDown(int)}
+	 * 
+	 * @param keycode The keycode in question
+	 * @return If the key is down either on mouse or keyboard
+	 */
 	public boolean isKeyDown(int keycode) {
 		if(keycode >= 0) {
 			return KEYBOARD.isKeyDown(keycode);
@@ -72,6 +80,14 @@ public class VirtualInput2 {
 		}
 	}
 	
+	/**
+	 * If the keyboard or mouse key is will be down in the next tick.
+	 * If keycode >= 0 then {@link VirtualKeyboardInput#willKeyBeDown(int)} will be called,<br>
+	 * otherwise {@link VirtualMouseInput#willKeyBeDown(int)}
+	 * 
+	 * @param keycode The keycode in question
+	 * @return If the key will be down either on mouse or keyboard
+	 */
 	public boolean willKeyBeDown(int keycode) {
 		if(keycode >= 0) {
 			return KEYBOARD.willKeyBeDown(keycode);
@@ -80,6 +96,9 @@ public class VirtualInput2 {
 		}
 	}
 	
+	/**
+	 * Unpresses all keys in {@link VirtualKeyboardInput#nextKeyboard} and {@link VirtualMouseInput#nextMouse}
+	 */
 	public void unpress() {
 		KEYBOARD.nextKeyboard.clear();
 		MOUSE.nextMouse.clear();
@@ -117,9 +136,10 @@ public class VirtualInput2 {
 	 *		}
 	 *	}
 	 * </pre>
-	 *
+	 * @see com.minecrafttas.tasmod.virtual.VirtualKeyboard2
 	 */
 	public class VirtualKeyboardInput {
+		
 		/**
 		 * The keyboard "state" that is currently recognized by the game,<br>
 		 * meaning it is a direct copy of the vanilla keybindings. Updated every
@@ -127,18 +147,21 @@ public class VirtualInput2 {
 		 * Updated in {@link #nextKeyboardTick()}
 		 */
 		private final VirtualKeyboard2 currentKeyboard;
+		
 		/**
 		 * The "state" of the real physical keyboard.<br>
 		 * This is updated every <em>frame</em>.<br>
 		 * Updates {@link #currentKeyboard} in {@link #nextKeyboardTick()}
 		 */
 		private final VirtualKeyboard2 nextKeyboard = new VirtualKeyboard2();
+		
 		/**
 		 * Queue for keyboard events.<br>
 		 * Is filled in {@link #nextKeyboardTick()} and read in
 		 * {@link #nextKeyboardSubtick()}
 		 */
 		private final Queue<VirtualKeyboardEvent> keyboardEventQueue = new ConcurrentLinkedQueue<VirtualKeyboardEvent>();
+		
 		/**
 		 * The current keyboard event where the vanilla keybindings are reading
 		 * from.<br>
@@ -148,6 +171,10 @@ public class VirtualInput2 {
 		 */
 		private VirtualKeyboardEvent currentKeyboardEvent = new VirtualKeyboardEvent();
 
+		/**
+		 * Constructor to preload the {@link #currentKeyboard} with an existing keyboard
+		 * @param preloadedKeyboard
+		 */
 		public VirtualKeyboardInput(VirtualKeyboard2 preloadedKeyboard) {
 			currentKeyboard = preloadedKeyboard;
 		}
@@ -208,15 +235,64 @@ public class VirtualInput2 {
 			return currentKeyboardEvent.getCharacter();
 		}
 		
+		/**
+		 * If the key is currently down and recognised by Minecraft
+		 * @param keycode The keycode of the key in question
+		 * @return Whether the key of the {@link #currentKeyboard} is down
+		 */
 		public boolean isKeyDown(int keycode) {
 			return currentKeyboard.isKeyDown(keycode);
 		}
 		
+		/**
+		 * If the key will be down and recognised in the next tick by Minecraft.<br>
+		 * This is equal to checking if a key on the physical keyboard is pressed
+		 * @param keycode The keycode of the key in question
+		 * @return Whether the key of the {@link #nextKeyboard} is down
+		 */
 		public boolean willKeyBeDown(int keycode) {
 			return nextKeyboard.isKeyDown(keycode);
 		}
 	}
 
+	/**
+	 * Subclass of {@link VirtualInput2} handling mouse logic.<br>
+	 * <br>
+	 * Vanilla mouse handling looks something like this:
+	 * 
+	 * <pre>
+	 *	public void runTickMouse()  { // Executed every tick in runTick()
+	 *		while({@linkplain Mouse#next()}){
+	 *			int keycode = {@linkplain Mouse#getEventButton()};
+	 *			boolean keystate = {@linkplain Mouse#getEventButtonState()};
+	 *			int scrollWheel = {@linkplain Mouse#getEventDWheel()}
+	 *			int cursorX = {@linkplain Mouse#getEventX()} // Important in GUIs
+	 *			int cursorY = {@linkplain Mouse#getEventY()}
+	 *
+	 *			Keybindings.updateKeybind(keycode, keystate, etc...)
+	 *		}
+	 *	}
+	 * </pre>
+	 * 
+	 * After redirecting the calls in {@link MixinMinecraft}, the resulting logic
+	 * now looks like this:
+	 * 
+	 * <pre>
+	 *	public void runTickMouse()  { // Executed every tick in runTick()
+	 *		{@linkplain #nextMouseTick()}
+	 *		while({@linkplain #nextMouseSubtick}){
+	 *			int keycode = {@linkplain #getEventMouseKey};
+	 *			boolean keystate = {@linkplain #getEventButtonState()};
+	 *			int scrollWheel = {@linkplain #getEventMouseScrollWheel()}
+	 *			int cursorX = {@linkplain #getEventCursorX()} // Important in GUIs
+	 *			int cursorY = {@linkplain #getEventCursorY()}
+	 *
+	 *			Keybindings.updateKeybind(keycode, keystate, etc...)
+	 *		}
+	 *	}
+	 * </pre>
+	 * @see com.minecrafttas.tasmod.virtual.VirtualMouse2
+	 */
 	public class VirtualMouseInput {
 		private final VirtualMouse2 currentMouse;
 		private final VirtualMouse2 nextMouse = new VirtualMouse2();
@@ -275,7 +351,6 @@ public class VirtualInput2 {
 	}
 
 	public class VirtualCameraAngleInput {
-
 		private final VirtualCameraAngle2 cameraAngle;
 
 		public VirtualCameraAngleInput(VirtualCameraAngle2 preloadedCamera) {
@@ -293,6 +368,5 @@ public class VirtualInput2 {
 		public float getYaw() {
 			return cameraAngle.getYaw();
 		}
-
 	}
 }

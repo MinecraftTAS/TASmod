@@ -32,8 +32,7 @@ import com.google.common.collect.ImmutableList;
  * <pre>
  *     17, true, w
  * </pre>
- * For <code>keycode, keystate, keycharacter</code><br>
- * <br>
+ * For <code>keycode, keystate, keycharacter</code>
  * <h2>Updating the keyboard</h2>
  * This keyboard stores it's values in "states".<br>
  * That means that all the keys that are currently pressed are stored in {@link #pressedKeys}.<br>
@@ -53,7 +52,7 @@ import com.google.common.collect.ImmutableList;
  * <h2>Subticks</h2>
  * Minecraft updates it's keyboard every tick. All the key events that occur inbetween are stored,<br>
  * then read out when a new tick has started.<br> We call these "inbetween" ticks <em>subticks</em>.<br>
- * <h3>Parent-Subtick</h3>
+ * <h3>Parent->Subtick</h3>
  * In a previous version of this keyboard, subticks were bundeled and flattened into one keyboard state.<br>
  * After all, Minecraft updates only occur once every tick, storing subticks seemed unnecessary.<br>
  * <br>
@@ -66,6 +65,7 @@ import com.google.common.collect.ImmutableList;
  * In a nutshell, the keyboard stores it's past changes in {@link #subtickList} with the first being the oldest change.
  *
  * @author Scribble
+ * @see com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput
  */
 public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implements Serializable {
 
@@ -88,7 +88,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     }
 
     /**
-     * Creates a subtick keyboard with {@link #subtickList} uninitialized
+     * Creates a subtick keyboard with {@link VirtualPeripheral#subtickList} uninitialized
      * @param pressedKeys The new list of pressed keycodes for this subtickKeyboard
      * @param charList A list of characters for this subtickKeyboard
      */
