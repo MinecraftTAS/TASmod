@@ -59,7 +59,11 @@ public class VirtualInput2 {
 				MOUSE.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), null, null);
 			} else {
 				Ducks.GuiScreenDuck screen = (Ducks.GuiScreenDuck) currentScreen;
-				MOUSE.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), screen.calcX(Mouse.getEventX()), screen.calcY(Mouse.getEventY()));
+				int eventX = screen.unscaleX(Mouse.getEventX());
+				int eventY = screen.unscaleY(Mouse.getEventY());
+				eventX = PointerNormalizer.getNormalizedX(eventX);
+				eventY = PointerNormalizer.getNormalizedY(eventY);
+				MOUSE.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), eventX, eventY);
 			}
 		}
 	}
@@ -308,7 +312,7 @@ public class VirtualInput2 {
 		}
 
 		public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, Integer cursorX, Integer cursorY) {
-			nextMouse.update(keycode, keystate, scrollwheel, cursorX, cursorY);
+			nextMouse.update(keycode-100, keystate, scrollwheel, cursorX, cursorY);
 		}
 
 		public void nextMouseTick() {

@@ -77,19 +77,18 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	}
 
 	public void update(int keycode, boolean keystate, int scrollwheel, Integer cursorX, Integer cursorY) {
+    	if(isParent() && !ignoreFirstUpdate()) {
+    		addSubtick(clone());
+    	}
 		setPressed(keycode, keystate);
 		this.scrollWheel = scrollwheel;
 		this.cursorX = cursorX;
 		this.cursorY = cursorY;
-
-		if(isParent()) {
-			addSubtick(clone());
-		}
 	}
 
 	@Override
 	public void setPressed(int keycode, boolean keystate) {
-		if (keycode < 0) {
+		if (keycode < 0) {	// Mouse buttons always have a keycode smaller than 0
 			super.setPressed(keycode, keystate);
 		}
 	}
@@ -142,18 +141,6 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		}
 	}
 
-	public int getScrollWheel() {
-		return scrollWheel;
-	}
-	
-	public Integer getCursorX() {
-		return cursorX;
-	}
-	
-	public Integer getCursorY() {
-		return cursorY;
-	}
-	
 	@Override
 	protected void clear() {
 		super.clear();
@@ -170,10 +157,14 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	@Override
 	public String toString() {
 		if (isParent()) {
-			return getSubticks().stream().map(VirtualMouse2::toString).collect(Collectors.joining("\n"));
+			return getSubticks().stream().map(VirtualMouse2::toString2).collect(Collectors.joining("\n"));
 		} else {
-			return String.format("%s;%s,%s,%s", super.toString(), scrollWheel, cursorX, cursorY);
+			return toString2();
 		}
+	}
+	
+	private String toString2(){
+		return String.format("%s;%s,%s,%s", super.toString(), scrollWheel, cursorX, cursorY);
 	}
 
 	/**
@@ -202,5 +193,17 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 					cursorY == mouse.cursorY;
 		}
 		return super.equals(obj);
+	}
+	
+	public int getScrollWheel() {
+		return scrollWheel;
+	}
+	
+	public Integer getCursorX() {
+		return cursorX;
+	}
+	
+	public Integer getCursorY() {
+		return cursorY;
 	}
 }

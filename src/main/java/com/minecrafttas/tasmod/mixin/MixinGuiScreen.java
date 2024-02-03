@@ -79,7 +79,7 @@ public class MixinGuiScreen implements GuiScreenDuck {
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", remap = false))
 	public boolean redirectGetEventButtonState() {
 		if (TASmodClient.controller.isPlayingback()) {
-			Mouse.setCursorPosition(uncalcX(TASmodClient.virtual.MOUSE.getEventCursorX()), uncalcY(TASmodClient.virtual.MOUSE.getEventCursorY()));
+			Mouse.setCursorPosition(rescaleX(TASmodClient.virtual.MOUSE.getEventCursorX()), rescaleY(TASmodClient.virtual.MOUSE.getEventCursorY()));
 		}
 		return TASmodClient.virtual.MOUSE.getEventMouseState();
 	}
@@ -88,14 +88,14 @@ public class MixinGuiScreen implements GuiScreenDuck {
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventX()I", remap = false))
 	public int redirectGetEventX() {
-		return uncalcX(TASmodClient.virtual.MOUSE.getEventCursorX());
+		return rescaleX(TASmodClient.virtual.MOUSE.getEventCursorX());
 	}
 
 	// =====================================================================================================================================
 
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventY()I", remap = false))
 	public int redirectGetEventY() {
-		return uncalcY(TASmodClient.virtual.MOUSE.getEventCursorY());
+		return rescaleY(TASmodClient.virtual.MOUSE.getEventCursorY());
 	}
 
 	// =====================================================================================================================================
@@ -131,22 +131,22 @@ public class MixinGuiScreen implements GuiScreenDuck {
 	private Minecraft mc;
 
 	@Override
-	public int calcX(int X) {
+	public int unscaleX(int X) {
 		return X * this.width / this.mc.displayWidth;
 	}
 
 	@Override
-	public int calcY(int Y) {
+	public int unscaleY(int Y) {
 		return this.height - Y * this.height / this.mc.displayHeight - 1;
 	}
 
 	@Override
-	public int uncalcX(int X) {
+	public int rescaleX(int X) {
 		return X * this.mc.displayWidth / this.width;
 	}
 
 	@Override
-	public int uncalcY(int Y) {
+	public int rescaleY(int Y) {
 		return (this.mc.displayHeight * (this.height - Y - 1) / this.height);
 	}
 

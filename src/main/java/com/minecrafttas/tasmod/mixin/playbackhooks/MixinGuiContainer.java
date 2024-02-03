@@ -1,7 +1,6 @@
 package com.minecrafttas.tasmod.mixin.playbackhooks;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -13,6 +12,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 
 @Mixin(GuiContainer.class)
 public class MixinGuiContainer {
+	
 	@Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", ordinal = 0, remap = false))
 	private boolean redirectIsKeyDown(int i) {
 		return TASmodClient.virtual.isKeyDown(i);
@@ -23,6 +23,10 @@ public class MixinGuiContainer {
 		return TASmodClient.virtual.isKeyDown(i);
 	}
 
+	/**
+	 * Fixes <a href="https://github.com/MinecraftTAS/TASmod/issues/67">#67</a>
+	 * @param player
+	 */
 	@Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V"))
 	public void redirectCloseScreen(EntityPlayerSP player) {
 		Minecraft mc = Minecraft.getMinecraft();

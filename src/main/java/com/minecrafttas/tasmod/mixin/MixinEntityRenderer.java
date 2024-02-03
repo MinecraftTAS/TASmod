@@ -20,7 +20,6 @@ import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.util.math.MathHelper;
 
 @Mixin(EntityRenderer.class)
-@SuppressWarnings("unused")
 public class MixinEntityRenderer implements SubtickDuck {
 
 	public double dX = 0;

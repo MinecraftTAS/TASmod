@@ -104,9 +104,16 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList, boolean ignoreFirstUpdate) {
 		this(pressedKeys, charList, null, ignoreFirstUpdate);
 	}
-
-    public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList, List<VirtualKeyboard2> subtick, boolean ignoreFirstUpdate) {
-        super(pressedKeys, subtick, ignoreFirstUpdate);
+	
+	/**
+	 * Creates a keyboard from existing variables
+	 * @param pressedKeys The existing list of {@link VirtualPeripheral#pressedKeys}
+	 * @param charList The {@link #charList}
+	 * @param subtickList {@link VirtualPeripheral#subtickList}
+	 * @param ignoreFirstUpdate The {@link VirtualPeripheral#ignoreFirstUpdate}
+	 */
+    public VirtualKeyboard2(Set<Integer> pressedKeys, List<Character> charList, List<VirtualKeyboard2> subtickList, boolean ignoreFirstUpdate) {
+        super(pressedKeys, subtickList, ignoreFirstUpdate);
         this.charList = charList;
     }
     
@@ -121,8 +128,8 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     		addSubtick(clone());
     	}
     	charList.clear();
-    	setPressed(keycode, keystate);
     	addChar(keycharacter);
+    	setPressed(keycode, keystate);
     }
     
     @Override
@@ -236,13 +243,13 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	@Override
 	public String toString() {
 		if (isParent()) {
-			return getAll().stream().map(VirtualKeyboard2::toStringWithCharlist).collect(Collectors.joining("\n"));
+			return getAll().stream().map(VirtualKeyboard2::toString2).collect(Collectors.joining("\n"));
 		} else {
-			return toStringWithCharlist();
+			return toString2();
 		}
 	}
 
-	private String toStringWithCharlist(){
+	private String toString2(){
 		return String.format("%s;%s", super.toString(), charListToString(charList));
 	}
 
@@ -264,16 +271,11 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
         return new VirtualKeyboard2(new HashSet<>(this.pressedKeys), new ArrayList<>(this.charList), isIgnoreFirstUpdate());
     }
     
-
     @Override
     public void copyFrom(VirtualKeyboard2 keyboard) {
     	super.copyFrom(keyboard);
     	charList.clear();
     	charList.addAll(keyboard.charList);
-    }
-    
-    public List<Character> getCharList() {
-        return ImmutableList.copyOf(charList);
     }
     
     @Override
@@ -293,5 +295,10 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     		return super.equals(obj);
     	}
     	return super.equals(obj);
+    }
+    
+    
+    public List<Character> getCharList() {
+        return ImmutableList.copyOf(charList);
     }
 }

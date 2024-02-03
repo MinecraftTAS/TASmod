@@ -60,6 +60,9 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
      * @param keystate The keystate of the keycode
      */
     protected void setPressed(int keycode, boolean keystate) {
+		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) { //TODO Maybe a better system?
+			return;
+		}
         if (keystate)
             pressedKeys.add(keycode);
         else
@@ -185,6 +188,7 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 	protected void copyFrom(T peripheral) {
 		this.pressedKeys.clear();
 		this.pressedKeys.addAll(peripheral.pressedKeys);
+		peripheral.subtickList.clear();
 	}
 	
 	/**

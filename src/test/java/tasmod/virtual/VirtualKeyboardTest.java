@@ -232,7 +232,7 @@ class VirtualKeyboardTest {
         assertIterableEquals(expected.getPressedKeys(), actual.getPressedKeys());
         assertIterableEquals(expected.getCharList(), actual.getCharList());
 
-        assertFalse(copyFrom.getSubticks().isEmpty());
+        assertTrue(copyFrom.getSubticks().isEmpty());
     }
 
     /**

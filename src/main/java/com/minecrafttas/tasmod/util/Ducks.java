@@ -15,6 +15,8 @@ package com.minecrafttas.tasmod.util;
  * #TeamNoDucks
  * 
  * <b>Ducks now use up 66.66% less files on my hard drive! I call that a success.</b>
+ * 
+ * @author Pancake
  */
 public class Ducks {
 	
@@ -26,13 +28,53 @@ public class Ducks {
 	}
 	
 	/**
-	 * Quacks the gui screen to spit out mouse positions independant of the display size
+	 * Quacks the gui screen to spit out mouse positions independent of the display size
 	 */
 	public static interface GuiScreenDuck {
-		public int calcX(int X);
-		public int calcY(int Y);
-		public int uncalcX(int X);
-		public int uncalcY(int J);
+		
+		/**
+		 * Calculates the true value of the pointer coordinate, by removing the scaling for custom screen sizes applied to it:
+		 * <pre>
+		 * X * this.width / this.mc.displayWidth
+		 * </pre>
+		 * By storing the true value in the TASfile, we can play back the TAS even with a different GUI Scale applied to it
+		 * @param x The scaled pointer coordinate
+		 * @return The unscaled pointer coordinate
+		 * @see #rescaleX(int)
+		 */
+		public int unscaleX(int x);
+		
+		/**
+		 * Calculates the true value of the pointer coordinate, by removing the scaling for custom screen sizes applied to it:
+		 * <pre>
+		 * this.height - Y * this.height / this.mc.displayHeight - 1
+		 * </pre>
+		 * By storing the true value in the TASfile, we can play back the TAS even with a different GUI Scale applied to it
+		 * @param y The scaled pointer coordinate
+		 * @return The unscaled pointer coordinate
+		 * @see #rescaleY(int)
+		 */
+		public int unscaleY(int y);
+		
+		/**
+		 * Reapplies the math for custom gui scales to the pointer coordinate:
+		 * <pre>
+		 * X * this.mc.displayWidth / this.width
+		 * </pre>
+		 * @param x The unscaled pointer coordinate
+		 * @return The scaled pointer coordinate
+		 */
+		public int rescaleX(int x);
+		
+		/**
+		 * Reapplies the math for custom gui scales to the pointer coordinate:
+		 * <pre>
+		 * (this.mc.displayHeight * (this.height - Y - 1) / this.height)
+		 * </pre>
+		 * @param y The unscaled pointer coordinate
+		 * @return The scaled pointer coordinate
+		 */
+		public int rescaleY(int y);
 	}
 
 	/**
