@@ -11,7 +11,6 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import com.minecrafttas.mctcommon.events.EventClient.EventClientTick;

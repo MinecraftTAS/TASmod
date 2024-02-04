@@ -1,17 +1,19 @@
 package com.minecrafttas.tasmod.virtual;
 
-import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.mixin.playbackhooks.MixinMinecraft;
-import com.minecrafttas.tasmod.util.Ducks;
-import com.minecrafttas.tasmod.util.LoggerMarkers;
-import com.minecrafttas.tasmod.util.PointerNormalizer;
-import net.minecraft.client.gui.GuiScreen;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import com.minecrafttas.tasmod.mixin.playbackhooks.MixinMinecraft;
+import com.minecrafttas.tasmod.util.Ducks;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
+import com.minecrafttas.tasmod.util.PointerNormalizer;
+
+import net.minecraft.client.gui.GuiScreen;
 
 /**
  * Main component for redirecting inputs.<br>
@@ -21,12 +23,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * <br>
  */
 public class VirtualInput2 {
+	private final Logger LOGGER;
 	public final VirtualKeyboardInput KEYBOARD;
 	public final VirtualMouseInput MOUSE;
 	public final VirtualCameraAngleInput CAMERA_ANGLE;
 
-	public VirtualInput2() {
-		this(new VirtualKeyboard2(), new VirtualMouse2(), new VirtualCameraAngle2());
+	public VirtualInput2(Logger logger) {
+		this(logger, new VirtualKeyboard2(), new VirtualMouse2(), new VirtualCameraAngle2());
 	}
 
 	/**
@@ -36,7 +39,8 @@ public class VirtualInput2 {
 	 * @param preloadedMouse
 	 * @param preloadedCamera
 	 */
-	public VirtualInput2(VirtualKeyboard2 preloadedKeyboard, VirtualMouse2 preloadedMouse, VirtualCameraAngle2 preloadedCamera) {
+	public VirtualInput2(Logger logger, VirtualKeyboard2 preloadedKeyboard, VirtualMouse2 preloadedMouse, VirtualCameraAngle2 preloadedCamera) {
+		this.LOGGER = logger;
 		KEYBOARD = new VirtualKeyboardInput(preloadedKeyboard);
 		MOUSE = new VirtualMouseInput(preloadedMouse);
 		CAMERA_ANGLE = new VirtualCameraAngleInput(preloadedCamera);
@@ -54,7 +58,7 @@ public class VirtualInput2 {
 	 */
 	public void update(GuiScreen currentScreen) {
 		while (Keyboard.next()) {
-			KEYBOARD.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter());
+			KEYBOARD.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter(), Keyboard.areRepeatEventsEnabled());
 		}
 		while (Mouse.next()) {
 			if (currentScreen == null) {
@@ -194,10 +198,23 @@ public class VirtualInput2 {
 		 * @param character The character of this event
 		 */
 		public void updateNextKeyboard(int keycode, boolean keystate, char character) {
-			TASmod.LOGGER.debug(LoggerMarkers.Keyboard,"Update: {}, {}, {}, {}", keycode, keystate, character, Keyboard.areRepeatEventsEnabled());
-			nextKeyboard.update(keycode, keystate, character);
+			updateNextKeyboard(keycode, keystate, character, false);
 		}
-
+		
+		/**
+		 * Updates the next keyboard
+		 * 
+		 * @see VirtualInput2#update(GuiScreen)
+		 * @param keycode   The keycode of this event
+		 * @param keystate  The keystate of this event
+		 * @param character The character of this event
+		 * @param repeatEventsEnabled If repeat events are enabled
+		 */
+		public void updateNextKeyboard(int keycode, boolean keystate, char character, boolean repeatEventsEnabled) {
+			LOGGER.debug(LoggerMarkers.Keyboard, "Update: {}, {}, {}, {}", keycode, keystate, character, repeatEventsEnabled);
+			nextKeyboard.update(keycode, keystate, character, repeatEventsEnabled);
+		}
+		
 		/**
 		 * Runs when the next keyboard tick is about to occur.<br>
 		 * Used to load {@link #nextKeyboard} into {@link #currentKeyboard}, creating
@@ -316,7 +333,7 @@ public class VirtualInput2 {
 
 		public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, Integer cursorX, Integer cursorY) {
 			keycode-=100;
-			TASmod.LOGGER.debug(LoggerMarkers.Mouse,"Update: {} ({}), {}, {}", keycode, VirtualKey2.getName(keycode), keystate, scrollwheel, cursorX, cursorY);
+			LOGGER.debug(LoggerMarkers.Mouse,"Update: {} ({}), {}, {}", keycode, VirtualKey2.getName(keycode), keystate, scrollwheel, cursorX, cursorY);
 			nextMouse.update(keycode, keystate, scrollwheel, cursorX, cursorY);
 		}
 

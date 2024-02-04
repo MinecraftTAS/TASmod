@@ -119,7 +119,7 @@ class VirtualKeyboardTest {
     @Test
     void testAddCharacter(){
         VirtualKeyboard2 actual = new VirtualKeyboard2();
-        actual.addChar('w');
+        actual.addChar('w', false);
 
         assertIterableEquals(Arrays.asList('w'), actual.getCharList());
     }

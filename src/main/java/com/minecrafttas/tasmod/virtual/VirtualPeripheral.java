@@ -189,6 +189,7 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 		this.pressedKeys.clear();
 		this.pressedKeys.addAll(peripheral.pressedKeys);
 		peripheral.subtickList.clear();
+		peripheral.resetFirstUpdate();
 	}
 	
 	/**
@@ -207,5 +208,9 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 	 */
 	protected boolean isIgnoreFirstUpdate(){
 		return ignoreFirstUpdate;
+	}
+	
+	protected void resetFirstUpdate() {
+		ignoreFirstUpdate = true;
 	}
 }

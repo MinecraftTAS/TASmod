@@ -3,6 +3,7 @@ package com.minecrafttas.tasmod.virtual;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -84,7 +85,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * Creates an empty parent keyboard with all keys unpressed
      */
     public VirtualKeyboard2() {
-        this(new HashSet<>(), new ArrayList<>(), new ArrayList<>(), true);
+        this(new LinkedHashSet<>(), new ArrayList<>(), new ArrayList<>(), true);
     }
 
     /**
@@ -123,13 +124,17 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * @param keystate The keystate of this key, true for pressed
      * @param keycharacter The character that is associated with that key. Can change between keyboards or whenever shift is held in combination.
      */
-    public void update(int keycode, boolean keystate, char keycharacter) {
+    public void update(int keycode, boolean keystate, char keycharacter, boolean repeatEventsEnabled) {
     	if(isParent() && !ignoreFirstUpdate()) {
     		addSubtick(clone());
     	}
     	charList.clear();
-    	addChar(keycharacter);
+    	addChar(keycharacter, repeatEventsEnabled);
     	setPressed(keycode, keystate);
+    }
+    
+    public void update(int keycode, boolean keystate, char keycharacter) {
+    	update(keycode, keystate, keycharacter, false);
     }
     
     @Override
@@ -149,7 +154,6 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 	 * @param reference The queue to fill. Passed in by reference.
 	 */
     public void getDifference(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
-
         charQueue.addAll(nextKeyboard.charList);
 
         /* Calculate symmetric difference of keycodes */
@@ -161,11 +165,11 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 		    -------------
 		            A     <- unpressed
 		 */
-        this.pressedKeys.forEach(key -> {
+        for(int key : pressedKeys) {
             if (!nextKeyboard.getPressedKeys().contains(key)) {
             	reference.add(new VirtualKeyboardEvent(key, false, Character.MIN_VALUE));
             }
-        });
+        }
 
 		/*
 		 	Calculate pressed keys
@@ -174,11 +178,13 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 		 	-------------
 		 	            D <- pressed
 		 */
-        nextKeyboard.getPressedKeys().forEach(key -> {
+        int lastKey = 0;
+        for(int key : nextKeyboard.getPressedKeys()) {
+        	lastKey = key;
             if (!this.pressedKeys.contains(key)) {
             	reference.add(new VirtualKeyboardEvent(key, true, getOrMinChar(charQueue.poll())));
             }
-        });
+        }
 
 		/*
 			Add the rest of the characters as keyboard events.
@@ -191,7 +197,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 			otherwise you'd either need to add a keycode for each char or write it in new lines
 		 */
         while (!charQueue.isEmpty()) {
-        	reference.add(new VirtualKeyboardEvent(0, false, getOrMinChar(charQueue.poll())));
+        	reference.add(new VirtualKeyboardEvent(lastKey, true, getOrMinChar(charQueue.poll())));
         }
 
     }
@@ -229,9 +235,10 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
      * Null characters will be discarded;
      * @param character The character to add
      */
-    public void addChar(char character) {
-        if(character != Character.MIN_VALUE)
-            charList.add(character);
+    public void addChar(char character, boolean repeatEventsEnabled) {
+        if(character != Character.MIN_VALUE || repeatEventsEnabled) {
+        	charList.add(character);
+        }
     }
 
     @Override
@@ -276,6 +283,7 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     	super.copyFrom(keyboard);
     	charList.clear();
     	charList.addAll(keyboard.charList);
+    	keyboard.charList.clear();
     }
     
     @Override

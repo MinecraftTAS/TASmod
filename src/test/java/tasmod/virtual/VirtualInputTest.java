@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 
 import com.minecrafttas.tasmod.virtual.VirtualCameraAngle2;
@@ -15,12 +17,14 @@ import com.minecrafttas.tasmod.virtual.VirtualMouse2;
 
 class VirtualInputTest {
 
+	private Logger LOGGER = LogManager.getLogger("TASmod");
+	
 	/**
 	 * Test constructor initializing keyboard, mouse and camera_angle
 	 */
 	@Test
 	void testConstructor() {
-		VirtualInput2 virtual = new VirtualInput2();
+		VirtualInput2 virtual = new VirtualInput2(LOGGER);
 		
 		assertNotNull(virtual.KEYBOARD);
 		assertNotNull(virtual.MOUSE);
@@ -40,7 +44,7 @@ class VirtualInputTest {
 		preloadedMouse.update(VirtualKey2.LC.getKeycode(), true, 15, null, null);
 		
 		
-		VirtualInput2 virtual = new VirtualInput2(preloadedKeyboard, preloadedMouse, preloadedCameraAngle);
+		VirtualInput2 virtual = new VirtualInput2(LOGGER, preloadedKeyboard, preloadedMouse, preloadedCameraAngle);
 		
 		virtual.KEYBOARD.nextKeyboardTick();
 		assertTrue(virtual.KEYBOARD.nextKeyboardSubtick());
@@ -59,7 +63,7 @@ class VirtualInputTest {
 	 */
 	@Test
 	void testKeyboardAddPresses() {
-		VirtualInput2 virtual = new VirtualInput2();
+		VirtualInput2 virtual = new VirtualInput2(LOGGER);
 		
 		// Simulate pressing keys WAS on the keyboard
 		virtual.KEYBOARD.updateNextKeyboard(VirtualKey2.W.getKeycode(), true, 'w');
@@ -108,7 +112,7 @@ class VirtualInputTest {
 		VirtualKeyboard2 preloadedKeyboard = new VirtualKeyboard2();
 		
 		preloadedKeyboard.update(VirtualKey2.W.getKeycode(), true, 'w');
-		VirtualInput2 virtual = new VirtualInput2(preloadedKeyboard, new VirtualMouse2(), new VirtualCameraAngle2());
+		VirtualInput2 virtual = new VirtualInput2(LOGGER, preloadedKeyboard, new VirtualMouse2(), new VirtualCameraAngle2());
 		
 		virtual.KEYBOARD.updateNextKeyboard(VirtualKey2.W.getKeycode(), false, Character.MIN_VALUE);
 		

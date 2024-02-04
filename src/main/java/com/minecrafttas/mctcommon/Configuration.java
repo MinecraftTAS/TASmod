@@ -10,7 +10,6 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.io.FileUtils;
 
 /**
  * A <i>very</i> simple configuration class
