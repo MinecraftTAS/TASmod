@@ -14,15 +14,19 @@ import net.minecraft.client.settings.KeyBinding;
 
 /**
  * Keybind manager
+ * 
  * @author Pancake
  */
-public abstract class KeybindManager implements EventClientGameLoop {
+public class KeybindManager implements EventClientGameLoop {
+
+	private final IsKeyDownFunc defaultFunction;
 
 	public static class Keybind {
 
 		private KeyBinding keyBinding;
 		private String category;
 		private Runnable onKeyDown;
+		private IsKeyDownFunc isKeyDownFunc;
 
 		/**
 		 * Initialize keybind
@@ -33,9 +37,22 @@ public abstract class KeybindManager implements EventClientGameLoop {
 		 * @param onKeyDown  Will be run when the keybind is pressed
 		 */
 		public Keybind(String name, String category, int defaultKey, Runnable onKeyDown) {
+			this(name, category, defaultKey, onKeyDown, null);
+		}
+
+		/**
+		 * Initialize keybind with a different "isKeyDown" method
+		 * 
+		 * @param name       Name of keybind
+		 * @param category   Category of keybind
+		 * @param defaultKey Default key of keybind
+		 * @param onKeyDown  Will be run when the keybind is pressed
+		 */
+		public Keybind(String name, String category, int defaultKey, Runnable onKeyDown, IsKeyDownFunc func) {
 			this.keyBinding = new KeyBinding(name, defaultKey, category);
 			this.category = category;
 			this.onKeyDown = onKeyDown;
+			this.isKeyDownFunc = func;
 		}
 
 	}
@@ -43,9 +60,13 @@ public abstract class KeybindManager implements EventClientGameLoop {
 	private List<Keybind> keybindings;
 
 	/**
-	 * Initialize keybind manager
+	 * Initialize keybind manage
+	 * 
+	 * @param defaultFunction The default function used to determine if a keybind is
+	 *                        down. Can be overridden when registering a new keybind
 	 */
-	public KeybindManager() {
+	public KeybindManager(IsKeyDownFunc defaultFunction) {
+		this.defaultFunction = defaultFunction;
 		this.keybindings = new ArrayList<>();
 	}
 
@@ -55,11 +76,13 @@ public abstract class KeybindManager implements EventClientGameLoop {
 	@Override
 	public void onRunClientGameLoop(Minecraft mc) {
 		for (Keybind keybind : this.keybindings)
-			if (this.isKeyDown(keybind.keyBinding))
-				keybind.onKeyDown.run();
+			if (keybind.isKeyDownFunc == null) {
+				defaultFunction.isKeyDown(keybind.keyBinding);
+			} else {
+				if (keybind.isKeyDownFunc.isKeyDown(keybind.keyBinding))
+					keybind.onKeyDown.run();
+			}
 	}
-
-	protected abstract boolean isKeyDown(KeyBinding i);
 
 	/**
 	 * Register new keybind
@@ -80,4 +103,9 @@ public abstract class KeybindManager implements EventClientGameLoop {
 		return keyBinding;
 	}
 
+	@FunctionalInterface
+	public static interface IsKeyDownFunc {
+
+		public boolean isKeyDown(KeyBinding keybind);
+	}
 }

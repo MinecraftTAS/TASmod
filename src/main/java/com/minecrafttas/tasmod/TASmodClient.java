@@ -137,13 +137,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		// Initialize Ticksync
 		ticksyncClient = new TickSyncClient();
 		// Initialize keybind manager
-		keybindManager = new KeybindManager() {
-			
-			protected boolean isKeyDown(KeyBinding i) {
-				return VirtualKeybindings.isKeyDownExceptTextfield(i);
-			};
-			
-		};
+		keybindManager = new KeybindManager(VirtualKeybindings::isKeyDownExceptTextfield);
 		
 		// Register event listeners
 		EventListenerRegistry.register(this);
@@ -181,9 +175,9 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	public void onClientInit(Minecraft mc) {
 		// initialize keybindings
 		List<KeyBinding> blockedKeybindings = new ArrayList<>();
-		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Tickrate 0 Key", "TASmod", Keyboard.KEY_F8, () -> TASmodClient.tickratechanger.togglePause())));
-		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Advance Tick", "TASmod", Keyboard.KEY_F9, () -> TASmodClient.tickratechanger.advanceTick())));
-		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Recording/Playback Stop", "TASmod", Keyboard.KEY_F10, () -> TASmodClient.controller.setTASState(TASstate.NONE))));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Tickrate 0 Key", "TASmod", Keyboard.KEY_F8, () -> TASmodClient.tickratechanger.togglePause(), VirtualKeybindings::isKeyDown)));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Advance Tick", "TASmod", Keyboard.KEY_F9, () -> TASmodClient.tickratechanger.advanceTick(), VirtualKeybindings::isKeyDown)));
+		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Recording/Playback Stop", "TASmod", Keyboard.KEY_F10, () -> TASmodClient.controller.setTASState(TASstate.NONE), VirtualKeybindings::isKeyDown)));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Create Savestate", "TASmod", Keyboard.KEY_J, () -> {
 			try {
 				TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_SAVE).writeInt(-1));
@@ -201,14 +195,14 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Open InfoGui Editor", "TASmod", Keyboard.KEY_F6, () -> Minecraft.getMinecraft().displayGuiScreen(TASmodClient.hud))));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing", "TASmod", Keyboard.KEY_F12, () -> {
 			TASmodClient.client.disconnect();
-		})));
+		}, VirtualKeybindings::isKeyDown)));
 		blockedKeybindings.add(keybindManager.registerKeybind(new Keybind("Various Testing2", "TASmod", Keyboard.KEY_F7, () -> {
 			try {
 				TASmodClient.client = new Client("localhost", TASmod.networkingport-1, TASmodPackets.values(), mc.getSession().getProfile().getName(), true);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		})));
+		}, VirtualKeybindings::isKeyDown)));
 		blockedKeybindings.forEach(VirtualKeybindings::registerBlockedKeyBinding);
 		
 		createTASDir();
