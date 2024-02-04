@@ -211,7 +211,7 @@ public class VirtualInput2 {
 		 * @param repeatEventsEnabled If repeat events are enabled
 		 */
 		public void updateNextKeyboard(int keycode, boolean keystate, char character, boolean repeatEventsEnabled) {
-			LOGGER.debug(LoggerMarkers.Keyboard, "Update: {}, {}, {}, {}", keycode, keystate, character, repeatEventsEnabled);
+			LOGGER.debug(LoggerMarkers.Keyboard, "Update: {}, {}, {}, {}", keycode, keystate, character);
 			nextKeyboard.update(keycode, keystate, character, repeatEventsEnabled);
 		}
 		
