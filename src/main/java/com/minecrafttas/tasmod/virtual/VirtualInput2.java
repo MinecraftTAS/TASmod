@@ -1,7 +1,9 @@
 package com.minecrafttas.tasmod.virtual;
 
+import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.mixin.playbackhooks.MixinMinecraft;
 import com.minecrafttas.tasmod.util.Ducks;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.PointerNormalizer;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
@@ -192,6 +194,7 @@ public class VirtualInput2 {
 		 * @param character The character of this event
 		 */
 		public void updateNextKeyboard(int keycode, boolean keystate, char character) {
+			TASmod.LOGGER.debug(LoggerMarkers.Keyboard,"Update: {}, {}, {}, {}", keycode, keystate, character, Keyboard.areRepeatEventsEnabled());
 			nextKeyboard.update(keycode, keystate, character);
 		}
 
@@ -312,7 +315,9 @@ public class VirtualInput2 {
 		}
 
 		public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, Integer cursorX, Integer cursorY) {
-			nextMouse.update(keycode-100, keystate, scrollwheel, cursorX, cursorY);
+			keycode-=100;
+			TASmod.LOGGER.debug(LoggerMarkers.Mouse,"Update: {} ({}), {}, {}", keycode, VirtualKey2.getName(keycode), keystate, scrollwheel, cursorX, cursorY);
+			nextMouse.update(keycode, keystate, scrollwheel, cursorX, cursorY);
 		}
 
 		public void nextMouseTick() {

@@ -35,4 +35,8 @@ public class LoggerMarkers {
 	public static final Marker Tickrate = MarkerManager.getMarker("Tickrate");
 
 	public static final Marker Playback = MarkerManager.getMarker("Playback");
+	
+	public static final Marker Keyboard = MarkerManager.getMarker("Keyboard");
+	
+	public static final Marker Mouse = MarkerManager.getMarker("Mouse");
 }
