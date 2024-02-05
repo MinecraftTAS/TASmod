@@ -62,6 +62,10 @@ task downloadKTRNG(type: Copy) {
     into 'run/mods/'
 }
 
+compileJava{
+	options.release = 8
+}
+
 // process fabric mod json
 processResources {
     inputs.property "version", project.version
