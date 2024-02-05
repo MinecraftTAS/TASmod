@@ -2,12 +2,7 @@ package tasmod.virtual;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.junit.jupiter.api.Test;
@@ -129,7 +124,7 @@ class VirtualKeyboardTest {
      */
     @Test
     void testToString(){
-        Set<Integer> testKeycodeSet = new HashSet<>();
+        Set<Integer> testKeycodeSet = new LinkedHashSet<>();
         testKeycodeSet.add(VirtualKey2.W.getKeycode());
         testKeycodeSet.add(VirtualKey2.S.getKeycode());
 
@@ -142,6 +137,19 @@ class VirtualKeyboardTest {
 
         assertEquals("W,S;ws", actual.toString());
         assertEquals("W,S;", actual2.toString());
+    }
+
+    /**
+     * Test the toString method <em>with</em> subticks
+     */
+    @Test
+    void testToStringSubticks(){
+        VirtualKeyboard2 actual = new VirtualKeyboard2();
+
+        actual.update(VirtualKey2.W.getKeycode(), true, 'w');
+        actual.update(VirtualKey2.S.getKeycode(), true, 's');
+
+        assertEquals("W;w\nW,S;s", actual.toString());
     }
 
     /**
@@ -212,10 +220,10 @@ class VirtualKeyboardTest {
     }
 
     /**
-     * Test move from method
+     * Test copy from method
      */
     @Test
-    void testMoveFrom(){
+    void testCopyFrom(){
     	VirtualKeyboard2 copyFrom = new VirtualKeyboard2();
     	VirtualKeyboard2 actual = new VirtualKeyboard2();
     	
@@ -233,6 +241,7 @@ class VirtualKeyboardTest {
         assertIterableEquals(expected.getCharList(), actual.getCharList());
 
         assertTrue(copyFrom.getSubticks().isEmpty());
+        assertTrue(copyFrom.getCharList().isEmpty());
     }
 
     /**
@@ -303,5 +312,57 @@ class VirtualKeyboardTest {
     	List<VirtualKeyboardEvent> expected = Arrays.asList(new VirtualKeyboardEvent(VirtualKey2.W.getKeycode(), false, Character.MIN_VALUE));
     	
     	assertIterableEquals(expected, actual);
+    }
+
+    /**
+     * Test repeat events enabled
+     */
+    @Test
+    void testRepeatEvents(){
+        VirtualKeyboard2 testKb = new VirtualKeyboard2();
+
+        int keycode = VirtualKey2.BACK.getKeycode();
+
+        // Update the keyboard multiple times with the same value
+        testKb.update(keycode, true, Character.MIN_VALUE, true);
+        testKb.update(keycode, true, Character.MIN_VALUE, true);
+        testKb.update(keycode, true, Character.MIN_VALUE, true);
+
+        Queue<VirtualKeyboardEvent> actual = new ConcurrentLinkedQueue<>();
+        // Fill "actual" with VirtualKeyboardEvents
+        new VirtualKeyboard2().getVirtualEvents(testKb, actual);
+
+        List<VirtualKeyboardEvent> expected = new ArrayList<>();
+        // Add expected VirtualKeyboardEvents
+        expected.add(new VirtualKeyboardEvent(keycode, true, Character.MIN_VALUE));
+        expected.add(new VirtualKeyboardEvent(keycode, true, Character.MIN_VALUE));
+        expected.add(new VirtualKeyboardEvent(keycode, true, Character.MIN_VALUE));
+
+        assertIterableEquals(expected, actual);
+    }
+
+    /**
+     * Same as {@link #testRepeatEvents()} but with repeat events disabled
+     */
+    @Test
+    void testRepeatEventsFail(){
+        VirtualKeyboard2 testKb = new VirtualKeyboard2();
+
+        int keycode = VirtualKey2.BACK.getKeycode();
+        // Update the keyboard multiple times with the same value.
+        testKb.update(keycode, true, Character.MIN_VALUE, false);
+        testKb.update(keycode, true, Character.MIN_VALUE, false);
+        testKb.update(keycode, true, Character.MIN_VALUE, false);
+
+        Queue<VirtualKeyboardEvent> actual = new ConcurrentLinkedQueue<>();
+        // Fill "actual" with VirtualKeyboardEvents
+        new VirtualKeyboard2().getVirtualEvents(testKb, actual);
+
+        List<VirtualKeyboardEvent> expected = new ArrayList<>();
+
+        // Only one keyboard event should be added
+        expected.add(new VirtualKeyboardEvent(keycode, true, Character.MIN_VALUE));
+
+        assertIterableEquals(expected, actual);
     }
 }

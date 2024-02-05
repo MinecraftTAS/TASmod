@@ -1,11 +1,7 @@
 package com.minecrafttas.tasmod.virtual;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements Serializable {
@@ -31,7 +27,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	 * Creates a mouse with no buttons pressed and no data
 	 */
 	public VirtualMouse2(){
-		this(new HashSet<>(), 0, 0, 0, new ArrayList<>(), true);
+		this(new LinkedHashSet<>(), 0, 0, 0, new ArrayList<>(), true);
 	}
 
 	/**
@@ -42,7 +38,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	 * @param cursorY The Y coordinate of the cursor for this subtickMouse
 	 */
 	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, int cursorX, int cursorY) {
-		this(pressedKeys, scrollWheel, cursorX, cursorY, null, false);
+		this(pressedKeys, scrollWheel, cursorX, cursorY, null);
 	}
 
 	/**
@@ -161,7 +157,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	@Override
 	public String toString() {
 		if (isParent()) {
-			return getSubticks().stream().map(VirtualMouse2::toString2).collect(Collectors.joining("\n"));
+			return getAll().stream().map(VirtualMouse2::toString2).collect(Collectors.joining("\n"));
 		} else {
 			return toString2();
 		}
@@ -180,7 +176,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	}
 
 	@Override
-	protected void copyFrom(VirtualMouse2 mouse) {
+	public void copyFrom(VirtualMouse2 mouse) {
 		super.copyFrom(mouse);
 		this.scrollWheel = mouse.scrollWheel;
 		this.cursorX = mouse.cursorX;
