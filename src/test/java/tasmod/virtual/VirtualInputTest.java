@@ -17,7 +17,7 @@ import com.minecrafttas.tasmod.virtual.VirtualMouse2;
 
 class VirtualInputTest {
 
-	private Logger LOGGER = LogManager.getLogger("TASmod");
+	private final Logger LOGGER = LogManager.getLogger("TASmod");
 	
 	/**
 	 * Test constructor initializing keyboard, mouse and camera_angle
@@ -41,7 +41,7 @@ class VirtualInputTest {
 		VirtualCameraAngle2 preloadedCameraAngle = new VirtualCameraAngle2(1f, 2f);
 		
 		preloadedKeyboard.update(VirtualKey2.W.getKeycode(), true, 'w');
-		preloadedMouse.update(VirtualKey2.LC.getKeycode(), true, 15, null, null);
+		preloadedMouse.update(VirtualKey2.LC.getKeycode(), true, 15, 0, 0);
 		
 		
 		VirtualInput2 virtual = new VirtualInput2(LOGGER, preloadedKeyboard, preloadedMouse, preloadedCameraAngle);
@@ -50,9 +50,9 @@ class VirtualInputTest {
 		assertTrue(virtual.KEYBOARD.nextKeyboardSubtick());
 		assertEquals(VirtualKey2.W.getKeycode(), virtual.KEYBOARD.getEventKeyboardKey());
 		
-//		virtual.MOUSE.nextMouseTick();
-//		assertTrue(virtual.MOUSE.nextMouseSubtick());
-//		assertEquals(VirtualKey2.LC.getKeycode(), virtual.MOUSE.getEventMouseKey());
+		virtual.MOUSE.nextMouseTick();
+		assertTrue(virtual.MOUSE.nextMouseSubtick());
+		assertEquals(VirtualKey2.LC.getKeycode(), virtual.MOUSE.getEventMouseKey());
 		
 		assertEquals(1f, virtual.CAMERA_ANGLE.getPitch());
 		assertEquals(2f, virtual.CAMERA_ANGLE.getYaw());
@@ -80,7 +80,7 @@ class VirtualInputTest {
 		
 		// Read out values from the subtick
 		assertEquals(VirtualKey2.W.getKeycode(), virtual.KEYBOARD.getEventKeyboardKey());
-		assertEquals(true, virtual.KEYBOARD.getEventKeyboardState());
+		assertTrue(virtual.KEYBOARD.getEventKeyboardState());
 		assertEquals('w', virtual.KEYBOARD.getEventKeyboardCharacter());
 		
 		//A
@@ -90,7 +90,7 @@ class VirtualInputTest {
 		
 		// Read out values from the subtick
 		assertEquals(VirtualKey2.A.getKeycode(), virtual.KEYBOARD.getEventKeyboardKey());
-		assertEquals(true, virtual.KEYBOARD.getEventKeyboardState());
+		assertTrue(virtual.KEYBOARD.getEventKeyboardState());
 		assertEquals('a', virtual.KEYBOARD.getEventKeyboardCharacter());
 		
 		//S
@@ -107,6 +107,9 @@ class VirtualInputTest {
 		assertFalse(virtual.KEYBOARD.nextKeyboardSubtick());
 	}
 
+	/**
+	 * Test simulating button removals
+	 */
 	@Test
 	void testKeyboardRemovePresses() {
 		VirtualKeyboard2 preloadedKeyboard = new VirtualKeyboard2();
@@ -116,7 +119,6 @@ class VirtualInputTest {
 		
 		virtual.KEYBOARD.updateNextKeyboard(VirtualKey2.W.getKeycode(), false, Character.MIN_VALUE);
 		
-		
 		// Load the next keyboard events
 		virtual.KEYBOARD.nextKeyboardTick();
 		
@@ -125,7 +127,7 @@ class VirtualInputTest {
 		
 		// Read out values from the subtick
 		assertEquals(VirtualKey2.W.getKeycode(), virtual.KEYBOARD.getEventKeyboardKey());
-		assertEquals(false, virtual.KEYBOARD.getEventKeyboardState());
+		assertFalse(virtual.KEYBOARD.getEventKeyboardState());
 		assertEquals(Character.MIN_VALUE, virtual.KEYBOARD.getEventKeyboardCharacter());
 		
 		// Check if subtick list is empty

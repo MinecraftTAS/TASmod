@@ -343,11 +343,11 @@ public class VirtualInput implements EventPlayerJoinedClientSide{
 	}
 
 	public int getEventCursorX() {
-		return PointerNormalizer.getCoordsX(currentMouseEvent.getMouseX());
+		return PointerNormalizer.getCoordsX(currentMouseEvent.getCursorX());
 	}
 
 	public int getEventCursorY() {
-		return PointerNormalizer.getCoordsY(currentMouseEvent.getMouseY());
+		return PointerNormalizer.getCoordsY(currentMouseEvent.getCursorY());
 	}
 
 	public void clearNextMouse() {

@@ -35,9 +35,9 @@ public class VirtualInput2 {
 	/**
 	 * Creates a virtual input with pre-loaded values
 	 * 
-	 * @param preloadedKeyboard
-	 * @param preloadedMouse
-	 * @param preloadedCamera
+	 * @param preloadedKeyboard A keyboard loaded at the beginning
+	 * @param preloadedMouse A mouse loaded at the beginning
+	 * @param preloadedCamera A camera loaded at the beginning
 	 */
 	public VirtualInput2(Logger logger, VirtualKeyboard2 preloadedKeyboard, VirtualMouse2 preloadedMouse, VirtualCameraAngle2 preloadedCamera) {
 		this.LOGGER = logger;
@@ -62,7 +62,7 @@ public class VirtualInput2 {
 		}
 		while (Mouse.next()) {
 			if (currentScreen == null) {
-				MOUSE.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), null, null);
+				MOUSE.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), 0, 0);
 			} else {
 				Ducks.GuiScreenDuck screen = (Ducks.GuiScreenDuck) currentScreen;
 				int eventX = screen.unscaleX(Mouse.getEventX());
@@ -306,7 +306,7 @@ public class VirtualInput2 {
 	 *		{@linkplain #nextMouseTick()}
 	 *		while({@linkplain #nextMouseSubtick}){
 	 *			int keycode = {@linkplain #getEventMouseKey};
-	 *			boolean keystate = {@linkplain #getEventButtonState()};
+	 *			boolean keystate = {@linkplain #getEventMouseState()} ()};
 	 *			int scrollWheel = {@linkplain #getEventMouseScrollWheel()}
 	 *			int cursorX = {@linkplain #getEventCursorX()} // Important in GUIs
 	 *			int cursorY = {@linkplain #getEventCursorY()}
@@ -331,9 +331,9 @@ public class VirtualInput2 {
 			currentMouse = preloadedMouse;
 		}
 
-		public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, Integer cursorX, Integer cursorY) {
+		public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY) {
 			keycode-=100;
-			LOGGER.debug(LoggerMarkers.Mouse,"Update: {} ({}), {}, {}", keycode, VirtualKey2.getName(keycode), keystate, scrollwheel, cursorX, cursorY);
+			LOGGER.debug(LoggerMarkers.Mouse,"Update: {} ({}), {}, {}, {}, {}", keycode, VirtualKey2.getName(keycode), keystate, scrollwheel, cursorX, cursorY);
 			nextMouse.update(keycode, keystate, scrollwheel, cursorX, cursorY);
 		}
 
@@ -359,11 +359,11 @@ public class VirtualInput2 {
 		}
 
 		public int getEventCursorX() {
-			return PointerNormalizer.getCoordsX(currentMouseEvent.getMouseX());
+			return PointerNormalizer.getCoordsX(currentMouseEvent.getCursorX());
 		}
 
 		public int getEventCursorY() {
-			return PointerNormalizer.getCoordsY(currentMouseEvent.getMouseY());
+			return PointerNormalizer.getCoordsY(currentMouseEvent.getCursorY());
 		}
 
 		public boolean isKeyDown(int keycode) {

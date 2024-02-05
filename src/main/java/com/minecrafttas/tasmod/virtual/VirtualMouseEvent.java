@@ -9,33 +9,33 @@ import com.minecrafttas.tasmod.virtual.VirtualEvent.VirtualButtonEvent;
  */
 public class VirtualMouseEvent extends VirtualButtonEvent {
     private final int scrollwheel;
-    private final Integer mouseX;
-    private final Integer mouseY;
+    private final int cursorX;
+    private final int cursorY;
 
     public VirtualMouseEvent(){
-        this(0, false, 0, null, null);
+        this(0, false, 0, 0, 0);
     }
-    public VirtualMouseEvent(int keycode, boolean state, int scrollwheel, Integer mouseX, Integer mouseY) {
+    public VirtualMouseEvent(int keycode, boolean state, int scrollwheel, int cursorX, int cursorY) {
         super(keycode, state);
         this.scrollwheel = scrollwheel;
-        this.mouseX = mouseX;
-        this.mouseY = mouseY;
+        this.cursorX = cursorX;
+        this.cursorY = cursorY;
     }
 
     public int getScrollwheel() {
         return scrollwheel;
     }
 
-    public Integer getMouseX() {
-        return mouseX;
+    public Integer getCursorX() {
+        return cursorX;
     }
 
-    public Integer getMouseY() {
-        return mouseY;
+    public Integer getCursorY() {
+        return cursorY;
     }
 
     @Override
     public String toString() {
-        return String.format("%s, %s, %s, %s", super.toString(), scrollwheel, mouseX != null ? mouseX : " ", mouseY != null ? mouseY : " ");
+        return String.format("%s, %s, %s, %s", super.toString(), scrollwheel, cursorX, cursorY);
     }
 }

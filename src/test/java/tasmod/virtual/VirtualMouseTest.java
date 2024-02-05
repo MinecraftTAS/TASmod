@@ -21,8 +21,8 @@ class VirtualMouseTest {
 		VirtualMouse2 actual = new VirtualMouse2();
 		assertTrue(actual.getPressedKeys().isEmpty());
 		assertEquals(0, actual.getScrollWheel());
-		assertNull(actual.getCursorX());
-		assertNull(actual.getCursorY());
+		assertEquals(0, actual.getCursorX());
+		assertEquals(0, actual.getCursorY());
 		assertTrue(actual.isParent());
 	}
 	

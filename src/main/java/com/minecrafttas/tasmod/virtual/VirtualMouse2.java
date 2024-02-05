@@ -20,18 +20,18 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	 * X coordinate of the on-screen cursor, used in GUI screens.<br>
 	 * When null, no change to the cursor is applied.
 	 */
-	private Integer cursorX;
+	private int cursorX;
 	/**
 	 * Y coordinate of the on-screen cursor, used in GUI screens.<br>
 	 * When null, no change to the cursor is applied.
 	 */
-	private Integer cursorY;
+	private int cursorY;
 
 	/**
 	 * Creates a mouse with no buttons pressed and no data
 	 */
 	public VirtualMouse2(){
-		this(new HashSet<>(), 0, null, null, new ArrayList<>(), true);
+		this(new HashSet<>(), 0, 0, 0, new ArrayList<>(), true);
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	 * @param cursorX The X coordinate of the cursor for this subtickMouse
 	 * @param cursorY The Y coordinate of the cursor for this subtickMouse
 	 */
-	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY) {
+	public VirtualMouse2(Set<Integer> pressedKeys, int scrollWheel, int cursorX, int cursorY) {
 		this(pressedKeys, scrollWheel, cursorX, cursorY, null, false);
 	}
 
@@ -93,11 +93,25 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		}
 	}
 
+	public void getVirtualEvents(VirtualMouse2 nextMouse, Queue<VirtualMouseEvent> reference) {
+		if (isParent()) {
+			VirtualMouse2 currentSubtick = this;
+			for(VirtualMouse2 subtick : nextMouse.getAll()) {
+				currentSubtick.getDifference(subtick, reference);
+				currentSubtick = subtick;
+			}
+		}
+	}
+
 	public void getDifference(VirtualMouse2 nextPeripheral, Queue<VirtualMouseEvent> reference) {
 
-		int scrollWheelCopy = scrollWheel;
-		Integer cursorXCopy = cursorX;
-		Integer cursorYCopy = cursorY;
+		if(pressedKeys.equals(nextPeripheral.pressedKeys)){
+			reference.add(new VirtualMouseEvent(VirtualKey2.MOUSEMOVED.getKeycode(), false, nextPeripheral.scrollWheel, nextPeripheral.cursorX, nextPeripheral.cursorY));
+			return;
+		}
+		int scrollWheelCopy = nextPeripheral.scrollWheel;
+		int cursorXCopy = nextPeripheral.cursorX;
+		int cursorYCopy = nextPeripheral.cursorY;
 
 		/* Calculate symmetric difference of keycodes */
 
@@ -112,8 +126,8 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 			if (!nextPeripheral.getPressedKeys().contains(keycode)) {
 				reference.add(new VirtualMouseEvent(keycode, false, scrollWheelCopy, cursorXCopy, cursorYCopy));
 				scrollWheelCopy = 0;
-				cursorXCopy = null;
-				cursorYCopy = null;
+				cursorXCopy = 0;
+				cursorYCopy = 0;
 			}
 		};
 
@@ -131,16 +145,6 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		};
 	}
 
-	public void getVirtualEvents(VirtualMouse2 nextMouse, Queue<VirtualMouseEvent> reference) {
-		if (isParent()) {
-			VirtualMouse2 currentSubtick = this;
-			for(VirtualMouse2 subtick : nextMouse.getAll()) {
-				currentSubtick.getDifference(subtick, reference);
-				currentSubtick = subtick;
-			}
-		}
-	}
-
 	@Override
 	protected void clear() {
 		super.clear();
@@ -149,8 +153,8 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 	
 	private void clearMouseData() {
 		scrollWheel = 0;
-		cursorX = null;
-		cursorY = null;
+		cursorX = 0;
+		cursorY = 0;
 	}
 	
 	
@@ -181,6 +185,7 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		this.scrollWheel = mouse.scrollWheel;
 		this.cursorX = mouse.cursorX;
 		this.cursorY = mouse.cursorY;
+		mouse.clearMouseData();
 	}
 	
 	@Override
@@ -199,11 +204,11 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		return scrollWheel;
 	}
 	
-	public Integer getCursorX() {
+	public int getCursorX() {
 		return cursorX;
 	}
 	
-	public Integer getCursorY() {
+	public int getCursorY() {
 		return cursorY;
 	}
 }

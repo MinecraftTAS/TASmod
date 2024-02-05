@@ -129,7 +129,9 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     		addSubtick(clone());
     	}
     	charList.clear();
-    	addChar(keycharacter, repeatEventsEnabled);
+		if (keystate) {
+			addChar(keycharacter, repeatEventsEnabled);
+		}
     	setPressed(keycode, keystate);
     }
     
@@ -143,6 +145,27 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
             super.setPressed(keycode, keystate);
         }
     }
+
+	/**
+	 * Calculates a list of {@link VirtualKeyboardEvent}s to the next peripheral, including
+	 * the subticks.
+	 *
+	 * @see VirtualKeyboard2#getDifference(VirtualKeyboard2, Queue)
+	 *
+	 * @param nextKeyboard The peripheral that is comes after this one.<br>
+	 *                       If this one is loaded at tick 15, the nextPeripheral
+	 *                       should be the one from tick 16
+	 * @param reference The queue to fill. Passed in by reference.
+	 */
+	public void getVirtualEvents(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
+		if (isParent()) {
+			VirtualKeyboard2 currentSubtick = this;
+			for(VirtualKeyboard2 subtick : nextKeyboard.getAll()) {
+				currentSubtick.getDifference(subtick, reference);
+				currentSubtick = subtick;
+			}
+		}
+	}
 
 	/**
 	 * Calculates the difference between 2 keyboards via symmetric difference <br>
@@ -209,27 +232,6 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
         return charr;
     }
 
-	/**
-	 * Calculates a list of {@link VirtualKeyboardEvent}s to the next peripheral, including
-	 * the subticks.
-	 * 
-	 * @see VirtualKeyboard2#getDifference(VirtualKeyboard2, Queue)
-	 * 
-	 * @param nextKeyboard The peripheral that is comes after this one.<br>
-	 *                       If this one is loaded at tick 15, the nextPeripheral
-	 *                       should be the one from tick 16
-	 * @param reference The queue to fill. Passed in by reference.
-	 */
-	public void getVirtualEvents(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
-		if (isParent()) {
-			VirtualKeyboard2 currentSubtick = this;
-			for(VirtualKeyboard2 subtick : nextKeyboard.getAll()) {
-				currentSubtick.getDifference(subtick, reference);
-				currentSubtick = subtick;
-			}
-		}
-	}
-    
     /**
      * Add a character to the {@link #charList}<br>
      * Null characters will be discarded;
@@ -304,7 +306,6 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     	}
     	return super.equals(obj);
     }
-    
     
     public List<Character> getCharList() {
         return ImmutableList.copyOf(charList);
