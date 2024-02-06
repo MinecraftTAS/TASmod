@@ -19,8 +19,6 @@ loom {
 	// add log4jconfig
 	log4jConfigs.from(file('src/main/resources/log4j.xml'))
 	
-	// default refmap name
-	mixin.defaultRefmapName = "tasmod.refmap.json"
 }
 
 // dependency repositories
