@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.dselent.bigarraylist.BigArrayList;
-import com.minecrafttas.killtherng.custom.CustomRandom;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
 
@@ -184,7 +183,7 @@ public class DesyncMonitoring {
 				lastSeed = "";
 			} else {
 				if(TASmod.ktrngHandler.isLoaded()) {
-					long distance = CustomRandom.distance(currentValues.seed, TASmod.ktrngHandler.getGlobalSeedClient());
+					long distance = 0; //CustomRandom.distance(currentValues.seed, TASmod.ktrngHandler.getGlobalSeedClient());
 					if(distance == 0L) {
 						lastSeed = "";
 					} else {
@@ -244,9 +243,9 @@ public class DesyncMonitoring {
 			
 			if(this.seed != seed) {
 				if(TASmod.ktrngHandler.isLoaded()) {
-					if(CustomRandom.distance(this.seed, seed)!=1) {
+//					if(CustomRandom.distance(this.seed, seed)!=1) {
 						return DesyncStatus.SEED;
-					}
+//					}
 				} else {
 					return DesyncStatus.SEED;
 				}
