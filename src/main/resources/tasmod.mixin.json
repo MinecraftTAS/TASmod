@@ -27,7 +27,6 @@
         //General
         "MixinMinecraft",
         "MixinTimer",
-        "MixinEntityRenderer",
         "MixinGuiScreen",
         "MixinInGameHud",
         
@@ -40,14 +39,13 @@
 		//Keybinding
 		"MixinTextfield",
 		
-		"fixes.MixinMinecraftFullscreen",
-		
 		//Join and leave game event on the client
 		"events.MixinGuiMainMenu",
 		"events.MixinGuiIngame",
 		
 		//Playbackhooks
 		"playbackhooks.MixinMinecraft",
+        "playbackhooks.MixinEntityRenderer",
 		"playbackhooks.MixinGameSettings",
 		"playbackhooks.MixinGuiChat",
 		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",
@@ -63,6 +61,7 @@
 		"shields.MixinTileEntityItemStackRenderer",
 		
 		//Fixes
+        "fixes.MixinMinecraftFullscreen",
         "fixes.MixinNetworkManager"
 	]
 }

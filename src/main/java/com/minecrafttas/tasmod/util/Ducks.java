@@ -81,7 +81,7 @@ public class Ducks {
 	 * Quacks the subtick
 	 */
 	public static interface SubtickDuck {
-		public abstract void runSubtick(float partialTicks);
+		void runUpdate(float partialTicks);
 	}
 	
 }
