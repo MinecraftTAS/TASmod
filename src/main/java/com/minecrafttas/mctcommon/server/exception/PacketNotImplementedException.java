@@ -4,7 +4,6 @@ import com.minecrafttas.mctcommon.server.Client.Side;
 import com.minecrafttas.mctcommon.server.interfaces.PacketHandlerBase;
 import com.minecrafttas.mctcommon.server.interfaces.PacketID;
 
-@SuppressWarnings("serial")
 public class PacketNotImplementedException extends Exception {
 
 	public PacketNotImplementedException(String msg) {

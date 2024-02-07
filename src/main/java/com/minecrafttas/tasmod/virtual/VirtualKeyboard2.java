@@ -147,15 +147,15 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     }
 
 	/**
-	 * Calculates a list of {@link VirtualKeyboardEvent}s to the next peripheral, including
-	 * the subticks.
+	 * Calculates a list of {@link VirtualKeyboardEvent}s to the next peripheral,
+	 * including the subticks.
 	 *
 	 * @see VirtualKeyboard2#getDifference(VirtualKeyboard2, Queue)
 	 *
-	 * @param nextKeyboard The peripheral that is comes after this one.<br>
-	 *                       If this one is loaded at tick 15, the nextPeripheral
-	 *                       should be the one from tick 16
-	 * @param reference The queue to fill. Passed in by reference.
+	 * @param nextKeyboard The keyboard that comes after this one.<br>
+	 *                     If this one is loaded at tick 15, the nextKeyboard should
+	 *                     be the one from tick 16
+	 * @param reference    The queue to fill. Passed in by reference.
 	 */
 	public void getVirtualEvents(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
 		if (isParent()) {
@@ -169,12 +169,13 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 
 	/**
 	 * Calculates the difference between 2 keyboards via symmetric difference <br>
-	 * and returns a list of the changes between them in form of {@link VirtualKeyboardEvent}s
+	 * and returns a list of the changes between them in form of
+	 * {@link VirtualKeyboardEvent}s
 	 *
-	 * @param nextKeyboard The keyboard that is comes after this one.<br>
-	 *                       If this one is loaded at tick 15, the nextPeripheral
-	 *                       should be the one from tick 16
-	 * @param reference The queue to fill. Passed in by reference.
+	 * @param nextKeyboard The keyboard that comes after this one.<br>
+	 *                     If this one is loaded at tick 15, the nextKeyboard should
+	 *                     be the one from tick 16
+	 * @param reference    The queue to fill. Passed in by reference.
 	 */
     public void getDifference(VirtualKeyboard2 nextKeyboard, Queue<VirtualKeyboardEvent> reference) {
         charQueue.addAll(nextKeyboard.charList);
@@ -211,13 +212,19 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
 
 		/*
 			Add the rest of the characters as keyboard events.
-			This may happen when specifying more chars than keycodes
-			int the TASFile:
-
-			Keyboard:H,E,L;Hello|
-
-			This makes it easier to write words when working only with the TASfile,
-			otherwise you'd either need to add a keycode for each char or write it in new lines
+			Also responsible for holding the key and adding a lot of characters in chat.
+			
+			The LWJGL Keyboard has a method called "areRepeatEventsEnabled" which returns true, when the user is in a gui.
+			Additionally when a key is held, the Keyboard resends the same keyboard event, in this case to the update method of the VirtualKeyboard.
+			
+			What ends up happening is, that the subtickList is filled with multiple characters, which are then converted to keyboard events
+			here.
+			
+			However, some functionality like \b or the arrow keys have no associated character, Minecraft instead listens for the keycode.
+			Thats where the "lastKey" comes in. Since we are using a LinkedHashSet, as pressedKeys, we can get the last pressed keycode.
+			
+			So, to get the repeat events working, one needs a pressed key and any character.
+			
 		 */
         while (!charQueue.isEmpty()) {
         	reference.add(new VirtualKeyboardEvent(lastKey, true, getOrMinChar(charQueue.poll())));
@@ -307,6 +314,9 @@ public class VirtualKeyboard2 extends VirtualPeripheral<VirtualKeyboard2> implem
     	return super.equals(obj);
     }
     
+    /**
+     * @return An immutable {@link #charList}
+     */
     public List<Character> getCharList() {
         return ImmutableList.copyOf(charList);
     }

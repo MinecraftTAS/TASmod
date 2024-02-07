@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.mixin.playbackhooks.MixinMinecraft;
 import com.minecrafttas.tasmod.util.Ducks;
@@ -24,10 +23,23 @@ import net.minecraft.client.gui.GuiScreen;
  */
 public class VirtualInput2 {
 	private final Logger LOGGER;
+	/**
+	 * Instance of the {@link VirtualKeyboardInput} subclass, intended to improve readability.
+	 */
 	public final VirtualKeyboardInput KEYBOARD;
+	/**
+	 * Instance of the {@link VirtualMouseInput} subclass, intended to improve readability.
+	 */
 	public final VirtualMouseInput MOUSE;
+	/**
+	 * Instance of the {@link VirtualCameraAngleInput} subclass, intended to improve readability.
+	 */
 	public final VirtualCameraAngleInput CAMERA_ANGLE;
 
+	/**
+	 * Creates a new virtual input with an empty {@link VirtualKeyboardInput}, {@link VirtualMouseInput} and {@link VirtualCameraAngleInput}
+	 * @param logger
+	 */
 	public VirtualInput2(Logger logger) {
 		this(logger, new VirtualKeyboard2(), new VirtualMouse2(), new VirtualCameraAngle2());
 	}
@@ -35,9 +47,9 @@ public class VirtualInput2 {
 	/**
 	 * Creates a virtual input with pre-loaded values
 	 * 
-	 * @param preloadedKeyboard A keyboard loaded at the beginning
-	 * @param preloadedMouse A mouse loaded at the beginning
-	 * @param preloadedCamera A camera loaded at the beginning
+	 * @param preloadedKeyboard A keyboard loaded when creating {@link VirtualKeyboardInput}
+	 * @param preloadedMouse A mouse loaded when creating {@link VirtualMouseInput}
+	 * @param preloadedCamera A camera loaded when creating {@link VirtualCameraAngleInput}
 	 */
 	public VirtualInput2(Logger logger, VirtualKeyboard2 preloadedKeyboard, VirtualMouse2 preloadedMouse, VirtualCameraAngle2 preloadedCamera) {
 		this.LOGGER = logger;
@@ -149,7 +161,6 @@ public class VirtualInput2 {
 	 * @see com.minecrafttas.tasmod.virtual.VirtualKeyboard2
 	 */
 	public class VirtualKeyboardInput {
-		
 		/**
 		 * The keyboard "state" that is currently recognized by the game,<br>
 		 * meaning it is a direct copy of the vanilla keybindings. Updated every
@@ -157,33 +168,33 @@ public class VirtualInput2 {
 		 * Updated in {@link #nextKeyboardTick()}
 		 */
 		private final VirtualKeyboard2 currentKeyboard;
-		
 		/**
 		 * The "state" of the real physical keyboard.<br>
 		 * This is updated every <em>frame</em>.<br>
 		 * Updates {@link #currentKeyboard} in {@link #nextKeyboardTick()}
 		 */
 		private final VirtualKeyboard2 nextKeyboard = new VirtualKeyboard2();
-		
 		/**
 		 * Queue for keyboard events.<br>
 		 * Is filled in {@link #nextKeyboardTick()} and read in
 		 * {@link #nextKeyboardSubtick()}
 		 */
 		private final Queue<VirtualKeyboardEvent> keyboardEventQueue = new ConcurrentLinkedQueue<VirtualKeyboardEvent>();
-		
 		/**
 		 * The current keyboard event where the vanilla keybindings are reading
 		 * from.<br>
 		 * Updated in {@link #nextKeyboardSubtick()} and read out in
-		 * {@link #getEventKeyboardKey()}, {@link #getEventKeyboardState()} and
-		 * {@link #getEventKeyboardCharacter()}
+		 * <ul>
+		 * 	<li>{@link #getEventKeyboardKey()}</li>
+		 * 	<li>{@link #getEventKeyboardState()}</li>
+		 * 	<li>{@link #getEventKeyboardCharacter()}</li>
+		 * </ul>
 		 */
 		private VirtualKeyboardEvent currentKeyboardEvent = new VirtualKeyboardEvent();
 
 		/**
 		 * Constructor to preload the {@link #currentKeyboard} with an existing keyboard
-		 * @param preloadedKeyboard
+		 * @param preloadedKeyboard The new {@link #currentKeyboard}
 		 */
 		public VirtualKeyboardInput(VirtualKeyboard2 preloadedKeyboard) {
 			currentKeyboard = preloadedKeyboard;
@@ -211,7 +222,7 @@ public class VirtualInput2 {
 		 * @param repeatEventsEnabled If repeat events are enabled
 		 */
 		public void updateNextKeyboard(int keycode, boolean keystate, char character, boolean repeatEventsEnabled) {
-			LOGGER.debug(LoggerMarkers.Keyboard, "Update: {}, {}, {}, {}", keycode, keystate, character);
+			LOGGER.debug(LoggerMarkers.Keyboard, "Update: {}, {}, {}, {}", keycode, keystate, character); 	// Activate with -Dtasmod.marker.keyboard=ACCEPT in VM arguments (and -Dtasmod.log.level=debug)
 			nextKeyboard.update(keycode, keystate, character, repeatEventsEnabled);
 		}
 		
@@ -318,58 +329,135 @@ public class VirtualInput2 {
 	 * @see com.minecrafttas.tasmod.virtual.VirtualMouse2
 	 */
 	public class VirtualMouseInput {
+		/**
+		 * The mouse "state" that is currently recognized by the game,<br>
+		 * meaning it is a direct copy of the vanilla mouse. Updated every
+		 * <em>tick</em>.<br>
+		 * Updated in {@link #nextMouseTick()}
+		 */
 		private final VirtualMouse2 currentMouse;
+		/**
+		 * The "state" of the real physical mouse.<br>
+		 * This is updated every <em>frame</em>.<br>
+		 * Updates {@link #currentMouse} in {@link #nextMouseTick()}
+		 */
 		private final VirtualMouse2 nextMouse = new VirtualMouse2();
+		/**
+		 * Queue for keyboard events.<br>
+		 * Is filled in {@link #nextMouseTick()} and read in
+		 * {@link #nextMouseSubtick()}
+		 */
 		private final Queue<VirtualMouseEvent> mouseEventQueue = new ConcurrentLinkedQueue<>();
+		/**
+		 * The current mouse event where the vanilla mouse is reading
+		 * from.<br>
+		 * Updated in {@link #nextMouseSubtick()} and read out in
+		 * <ul>
+		 * 	<li>{@link #getEventMouseKey()}</li>
+		 * 	<li>{@link #getEventMouseState()}</li>
+		 * 	<li>{@link #getEventMouseScrollWheel()}</li>
+		 * 	<li>{@link #getEventCursorX()}</li>
+		 * 	<li>{@link #getEventCursorY()}</li>
+		 * </ul>
+		 */
 		private VirtualMouseEvent currentMouseEvent = new VirtualMouseEvent();
 
-		public VirtualMouseInput() {
-			this(new VirtualMouse2());
-		}
-
+		/**
+		 * Constructor to preload the {@link #currentMouse} with an existing mouse
+		 * @param preloadedMouse The new {@link #currentMouse}
+		 */
 		public VirtualMouseInput(VirtualMouse2 preloadedMouse) {
 			currentMouse = preloadedMouse;
 		}
 
+		/**
+		 * Updates the next keyboard
+		 * 
+		 * @see VirtualInput2#update(GuiScreen)
+		 * @param keycode   The keycode of this event
+		 * @param keystate  The keystate of this event
+		 * @param character The character of this event
+		 * @param repeatEventsEnabled If repeat events are enabled
+		 */
 		public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY) {
 			keycode-=100;
-			LOGGER.debug(LoggerMarkers.Mouse,"Update: {} ({}), {}, {}, {}, {}", keycode, VirtualKey2.getName(keycode), keystate, scrollwheel, cursorX, cursorY);
+			LOGGER.debug(LoggerMarkers.Mouse,"Update: {} ({}), {}, {}, {}, {}", keycode, VirtualKey2.getName(keycode), keystate, scrollwheel, cursorX, cursorY); 	// Activate with -Dtasmod.marker.mouse=ACCEPT in VM arguments (and -Dtasmod.log.level=debug)
 			nextMouse.update(keycode, keystate, scrollwheel, cursorX, cursorY);
 		}
 
+		/**
+		 * Runs when the next mouse tick is about to occur.<br>
+		 * Used to load {@link #nextMouse} into {@link #currentMouse}, creating
+		 * {@link VirtualMouseEvent}s in the process.
+		 * 
+		 * @see MixinMinecraft#playback_injectRunTickMouse(org.spongepowered.asm.mixin.injection.callback.CallbackInfo)
+		 */
 		public void nextMouseTick() {
 			currentMouse.getVirtualEvents(nextMouse, mouseEventQueue);
 			currentMouse.copyFrom(nextMouse);
 		}
 
+		/**
+		 * Runs in a while loop. Used for updating {@link #currentMouseEvent} and
+		 * ending the while loop.
+		 * 
+		 * @see MixinMinecraft#playback_redirectMouseNext()
+		 * @return If a mouse event is in {@link #mouseEventQueue}
+		 */
 		public boolean nextMouseSubtick() {
 			return (currentMouseEvent = mouseEventQueue.poll()) != null;
 		}
 
+		/**
+		 * @return The keycode of {@link #currentMouseEvent}
+		 */
 		public int getEventMouseKey() {
 			return currentMouseEvent.getKeyCode();
 		}
 
+		/**
+		 * @return The keystate of {@link #currentMouseEvent}
+		 */
 		public boolean getEventMouseState() {
 			return currentMouseEvent.isState();
 		}
 
+		/**
+		 * @return The scroll wheel of {@link #currentMouseEvent}
+		 */
 		public int getEventMouseScrollWheel() {
 			return currentMouseEvent.getScrollwheel();
 		}
 
+		/**
+		 * @return The x coordinate of the cursor of {@link #currentMouseEvent}
+		 */
 		public int getEventCursorX() {
 			return PointerNormalizer.getCoordsX(currentMouseEvent.getCursorX());
 		}
 
+		/**
+		 * @return The y coordinate of the cursor of {@link #currentMouseEvent}
+		 */
 		public int getEventCursorY() {
 			return PointerNormalizer.getCoordsY(currentMouseEvent.getCursorY());
 		}
 
+		/**
+		 * If the key is currently down and recognised by Minecraft
+		 * @param keycode The keycode of the key in question
+		 * @return Whether the key of the {@link #currentMouse} is down
+		 */
 		public boolean isKeyDown(int keycode) {
 			return currentMouse.isKeyDown(keycode);
 		}
 		
+		/**
+		 * If the key will be down and recognised in the next tick by Minecraft.<br>
+		 * This is equal to checking if a key on the physical mouse is pressed
+		 * @param keycode The keycode of the key in question
+		 * @return Whether the key of the {@link #nextMouse} is down
+		 */
 		public boolean willKeyBeDown(int keycode) {
 			return nextMouse.isKeyDown(keycode);
 		}

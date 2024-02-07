@@ -1,13 +1,27 @@
 package tasmod.virtual;
 
-import com.minecrafttas.tasmod.virtual.VirtualKey2;
-import com.minecrafttas.tasmod.virtual.VirtualKeyboard2;
-import com.minecrafttas.tasmod.virtual.VirtualMouse2;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.minecrafttas.tasmod.virtual.VirtualKey2;
+import com.minecrafttas.tasmod.virtual.VirtualKeyboard2;
+import com.minecrafttas.tasmod.virtual.VirtualKeyboardEvent;
+import com.minecrafttas.tasmod.virtual.VirtualMouse2;
+import com.minecrafttas.tasmod.virtual.VirtualMouseEvent;
 
 class VirtualMouseTest {
 	
@@ -223,4 +237,153 @@ class VirtualMouseTest {
 
 		assertIterableEquals(expected, actual.getAll());
 	}
+	
+    /**
+     * Tests getDifference
+     */
+    @Test
+    void testGetDifference(){
+        VirtualMouse2 test = new VirtualMouse2(new HashSet<>(Arrays.asList(VirtualKey2.LC.getKeycode())), 15, 0, 0);
+        VirtualMouse2 test2 = new VirtualMouse2(new HashSet<>(Arrays.asList(VirtualKey2.LC.getKeycode(), VirtualKey2.RC.getKeycode())), 30, 1, 2);
+        Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
+        test.getDifference(test2, actual);
+        Queue<VirtualMouseEvent> expected = new ConcurrentLinkedQueue<>(Arrays.asList(new VirtualMouseEvent(VirtualKey2.RC.getKeycode(), true, 30, 1, 2)));
+
+        assertIterableEquals(expected, actual);
+    }
+    
+    /**
+     * Tests generating virtual events going from an unpressed mouse to a pressed mouse state
+     */
+    @Test
+    void testGetVirtualEventsPress() {
+    	VirtualMouse2 unpressed = new VirtualMouse2();
+    	
+    	VirtualMouse2 pressed = new VirtualMouse2();
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, 15, 10, 12);
+    	
+    	// Load actual with the events
+    	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
+    	unpressed.getVirtualEvents(pressed, actual);
+    	
+    	// Load expected
+    	List<VirtualMouseEvent> expected = Arrays.asList(new VirtualMouseEvent(VirtualKey2.LC.getKeycode(), true, 15, 10, 12));
+    	
+    	assertIterableEquals(expected, actual);
+    }
+    
+    /**
+     * Tests generating virtual events going from a pressed mouse to an unpressed mouse state
+     */
+    @Test
+    void testGetVirtualEventsUnpress() {
+    	VirtualMouse2 unpressed = new VirtualMouse2();
+    	
+    	VirtualMouse2 pressed = new VirtualMouse2();
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, 15, 10, 12);
+    	
+    	// Load actual with the events
+    	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
+    	pressed.getVirtualEvents(unpressed, actual);
+    	
+    	// Load expected
+    	List<VirtualMouseEvent> expected = Arrays.asList(new VirtualMouseEvent(VirtualKey2.LC.getKeycode(), false, 0, 0, 0));
+    	
+    	assertIterableEquals(expected, actual);
+    }
+    
+    /**
+     * Tests 2 updates having the same value. Should return no additional button events
+     */
+    @Test
+    void testSameUpdate() {
+    	VirtualMouse2 unpressed = new VirtualMouse2();
+    	
+    	VirtualMouse2 pressed = new VirtualMouse2();
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, 15, 10, 12);
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, 15, 10, 12);
+    	
+    	// Load actual with the events
+    	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
+    	unpressed.getVirtualEvents(pressed, actual);
+    	
+    	// Load expected
+    	List<VirtualMouseEvent> expected = Arrays.asList(
+    			new VirtualMouseEvent(VirtualKey2.LC.getKeycode(), true, 15, 10, 12) // Should only have one keyboard event
+    			); 
+    	
+    	assertIterableEquals(expected, actual);
+    }
+    
+    /**
+     * Tests 2 updates having the same pressed keys, but scrollWheel is different
+     */
+    @Test
+    void testScrollWheelDifferent() {
+    	VirtualMouse2 unpressed = new VirtualMouse2();
+    	
+    	VirtualMouse2 pressed = new VirtualMouse2();
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, 15, 10, 12);
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, -30, 10, 12);
+    	
+    	// Load actual with the events
+    	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
+    	unpressed.getVirtualEvents(pressed, actual);
+    	
+    	// Load expected
+    	List<VirtualMouseEvent> expected = Arrays.asList(
+    			new VirtualMouseEvent(VirtualKey2.LC.getKeycode(), true, 15, 10, 12),
+    			new VirtualMouseEvent(VirtualKey2.MOUSEMOVED.getKeycode(), false, -30, 10, 12) // Adds an additional "MOUSEMOVED" event with the scroll wheel
+    			);
+    	
+    	assertIterableEquals(expected, actual);
+    }
+    
+    /**
+     * Tests 2 updates having the same pressed keys, but scrollWheel is different
+     */
+    @Test
+    void testCursorXDifferent() {
+    	VirtualMouse2 unpressed = new VirtualMouse2();
+    	
+    	VirtualMouse2 pressed = new VirtualMouse2();
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, 15, 10, 12);
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, 15, 11, 12);
+    	
+    	// Load actual with the events
+    	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
+    	unpressed.getVirtualEvents(pressed, actual);
+    	
+    	// Load expected
+    	List<VirtualMouseEvent> expected = Arrays.asList(
+    			new VirtualMouseEvent(VirtualKey2.LC.getKeycode(), true, 15, 10, 12),
+    			new VirtualMouseEvent(VirtualKey2.MOUSEMOVED.getKeycode(), false, 15, 11, 12) // Adds an additional "MOUSEMOVED" event with the cursorX
+    			);
+    	
+    	assertIterableEquals(expected, actual);
+    }
+    
+    /**
+     * Tests 2 updates having the same pressed keys, but scrollWheel is different
+     */
+    @Test
+    void testCursorYDifferent() {
+    	VirtualMouse2 unpressed = new VirtualMouse2();
+    	
+    	VirtualMouse2 pressed = new VirtualMouse2();
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, 15, 10, 12);
+    	pressed.update(VirtualKey2.LC.getKeycode(), true, 15, 10, 120);
+    	
+    	// Load actual with the events
+    	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
+    	unpressed.getVirtualEvents(pressed, actual);
+    	
+    	// Load expected
+    	List<VirtualMouseEvent> expected = Arrays.asList(
+    			new VirtualMouseEvent(VirtualKey2.LC.getKeycode(), true, 15, 10, 12),
+    			new VirtualMouseEvent(VirtualKey2.MOUSEMOVED.getKeycode(), false, 15, 10, 120) // Adds an additional "MOUSEMOVED" event with the cursorY
+    			);
+    	
+    	assertIterableEquals(expected, actual);
+    }
 }

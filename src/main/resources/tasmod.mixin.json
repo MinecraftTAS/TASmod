@@ -26,7 +26,6 @@
         //General
         "MixinMinecraft",
         "MixinTimer",
-        "MixinGuiScreen",
         "MixinInGameHud",
         
         //Savestates
@@ -45,6 +44,7 @@
 		//Playbackhooks
 		"playbackhooks.MixinMinecraft",
         "playbackhooks.MixinEntityRenderer",
+		"playbackhooks.MixinGuiScreen",
 		"playbackhooks.MixinGameSettings",
 		"playbackhooks.MixinGuiChat",
 		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",

@@ -10,6 +10,9 @@ import net.minecraft.client.gui.GuiChat;
 
 @Mixin(GuiChat.class)
 public class MixinGuiChat {
+	/**
+	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualMouseInput#getEventMouseScrollWheel()}
+	 */
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I", remap = false))
 	public int redirectHandleMouseInput4() {
 		return TASmodClient.virtual.MOUSE.getEventMouseScrollWheel();

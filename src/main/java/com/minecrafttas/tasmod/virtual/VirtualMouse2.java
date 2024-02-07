@@ -89,6 +89,18 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		}
 	}
 
+	/**
+	 * Calculates a list of {@link VirtualMouseEvent}s, when comparing this mouse to
+	 * the next mouse in the sequence,<br>
+	 * which also includes the subticks.
+	 *
+	 * @see VirtualMouse2#getDifference(VirtualMouse2, Queue)
+	 *
+	 * @param nextMouse The mouse that comes after this one.<br>
+	 *                  If this one is loaded at tick 15, the nextMouse should be
+	 *                  the one from tick 16
+	 * @param reference The queue to fill. Passed in by reference.
+	 */
 	public void getVirtualEvents(VirtualMouse2 nextMouse, Queue<VirtualMouseEvent> reference) {
 		if (isParent()) {
 			VirtualMouse2 currentSubtick = this;
@@ -99,10 +111,30 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		}
 	}
 
+	/**
+	 * Calculates the difference between 2 mice via symmetric difference <br>
+	 * and returns a list of the changes between them in form of
+	 * {@link VirtualMouseEvent}s
+	 *
+	 * @param nextMouse The mouse that comes after this one.<br>
+	 *                  If this one is loaded at tick 15, the nextMouse should be
+	 *                  the one from tick 16
+	 * @param reference The queue to fill. Passed in by reference.
+	 */
 	public void getDifference(VirtualMouse2 nextPeripheral, Queue<VirtualMouseEvent> reference) {
-
+		
+		/*
+		 * Checks if pressedKeys are the same...
+		 */
 		if(pressedKeys.equals(nextPeripheral.pressedKeys)){
-			reference.add(new VirtualMouseEvent(VirtualKey2.MOUSEMOVED.getKeycode(), false, nextPeripheral.scrollWheel, nextPeripheral.cursorX, nextPeripheral.cursorY));
+			
+			/**
+			 * ...but scrollWheel, cursorX or cursorY are different.
+			 * Without this, the scrollWheel would only work if a mouse button is pressed at the same time. 
+			 */
+			if(!equals(nextPeripheral)) {
+				reference.add(new VirtualMouseEvent(VirtualKey2.MOUSEMOVED.getKeycode(), false, nextPeripheral.scrollWheel, nextPeripheral.cursorX, nextPeripheral.cursorY));
+			}
 			return;
 		}
 		int scrollWheelCopy = nextPeripheral.scrollWheel;
@@ -147,6 +179,9 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		clearMouseData();
 	}
 	
+	/**
+	 * Resets mouse specific data to it's defaults
+	 */
 	private void clearMouseData() {
 		scrollWheel = 0;
 		cursorX = 0;
@@ -196,14 +231,23 @@ public class VirtualMouse2 extends VirtualPeripheral<VirtualMouse2> implements S
 		return super.equals(obj);
 	}
 	
+	/**
+	 * @return {@link #scrollWheel}
+	 */
 	public int getScrollWheel() {
 		return scrollWheel;
 	}
 	
+	/**
+	 * @return {@link #cursorX}
+	 */
 	public int getCursorX() {
 		return cursorX;
 	}
 	
+	/**
+	 * @return {@link #cursorY}
+	 */
 	public int getCursorY() {
 		return cursorY;
 	}
