@@ -51,8 +51,8 @@ class VirtualInputTest {
 		assertTrue(virtual.MOUSE.nextMouseSubtick());
 		assertEquals(VirtualKey.LC.getKeycode(), virtual.MOUSE.getEventMouseKey());
 		
-		assertEquals(1f, virtual.CAMERA_ANGLE.getPitch());
-		assertEquals(2f, virtual.CAMERA_ANGLE.getYaw());
+		assertEquals(1f, virtual.CAMERA_ANGLE.getCurrentPitch());
+		assertEquals(2f, virtual.CAMERA_ANGLE.getCurrentYaw());
 	}
 	
 	/**

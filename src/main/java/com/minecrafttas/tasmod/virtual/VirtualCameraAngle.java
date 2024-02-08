@@ -1,34 +1,48 @@
 package com.minecrafttas.tasmod.virtual;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class VirtualCameraAngle implements Serializable {
-	private Float pitch;
-	private Float yaw;
-
-
+public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implements Serializable {
+	private float pitch;
+	private float yaw;
+	
 	public VirtualCameraAngle() {
-		this(null, null);
+		this(0, 0, new ArrayList<>(), true);
+	}
+	
+	public VirtualCameraAngle(float pitch, float yaw) {
+		this(pitch, yaw, null);
+	}
+	
+	public VirtualCameraAngle(float pitch, float yaw, List<VirtualCameraAngle> subtickList) {
+		this(pitch, yaw, subtickList, false);
 	}
 
-	public VirtualCameraAngle(Float pitch, Float yaw) {
+	public VirtualCameraAngle(float pitch, float yaw, List<VirtualCameraAngle> subtickList, boolean ignoreFirstUpdate) {
+		super(subtickList, ignoreFirstUpdate);
 		this.pitch = pitch;
 		this.yaw = yaw;
 	}
 
 	public void update(Float pitch, Float yaw) {
+		if(isParent() && !ignoreFirstUpdate()) {
+			addSubtick(clone());
+		}
 		this.pitch = pitch;
 		this.yaw = yaw;
 	}
 	
-	public Float getPitch() {
-		return pitch;
+	public void copyFrom(VirtualCameraAngle camera) {
+		this.pitch = camera.pitch;
+		this.yaw = camera.yaw;
+		this.subtickList.clear();
+		this.subtickList.addAll(camera.subtickList);
+		camera.subtickList.clear();
+		camera.resetFirstUpdate();
 	}
-
-	public Float getYaw() {
-		return yaw;
-	}
-
+	
 	@Override
 	public VirtualCameraAngle clone() {
 		return new VirtualCameraAngle(pitch, yaw);
@@ -46,5 +60,13 @@ public class VirtualCameraAngle implements Serializable {
 	@Override
 	public String toString() {
 		return String.format("%s;%s", pitch, yaw);
+	}
+	
+	public float getPitch() {
+		return pitch;
+	}
+
+	public float getYaw() {
+		return yaw;
 	}
 }

@@ -467,22 +467,27 @@ public class VirtualInput {
 	}
 
 	public class VirtualCameraAngleInput {
-		private final VirtualCameraAngle cameraAngle;
+		private final VirtualCameraAngle currentCameraAngle;
+		private final VirtualCameraAngle nextCameraAngle = new VirtualCameraAngle();
 
 		public VirtualCameraAngleInput(VirtualCameraAngle preloadedCamera) {
-			cameraAngle = preloadedCamera;
+			currentCameraAngle = preloadedCamera;
 		}
 		
-		public void updateCameraAngle(float pitch, float yaw) {
-			cameraAngle.update(pitch, yaw);
+		public void updateNextCameraAngle(float pitch, float yaw) {
+			nextCameraAngle.update(pitch, yaw);
 		}
 		
-		public float getPitch() {
-			return cameraAngle.getPitch();
+		public void nextCameraTick() {
+			currentCameraAngle.copyFrom(nextCameraAngle);
 		}
 		
-		public float getYaw() {
-			return cameraAngle.getYaw();
+		public float getCurrentPitch() {
+			return currentCameraAngle.getPitch();
+		}
+		
+		public float getCurrentYaw() {
+			return currentCameraAngle.getYaw();
 		}
 	}
 }

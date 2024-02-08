@@ -33,7 +33,7 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
 	}
 
 	/**
-	 * Creates a subtick mouse with {@link VirtualPeripheral#subtickList} uninitialized
+	 * Creates a subtick mouse with {@link Subtickable#subtickList} uninitialized
 	 * @param pressedKeys The new list of pressed keycodes for this subtickMouse
 	 * @param scrollWheel The scroll wheel direction for this subtickMouse
 	 * @param cursorX The X coordinate of the cursor for this subtickMouse
@@ -51,10 +51,10 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
 	 * @param scrollWheel	The {@link #scrollWheel}
 	 * @param cursorX		The {@link #cursorX}
 	 * @param cursorY		The {@link #cursorY}
-	 * @param subtick		The {@link VirtualPeripheral#subtickList}
+	 * @param subtickList		The {@link VirtualPeripheral#subtickList}
 	 */
-	public VirtualMouse(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse> subtick) {
-		this(pressedKeys, scrollWheel, cursorX, cursorY, subtick, false);
+	public VirtualMouse(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse> subtickList) {
+		this(pressedKeys, scrollWheel, cursorX, cursorY, subtickList, false);
 	}
 
 	/**
@@ -64,11 +64,11 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
 	 * @param scrollWheel		The {@link #scrollWheel}
 	 * @param cursorX			The {@link #cursorX}
 	 * @param cursorY			The {@link #cursorY}
-	 * @param subtick			The {@link VirtualPeripheral#subtickList}
+	 * @param subtickList			The {@link VirtualPeripheral#subtickList}
 	 * @param ignoreFirstUpdate	Whether the first call to {@link #update(int, boolean, int, Integer, Integer)} should create a new subtick
 	 */
-	public VirtualMouse(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse> subtick, boolean ignoreFirstUpdate) {
-		super(pressedKeys, subtick, ignoreFirstUpdate);
+	public VirtualMouse(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse> subtickList, boolean ignoreFirstUpdate) {
+		super(pressedKeys, subtickList, ignoreFirstUpdate);
 		this.scrollWheel = scrollWheel;
 		this.cursorX = cursorX;
 		this.cursorY = cursorY;
