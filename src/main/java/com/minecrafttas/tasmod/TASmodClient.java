@@ -36,7 +36,7 @@ import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.Scheduler;
 import com.minecrafttas.tasmod.util.ShieldDownloader;
-import com.minecrafttas.tasmod.virtual.VirtualInput2;
+import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -52,7 +52,7 @@ import net.minecraft.server.MinecraftServer;
 public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventOpenGui{
 
 
-	public static VirtualInput2 virtual;
+	public static VirtualInput virtual;
 
 	public static TickSyncClient ticksyncClient;
 	
@@ -126,7 +126,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		} else {
 			config.reset(ConfigOptions.FileToOpen);
 		}
-		virtual=new VirtualInput2(LOGGER); //TODO Move fileOnStart to PlaybackController
+		virtual=new VirtualInput(LOGGER); //TODO Move fileOnStart to PlaybackController
 		
 		// Initialize InfoHud
 		hud = new InfoHud();

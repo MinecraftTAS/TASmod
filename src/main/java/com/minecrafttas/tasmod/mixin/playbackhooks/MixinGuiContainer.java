@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.virtual.VirtualKey2;
+import com.minecrafttas.tasmod.virtual.VirtualKey;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -15,7 +15,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 public class MixinGuiContainer {
 	
 	/**
-	 * Redirects the check for {@link VirtualKey2#LSHIFT} and {@link VirtualKey2#RSHIFT} in mouseClicked
+	 * Redirects the check for {@link VirtualKey#LSHIFT} and {@link VirtualKey#RSHIFT} in mouseClicked
 	 * @param i The keycode to check for
 	 * @return If the keycode is down
 	 */
@@ -25,7 +25,7 @@ public class MixinGuiContainer {
 	}
 
 	/**
-	 * Redirects the check for {@link VirtualKey2#LSHIFT} and {@link VirtualKey2#RSHIFT} in mouseReleased
+	 * Redirects the check for {@link VirtualKey#LSHIFT} and {@link VirtualKey#RSHIFT} in mouseReleased
 	 * @param i The keycode to check for
 	 * @return If the keycode is down
 	 */

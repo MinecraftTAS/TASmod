@@ -7,9 +7,10 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.minecrafttas.tasmod.virtual.event.VirtualEvent;
 
 /**
- * Base class for {@link VirtualKeyboard2} and {@link VirtualMouse2}<br>
+ * Base class for {@link VirtualKeyboard} and {@link VirtualMouse}<br>
  * <br>
  * Contains the shared code for keeping track of which buttons are pressed.<br>
  * This works by storing the keycodes of the buttons in a set, as keycodes are supposed to be unique<br>
@@ -83,7 +84,7 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
      * @param keystate The keystate of the keyname
      */
     public void setPressed(String keyname, boolean keystate) {
-        Integer keycode = VirtualKey2.getKeycode(keyname);
+        Integer keycode = VirtualKey.getKeycode(keyname);
         if (keycode != null) {
             setPressed(keycode, keystate);
         }
@@ -95,7 +96,7 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
     public List<String> getCurrentPresses() {
         List<String> out = new ArrayList<>();
         pressedKeys.forEach(keycode -> {
-            out.add(VirtualKey2.getName(keycode));
+            out.add(VirtualKey.getName(keycode));
         });
         return out;
     }
@@ -156,7 +157,7 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> implemen
 	 * @return If the key is pressed
 	 */
 	public boolean isKeyDown(String keyname) {
-		return pressedKeys.contains(VirtualKey2.getKeycode(keyname));
+		return pressedKeys.contains(VirtualKey.getKeycode(keyname));
 	}
 	
 	/**

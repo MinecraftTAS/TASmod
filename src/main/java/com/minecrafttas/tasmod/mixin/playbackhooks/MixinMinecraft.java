@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.mixin.playbackhooks;
 
+import com.minecrafttas.tasmod.virtual.VirtualInput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,10 +9,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.virtual.VirtualInput2;
-import com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualMouseInput;
-import com.minecrafttas.tasmod.virtual.VirtualKeyboardEvent;
-import com.minecrafttas.tasmod.virtual.VirtualMouseEvent;
+import com.minecrafttas.tasmod.virtual.VirtualInput.VirtualMouseInput;
+import com.minecrafttas.tasmod.virtual.event.VirtualKeyboardEvent;
+import com.minecrafttas.tasmod.virtual.event.VirtualMouseEvent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -24,7 +24,7 @@ public class MixinMinecraft {
 	
 	/**
 	 * Runs every frame.
-	 * @see VirtualInput2#update(GuiScreen)
+	 * @see VirtualInput#update(GuiScreen)
 	 * @param ci CBI
 	 */
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
@@ -36,7 +36,7 @@ public class MixinMinecraft {
 	
 	/**
 	 * Run at the start of run tick keyboard. Runs every tick.
-	 * @see com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#nextKeyboardTick()
+	 * @see VirtualInput.VirtualKeyboardInput#nextKeyboardTick()
 	 * @param ci CBI
 	 */
 	@Inject(method = "runTickKeyboard", at = @At(value = "HEAD"))
@@ -45,9 +45,9 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * Redirects a {@link org.lwjgl.input.Keyboard#next()}. Starts running every tick and continues as long as there are {@link VirtualKeyboardEvent}s in {@link VirtualInput2}
-	 * @see com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#nextKeyboardSubtick()
-	 * @return If {@link VirtualKeyboardEvent}s are present in {@link VirtualInput2}
+	 * Redirects a {@link org.lwjgl.input.Keyboard#next()}. Starts running every tick and continues as long as there are {@link VirtualKeyboardEvent}s in {@link VirtualInput}
+	 * @see VirtualInput.VirtualKeyboardInput#nextKeyboardSubtick()
+	 * @return If {@link VirtualKeyboardEvent}s are present in {@link VirtualInput}
 	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z", remap = false))
 	public boolean playback_redirectKeyboardNext() {
@@ -55,7 +55,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#getEventKeyboardKey()}
+	 * @return {@link VirtualInput.VirtualKeyboardInput#getEventKeyboardKey()}
 	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int playback_redirectKeyboardGetEventKey() {
@@ -63,7 +63,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#getEventKeyboardState()}
+	 * @return {@link VirtualInput.VirtualKeyboardInput#getEventKeyboardState()}
 	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
 	public boolean playback_redirectGetEventState() {
@@ -71,7 +71,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#getEventKeyboardCharacter()}
+	 * @return {@link VirtualInput.VirtualKeyboardInput#getEventKeyboardCharacter()}
 	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
 	public char playback_redirectKeyboardGetEventCharacter() {
@@ -80,8 +80,8 @@ public class MixinMinecraft {
 	
 	/**
 	 * Runs everytime {@link #playback_redirectKeyboardNext()} has an event ready. Redirects {@link org.lwjgl.input.Keyboard#isKeyDown(int)}
-	 * @see com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#isKeyDown(int)
-	 * @return Whether the key is down in {@link VirtualInput2}
+	 * @see VirtualInput.VirtualKeyboardInput#isKeyDown(int)
+	 * @return Whether the key is down in {@link VirtualInput}
 	 */
 	@Redirect(method = "runTickKeyboard", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
 	public boolean playback_redirectIsKeyDown(int keyCode) {
@@ -89,7 +89,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#getEventKeyboardKey()}
+	 * @return {@link VirtualInput.VirtualKeyboardInput#getEventKeyboardKey()}
 	 */
 	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", remap = false))
 	public int playback_redirectGetEventKeyDPK() {
@@ -97,7 +97,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#getEventKeyboardState()}
+	 * @return {@link VirtualInput.VirtualKeyboardInput#getEventKeyboardState()}
 	 */
 	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKeyState()Z", remap = false))
 	public boolean playback_redirectGetEventKeyStateDPK() {
@@ -105,7 +105,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#getEventKeyboardCharacter()}
+	 * @return {@link VirtualInput.VirtualKeyboardInput#getEventKeyboardCharacter()}
 	 */
 	@Redirect(method = "dispatchKeypresses", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventCharacter()C", remap = false))
 	public char playback_redirectGetEventCharacterDPK() {
@@ -116,7 +116,7 @@ public class MixinMinecraft {
 	
 	/**
 	 * Run at the start of run tick mouse. Runs every tick.
-	 * @see com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualMouseInput#nextMouseTick()
+	 * @see VirtualInput.VirtualMouseInput#nextMouseTick()
 	 * @param ci CBI
 	 */
 	@Inject(method = "runTickMouse", at = @At(value = "HEAD"))
@@ -125,9 +125,9 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * Redirects a {@link org.lwjgl.input.Mouse#next()}. Starts running every tick and continues as long as there are {@link VirtualMouseEvent}s in {@link VirtualInput2}
-	 * @see com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualMouseInput#nextMouseSubtick()
-	 * @return If {@link VirtualMouseInput}s are present in {@link VirtualInput2}
+	 * Redirects a {@link org.lwjgl.input.Mouse#next()}. Starts running every tick and continues as long as there are {@link VirtualMouseEvent}s in {@link VirtualInput}
+	 * @see VirtualInput.VirtualMouseInput#nextMouseSubtick()
+	 * @return If {@link VirtualMouseInput}s are present in {@link VirtualInput}
 	 */
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z", remap = false))
 	public boolean playback_redirectMouseNext() {
@@ -135,7 +135,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualMouseInput#getEventMouseKey()}
+	 * @return {@link VirtualInput.VirtualMouseInput#getEventMouseKey()}
 	 */
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
 	public int playback_redirectMouseGetEventButton() {
@@ -143,7 +143,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualMouseInput#getEventMouseState()}
+	 * @return {@link VirtualInput.VirtualMouseInput#getEventMouseState()}
 	 */
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", remap = false))
 	public boolean playback_redirectGetEventButtonState() {
@@ -151,7 +151,7 @@ public class MixinMinecraft {
 	}
 	
 	/**
-	 * @return {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualMouseInput#getEventMouseScrollWheel()}
+	 * @return {@link VirtualInput.VirtualMouseInput#getEventMouseScrollWheel()}
 	 */
 	@Redirect(method = "runTickMouse", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I", remap = false))
 	public int playback_redirectGetEventDWheel() {

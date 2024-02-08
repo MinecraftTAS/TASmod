@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.mixin.playbackhooks;
 
+import com.minecrafttas.tasmod.virtual.VirtualInput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,8 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.util.Ducks.GuiScreenDuck;
-import com.minecrafttas.tasmod.virtual.VirtualInput2;
-import com.minecrafttas.tasmod.virtual.VirtualKeyboardEvent;
+import com.minecrafttas.tasmod.virtual.event.VirtualKeyboardEvent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -21,7 +21,7 @@ public class MixinGuiScreen implements GuiScreenDuck {
 
 	/**
 	 * Run at the start of run handleInput. Runs every tick.
-	 * @see com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#nextKeyboardTick()
+	 * @see VirtualInput.VirtualKeyboardInput#nextKeyboardTick()
 	 * @param ci CBI
 	 */
 	@Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isCreated()Z", shift = Shift.AFTER, remap = false))
@@ -30,9 +30,9 @@ public class MixinGuiScreen implements GuiScreenDuck {
 	}
 
 	/**
-	 * Redirects a {@link org.lwjgl.input.Keyboard#next()}. Starts running every tick and continues as long as there are {@link VirtualKeyboardEvent}s in {@link VirtualInput2}
-	 * @see com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualKeyboardInput#nextKeyboardSubtick()
-	 * @return If {@link VirtualKeyboardEvent}s are present in {@link VirtualInput2}
+	 * Redirects a {@link org.lwjgl.input.Keyboard#next()}. Starts running every tick and continues as long as there are {@link VirtualKeyboardEvent}s in {@link VirtualInput}
+	 * @see VirtualInput.VirtualKeyboardInput#nextKeyboardSubtick()
+	 * @return If {@link VirtualKeyboardEvent}s are present in {@link VirtualInput}
 	 */
 	@Redirect(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z", remap = false))
 	public boolean redirectKeyboardNext() {

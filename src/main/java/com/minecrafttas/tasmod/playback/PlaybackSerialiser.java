@@ -1,6 +1,17 @@
 package com.minecrafttas.tasmod.playback;
 
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
+import com.dselent.bigarraylist.BigArrayList;
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
+import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;
+import com.minecrafttas.tasmod.util.FileThread;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
+import com.minecrafttas.tasmod.virtual.VirtualCameraAngle;
+import com.minecrafttas.tasmod.virtual.VirtualKey;
+import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
+import com.minecrafttas.tasmod.virtual.VirtualMouse;
+import com.mojang.realmsclient.util.Pair;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,20 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
-
-import com.dselent.bigarraylist.BigArrayList;
-import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
-import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;
-import com.minecrafttas.tasmod.util.FileThread;
-import com.minecrafttas.tasmod.util.LoggerMarkers;
-import com.minecrafttas.tasmod.virtual.VirtualKey;
-import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
-import com.minecrafttas.tasmod.virtual.VirtualMouse;
-import com.minecrafttas.tasmod.virtual.VirtualMouse.PathNode;
-import com.minecrafttas.tasmod.virtual.VirtualCameraAngle;
-import com.mojang.realmsclient.util.Pair;
+import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 /**
  * Saves a given {@linkplain PlaybackControllerClient} to a file. Is also able to read an input container from a file. <br>
@@ -334,19 +332,19 @@ public class PlaybackSerialiser {
 
 			for (String key : splitKeys) {
 
-				VirtualKey vkey = null;
-				// Check if the key is a keycode
-				if (isNumeric(key)) {
-					vkey = keyboard.get(Integer.parseInt(key));
-				} else {
-					vkey = keyboard.get(key);
-				}
-
-				if (vkey == null) {
-					throw new IOException(key + " is not a recognised keyboard key in line " + linenumber);
-				}
-
-				vkey.setPressed(true);
+//				VirtualKey vkey = null;
+//				// Check if the key is a keycode
+//				if (isNumeric(key)) {
+//					vkey = keyboard.get(Integer.parseInt(key));
+//				} else {
+//					vkey = keyboard.get(key);
+//				}
+//
+//				if (vkey == null) {
+//					throw new IOException(key + " is not a recognised keyboard key in line " + linenumber);
+//				}
+//
+//				vkey.setPressed(true);
 			}
 		}
 		
@@ -357,7 +355,7 @@ public class PlaybackSerialiser {
 		}
 		
 		for (char onechar : chars) {
-			keyboard.addChar(onechar);
+//			keyboard.addChar(onechar);
 		}
 		return keyboard;
 	}
@@ -379,58 +377,58 @@ public class PlaybackSerialiser {
 			String[] splitButtons=buttons.split(",");
 			for (String button : splitButtons) {
 				
-				VirtualKey vkey = null;
-				// Check if the key is a keycode
-				if (isNumeric(button)) {
-					vkey = mouse.get(Integer.parseInt(button));
-				} else {
-					vkey = mouse.get(button);
-				}
-				if (vkey == null) {
-					throw new IOException(button + " is not a recognised mouse key in line " + linenumber);
-				}
-				mouse.get(button).setPressed(true);
+//				VirtualKey vkey = null;
+//				// Check if the key is a keycode
+//				if (isNumeric(button)) {
+//					vkey = mouse.get(Integer.parseInt(button));
+//				} else {
+//					vkey = mouse.get(button);
+//				}
+//				if (vkey == null) {
+//					throw new IOException(button + " is not a recognised mouse key in line " + linenumber);
+//				}
+//				mouse.get(button).setPressed(true);
 			}
 		}
-		mouse.setPath(readPath(path, linenumber, mouse));
+//		mouse.setPath(readPath(path, linenumber, mouse));
 
 		return mouse;
 	}
 
-	private List<PathNode> readPath(String section, int linenumber, VirtualMouse mouse) throws IOException {
-		List<PathNode> path = new ArrayList<VirtualMouse.PathNode>();
-		
-		section = section.replace("[", "").replace("]", "");
-		String[] pathNodes = section.split("->");
-
-		for (String pathNode : pathNodes) {
-			String[] split = pathNode.split(",");
-			
-			int length=split.length;
-			int scrollWheel = 0;
-			int cursorX = 0;
-			int cursorY = 0;
-			try {
-				scrollWheel = Integer.parseInt(split[length-3]);
-				cursorX = Integer.parseInt(split[length-2]);
-				cursorY = Integer.parseInt(split[length-1]);
-			} catch (NumberFormatException e) {
-				throw new IOException("'" + pathNode + "' couldn't be read in line " + linenumber+": Something is not a number");
-			} catch (ArrayIndexOutOfBoundsException e) {
-				throw new IOException("'" + pathNode + "' couldn't be read in line " + linenumber+": Something is missing or is too much");
-			}
-			PathNode node = mouse.new PathNode();
-			for (int i=0; i<length-3; i++) {
-				String key= split[i];
-				node.get(key).setPressed(true);
-			}
-			node.scrollwheel = scrollWheel;
-			node.cursorX = cursorX;
-			node.cursorY = cursorY;
-			path.add(node);
-		}
-		return path;
-	}
+//	private List<PathNode> readPath(String section, int linenumber, VirtualMouse mouse) throws IOException {
+//		List<PathNode> path = new ArrayList<VirtualMouse.PathNode>();
+//
+//		section = section.replace("[", "").replace("]", "");
+//		String[] pathNodes = section.split("->");
+//
+//		for (String pathNode : pathNodes) {
+//			String[] split = pathNode.split(",");
+//
+//			int length=split.length;
+//			int scrollWheel = 0;
+//			int cursorX = 0;
+//			int cursorY = 0;
+//			try {
+//				scrollWheel = Integer.parseInt(split[length-3]);
+//				cursorX = Integer.parseInt(split[length-2]);
+//				cursorY = Integer.parseInt(split[length-1]);
+//			} catch (NumberFormatException e) {
+//				throw new IOException("'" + pathNode + "' couldn't be read in line " + linenumber+": Something is not a number");
+//			} catch (ArrayIndexOutOfBoundsException e) {
+//				throw new IOException("'" + pathNode + "' couldn't be read in line " + linenumber+": Something is missing or is too much");
+//			}
+//			PathNode node = mouse.new PathNode();
+//			for (int i=0; i<length-3; i++) {
+//				String key= split[i];
+//				node.get(key).setPressed(true);
+//			}
+//			node.scrollwheel = scrollWheel;
+//			node.cursorX = cursorX;
+//			node.cursorY = cursorY;
+//			path.add(node);
+//		}
+//		return path;
+//	}
 	
 	private VirtualCameraAngle readSubtick(String section, int linenumber) throws IOException {
 		section = section.replace("Camera:", "");

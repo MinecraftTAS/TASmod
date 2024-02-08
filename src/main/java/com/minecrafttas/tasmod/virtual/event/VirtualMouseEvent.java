@@ -1,6 +1,6 @@
-package com.minecrafttas.tasmod.virtual;
+package com.minecrafttas.tasmod.virtual.event;
 
-import com.minecrafttas.tasmod.virtual.VirtualEvent.VirtualButtonEvent;
+import com.minecrafttas.tasmod.virtual.event.VirtualEvent.VirtualButtonEvent;
 
 /**
  * Template for recording Mouse.next() events.

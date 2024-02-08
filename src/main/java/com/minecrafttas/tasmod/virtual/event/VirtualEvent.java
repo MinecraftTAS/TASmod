@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.virtual;
+package com.minecrafttas.tasmod.virtual.event;
 
 public class VirtualEvent {
 

@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 import com.minecrafttas.tasmod.util.Ducks.SubtickDuck;
+import com.minecrafttas.tasmod.virtual.VirtualInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.util.math.MathHelper;
@@ -18,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Redirects the camera to use {@link com.minecrafttas.tasmod.virtual.VirtualInput2.VirtualCameraAngleInput}.<br>
+ * Redirects the camera to use {@link VirtualInput.VirtualCameraAngleInput}.<br>
  * Also conforms the camera to 20tps as
  */
 @Mixin(EntityRenderer.class)

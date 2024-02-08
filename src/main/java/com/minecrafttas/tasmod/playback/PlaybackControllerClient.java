@@ -683,9 +683,9 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 	 * Clears {@link #keyboard} and {@link #mouse}
 	 */
 	public void unpressContainer() {
-		LOGGER.trace(LoggerMarkers.Playback, "Unpressing container");
-		keyboard.clear();
-		mouse.clear();
+//		LOGGER.trace(LoggerMarkers.Playback, "Unpressing container");
+//		keyboard.clear();
+//		mouse.clear();
 	}
 
 	// ==============================================================
@@ -747,7 +747,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 			this.tick = tick;
 			this.keyboard = new VirtualKeyboard();
 			this.mouse = new VirtualMouse();
-			this.subticks = new VirtualCameraAngle(0, 0);
+//			this.subticks = new VirtualCameraAngle(0, 0);
 		}
 
 		@Override
