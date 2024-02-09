@@ -1,20 +1,26 @@
 package com.minecrafttas.tasmod.virtual;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.minecrafttas.tasmod.virtual.event.VirtualKeyboardEvent;
-import com.minecrafttas.tasmod.virtual.event.VirtualMouseEvent;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.mixin.playbackhooks.MixinMinecraft;
 import com.minecrafttas.tasmod.util.Ducks;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.PointerNormalizer;
+import com.minecrafttas.tasmod.virtual.event.VirtualCameraAngleEvent;
+import com.minecrafttas.tasmod.virtual.event.VirtualKeyboardEvent;
+import com.minecrafttas.tasmod.virtual.event.VirtualMouseEvent;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * Main component for redirecting inputs.<br>
@@ -469,7 +475,10 @@ public class VirtualInput {
 	public class VirtualCameraAngleInput {
 		private final VirtualCameraAngle currentCameraAngle;
 		private final VirtualCameraAngle nextCameraAngle = new VirtualCameraAngle();
-
+		private final List<VirtualCameraAngle> cameraAngleInterpolationStates = new ArrayList<>();
+		private float currentPitchDelta = 0f;
+		private float currentYawDelta = 0f;
+		
 		public VirtualCameraAngleInput(VirtualCameraAngle preloadedCamera) {
 			currentCameraAngle = preloadedCamera;
 		}
@@ -479,15 +488,49 @@ public class VirtualInput {
 		}
 		
 		public void nextCameraTick() {
+			nextCameraAngle.getStates(cameraAngleInterpolationStates);
+			VirtualCameraAngleEvent event = currentCameraAngle.getCollected(nextCameraAngle);
+			currentPitchDelta = event.getDeltaPitch();
+			currentYawDelta = event.getDeltaYaw();
 			currentCameraAngle.copyFrom(nextCameraAngle);
 		}
 		
 		public float getCurrentPitch() {
-			return currentCameraAngle.getPitch();
+			float out = currentPitchDelta;
+			if(currentPitchDelta != 0f) {
+				currentPitchDelta = 0f;
+			}
+			return out;
 		}
 		
 		public float getCurrentYaw() {
-			return currentCameraAngle.getYaw();
+			float out = currentYawDelta;
+			if(currentYawDelta != 0f) {
+				currentYawDelta = 0f;
+			}
+			return out;
+		}
+		
+		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable){
+			if(!enable) {
+				return Triple.of(pitch, yaw, 0f);
+			}
+			
+			float interpolatedPitch = 0f;
+			float interpolatedYaw = 0f;
+			
+			if(cameraAngleInterpolationStates.size()==1) { // If no interpolation data was specified, interpolate over 2 values
+				interpolatedPitch = (float) MathHelper.clampedLerp(currentCameraAngle.getPitch(), cameraAngleInterpolationStates.get(0).getPitch(), partialTick);
+				interpolatedYaw = (float) MathHelper.clampedLerp(currentCameraAngle.getYaw(), cameraAngleInterpolationStates.get(0).getYaw() + 180, partialTick);
+			} else {
+				
+				int index = (int)MathHelper.clampedLerp(0, cameraAngleInterpolationStates.size(), partialTick);	// Get interpolate index 
+				
+				interpolatedPitch = cameraAngleInterpolationStates.get(index).getPitch();
+				interpolatedYaw = cameraAngleInterpolationStates.get(index).getYaw();
+			}
+			
+			return Triple.of(interpolatedPitch, interpolatedYaw, 0f);
 		}
 	}
 }

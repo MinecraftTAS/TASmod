@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.minecrafttas.tasmod.virtual.event.VirtualCameraAngleEvent;
+
 public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implements Serializable {
 	private float pitch;
 	private float yaw;
@@ -26,12 +28,29 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		this.yaw = yaw;
 	}
 
-	public void update(Float pitch, Float yaw) {
+	public void update(float pitchDelta, float yawDelta) {
 		if(isParent() && !ignoreFirstUpdate()) {
 			addSubtick(clone());
 		}
-		this.pitch = pitch;
-		this.yaw = yaw;
+		this.pitch += pitchDelta;
+		this.yaw += yawDelta;
+	}
+	
+	public void getStates(List<VirtualCameraAngle> reference) {
+		if (isParent()) {
+			reference.addAll(subtickList);
+			reference.add(this);
+		}
+	}
+	
+	public VirtualCameraAngleEvent getCollected(VirtualCameraAngle nextCameraAngle) {
+		float pitchDelta = pitch;
+		float yawDelta = yaw;
+		for(VirtualCameraAngle subtick : nextCameraAngle.getAll()) {
+			pitchDelta+=subtick.pitch;
+			yawDelta+=subtick.yaw;
+		}
+		return new VirtualCameraAngleEvent(pitchDelta, yawDelta);
 	}
 	
 	public void copyFrom(VirtualCameraAngle camera) {

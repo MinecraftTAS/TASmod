@@ -147,7 +147,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		EventListenerRegistry.register(loadingScreenHandler);
 		EventListenerRegistry.register(ticksyncClient);
 		EventListenerRegistry.register(keybindManager);
-		EventListenerRegistry.register(interpolation);
+//		EventListenerRegistry.register(interpolation);
 		EventListenerRegistry.register((EventOpenGui)(gui -> {
 			if(gui instanceof GuiMainMenu) {
 				openMainMenuScheduler.runAllTasks();

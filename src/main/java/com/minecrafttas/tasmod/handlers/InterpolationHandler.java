@@ -14,6 +14,7 @@ import net.minecraft.util.math.MathHelper;
  * @author Pancake
  *
  */
+@Deprecated
 public class InterpolationHandler implements EventCamera {
 
 	public static float rotationPitch = 0f;
