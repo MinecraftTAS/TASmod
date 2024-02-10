@@ -59,6 +59,8 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		this.subtickList.clear();
 		this.subtickList.addAll(camera.subtickList);
 		camera.subtickList.clear();
+		camera.pitch = 0f;
+		camera.yaw = 0f;
 		camera.resetFirstUpdate();
 	}
 	
