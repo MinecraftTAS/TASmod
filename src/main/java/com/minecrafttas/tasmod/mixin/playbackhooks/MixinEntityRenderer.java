@@ -4,9 +4,10 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.At.Shift;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
@@ -29,12 +30,11 @@ public class MixinEntityRenderer implements SubtickDuck {
     private Minecraft mc;
 
     
-    @ModifyArgs(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;turn(FF)V"))
-    public void playback_redirectCamera(Args args) {
-    	TASmodClient.virtual.CAMERA_ANGLE.updateNextCameraAngle(args.get(0), args.get(1));
-    	
-    	args.set(0, TASmodClient.virtual.CAMERA_ANGLE.getCurrentPitch());
-    	args.set(1, TASmodClient.virtual.CAMERA_ANGLE.getCurrentYaw());
+    @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;turn(FF)V", shift = Shift.AFTER))
+    public void playback_injectAfterTurn(CallbackInfo ci) {
+    	TASmodClient.virtual.CAMERA_ANGLE.updateNextCameraAngle(mc.player.rotationPitch, mc.player.rotationYaw);
+    	mc.player.rotationPitch = TASmodClient.virtual.CAMERA_ANGLE.getCurrentPitch();
+    	mc.player.rotationYaw = TASmodClient.virtual.CAMERA_ANGLE.getCurrentYaw();
     }
     
     @Override
@@ -59,7 +59,7 @@ public class MixinEntityRenderer implements SubtickDuck {
 	}
 	
 	private float redirectCam(float yaw, float pitch) {
-		Triple<Float, Float, Float> interpolated = TASmodClient.virtual.CAMERA_ANGLE.getInterpolatedState(pitch, pitch, yaw, TASmodClient.controller.isPlayingback());
+		Triple<Float, Float, Float> interpolated = TASmodClient.virtual.CAMERA_ANGLE.getInterpolatedState(Minecraft.getMinecraft().timer.renderPartialTicks, pitch, yaw, TASmodClient.controller.isPlayingback());
 		GlStateManager.rotate(interpolated.getLeft(), 1.0f, 0.0f, 0.0f);
 		GlStateManager.rotate(interpolated.getRight(), 0.0f, 0.0f, 1.0f);
 		return interpolated.getMiddle();

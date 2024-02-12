@@ -28,12 +28,12 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		this.yaw = yaw;
 	}
 
-	public void update(float pitchDelta, float yawDelta) {
+	public void update(float pitch, float yaw) {
 		if(isParent() && !ignoreFirstUpdate()) {
 			addSubtick(clone());
 		}
-		this.pitch += pitchDelta;
-		this.yaw += yawDelta;
+		this.pitch = pitch;
+		this.yaw = yaw;
 	}
 	
 	public void getStates(List<VirtualCameraAngle> reference) {
@@ -43,24 +43,12 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		}
 	}
 	
-	public VirtualCameraAngleEvent getCollected(VirtualCameraAngle nextCameraAngle) {
-		float pitchDelta = pitch;
-		float yawDelta = yaw;
-		for(VirtualCameraAngle subtick : nextCameraAngle.getAll()) {
-			pitchDelta+=subtick.pitch;
-			yawDelta+=subtick.yaw;
-		}
-		return new VirtualCameraAngleEvent(pitchDelta, yawDelta);
-	}
-	
 	public void copyFrom(VirtualCameraAngle camera) {
 		this.pitch = camera.pitch;
 		this.yaw = camera.yaw;
 		this.subtickList.clear();
 		this.subtickList.addAll(camera.subtickList);
 		camera.subtickList.clear();
-		camera.pitch = 0f;
-		camera.yaw = 0f;
 		camera.resetFirstUpdate();
 	}
 	

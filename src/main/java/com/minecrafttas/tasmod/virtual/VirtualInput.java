@@ -476,45 +476,32 @@ public class VirtualInput {
 		private final VirtualCameraAngle currentCameraAngle;
 		private final VirtualCameraAngle nextCameraAngle = new VirtualCameraAngle();
 		private final List<VirtualCameraAngle> cameraAngleInterpolationStates = new ArrayList<>();
-		private float currentPitchDelta = 0f;
-		private float currentYawDelta = 0f;
 		
 		public VirtualCameraAngleInput(VirtualCameraAngle preloadedCamera) {
 			currentCameraAngle = preloadedCamera;
 		}
 		
 		public void updateNextCameraAngle(float pitch, float yaw) {
-			LOGGER.debug("Pitch: {}, Yaw: {}", pitch, yaw);
+//			LOGGER.debug("Pitch: {}, Yaw: {}", pitch, yaw);
 			nextCameraAngle.update(pitch, yaw);
 		}
 		
 		public void nextCameraTick() {
 			nextCameraAngle.getStates(cameraAngleInterpolationStates);
-			VirtualCameraAngleEvent event = currentCameraAngle.getCollected(nextCameraAngle);
-			currentPitchDelta = event.getDeltaPitch();
-			currentYawDelta = event.getDeltaYaw();
 			currentCameraAngle.copyFrom(nextCameraAngle);
 		}
 		
 		public float getCurrentPitch() {
-			float out = currentPitchDelta;
-			if(currentPitchDelta != 0f) {
-				currentPitchDelta = 0f;
-			}
-			return out;
+			return currentCameraAngle.getPitch();
 		}
 		
 		public float getCurrentYaw() {
-			float out = currentYawDelta;
-			if(currentYawDelta != 0f) {
-				currentYawDelta = 0f;
-			}
-			return out;
+			return currentCameraAngle.getYaw();
 		}
 		
 		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable){
 			if(!enable) {
-				return Triple.of(pitch, yaw, 0f);
+				return Triple.of(nextCameraAngle.getPitch(), nextCameraAngle.getYaw()+180, 0f);
 			}
 			
 			float interpolatedPitch = 0f;
