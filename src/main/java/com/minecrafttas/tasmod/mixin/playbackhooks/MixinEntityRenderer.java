@@ -4,10 +4,9 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
@@ -18,6 +17,7 @@ import com.minecrafttas.tasmod.virtual.VirtualInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * Redirects the camera to use {@link VirtualInput.VirtualCameraAngleInput}.<br>
@@ -30,11 +30,23 @@ public class MixinEntityRenderer implements SubtickDuck {
     private Minecraft mc;
 
     
-    @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;turn(FF)V", shift = Shift.AFTER))
-    public void playback_injectAfterTurn(CallbackInfo ci) {
-    	TASmodClient.virtual.CAMERA_ANGLE.updateNextCameraAngle(mc.player.rotationPitch, mc.player.rotationYaw);
-    	mc.player.rotationPitch = TASmodClient.virtual.CAMERA_ANGLE.getCurrentPitch();
-    	mc.player.rotationYaw = TASmodClient.virtual.CAMERA_ANGLE.getCurrentYaw();
+    @ModifyArgs(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;turn(FF)V"))
+    public void playback_injectAfterTurn(Args arguments) {
+    	double pitchDelta = (double)(float) arguments.get(1);
+    	double yawDelta = (double)(float) arguments.get(0);
+    	
+    	pitchDelta *=0.15D;
+    	yawDelta *= 0.15D;
+    	
+    	float pitch = (float) ((double)mc.player.rotationPitch - pitchDelta);
+    	pitch = MathHelper.clamp(pitch, -90.0F, 90.0F);
+    	
+    	float yaw = (float) ((double)mc.player.rotationYaw + yawDelta);
+    	
+    	TASmodClient.virtual.CAMERA_ANGLE.updateNextCameraAngle(pitch, yaw);
+    	
+    	arguments.set(0, 0f);
+    	arguments.set(1, 0f);
     }
     
     @Override

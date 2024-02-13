@@ -502,7 +502,7 @@ public class VirtualInput {
 		
 		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable){
 			if(!enable) {
-				return Triple.of(nextCameraAngle.getPitch(), nextCameraAngle.getYaw()+180, 0f);
+				return Triple.of(pitch, yaw, 0f);
 			}
 			
 			float interpolatedPitch = 0f;
