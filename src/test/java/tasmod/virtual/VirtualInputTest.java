@@ -40,7 +40,7 @@ class VirtualInputTest {
 		
 		preloadedKeyboard.update(VirtualKey.W.getKeycode(), true, 'w');
 		preloadedMouse.update(VirtualKey.LC.getKeycode(), true, 15, 0, 0);
-		preloadedCameraAngle.update(1, 2);
+		preloadedCameraAngle.update(1f, 2f);
 		
 		
 		VirtualInput virtual = new VirtualInput(LOGGER, preloadedKeyboard, preloadedMouse, preloadedCameraAngle);
@@ -53,7 +53,6 @@ class VirtualInputTest {
 		assertTrue(virtual.MOUSE.nextMouseSubtick());
 		assertEquals(VirtualKey.LC.getKeycode(), virtual.MOUSE.getEventMouseKey());
 		
-		virtual.CAMERA_ANGLE.nextCameraTick();
 		assertEquals(1f, virtual.CAMERA_ANGLE.getCurrentPitch());
 		assertEquals(2f, virtual.CAMERA_ANGLE.getCurrentYaw());
 	}

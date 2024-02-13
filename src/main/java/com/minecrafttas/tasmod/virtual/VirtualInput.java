@@ -384,8 +384,9 @@ public class VirtualInput {
 		 * @see VirtualInput#update(GuiScreen)
 		 * @param keycode   The keycode of this event
 		 * @param keystate  The keystate of this event
-		 * @param character The character of this event
-		 * @param repeatEventsEnabled If repeat events are enabled
+		 * @param scrollwheel The scrollWheel of this event
+		 * @param cursorX The x coordinate of the cursor of this event
+		 * @param cursorY The y coordinate of the cursot of this event
 		 */
 		public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY) {
 			keycode-=100;
