@@ -75,13 +75,13 @@ public class KeybindManager implements EventClientGameLoop {
 	 */
 	@Override
 	public void onRunClientGameLoop(Minecraft mc) {
-		for (Keybind keybind : this.keybindings)
-			if (keybind.isKeyDownFunc == null) {
-				defaultFunction.isKeyDown(keybind.keyBinding);
-			} else {
-				if (keybind.isKeyDownFunc.isKeyDown(keybind.keyBinding))
-					keybind.onKeyDown.run();
+		for (Keybind keybind : this.keybindings){
+			IsKeyDownFunc keyDown = keybind.isKeyDownFunc != null ? keybind.isKeyDownFunc : defaultFunction;
+			if(keyDown.isKeyDown(keybind.keyBinding)){
+				keybind.onKeyDown.run();
 			}
+		}
+
 	}
 
 	/**
