@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.minecrafttas.tasmod.TASmodClient;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -502,7 +503,7 @@ public class VirtualInput {
 		
 		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable){
 			if(!enable) {
-				return Triple.of(pitch, yaw, 0f);
+				return Triple.of(TASmodClient.virtual.CAMERA_ANGLE.nextCameraAngle.getPitch(), TASmodClient.virtual.CAMERA_ANGLE.nextCameraAngle.getYaw()+180, 0f);
 			}
 			
 			float interpolatedPitch = 0f;
