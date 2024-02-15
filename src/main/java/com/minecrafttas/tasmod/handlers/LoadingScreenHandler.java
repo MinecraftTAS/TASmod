@@ -62,6 +62,8 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 		if (TASmod.getServerInstance() != null) { // Check if a server is running and if it's an integrated server
 			LOGGER.debug(LoggerMarkers.Event, "Finished loading the world on the client");
 			loadingScreenDelay = 1;
+
+			TASmodClient.virtual.unpress();
 		}
 	}
 
