@@ -14,8 +14,10 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Redirects the camera to use {@link VirtualInput.VirtualCameraAngleInput}.<br>
@@ -26,66 +28,39 @@ public class MixinEntityRenderer implements SubtickDuck {
 
 	@Shadow
 	private Minecraft mc;
-//	@Shadow
-//	private float smoothCamYaw;
-//	@Shadow
-//	private float smoothCamPitch;
-//	@Shadow
-//	private float smoothCamPartialTicks;
-//	@Shadow
-//	private float smoothCamFilterX;
-//	@Shadow
-//	private float smoothCamFilterY;
+	@Shadow
+	private float smoothCamYaw;
+	@Shadow
+	private float smoothCamPitch;
+	@Shadow
+	private float smoothCamPartialTicks;
+	@Shadow
+	private float smoothCamFilterX;
+	@Shadow
+	private float smoothCamFilterY;
 
-    @Redirect(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;turn(FF)V"))
-    public void playback_injectAfterTurn(EntityPlayerSP player, float originalYawDelta, float originalPitchDelta) {
-		updateNextCameraAngle(player, originalYawDelta, originalPitchDelta);
+	@Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;startSection(Ljava/lang/String;)V", ordinal = 0, shift = At.Shift.AFTER))
+	public void playback_injectAtStartSection(float partialTicks, long nanoTime, CallbackInfo ci) {
+		// Calculate sensitivity
+		float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
+		float f1 = f * f * f * 8.0F;
+
+		if (this.mc.currentScreen == null) { // No Gui
+			mc.mouseHelper.mouseXYChange();
+			mc.getTutorial().handleMouse(mc.mouseHelper);
+			TASmodClient.virtual.CAMERA_ANGLE.updateNextCameraAngle((float) -(mc.mouseHelper.deltaY * f1 * 0.15D), (float) (mc.mouseHelper.deltaX * f1 * 0.15D));
+		}
 	}
 
-	private void updateNextCameraAngle(EntityPlayerSP player, float originalYawDelta, float originalPitchDelta) {
-		double pitchDelta = originalPitchDelta;
-		double yawDelta = originalYawDelta;
-
-		pitchDelta *=0.15D;
-		yawDelta *= 0.15D;
-
-		float pitch = (float) ((double) player.rotationPitch - pitchDelta);
-		pitch = MathHelper.clamp(pitch, -90.0F, 90.0F);
-
-		float yaw = (float) ((double) player.rotationYaw + yawDelta);
-
-		TASmodClient.virtual.CAMERA_ANGLE.updateNextCameraAngle(pitch, yaw);
+	@Redirect(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityPlayerSP;turn(FF)V"))
+	public void playback_stopVanilla(EntityPlayerSP player, float deltaYaw, float deltaPitch){
+		if(TASmodClient.tickratechanger.ticksPerSecond == 0){
+			player.turn(deltaYaw, deltaPitch);
+		}
 	}
 
 	@Override
 	public void runUpdate(float partialTicks) {
-//		boolean flag = Display.isActive();
-//		if (mc.inGameHasFocus && flag) {
-//			mc.getTutorial().handleMouse(mc.mouseHelper);
-//			this.mc.mouseHelper.mouseXYChange();
-//			float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
-//			float f1 = f * f * f * 8.0F;
-//			float f2 = (float) this.mc.mouseHelper.deltaX * f1;
-//			float f3 = (float) this.mc.mouseHelper.deltaY * f1;
-//			int i = 1;
-//
-//			if (mc.gameSettings.invertMouse) {
-//				i = -1;
-//			}
-//
-//			if (mc.gameSettings.smoothCamera) {
-//				smoothCamYaw += f2;
-//				smoothCamPitch += f3;
-//				float f4 = partialTicks - smoothCamPartialTicks;
-//				smoothCamPartialTicks = partialTicks;
-//				f2 = smoothCamFilterX * f4;
-//				f3 = smoothCamFilterY * f4;
-//				updateNextCameraAngle(mc.player, f2, f3 * (float) i);
-//			} else {
-//				smoothCamYaw = 0.0F;
-//				smoothCamPitch = 0.0F;
-//				updateNextCameraAngle(mc.player, f2, f3 * (float) i);
-//			}
 			if(mc.player == null){
 				return;
 			}
@@ -97,7 +72,6 @@ public class MixinEntityRenderer implements SubtickDuck {
 
 			mc.player.prevRotationPitch = prevPitch;
 			mc.player.prevRotationYaw = prevYaw;
-//		}
 	}
     
 	@ModifyArg(method = "orientCamera", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;rotate(FFFF)V", ordinal = 8), index = 0)

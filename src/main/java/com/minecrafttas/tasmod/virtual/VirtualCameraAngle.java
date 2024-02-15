@@ -1,5 +1,7 @@
 package com.minecrafttas.tasmod.virtual;
 
+import net.minecraft.util.math.MathHelper;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +32,9 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		if(isParent() && !ignoreFirstUpdate()) {
 			addSubtick(clone());
 		}
-		this.pitch = pitch;
-		this.yaw = yaw;
+		this.pitch += pitch;
+		this.pitch = MathHelper.clamp(this.pitch, -90.0F, 90.0F);
+		this.yaw += yaw;
 	}
 	
 	public void getStates(List<VirtualCameraAngle> reference) {
