@@ -5,38 +5,101 @@ import net.minecraft.util.math.MathHelper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * Stores the values of the camera angle of the player in a given timeframe.<br>
+ * <br>
+ * Similar to {@link VirtualKeyboard} and {@link VirtualMouse} with the difference,<br>
+ * that no difference calculation is applied and only the absolute camera coordinates are used.<br>
+ * This makes the playback desync proof to different mouse sensitivity across PCs.<br>
+ * 
+ */
 public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implements Serializable {
-	private float pitch;
-	private float yaw;
-	
+	/**
+	 * Controls the up/down coordinate of the camera. Clamped between -90 and +90
+	 */
+	private Float pitch;
+	/**
+	 * Controls the left/right coordinate of the camera. In this case the camera is clamped between -180 and +180
+	 */
+	private Float yaw;
+
+	/**
+	 * Creates an empty camera angle with pitch and yaw = 0
+	 */
 	public VirtualCameraAngle() {
-		this(0, 0, new ArrayList<>(), true);
+		this(null, null, new ArrayList<>(), true);
 	}
 	
-	public VirtualCameraAngle(float pitch, float yaw) {
+	/**
+	 * Creates a subtick camera angle with {@link Subtickable#subtickList} uninitialized
+	 * @param pitch {@link #pitch}
+	 * @param yaw {@link #yaw}
+	 */
+	public VirtualCameraAngle(Float pitch, Float yaw) {
 		this(pitch, yaw, null);
 	}
 	
-	public VirtualCameraAngle(float pitch, float yaw, List<VirtualCameraAngle> subtickList) {
+	/**
+	 * Creates a parent camera angle
+	 * @param pitch {@link #pitch}
+	 * @param yaw {@link #yaw}
+	 * @param ignoreFirstUpdate {@link Subtickable#ignoreFirstUpdate}
+	 */
+	public VirtualCameraAngle(Float pitch, Float yaw, boolean ignoreFirstUpdate) {
+		this(pitch, yaw, new ArrayList<>(), ignoreFirstUpdate);
+	}
+	
+	/**
+	 * Creates a camera angle with existing values
+	 * @param pitch {@link #pitch}
+	 * @param yaw {@link #yaw}
+	 * @param subtickList {@link Subtickable#subtickList}
+	 */
+	public VirtualCameraAngle(Float pitch, Float yaw, List<VirtualCameraAngle> subtickList) {
 		this(pitch, yaw, subtickList, false);
 	}
-
-	public VirtualCameraAngle(float pitch, float yaw, List<VirtualCameraAngle> subtickList, boolean ignoreFirstUpdate) {
+	
+	/**
+	 * Creates a camera angle with initialized values
+	 * @param pitch {@link VirtualCameraAngle#pitch}
+	 * @param yaw {@link VirtualCameraAngle#yaw}
+	 * @param subtickList {@link Subtickable#subtickList}
+	 * @param ignoreFirstUpdate {@link Subtickable#ignoreFirstUpdate}
+	 */
+	public VirtualCameraAngle(Float pitch, Float yaw, List<VirtualCameraAngle> subtickList, boolean ignoreFirstUpdate) {
 		super(subtickList, ignoreFirstUpdate);
 		this.pitch = pitch;
 		this.yaw = yaw;
 	}
 
-	public void update(float pitch, float yaw) {
+	/**
+	 * Updates the camera angle.
+	 * @param pitchDelta The difference between absolute coordinates of the pitch, is added to {@link VirtualCameraAngle#pitch}
+	 * @param yawDelta The difference between absolute coordinates of the yaw, is added to {@link VirtualCameraAngle#yaw}
+	 */
+	public void update(float pitchDelta, float yawDelta) {
+		if(pitch==null || yaw == null) {
+			return;
+		}
 		if(isParent() && !ignoreFirstUpdate()) {
 			addSubtick(clone());
 		}
-		this.pitch += pitch;
-		this.pitch = MathHelper.clamp(this.pitch, -90.0F, 90.0F);
-		this.yaw += yaw;
+		this.pitch = MathHelper.clamp(this.pitch + pitchDelta, -90.0F, 90.0F);
+		this.yaw += yawDelta;
 	}
 	
+	public void set(float pitch, float yaw) {
+		this.pitch = pitch;
+		this.yaw = yaw;
+	}
+	
+	/**
+	 * A list of all camera states in this VirtualCameraAngle.
+	 * It consists of: {@link Subtickable#subtickList} + this
+	 * @param reference A list of VirtualCameraAngles with the newest being the current camera angle
+	 */
 	public void getStates(List<VirtualCameraAngle> reference) {
 		if (isParent()) {
 			reference.addAll(subtickList);
@@ -44,6 +107,10 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		}
 	}
 	
+    /**
+     * Copies the data from another camera angle into this camera without creating a new object.
+     * @param camera The camera to move from
+     */
 	public void copyFrom(VirtualCameraAngle camera) {
 		this.pitch = camera.pitch;
 		this.yaw = camera.yaw;
@@ -52,6 +119,14 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		camera.subtickList.clear();
 	}
 	
+	public void clear() {
+		this.pitch = null;
+		this.yaw = null;
+	}
+	
+	/**
+	 * Creates a clone of this object as a subtick
+	 */
 	@Override
 	public VirtualCameraAngle clone() {
 		return new VirtualCameraAngle(pitch, yaw);
@@ -61,21 +136,36 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 	public boolean equals(Object obj) {
 		if (obj instanceof VirtualCameraAngle) {
 			VirtualCameraAngle angle = (VirtualCameraAngle) obj;
-			return pitch == angle.pitch && yaw == angle.yaw;
+			return (pitch != null && pitch.equals(angle.pitch)) && (yaw != null && yaw.equals(angle.yaw));
 		}
 		return super.equals(obj);
 	}
 
 	@Override
 	public String toString() {
+		if(isParent()) {
+			return getAll().stream().map(VirtualCameraAngle::toString2).collect(Collectors.joining("\n"));
+		} else {
+			return toString2();
+		}
+	}
+	
+	private String toString2() {
 		return String.format("%s;%s", pitch, yaw);
 	}
 	
-	public float getPitch() {
+	/**
+	 * @return {@link #pitch}
+	 */
+	public Float getPitch() {
 		return pitch;
 	}
 
-	public float getYaw() {
+	/**
+	 * @return {@link #yaw}
+	 */
+	public Float getYaw() {
 		return yaw;
 	}
+
 }

@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * A simple scheduling interface
  * 
  * @author Scribble
- *
  */
 public class Scheduler {
 	

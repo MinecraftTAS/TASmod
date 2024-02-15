@@ -350,18 +350,18 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 //				return String.format("Mouse Cursor: " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorX + " " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorY);
 //			})); TODO Remove?
 			
-			title = "trajectories";
-			y += 14;
-			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-				if (Minecraft.getMinecraft().currentScreen == this) return "Trajectories";
-				String message = "Invalid Item";
-				Vec3d vec = TrajectoriesCalculator.calculate();
-				if (vec != null) {
-					message = String.format("%.3f %.3f %.3f", vec.x, vec.y, vec.z);
-				}
-				return String.format("Trajectories: " + message);
-			}));
+//			title = "trajectories";
+//			y += 14;
+//			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+//			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+//				if (Minecraft.getMinecraft().currentScreen == this) return "Trajectories";
+//				String message = "Invalid Item";
+//				Vec3d vec = TrajectoriesCalculator.calculate();
+//				if (vec != null) {
+//					message = String.format("%.3f %.3f %.3f", vec.x, vec.y, vec.z);
+//				}
+//				return String.format("Trajectories: " + message);
+//			}));
 			
 			title = "velocity";
 			y += 14;

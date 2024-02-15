@@ -9,12 +9,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Thread for writing files to disc
+ *
+ * @author Pancake
+ */
 public class FileThread extends Thread {
 	
-	private PrintWriter stream;
+	private final PrintWriter stream;
 	private boolean end = false;
 	
-	private List<String> output = new ArrayList<String>();
+	private final List<String> output = new ArrayList<>();
 	
 	public FileThread(File fileLocation, boolean append) throws FileNotFoundException {
 		stream = new PrintWriter(new OutputStreamWriter(new FileOutputStream(fileLocation, append), StandardCharsets.UTF_8));

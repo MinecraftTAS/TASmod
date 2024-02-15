@@ -252,7 +252,7 @@ public class VirtualKeyboard extends VirtualPeripheral<VirtualKeyboard> implemen
     }
 
     @Override
-    protected void clear(){
+    public void clear(){
     	super.clear();
         charList.clear();
     }

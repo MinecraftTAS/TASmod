@@ -30,6 +30,11 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 
+/**
+ * Downloads shield textures from <a href="https://minecrafttas.com/>https://minecrafttas.com</a>
+ *
+ * @author Scribble
+ */
 public class ShieldDownloader implements EventPlayerJoinedClientSide, EventOtherPlayerJoinedClientSide{
 	private final ResourceLocation bottleshield = new ResourceLocation("tasmod:textures/shields/bottleshield.png");
 	private final String defaultshield = "bottleshield";

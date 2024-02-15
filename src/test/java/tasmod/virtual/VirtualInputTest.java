@@ -35,7 +35,7 @@ class VirtualInputTest {
 	void testPreloadedConstructor() {
 		VirtualKeyboard preloadedKeyboard = new VirtualKeyboard();
 		VirtualMouse preloadedMouse = new VirtualMouse();
-		VirtualCameraAngle preloadedCameraAngle = new VirtualCameraAngle();
+		VirtualCameraAngle preloadedCameraAngle = new VirtualCameraAngle(0f, 0f);
 		
 		preloadedKeyboard.update(VirtualKey.W.getKeycode(), true, 'w');
 		preloadedMouse.update(VirtualKey.LC.getKeycode(), true, 15, 0, 0);

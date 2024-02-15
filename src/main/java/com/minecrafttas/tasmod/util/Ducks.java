@@ -81,6 +81,10 @@ public class Ducks {
 	 * Quacks the subtick
 	 */
 	public static interface SubtickDuck {
+		/**
+		 * Custom updating method for EntityRenderer, updating the player rotation
+		 * @param partialTicks The partial ticks from the vanilla Minecraft timer
+		 */
 		void runUpdate(float partialTicks);
 	}
 	

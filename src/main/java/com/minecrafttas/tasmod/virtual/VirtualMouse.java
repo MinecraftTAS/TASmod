@@ -6,6 +6,15 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Stores the mouse specific values in a given timeframe<br>
+ * <br>
+ * Similar to {@link VirtualKeyboard}, but instead of a list of characters,<br>
+ * it stores the state of the scroll wheel and the cursors x and y coordinate on screen.
+ *
+ * @author Scribble
+ * @see VirtualInput.VirtualMouseInput
+ */
 public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Serializable {
 
 	/**
@@ -123,25 +132,25 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
 	 *                  the one from tick 16
 	 * @param reference The queue to fill. Passed in by reference.
 	 */
-	public void getDifference(VirtualMouse nextPeripheral, Queue<VirtualMouseEvent> reference) {
+	public void getDifference(VirtualMouse nextMouse, Queue<VirtualMouseEvent> reference) {
 		
 		/*
 		 * Checks if pressedKeys are the same...
 		 */
-		if(pressedKeys.equals(nextPeripheral.pressedKeys)){
+		if(pressedKeys.equals(nextMouse.pressedKeys)){
 			
-			/**
+			/*
 			 * ...but scrollWheel, cursorX or cursorY are different.
 			 * Without this, the scrollWheel would only work if a mouse button is pressed at the same time. 
 			 */
-			if(!equals(nextPeripheral)) {
-				reference.add(new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, nextPeripheral.scrollWheel, nextPeripheral.cursorX, nextPeripheral.cursorY));
+			if(!equals(nextMouse)) {
+				reference.add(new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, nextMouse.scrollWheel, nextMouse.cursorX, nextMouse.cursorY));
 			}
 			return;
 		}
-		int scrollWheelCopy = nextPeripheral.scrollWheel;
-		int cursorXCopy = nextPeripheral.cursorX;
-		int cursorYCopy = nextPeripheral.cursorY;
+		int scrollWheelCopy = nextMouse.scrollWheel;
+		int cursorXCopy = nextMouse.cursorX;
+		int cursorYCopy = nextMouse.cursorY;
 
 		/* Calculate symmetric difference of keycodes */
 
@@ -153,7 +162,7 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
                      RC     <- unpressed
          */
 		for(int keycode : pressedKeys) {
-			if (!nextPeripheral.getPressedKeys().contains(keycode)) {
+			if (!nextMouse.getPressedKeys().contains(keycode)) {
 				reference.add(new VirtualMouseEvent(keycode, false, scrollWheelCopy, cursorXCopy, cursorYCopy));
 				scrollWheelCopy = 0;
 				cursorXCopy = 0;
@@ -168,7 +177,7 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
 		 	-------------
 		 	            MC <- pressed
 		 */
-		for(int keycode : nextPeripheral.getPressedKeys()) {
+		for(int keycode : nextMouse.getPressedKeys()) {
 			if (!this.pressedKeys.contains(keycode)) {
 				reference.add(new VirtualMouseEvent(keycode, true, scrollWheelCopy, cursorXCopy, cursorYCopy));
 			}
@@ -176,7 +185,7 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
 	}
 
 	@Override
-	protected void clear() {
+	public void clear() {
 		super.clear();
 		clearMouseData();
 	}

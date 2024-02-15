@@ -1,15 +1,5 @@
 package com.minecrafttas.tasmod.mixin.playbackhooks;
 
-import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
-import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.util.Ducks.SubtickDuck;
-import com.minecrafttas.tasmod.virtual.VirtualInput;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.tuple.Triple;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,9 +9,25 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
+import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.util.Ducks.SubtickDuck;
+import com.minecrafttas.tasmod.virtual.VirtualInput;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.GlStateManager;
+
 /**
  * Redirects the camera to use {@link VirtualInput.VirtualCameraAngleInput}.<br>
- * Also conforms the camera to 20tps as
+ * To support handling the camera in TASes and to avoid desyncs via lag,<br>
+ * it was decided to only update the camera every tick.<br>
+ * <br>
+ * To achieve this, some parts of the vanilla code were disabled, but get called every tick in {@link #runUpdate(float)}
+ *
+ * @author Scribble, Pancake
  */
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer implements SubtickDuck {
@@ -45,7 +51,7 @@ public class MixinEntityRenderer implements SubtickDuck {
 		float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
 		float f1 = f * f * f * 8.0F;
 
-		if (this.mc.currentScreen == null) { // No Gui
+		if (this.mc.currentScreen == null && !TASmodClient.controller.isPlayingback() && mc.player != null) { // No Gui
 			mc.mouseHelper.mouseXYChange();
 			mc.getTutorial().handleMouse(mc.mouseHelper);
 			TASmodClient.virtual.CAMERA_ANGLE.updateNextCameraAngle((float) -(mc.mouseHelper.deltaY * f1 * 0.15D), (float) (mc.mouseHelper.deltaX * f1 * 0.15D));
@@ -64,11 +70,19 @@ public class MixinEntityRenderer implements SubtickDuck {
 			if(mc.player == null){
 				return;
 			}
+			TASmodClient.virtual.CAMERA_ANGLE.nextCameraTick();
+			
 			float prevPitch = mc.player.rotationPitch;
 			float prevYaw = mc.player.rotationYaw;
-			TASmodClient.virtual.CAMERA_ANGLE.nextCameraTick();
-			mc.player.rotationPitch = TASmodClient.virtual.CAMERA_ANGLE.getCurrentPitch();
-			mc.player.rotationYaw = TASmodClient.virtual.CAMERA_ANGLE.getCurrentYaw();
+			Float newPitch = TASmodClient.virtual.CAMERA_ANGLE.getCurrentPitch();
+			Float newYaw = TASmodClient.virtual.CAMERA_ANGLE.getCurrentYaw();
+			
+			if(newPitch == null) {
+				TASmodClient.virtual.CAMERA_ANGLE.setCamera(prevPitch, prevYaw);
+				return;
+			}
+			mc.player.rotationPitch = newPitch;
+			mc.player.rotationYaw = newYaw;
 
 			mc.player.prevRotationPitch = prevPitch;
 			mc.player.prevRotationYaw = prevYaw;

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.minecrafttas.tasmod.TASmodClient;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -16,7 +15,6 @@ import com.minecrafttas.tasmod.mixin.playbackhooks.MixinMinecraft;
 import com.minecrafttas.tasmod.util.Ducks;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.PointerNormalizer;
-import com.minecrafttas.tasmod.virtual.event.VirtualCameraAngleEvent;
 import com.minecrafttas.tasmod.virtual.event.VirtualKeyboardEvent;
 import com.minecrafttas.tasmod.virtual.event.VirtualMouseEvent;
 
@@ -130,9 +128,10 @@ public class VirtualInput {
 	/**
 	 * Unpresses all keys in {@link VirtualKeyboardInput#nextKeyboard} and {@link VirtualMouseInput#nextMouse}
 	 */
-	public void unpress() {
+	public void clear() {
 		KEYBOARD.nextKeyboard.clear();
 		MOUSE.nextMouse.clear();
+		CAMERA_ANGLE.nextCameraAngle.clear();
 	}
 	
 	/**
@@ -385,7 +384,7 @@ public class VirtualInput {
 		 * @see VirtualInput#update(GuiScreen)
 		 * @param keycode   The keycode of this event
 		 * @param keystate  The keystate of this event
-		 * @param scrollwheel The scrollWheel of this event
+		 * @param scrollwheel The scrollwheel direction of this event
 		 * @param cursorX The x coordinate of the cursor of this event
 		 * @param cursorY The y coordinate of the cursot of this event
 		 */
@@ -443,14 +442,14 @@ public class VirtualInput {
 		 * @return The x coordinate of the cursor of {@link #currentMouseEvent}
 		 */
 		public int getEventCursorX() {
-			return PointerNormalizer.getCoordsX(currentMouseEvent.getCursorX());
+			return PointerNormalizer.reapplyScalingX(currentMouseEvent.getCursorX());
 		}
 
 		/**
 		 * @return The y coordinate of the cursor of {@link #currentMouseEvent}
 		 */
 		public int getEventCursorY() {
-			return PointerNormalizer.getCoordsY(currentMouseEvent.getCursorY());
+			return PointerNormalizer.reapplyScalingY(currentMouseEvent.getCursorY());
 		}
 
 		/**
@@ -474,15 +473,37 @@ public class VirtualInput {
 		
 	}
 
+	/**
+	 * Subclass of {@link VirtualInput} handling camera angle logic.<br>
+	 * <br>
+	 * Unlike {@link VirtualKeyboardInput} or {@link VirtualMouseInput} no subtick behaviour is implemented,<br>
+	 * making this a simple pitch and yaw storing class, allowing for redirection.
+	 * <br>
+	 * In theory, subtick behaviour is possible, but only useful for interpolation,<br>
+	 * as the camera angle is only updated every tick (see {@link com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer}).
+	 */
 	public class VirtualCameraAngleInput {
+		/**
+		 * The current camera angle
+		 */
 		private final VirtualCameraAngle currentCameraAngle;
 		private final VirtualCameraAngle nextCameraAngle = new VirtualCameraAngle();
 		private final List<VirtualCameraAngle> cameraAngleInterpolationStates = new ArrayList<>();
-		
+        
+		/**
+		 * Constructor to preload the {@link #currentCameraAngle} with an existing camera angle
+		 * @param preloadedCamera The new {@link #currentCameraAngle}
+		 */
 		public VirtualCameraAngleInput(VirtualCameraAngle preloadedCamera) {
 			currentCameraAngle = preloadedCamera;
 		}
-		
+
+		/**
+		 * Update the camera angle
+		 * @see com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer#runUpdate(float);
+		 * @param pitch Absolute rotationPitch of the player
+		 * @param yaw Absolute rotationYaw of the player
+		 */
 		public void updateNextCameraAngle(float pitch, float yaw) {
 //			LOGGER.debug("Pitch: {}, Yaw: {}", pitch, yaw);
 			nextCameraAngle.update(pitch, yaw);
@@ -493,17 +514,21 @@ public class VirtualInput {
 			currentCameraAngle.copyFrom(nextCameraAngle);
 		}
 		
-		public float getCurrentPitch() {
+		public void setCamera(Float pitch, Float yaw) {
+			nextCameraAngle.set(pitch, yaw);
+		}
+		
+		public Float getCurrentPitch() {
 			return currentCameraAngle.getPitch();
 		}
 		
-		public float getCurrentYaw() {
+		public Float getCurrentYaw() {
 			return currentCameraAngle.getYaw();
 		}
 		
 		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable){
 			if(!enable) {
-				return Triple.of(TASmodClient.virtual.CAMERA_ANGLE.nextCameraAngle.getPitch(), TASmodClient.virtual.CAMERA_ANGLE.nextCameraAngle.getYaw()+180, 0f);
+				return Triple.of(nextCameraAngle.getPitch()==null ? pitch : nextCameraAngle.getPitch(), nextCameraAngle.getYaw()==null? pitch : nextCameraAngle.getYaw()+180, 0f);
 			}
 			
 			float interpolatedPitch = 0f;

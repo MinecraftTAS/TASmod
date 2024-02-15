@@ -63,7 +63,7 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 			LOGGER.debug(LoggerMarkers.Event, "Finished loading the world on the client");
 			loadingScreenDelay = 1;
 
-			TASmodClient.virtual.unpress();
+			TASmodClient.virtual.clear();
 		}
 	}
 

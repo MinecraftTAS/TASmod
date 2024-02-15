@@ -232,7 +232,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 					return verbose ? TextFormatting.GREEN + "Pausing a recording" : "";
 				case NONE:
 					LOGGER.debug(LoggerMarkers.Playback, "Stopping a recording");
-					TASmodClient.virtual.unpress();
+					TASmodClient.virtual.clear();
 					state = TASstate.NONE;
 					return verbose ? TextFormatting.GREEN + "Stopping the recording" : "";
 			}
@@ -246,12 +246,12 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 					LOGGER.debug(LoggerMarkers.Playback, "Pausing a playback");
 					state = TASstate.PAUSED;
 					tempPause = TASstate.PLAYBACK;
-					TASmodClient.virtual.unpress();
+					TASmodClient.virtual.clear();
 					return verbose ? TextFormatting.GREEN + "Pausing a playback" : "";
 				case NONE:
 					LOGGER.debug(LoggerMarkers.Playback, "Stopping a playback");
 					Minecraft.getMinecraft().gameSettings.chatLinks = true;
-					TASmodClient.virtual.unpress();
+					TASmodClient.virtual.clear();
 					state = TASstate.NONE;
 					return verbose ? TextFormatting.GREEN + "Stopping the playback" : "";
 			}
