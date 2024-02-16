@@ -48,13 +48,33 @@ public class MixinEntityRenderer implements SubtickDuck {
 	@Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;startSection(Ljava/lang/String;)V", ordinal = 0, shift = At.Shift.AFTER))
 	public void playback_injectAtStartSection(float partialTicks, long nanoTime, CallbackInfo ci) {
 		// Calculate sensitivity
-		float f = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
-		float f1 = f * f * f * 8.0F;
+		float mouseSensititvity = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
+		float mouseSensitivityCubed = mouseSensititvity * mouseSensititvity * mouseSensititvity * 8.0F;
 
 		if (this.mc.currentScreen == null && !TASmodClient.controller.isPlayingback() && mc.player != null) { // No Gui
 			mc.mouseHelper.mouseXYChange();
+			float deltaPitch = mc.mouseHelper.deltaY * mouseSensitivityCubed;
+			float deltaYaw = mc.mouseHelper.deltaX * mouseSensitivityCubed;
+
+			int invertMouse = 1;
+			if (this.mc.gameSettings.invertMouse) {
+				invertMouse = -1;
+			}
+
+			if (this.mc.gameSettings.smoothCamera) {
+				this.smoothCamPitch += deltaPitch;
+				this.smoothCamYaw += deltaYaw;
+				float m = mouseSensititvity - this.smoothCamPartialTicks;
+				this.smoothCamPartialTicks = mouseSensititvity;
+				deltaPitch = this.smoothCamFilterY * m;
+				deltaYaw = this.smoothCamFilterX * m;
+			} else {
+				this.smoothCamYaw = 0.0F;
+				this.smoothCamPitch = 0.0F;
+			}
+
 			mc.getTutorial().handleMouse(mc.mouseHelper);
-			TASmodClient.virtual.CAMERA_ANGLE.updateNextCameraAngle((float) -(mc.mouseHelper.deltaY * f1 * 0.15D), (float) (mc.mouseHelper.deltaX * f1 * 0.15D));
+			TASmodClient.virtual.CAMERA_ANGLE.updateNextCameraAngle((float) -((double)deltaPitch * 0.15D * invertMouse), (float) ((double)deltaYaw * 0.15D));
 		}
 	}
 
