@@ -90,6 +90,11 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		this.yaw += yawDelta;
 	}
 	
+	/**
+	 * Setting the absolute camera coordinates directly
+	 * @param pitch {@link #pitch}
+	 * @param yaw {@link #yaw}
+	 */
 	public void set(float pitch, float yaw) {
 		this.pitch = pitch;
 		this.yaw = yaw;
@@ -119,9 +124,14 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		camera.subtickList.clear();
 	}
 	
+	/**
+	 * Sets {@link #pitch} and {@link #yaw} to null
+	 */
+	@Override
 	public void clear() {
 		this.pitch = null;
 		this.yaw = null;
+		super.clear();
 	}
 	
 	/**
@@ -167,5 +177,4 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 	public Float getYaw() {
 		return yaw;
 	}
-
 }

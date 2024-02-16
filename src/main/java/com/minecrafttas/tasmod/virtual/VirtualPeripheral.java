@@ -107,9 +107,10 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> extends 
 	/**
 	 * Clears pressed keys and subticks
 	 */
+	@Override
 	protected void clear() {
 		pressedKeys.clear();
-		subtickList.clear();
+		super.clear();
 	}
 	
 	@Override

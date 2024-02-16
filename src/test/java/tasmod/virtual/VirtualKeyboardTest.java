@@ -259,6 +259,16 @@ class VirtualKeyboardTest {
 
         assertIterableEquals(expected, actual.getAll());
     }
+    
+    /**
+     * Tests update method on a subtick. Should not add a subtick
+     */
+    @Test
+    void testUpdateOnSubtick() {
+    	VirtualKeyboard actual = new VirtualKeyboard(new LinkedHashSet<>(), new ArrayList<>(), null, false);
+    	
+    	actual.update(VirtualKey.W.getKeycode(), true, 'w');
+    }
 
     /**
      * Tests getDifference
@@ -313,7 +323,39 @@ class VirtualKeyboardTest {
     	
     	assertIterableEquals(expected, actual);
     }
+    
+    /**
+     * Test clearing the keyboard
+     */
+    @Test
+    void testClear(){
+    	VirtualKeyboard pressed = new VirtualKeyboard();
+    	pressed.update(VirtualKey.W.getKeycode(), true, 'w');
+    	pressed.update(VirtualKey.S.getKeycode(), true, 's');
+    	pressed.update(VirtualKey.A.getKeycode(), true, 'a');
+    	
+    	pressed.clear();
+    	
+    	assertTrue(pressed.getPressedKeys().isEmpty());
+    	assertTrue(pressed.getSubticks().isEmpty());
+    	assertTrue(pressed.getCharList().isEmpty());
+    }
 
+    /**
+     * Tests virtualEvents behaviour on a subtick, should fail
+     */
+    @Test
+    void testGetVirtualEventsOnSubtick() {
+    	
+    	VirtualKeyboard pressed = new VirtualKeyboard(new HashSet<>(), new ArrayList<>(), null, false);
+    	
+    	// Load actual with the events
+    	Queue<VirtualKeyboardEvent> actual = new ConcurrentLinkedQueue<>();
+    	pressed.getVirtualEvents(pressed, actual);
+    	
+    	assertTrue(actual.isEmpty());
+    }
+    
     /**
      * Test repeat events enabled
      */
