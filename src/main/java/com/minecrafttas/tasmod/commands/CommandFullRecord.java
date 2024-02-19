@@ -28,6 +28,7 @@ public class CommandFullRecord extends CommandBase {
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		sender.sendMessage(new TextComponentString(TextFormatting.RED+"This feature doesn't work at the moment!"));
 		try {
 			TASmod.savestateHandlerServer.saveState(0, false);
 		} catch (SavestateException e) {

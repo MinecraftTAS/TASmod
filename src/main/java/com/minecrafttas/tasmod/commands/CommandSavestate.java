@@ -37,6 +37,7 @@ public class CommandSavestate extends CommandBase {
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		sender.sendMessage(new TextComponentString("Savestates might not work correctly at the moment... rewriting a lot of core features, which might break this..."));
 		if (args.length == 0) {
 			sendHelp(sender);
 		} else if (args.length >= 1) {
