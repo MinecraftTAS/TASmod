@@ -81,14 +81,14 @@ public class VirtualInput {
 		}
 		while (Mouse.next()) {
 			if (currentScreen == null) {
-				MOUSE.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), 0, 0);
+				MOUSE.updateNextMouse(Mouse.getEventButton()-100, Mouse.getEventButtonState(), Mouse.getEventDWheel(), 0, 0);
 			} else {
 				Ducks.GuiScreenDuck screen = (Ducks.GuiScreenDuck) currentScreen;
 				int eventX = screen.unscaleX(Mouse.getEventX());
 				int eventY = screen.unscaleY(Mouse.getEventY());
 				eventX = PointerNormalizer.getNormalizedX(eventX);
 				eventY = PointerNormalizer.getNormalizedY(eventY);
-				MOUSE.updateNextMouse(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel(), eventX, eventY);
+				MOUSE.updateNextMouse(Mouse.getEventButton()-100, Mouse.getEventButtonState(), Mouse.getEventDWheel(), eventX, eventY);
 			}
 		}
 	}
@@ -389,7 +389,6 @@ public class VirtualInput {
 		 * @param cursorY The y coordinate of the cursot of this event
 		 */
 		public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY) {
-			keycode-=100;
 			LOGGER.debug(LoggerMarkers.Mouse,"Update: {} ({}), {}, {}, {}, {}", keycode, VirtualKey.getName(keycode), keystate, scrollwheel, cursorX, cursorY); 	// Activate with -Dtasmod.marker.mouse=ACCEPT in VM arguments (and -Dtasmod.log.level=debug)
 			nextMouse.update(keycode, keystate, scrollwheel, cursorX, cursorY);
 		}
@@ -439,19 +438,33 @@ public class VirtualInput {
 		}
 
 		/**
-		 * @return The x coordinate of the cursor of {@link #currentMouseEvent}
+		 * @return The scaled x coordinate of the cursor of {@link #currentMouseEvent}
 		 */
 		public int getEventCursorX() {
-			return PointerNormalizer.reapplyScalingX(currentMouseEvent.getCursorX());
+			return PointerNormalizer.reapplyScalingX(getNormalizedCursorX());
 		}
 
 		/**
-		 * @return The y coordinate of the cursor of {@link #currentMouseEvent}
+		 * @return The x coordinate of the cursor of {@link #currentMouseEvent}
+		 */
+		public int getNormalizedCursorX() {
+			return currentMouseEvent.getCursorX();
+		}
+		
+		/**
+		 * @return The scaled y coordinate of the cursor of {@link #currentMouseEvent}
 		 */
 		public int getEventCursorY() {
-			return PointerNormalizer.reapplyScalingY(currentMouseEvent.getCursorY());
+			return PointerNormalizer.reapplyScalingY(getNormalizedCursorY());
 		}
-
+		
+		/**
+		 * @return The y coordinate of the cursor of {@link #currentMouseEvent}
+		 */
+		public int getNormalizedCursorY() {
+			return currentMouseEvent.getCursorY();
+		}
+		
 		/**
 		 * If the key is currently down and recognised by Minecraft
 		 * @param keycode The keycode of the key in question
@@ -476,11 +489,14 @@ public class VirtualInput {
 	/**
 	 * Subclass of {@link VirtualInput} handling camera angle logic.<br>
 	 * <br>
-	 * Unlike {@link VirtualKeyboardInput} or {@link VirtualMouseInput} no subtick behaviour is implemented,<br>
+	 * Unlike {@link VirtualKeyboardInput} or {@link VirtualMouseInput} no subtick
+	 * behaviour is implemented,<br>
 	 * making this a simple pitch and yaw storing class, allowing for redirection.
 	 * <br>
-	 * In theory, subtick behaviour is possible, but only useful for interpolation,<br>
-	 * as the camera angle is only updated every tick (see {@link com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer}).
+	 * In theory, subtick behaviour is possible, but only useful for
+	 * interpolation,<br>
+	 * as the camera angle is only updated every tick (see
+	 * {@link com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer}).
 	 */
 	public class VirtualCameraAngleInput {
 		/**
@@ -489,9 +505,11 @@ public class VirtualInput {
 		private final VirtualCameraAngle currentCameraAngle;
 		private final VirtualCameraAngle nextCameraAngle = new VirtualCameraAngle();
 		private final List<VirtualCameraAngle> cameraAngleInterpolationStates = new ArrayList<>();
-        
+
 		/**
-		 * Constructor to preload the {@link #currentCameraAngle} with an existing camera angle
+		 * Constructor to preload the {@link #currentCameraAngle} with an existing
+		 * camera angle
+		 * 
 		 * @param preloadedCamera The new {@link #currentCameraAngle}
 		 */
 		public VirtualCameraAngleInput(VirtualCameraAngle preloadedCamera) {
@@ -500,51 +518,52 @@ public class VirtualInput {
 
 		/**
 		 * Update the camera angle
+		 * 
 		 * @see com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer#runUpdate(float);
 		 * @param pitch Absolute rotationPitch of the player
-		 * @param yaw Absolute rotationYaw of the player
+		 * @param yaw   Absolute rotationYaw of the player
 		 */
 		public void updateNextCameraAngle(float pitch, float yaw) {
 //			LOGGER.debug("Pitch: {}, Yaw: {}", pitch, yaw);
 			nextCameraAngle.update(pitch, yaw);
 		}
-		
+
 		public void nextCameraTick() {
 			nextCameraAngle.getStates(cameraAngleInterpolationStates);
 			currentCameraAngle.copyFrom(nextCameraAngle);
 		}
-		
+
 		public void setCamera(Float pitch, Float yaw) {
 			nextCameraAngle.set(pitch, yaw);
 		}
-		
+
 		public Float getCurrentPitch() {
 			return currentCameraAngle.getPitch();
 		}
-		
+
 		public Float getCurrentYaw() {
 			return currentCameraAngle.getYaw();
 		}
-		
-		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable){
-			if(!enable) {
-				return Triple.of(nextCameraAngle.getPitch()==null ? pitch : nextCameraAngle.getPitch(), nextCameraAngle.getYaw()==null? pitch : nextCameraAngle.getYaw()+180, 0f);
+
+		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable) {
+			if (!enable) {
+				return Triple.of(nextCameraAngle.getPitch() == null ? pitch : nextCameraAngle.getPitch(), nextCameraAngle.getYaw() == null ? pitch : nextCameraAngle.getYaw() + 180, 0f);
 			}
-			
+
 			float interpolatedPitch = 0f;
 			float interpolatedYaw = 0f;
-			
-			if(cameraAngleInterpolationStates.size()==1) { // If no interpolation data was specified, interpolate over 2 values
+
+			if (cameraAngleInterpolationStates.size() == 1) { // If no interpolation data was specified, interpolate over 2 values
 				interpolatedPitch = (float) MathHelper.clampedLerp(currentCameraAngle.getPitch(), cameraAngleInterpolationStates.get(0).getPitch(), partialTick);
 				interpolatedYaw = (float) MathHelper.clampedLerp(currentCameraAngle.getYaw(), cameraAngleInterpolationStates.get(0).getYaw() + 180, partialTick);
 			} else {
-				
-				int index = (int)MathHelper.clampedLerp(0, cameraAngleInterpolationStates.size(), partialTick);	// Get interpolate index 
-				
+
+				int index = (int) MathHelper.clampedLerp(0, cameraAngleInterpolationStates.size(), partialTick); // Get interpolate index
+
 				interpolatedPitch = cameraAngleInterpolationStates.get(index).getPitch();
 				interpolatedYaw = cameraAngleInterpolationStates.get(index).getYaw();
 			}
-			
+
 			return Triple.of(interpolatedPitch, interpolatedYaw, 0f);
 		}
 	}
