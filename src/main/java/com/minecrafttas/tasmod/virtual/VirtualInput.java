@@ -11,6 +11,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer;
 import com.minecrafttas.tasmod.mixin.playbackhooks.MixinMinecraft;
 import com.minecrafttas.tasmod.util.Ducks;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
@@ -478,7 +479,7 @@ public class VirtualInput {
 		 * If the key will be down and recognised in the next tick by Minecraft.<br>
 		 * This is equal to checking if a key on the physical mouse is pressed
 		 * @param keycode The keycode of the key in question
-		 * @return Whether the key of the {@link #nextMouse} is down
+		 * @return Whether the key of the {@link #nextMouse} is down3
 		 */
 		public boolean willKeyBeDown(int keycode) {
 			return nextMouse.isKeyDown(keycode);
@@ -489,21 +490,70 @@ public class VirtualInput {
 	/**
 	 * Subclass of {@link VirtualInput} handling camera angle logic.<br>
 	 * <br>
-	 * Unlike {@link VirtualKeyboardInput} or {@link VirtualMouseInput} no subtick
-	 * behaviour is implemented,<br>
-	 * making this a simple pitch and yaw storing class, allowing for redirection.
+	 * Normally, the camera angle is updated every <em>frame</em>.<br>
+	 * This meant that inputs on mouse and keyboard, updated every <em>tick</em>,<br>
+	 * had to sync with the camera angle, updated every frame, which desynced in some edgecases.<br>
 	 * <br>
-	 * In theory, subtick behaviour is possible, but only useful for
-	 * interpolation,<br>
-	 * as the camera angle is only updated every tick (see
-	 * {@link com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer}).
+	 * After extensive testing, the decision was made to conform the camera to update every <em>tick</em>,<br>
+	 * instead of every frame. By itself, this meant that moving the camera felt really laggy<br>
+	 * <br>
+	 * Therefore an interpolation system was created that seperated the camera angle from the player head rotation,<br>
+	 * which are usually the synced.
+	 * <br>
+	 * While the camera is the angle displayed on screen, the player rotation is responsible for the logic,<br>
+	 * e.g. at which block the player is currently aiming.<br>
+	 * This calls for a similar architecture as the {@link VirtualKeyboardInput} and the {@link VirtualMouseInput}.
+	 * <br>
+	 * The {@link VirtualCameraAngleInput#currentCameraAngle} represents the player rotation, updated every tick<br>
+	 * and the {@link VirtualCameraAngleInput#nextCameraAngle} represents the camera angle, updated every frame.
+	 * <br>
+	 * In pseudocode, the tick conformed camera looks like this:
+	 * <pre>
+	 * public void runGameLoop() {// The main update loop, every frame
+	 * 	for(int i;i<timer.toTickCount;i++){ // For loop to enable ticking
+	 * 		entityRenderer.updatePlayerRotation();
+	 * 		runTick()
+	 * 	}
+	 * 
+	 * 	entityRenderer.updateCamera();	// Update the camera
+	 * }
+	 * </pre>
+	 * Note that the camera is updated <em>after</em> the tick function.
+	 * Now in this pseudocode, the following methods from this class are injected like so:
+	 * <pre>
+	 * public void runGameLoop() {// The main update loop, every frame
+	 * 	for(int i;i<timer.toTickCount;i++){ // For loop to enable ticking
+	 * 		{@linkplain VirtualCameraAngleInput#nextCameraTick()};
+	 * 		entityRenderer.updatePlayerRotation({@linkplain VirtualCameraAngleInput#getCurrentPitch()}, {@linkplain VirtualCameraAngleInput#getCurrentYaw()});
+	 * 		runTick()
+	 * 	}
+	 *  {@linkplain VirtualCameraAngleInput#updateNextCameraAngle(float, float)};
+	 * 	entityRenderer.updateCamera();	// Update the camera
+	 * }
+	 * </pre>
+	 * 
+	 * While there is "subtick" behavior in this implementation,<br>
+	 * it is only used for the interpolation of the camera angle and not for the player rotation.<br>
+	 * This way you can customize the interpolated frames during playback.
 	 */
 	public class VirtualCameraAngleInput {
 		/**
-		 * The current camera angle
+		 * The current camera angle in game.<br>
+		 * <br>
+		 * Updated every tick in {@link #nextCameraTick()}
 		 */
 		private final VirtualCameraAngle currentCameraAngle;
+		/**
+		 * The new camera angle<br>
+		 * <br>
+		 * updated every frame in {@link #updateNextCameraAngle(float, float)}<br>
+		 * and updates {@link #currentCameraAngle} in {@link #nextCameraTick()}
+		 */
 		private final VirtualCameraAngle nextCameraAngle = new VirtualCameraAngle();
+		/**
+		 * States of the {@link #nextCameraAngle} made during the tick.<br>
+		 * Is updated in {@link #nextCameraTick()}
+		 */
 		private final List<VirtualCameraAngle> cameraAngleInterpolationStates = new ArrayList<>();
 
 		/**
@@ -517,34 +567,71 @@ public class VirtualInput {
 		}
 
 		/**
-		 * Update the camera angle
+		 * Update the camera angle.<br>
+		 * <br>
+		 * Runs every frame
 		 * 
 		 * @see com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer#runUpdate(float);
-		 * @param pitch Absolute rotationPitch of the player
-		 * @param yaw   Absolute rotationYaw of the player
+		 * @param pitchDelta Relative rotationPitch delta from LWJGLs mouse delta.
+		 * @param yawDelta   Relative rotationYaw delta from LWJGLs mouse delta.
 		 */
-		public void updateNextCameraAngle(float pitch, float yaw) {
+		public void updateNextCameraAngle(float pitchDelta, float yawDelta) {
 //			LOGGER.debug("Pitch: {}, Yaw: {}", pitch, yaw);
-			nextCameraAngle.update(pitch, yaw);
+			nextCameraAngle.update(pitchDelta, yawDelta);
 		}
 
+		/**
+		 * Updates the {@link #currentCameraAngle} and {@link #cameraAngleInterpolationStates}.<br>
+		 * Runs every tick.
+		 * 
+		 * @see MixinEntityRenderer#runUpdate(float)
+		 */
 		public void nextCameraTick() {
 			nextCameraAngle.getStates(cameraAngleInterpolationStates);
 			currentCameraAngle.copyFrom(nextCameraAngle);
 		}
 
+		/**
+		 * Sets the camera coordinates directly.<br>
+		 * <br>
+		 * The camera angle is stored in absolute coordinates,<br>
+		 * which should match the vanilla coordinates displayed in F3<br>
+		 * <br>
+		 * This creates a problem when initializing the world, we don't know the camera angle the player has.<br>
+		 * Without this, the player would always start facing the 0;0 coordinate.
+		 * <br>
+		 * To fix this, the camera is initialized with pitch and yaw being null. If that is the case,<br>
+		 * then the current player rotation is set with this method in {@link MixinEntityRenderer#runUpdate(float)}
+		 * @param pitch The absolute player pitch
+		 * @param yaw The absolute player yaw
+		 */
 		public void setCamera(Float pitch, Float yaw) {
 			nextCameraAngle.set(pitch, yaw);
 		}
 
+		/**
+		 * @return The absolute pitch coordinate of the player. May be null when it's initialized
+		 */
 		public Float getCurrentPitch() {
 			return currentCameraAngle.getPitch();
 		}
-
+		
+		/**
+		 * @return The absolute yaw coordinate of the player. May be null when it's initialized
+		 */
 		public Float getCurrentYaw() {
 			return currentCameraAngle.getYaw();
 		}
 
+		/**
+		 * Gets the absolute coordinates of the camera angle
+		 * 
+		 * @param partialTick The partial ticks of the timer
+		 * @param pitch The original pitch of the camera
+		 * @param yaw The original yaw of the camera
+		 * @param enable Whether the custom interpolation is enabled. Enabled during playback.
+		 * @return A triple of pitch, yaw and roll, as left, middle and right respectively 
+		 */
 		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable) {
 			if (!enable) {
 				return Triple.of(nextCameraAngle.getPitch() == null ? pitch : nextCameraAngle.getPitch(), nextCameraAngle.getYaw() == null ? pitch : nextCameraAngle.getYaw() + 180, 0f);
