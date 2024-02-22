@@ -43,7 +43,7 @@
 		
 		//Playbackhooks
 		"playbackhooks.MixinMinecraft",
-        "playbackhooks.MixinEntityRenderer",
+		"playbackhooks.MixinEntityRenderer",
 		"playbackhooks.MixinGuiScreen",
 		"playbackhooks.MixinGameSettings",
 		"playbackhooks.MixinGuiChat",
