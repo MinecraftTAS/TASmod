@@ -15,9 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import com.minecrafttas.mctcommon.events.CompactPacketHandler;
 import com.minecrafttas.mctcommon.server.ByteBufferBuilder;
 import com.minecrafttas.mctcommon.server.Client;
+import com.minecrafttas.mctcommon.server.CompactPacketHandler;
 import com.minecrafttas.mctcommon.server.Client.Side;
 import com.minecrafttas.mctcommon.server.PacketHandlerRegistry;
 import com.minecrafttas.mctcommon.server.Server;

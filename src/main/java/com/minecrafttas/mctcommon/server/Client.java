@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Marker;
 
 import com.minecrafttas.mctcommon.MCTCommon;
 import com.minecrafttas.mctcommon.events.EventClient.EventDisconnectClient;
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import com.minecrafttas.mctcommon.events.EventServer.EventClientCompleteAuthentication;
 import com.minecrafttas.mctcommon.server.exception.InvalidPacketException;
 import com.minecrafttas.mctcommon.server.exception.PacketNotImplementedException;
@@ -83,7 +84,11 @@ public class Client {
 		this.createHandlers();
 
 		this.callback = (client) -> {
-			EventDisconnectClient.fireDisconnectClient(client);
+			try {
+				EventListenerRegistry.fireEvent(EventDisconnectClient.class, client);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		};
 
 		this.local = local;

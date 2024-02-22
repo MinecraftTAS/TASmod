@@ -1,4 +1,4 @@
-package com.minecrafttas.mctcommon.events;
+package com.minecrafttas.mctcommon.server;
 
 import java.nio.ByteBuffer;
 

@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.networking;
 
-import com.minecrafttas.mctcommon.events.CompactPacketHandler;
+import com.minecrafttas.mctcommon.server.CompactPacketHandler;
 import com.minecrafttas.mctcommon.server.Client.Side;
 import com.minecrafttas.mctcommon.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.commands.CommandFolder;
