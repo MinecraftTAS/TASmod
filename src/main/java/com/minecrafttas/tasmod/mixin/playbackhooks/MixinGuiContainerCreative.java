@@ -12,11 +12,11 @@ import net.minecraft.client.gui.inventory.GuiContainerCreative;
 public class MixinGuiContainerCreative {
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventDWheel()I", ordinal = 0, remap = false))
 	public int redirectHandleMouseInput() {
-		return TASmodClient.virtual.getEventMouseScrollWheel();
+		return TASmodClient.virtual.MOUSE.getEventMouseScrollWheel();
 	}
 
 	@Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;isButtonDown(I)Z", ordinal = 0, remap = false))
 	public boolean redirectHandleMouseInput2(int i) {
-		return TASmodClient.virtual.isKeyDown(-100);
+		return TASmodClient.virtual.MOUSE.isKeyDown(-100);
 	}
 }

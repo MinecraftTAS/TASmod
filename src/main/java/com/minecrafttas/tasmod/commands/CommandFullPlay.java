@@ -14,7 +14,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
-public class CommandFullPlay extends CommandBase{
+public class CommandFullPlay extends CommandBase {
 
 	@Override
 	public String getName() {
@@ -28,17 +28,18 @@ public class CommandFullPlay extends CommandBase{
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		sender.sendMessage(new TextComponentString(TextFormatting.RED + "This feature doesn't work at the moment!"));
 		try {
 			TASmod.savestateHandlerServer.loadState(0, false, false);
 		} catch (LoadstateException e) {
-			sender.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to load a savestate: "+e.getMessage()));
+			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getMessage()));
 			return;
 		} catch (Exception e) {
-			sender.sendMessage(new TextComponentString(TextFormatting.RED+"Failed to load a savestate: "+e.getCause().toString()));
+			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to load a savestate: " + e.getCause().toString()));
 			e.printStackTrace();
 			return;
 		} finally {
-			TASmod.savestateHandlerServer.state=SavestateState.NONE;
+			TASmod.savestateHandlerServer.state = SavestateState.NONE;
 		}
 		TASmod.playbackControllerServer.setServerState(TASstate.PLAYBACK);
 		try {

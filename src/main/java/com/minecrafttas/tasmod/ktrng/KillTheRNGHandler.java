@@ -4,8 +4,6 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.killtherng.KillTheRNG;
-import com.minecrafttas.killtherng.SeedingModes;
 import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
 import com.minecrafttas.mctcommon.events.EventServer.EventServerTick;
 import com.minecrafttas.mctcommon.server.Client.Side;
@@ -45,30 +43,30 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 		this.isLoaded = isLoaded;
 
 		if (isLoaded) {
-			KillTheRNG.LOGGER.info("Connection established with TASmod");
-			KillTheRNG.isLibrary = true;
-			KillTheRNG.mode = SeedingModes.TickChange;
-
-			KillTheRNG.annotations.register(new KTRNGMonitor());
+//			KillTheRNG.LOGGER.info("Connection established with TASmod");
+//			KillTheRNG.isLibrary = true;
+//			KillTheRNG.mode = SeedingModes.TickChange;
+//
+//			KillTheRNG.annotations.register(new KTRNGMonitor());
 		} else {
 			LOGGER.info("KillTheRNG doesn't appear to be loaded");
 		}
 	}
 
 	public long advanceGlobalSeedServer() {
-		if (isLoaded()) {
-			return KillTheRNG.commonRandom.nextSeed();
-		} else {
+//		if (isLoaded()) {
+//			return KillTheRNG.commonRandom.nextSeed();
+//		} else {
 			return 0;
-		}
+//		}
 	}
 
 	public long getGlobalSeedServer() {
-		if (isLoaded()) {
-			return KillTheRNG.commonRandom.GlobalServer.getSeed();
-		} else {
+//		if (isLoaded()) {
+//			return KillTheRNG.commonRandom.GlobalServer.getSeed();
+//		} else {
 			return 0;
-		}
+//		}
 	}
 
 	public boolean isLoaded() {
@@ -81,9 +79,9 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	 */
 	@Environment(EnvType.CLIENT)
 	public long getGlobalSeedClient() {
-		if (isLoaded())
-			return KillTheRNG.clientRandom.GlobalClient.getSeed();
-		else
+//		if (isLoaded())
+//			return KillTheRNG.clientRandom.GlobalClient.getSeed();
+//		else
 			return 0;
 	}
 
@@ -95,13 +93,13 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	@Environment(EnvType.CLIENT)
 	public void setGlobalSeedClient(long seedIn) {
 		if (isLoaded()) {
-			KillTheRNG.clientRandom.setSeedAll(seedIn);
+//			KillTheRNG.clientRandom.setSeedAll(seedIn);
 		}
 	}
 
 	public void setGlobalSeedServer(long seedIn) {
 		if (isLoaded()) {
-			KillTheRNG.commonRandom.setSeedAll(seedIn);
+//			KillTheRNG.commonRandom.setSeedAll(seedIn);
 		}
 	}
 
@@ -211,7 +209,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 				break;
 
 			case KILLTHERNG_STARTSEED:
-				TASmodClient.virtual.getContainer().setStartSeed(seed);
+				TASmodClient.controller.setStartSeed(seed);
 				break;
 
 			default:

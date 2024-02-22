@@ -19,8 +19,6 @@ loom {
 	// add log4jconfig
 	log4jConfigs.from(file('src/main/resources/log4j.xml'))
 	
-	// default refmap name
-	mixin.defaultRefmapName = "tasmod.refmap.json"
 }
 
 // dependency repositories
@@ -44,8 +42,8 @@ configurations {
 dependencies {
     // tasmod dependencies
     embed group: 'com.dselent', name: 'bigarraylist', version: '1.1'
-    compileOnly group: 'com.minecrafttas', name: 'killtherng', version: '2.0'
-    downloadMod group: 'com.minecrafttas', name: 'killtherng-full', version: '2.0' // for downloadKTRNG task
+    //compileOnly group: 'com.minecrafttas', name: 'killtherng', version: '2.0'
+    //downloadMod group: 'com.minecrafttas', name: 'killtherng-full', version: '2.0' // for downloadKTRNG task
 
 	// loom dependencies
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -54,12 +52,18 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
 }
 
+
+
 // task for downloading KillTheRng
-task downloadKTRNG(type: Copy) {
-	group 'tasmod'
-	description 'Download KillTheRNG to the run/mods/ folder of the project'
-    from configurations.downloadMod
-    into 'run/mods/'
+//task downloadKTRNG(type: Copy) {
+	//group 'tasmod'
+	//description 'Download KillTheRNG to the run/mods/ folder of the project'
+    //from configurations.downloadMod
+    //into 'run/mods/'
+//}
+
+compileJava{
+	options.release = 8
 }
 
 // process fabric mod json

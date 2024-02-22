@@ -88,7 +88,9 @@ public class LanguageManager {
         }
         Gson gson = new Gson();
         HashMap<String, String> template = new HashMap<>();
-        HashMap<String, String> out = (HashMap<String, String>) gson.fromJson(new InputStreamReader(inputStream), template.getClass());
+        
+        @SuppressWarnings("unchecked")
+		HashMap<String, String> out = (HashMap<String, String>) gson.fromJson(new InputStreamReader(inputStream), template.getClass());
         out.forEach((key, value) -> {
             value = PATTERN.matcher(value).replaceAll("%$1s");
         });

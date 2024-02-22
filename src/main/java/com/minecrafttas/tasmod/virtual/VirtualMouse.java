@@ -1,347 +1,265 @@
 package com.minecrafttas.tasmod.virtual;
 
+import com.minecrafttas.tasmod.virtual.event.VirtualMouseEvent;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import com.google.common.collect.Maps;
-import com.minecrafttas.tasmod.playback.PlaybackSerialiser;
-
-public class VirtualMouse implements Serializable {
+/**
+ * Stores the mouse specific values in a given timeframe<br>
+ * <br>
+ * Similar to {@link VirtualKeyboard}, but instead of a list of characters,<br>
+ * it stores the state of the scroll wheel and the cursors x and y coordinate on screen.
+ *
+ * @author Scribble
+ * @see VirtualInput.VirtualMouseInput
+ */
+public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Serializable {
 
 	/**
+	 * The direction of the scrollWheel<br>
+	 * <br>
+	 * If the number is positive or negative depending on scroll direction.
+	 */
+	private int scrollWheel;
+	/**
+	 * X coordinate of the on-screen cursor, used in GUI screens.<br>
+	 * When null, no change to the cursor is applied.
+	 */
+	private int cursorX;
+	/**
+	 * Y coordinate of the on-screen cursor, used in GUI screens.<br>
+	 * When null, no change to the cursor is applied.
+	 */
+	private int cursorY;
+
+	/**
+	 * Creates a mouse with no buttons pressed and no data
+	 */
+	public VirtualMouse(){
+		this(new LinkedHashSet<>(), 0, 0, 0, new ArrayList<>(), true);
+	}
+
+	/**
+	 * Creates a subtick mouse with {@link Subtickable#subtickList} uninitialized
+	 * @param pressedKeys The new list of pressed keycodes for this subtickMouse
+	 * @param scrollWheel The scroll wheel direction for this subtickMouse
+	 * @param cursorX The X coordinate of the cursor for this subtickMouse
+	 * @param cursorY The Y coordinate of the cursor for this subtickMouse
+	 */
+	public VirtualMouse(Set<Integer> pressedKeys, int scrollWheel, int cursorX, int cursorY) {
+		this(pressedKeys, scrollWheel, cursorX, cursorY, null);
+	}
+
+	/**
+	 * Creates a mouse from existing values with
+	 * {@link VirtualPeripheral#ignoreFirstUpdate} set to false
 	 * 
+	 * @param pressedKeys	The list of {@link #pressedKeys}
+	 * @param scrollWheel	The {@link #scrollWheel}
+	 * @param cursorX		The {@link #cursorX}
+	 * @param cursorY		The {@link #cursorY}
+	 * @param subtickList		The {@link VirtualPeripheral#subtickList}
 	 */
-	private static final long serialVersionUID = -5389661329436686190L;
-
-	private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
-
-	private int scrollwheel = 0;
-
-	private int cursorX = 0;
-
-	private int cursorY = 0;
-
-	public VirtualMouse(Map<Integer, VirtualKey> keyListIn, int scrollwheel, int cursorX, int cursorY, List<PathNode> path) {
-		Map<Integer, VirtualKey> copy = new HashMap<Integer, VirtualKey>();
-
-		keyListIn.forEach((key, value) -> {
-			copy.put(key, value.clone());
-		});
-		keyList = copy;
-
-		this.scrollwheel = scrollwheel;
-
-		this.cursorX = cursorX;
-
-		this.cursorY = cursorY;
-
-		List<PathNode> pathCopy = new ArrayList<PathNode>();
-		path.forEach(pathNode -> {
-			pathCopy.add(pathNode);
-		});
-		this.path = pathCopy;
-
+	public VirtualMouse(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse> subtickList) {
+		this(pressedKeys, scrollWheel, cursorX, cursorY, subtickList, false);
 	}
 
 	/**
-	 * Creates a Keyboard, where the keys are all unpressed
+	 * Creates a mouse from existing values
+	 * 
+	 * @param pressedKeys		The list of {@link #pressedKeys}
+	 * @param scrollWheel		The {@link #scrollWheel}
+	 * @param cursorX			The {@link #cursorX}
+	 * @param cursorY			The {@link #cursorY}
+	 * @param subtickList			The {@link VirtualPeripheral#subtickList}
+	 * @param ignoreFirstUpdate	Whether the first call to {@link #update(int, boolean, int, Integer, Integer)} should create a new subtick
 	 */
-	public VirtualMouse() {
-		keyList.put(-101, new VirtualKey("MOUSEMOVED", -101));
-		keyList.put(-100, new VirtualKey("LC", -100));
-		keyList.put(-99, new VirtualKey("RC", -99));
-		keyList.put(-98, new VirtualKey("MC", -98));
-		keyList.put(-97, new VirtualKey("MBUTTON4", -97));
-		keyList.put(-96, new VirtualKey("MBUTTON5", -96));
-		keyList.put(-95, new VirtualKey("MBUTTON6", -95));
-		keyList.put(-94, new VirtualKey("MBUTTON7", -94));
-		keyList.put(-93, new VirtualKey("MBUTTON8", -93));
-		keyList.put(-92, new VirtualKey("MBUTTON9", -92));
-		keyList.put(-91, new VirtualKey("MBUTTON10", -91));
-		keyList.put(-90, new VirtualKey("MBUTTON11", -90));
-		keyList.put(-89, new VirtualKey("MBUTTON12", -89));
-		keyList.put(-88, new VirtualKey("MBUTTON13", -88));
-		keyList.put(-87, new VirtualKey("MBUTTON14", -87));
-		keyList.put(-86, new VirtualKey("MBUTTON15", -86));
-		keyList.put(-85, new VirtualKey("MBUTTON16", -85));
-
-		this.scrollwheel = 0;
-
-		this.cursorX = 0;
-
-		this.cursorY = 0;
-
-		addPathNode();
+	public VirtualMouse(Set<Integer> pressedKeys, int scrollWheel, Integer cursorX, Integer cursorY, List<VirtualMouse> subtickList, boolean ignoreFirstUpdate) {
+		super(pressedKeys, subtickList, ignoreFirstUpdate);
+		this.scrollWheel = scrollWheel;
+		this.cursorX = cursorX;
+		this.cursorY = cursorY;
 	}
 
-	public void add(int keycode) {
-		String keyString = Integer.toString(keycode);
-
-		keyList.put(keycode, new VirtualKey(keyString, keycode));
-	}
-
-	public VirtualKey get(int keycode) {
-		return keyList.get(keycode);
-	}
-
-	public VirtualKey get(String keyname) {
-		Collection<VirtualKey> list = keyList.values();
-		VirtualKey out = null;
-
-		for (VirtualKey key : list) {
-			if (key.getName().equalsIgnoreCase(keyname)) {
-				out = key;
-			}
-		}
-		return out;
-	}
-
-	public List<String> getCurrentPresses() {
-		List<String> out = new ArrayList<String>();
-
-		keyList.forEach((keycodes, virtualkeys) -> {
-			if (keycodes <= 0) {
-				if (virtualkeys.isKeyDown()) {
-					out.add(virtualkeys.getName());
-				}
-			}
-		});
-
-		return out;
-	}
-
-	public Map<Integer, VirtualKey> getKeyList() {
-		return this.keyList;
-	}
-
-	public List<VirtualMouseEvent> getDifference(VirtualMouse mouseToCompare) {
-		List<VirtualMouseEvent> eventList = new ArrayList<VirtualMouseEvent>();
-
-		List<PathNode> path = mouseToCompare.getPath();
-
-		if (path.size() != 1) {
-			for (int i = 0; i < path.size() - 1; i++) {
-				PathNode currentNode = path.get(i);
-				PathNode nextNode = path.get(i + 1);
-
-				boolean flag = false;
-
-				for (VirtualKey key : nextNode.keyList.values()) {
-					if (!key.equals(currentNode.keyList.get(key.getKeycode()))) {
-						eventList.add(new VirtualMouseEvent(key.getKeycode(), key.isKeyDown(), nextNode.scrollwheel, nextNode.cursorX, nextNode.cursorY));
-						flag = true;
-						break;
-					}
-				}
-				if (!flag) {
-					eventList.add(new VirtualMouseEvent(-101, false, nextNode.scrollwheel, nextNode.cursorX, nextNode.cursorY));
-				}
-
-			}
-		} else {
-			keyList.forEach((keycodes, virtualkeys) -> {
-
-				VirtualKey keyToCompare = mouseToCompare.get(keycodes);
-
-				if (!virtualkeys.equals(keyToCompare)) {
-					eventList.add(new VirtualMouseEvent(keycodes, keyToCompare.isKeyDown(), scrollwheel, cursorX, cursorY));
-				}
-
-			});
-		}
-		return eventList;
-	}
-
-	public boolean isSomethingDown() {
-		for (VirtualKey key : keyList.values()) {
-			if (key.isKeyDown()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean isSomethingDown(Map<Integer, VirtualKey> keyList) {
-		for (VirtualKey key : keyList.values()) {
-			if (key.isKeyDown()) {
-				return true;
-			}
-		}
-		return false;
+	public void update(int keycode, boolean keystate, int scrollwheel, Integer cursorX, Integer cursorY) {
+    	if(isParent() && !ignoreFirstUpdate()) {
+    		addSubtick(clone());
+    	}
+		setPressed(keycode, keystate);
+		this.scrollWheel = scrollwheel;
+		this.cursorX = cursorX;
+		this.cursorY = cursorY;
 	}
 
 	@Override
-	public VirtualMouse clone() {
-		return new VirtualMouse(keyList, scrollwheel, cursorX, cursorY, path);
+	public void setPressed(int keycode, boolean keystate) {
+		if (keycode < 0) {	// Mouse buttons always have a keycode smaller than 0
+			super.setPressed(keycode, keystate);
+		}
 	}
 
-	public void setCursor(int x, int y) {
-		cursorX = x;
-		cursorY = y;
+	/**
+	 * Calculates a list of {@link VirtualMouseEvent}s, when comparing this mouse to
+	 * the next mouse in the sequence,<br>
+	 * which also includes the subticks.
+	 *
+	 * @see VirtualMouse#getDifference(VirtualMouse, Queue)
+	 *
+	 * @param nextMouse The mouse that comes after this one.<br>
+	 *                  If this one is loaded at tick 15, the nextMouse should be
+	 *                  the one from tick 16
+	 * @param reference The queue to fill. Passed in by reference.
+	 */
+	public void getVirtualEvents(VirtualMouse nextMouse, Queue<VirtualMouseEvent> reference) {
+		if (isParent()) {
+			VirtualMouse currentSubtick = this;
+			for(VirtualMouse subtick : nextMouse.getAll()) {
+				currentSubtick.getDifference(subtick, reference);
+				currentSubtick = subtick;
+			}
+		}
 	}
 
-	public void setScrollWheel(int scrollwheel) {
-		this.scrollwheel = scrollwheel;
+	/**
+	 * Calculates the difference between 2 mice via symmetric difference <br>
+	 * and returns a list of the changes between them in form of
+	 * {@link VirtualMouseEvent}s
+	 *
+	 * @param nextMouse The mouse that comes after this one.<br>
+	 *                  If this one is loaded at tick 15, the nextMouse should be
+	 *                  the one from tick 16
+	 * @param reference The queue to fill. Passed in by reference.
+	 */
+	public void getDifference(VirtualMouse nextMouse, Queue<VirtualMouseEvent> reference) {
+		
+		/*
+		 * Checks if pressedKeys are the same...
+		 */
+		if(pressedKeys.equals(nextMouse.pressedKeys)){
+			
+			/*
+			 * ...but scrollWheel, cursorX or cursorY are different.
+			 * Without this, the scrollWheel would only work if a mouse button is pressed at the same time. 
+			 */
+			if(!equals(nextMouse)) {
+				reference.add(new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, nextMouse.scrollWheel, nextMouse.cursorX, nextMouse.cursorY));
+			}
+			return;
+		}
+		int scrollWheelCopy = nextMouse.scrollWheel;
+		int cursorXCopy = nextMouse.cursorX;
+		int cursorYCopy = nextMouse.cursorY;
+
+		/* Calculate symmetric difference of keycodes */
+
+        /*
+            Calculate unpressed keys
+            this: LC RC
+            next: LC    MC
+            -------------
+                     RC     <- unpressed
+         */
+		for(int keycode : pressedKeys) {
+			if (!nextMouse.getPressedKeys().contains(keycode)) {
+				reference.add(new VirtualMouseEvent(keycode, false, scrollWheelCopy, cursorXCopy, cursorYCopy));
+				scrollWheelCopy = 0;
+				cursorXCopy = 0;
+				cursorYCopy = 0;
+			}
+		};
+
+		/*
+		 	Calculate pressed keys
+		 	next: LC    MC
+		 	this: LC RC
+		 	-------------
+		 	            MC <- pressed
+		 */
+		for(int keycode : nextMouse.getPressedKeys()) {
+			if (!this.pressedKeys.contains(keycode)) {
+				reference.add(new VirtualMouseEvent(keycode, true, scrollWheelCopy, cursorXCopy, cursorYCopy));
+			}
+		};
 	}
 
-	List<PathNode> path = new ArrayList<PathNode>();
-
-	public List<PathNode> getPath() {
-		return path;
+	@Override
+	public void clear() {
+		super.clear();
+		clearMouseData();
 	}
 	
-	public String getPathAsString() {
-		String out="";
-		for(PathNode node: path) {
-			out=out.concat(node.toString());
-		}
-		return out;
+	/**
+	 * Resets mouse specific data to it's defaults
+	 */
+	private void clearMouseData() {
+		scrollWheel = 0;
+		cursorX = 0;
+		cursorY = 0;
 	}
-
-	public void addPathNode() {
-		path.add(new PathNode(keyList, scrollwheel, cursorX, cursorY));
-	}
-
-	public void resetPath() {
-		path.clear();
-		addPathNode();
-	}
-
-	public class PathNode implements Serializable {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -2221602955260299028L;
-
-		private Map<Integer, VirtualKey> keyList = Maps.<Integer, VirtualKey>newHashMap();
-
-		public int scrollwheel = 0;
-
-		public int cursorX = 0;
-
-		public int cursorY = 0;
-
-		public PathNode(Map<Integer, VirtualKey> keyList, int scrollwheel, int cursorX, int cursorY) {
-			Map<Integer, VirtualKey> copy = new HashMap<Integer, VirtualKey>();
-
-			keyList.forEach((key, value) -> {
-				copy.put(key, value.clone());
-			});
-			this.keyList = copy;
-			this.scrollwheel = scrollwheel;
-			this.cursorX = cursorX;
-			this.cursorY = cursorY;
-		}
-
-		public PathNode() {
-			keyList.put(-101, new VirtualKey("MOUSEMOVED", -101));
-			keyList.put(-100, new VirtualKey("LC", -100));
-			keyList.put(-99, new VirtualKey("RC", -99));
-			keyList.put(-98, new VirtualKey("MC", -98));
-			keyList.put(-97, new VirtualKey("MBUTTON3", -97));
-			keyList.put(-96, new VirtualKey("MBUTTON4", -96));
-			keyList.put(-95, new VirtualKey("MBUTTON5", -95));
-			keyList.put(-94, new VirtualKey("MBUTTON6", -94));
-			keyList.put(-93, new VirtualKey("MBUTTON7", -93));
-			keyList.put(-92, new VirtualKey("MBUTTON8", -92));
-			keyList.put(-91, new VirtualKey("MBUTTON9", -91));
-			keyList.put(-90, new VirtualKey("MBUTTON10", -90));
-			keyList.put(-89, new VirtualKey("MBUTTON11", -89));
-			keyList.put(-88, new VirtualKey("MBUTTON12", -88));
-			keyList.put(-87, new VirtualKey("MBUTTON13", -87));
-			keyList.put(-86, new VirtualKey("MBUTTON14", -86));
-			keyList.put(-85, new VirtualKey("MBUTTON15", -85));
-
-			this.scrollwheel = 0;
-
-			this.cursorX = 0;
-
-			this.cursorY = 0;
-		}
-
-		@Override
-		public String toString() {
-			String keyString = "";
-			List<String> strings = new ArrayList<String>();
-
-			keyList.forEach((keycodes, virtualkeys) -> {
-				if (virtualkeys.isKeyDown()) {
-					strings.add(virtualkeys.getName());
-				}
-			});
-			if (!strings.isEmpty()) {
-				String seperator = ",";
-				for (int i = 0; i < strings.size(); i++) {
-					if (i == strings.size() - 1) {
-						seperator = "";
-					}
-					keyString = keyString.concat(strings.get(i) + seperator);
-				}
-			}
-			if (keyString.isEmpty()) {
-				return "MOUSEMOVED," + scrollwheel + "," + cursorX + "," + cursorY;
-			} else {
-				return keyString + "," + scrollwheel + "," + cursorX + "," + cursorY;
-			}
-		}
-		
-		public VirtualKey get(String keyname) {
-			Collection<VirtualKey> list = keyList.values();
-			VirtualKey out = null;
-
-			for (VirtualKey key : list) {
-				if (key.getName().equalsIgnoreCase(keyname)) {
-					out = key;
-				}
-			}
-			return out;
-		}
-
-	}
-
-	public void clear() {
-		keyList.forEach((keycode, key) -> {
-			key.setPressed(false);
-		});
-		resetPath();
-	}
-
+	
+	
 	@Override
 	public String toString() {
-		List<String> stringy = getCurrentPresses();
-		String keyString = "";
-		if (!stringy.isEmpty()) {
-			String seperator = ",";
-			for (int i = 0; i < stringy.size(); i++) {
-				if (i == stringy.size() - 1) {
-					seperator = "";
-				}
-				keyString = keyString.concat(stringy.get(i) + seperator);
-			}
+		if (isParent()) {
+			return getAll().stream().map(VirtualMouse::toString2).collect(Collectors.joining("\n"));
+		} else {
+			return toString2();
 		}
-		String pathString = "";
-		if (!path.isEmpty()) {
-			String seperator = "->";
-			for (int i = 0; i < path.size(); i++) {
-				if (i == path.size() - 1) {
-					seperator = "";
-				}
-				pathString = pathString.concat("[" + path.get(i).toString() + "]" + seperator);
-			}
-		}
-		return PlaybackSerialiser.SectionsV1.MOUSE.getName()+":"+keyString + ";" + pathString;
 	}
 	
-	public void setPath(List<PathNode> path) {
-		List<PathNode> pathCopy = new ArrayList<PathNode>();
-		path.forEach(pathNode -> {
-			pathCopy.add(pathNode);
-		});
-		this.path = pathCopy;
+	private String toString2(){
+		return String.format("%s;%s,%s,%s", super.toString(), scrollWheel, cursorX, cursorY);
 	}
 
+	/**
+	 * Clones this VirtualMouse <strong>without</strong> subticks
+	 */
+	@Override
+	public VirtualMouse clone() {
+		return new VirtualMouse(new HashSet<>(this.pressedKeys), scrollWheel, cursorX, cursorY, null, ignoreFirstUpdate());
+	}
+
+	@Override
+	public void copyFrom(VirtualMouse mouse) {
+		super.copyFrom(mouse);
+		this.scrollWheel = mouse.scrollWheel;
+		this.cursorX = mouse.cursorX;
+		this.cursorY = mouse.cursorY;
+		mouse.clearMouseData();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof VirtualMouse) {
+			VirtualMouse mouse = (VirtualMouse) obj;
+			return super.equals(obj) && 
+					scrollWheel == mouse.scrollWheel &&
+					cursorX == mouse.cursorX &&
+					cursorY == mouse.cursorY;
+		}
+		return super.equals(obj);
+	}
+	
+	/**
+	 * @return {@link #scrollWheel}
+	 */
+	public int getScrollWheel() {
+		return scrollWheel;
+	}
+	
+	/**
+	 * @return {@link #cursorX}
+	 */
+	public int getCursorX() {
+		return cursorX;
+	}
+	
+	/**
+	 * @return {@link #cursorY}
+	 */
+	public int getCursorY() {
+		return cursorY;
+	}
 }

@@ -11,6 +11,10 @@
 			onMatch="${sys:tasmod.marker.tickrate:-ACCEPT}" onMismatch="NEUTRAL" />
 		<MarkerFilter marker="Playback"
 			onMatch="${sys:tasmod.marker.playback:-ACCEPT}" onMismatch="NEUTRAL" />
+		<MarkerFilter marker="Keyboard"
+			onMatch="${sys:tasmod.marker.keyboard:-DENY}" onMismatch="NEUTRAL" />
+		<MarkerFilter marker="Mouse"
+			onMatch="${sys:tasmod.marker.mouse:-DENY}" onMismatch="NEUTRAL" />
 	</Filters>
 	<Appenders>
 		<Console name="SysOut2" target="SYSTEM_OUT">

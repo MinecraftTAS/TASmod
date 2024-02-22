@@ -1,608 +1,658 @@
 package com.minecrafttas.tasmod.virtual;
 
-import static com.minecrafttas.tasmod.TASmod.LOGGER;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
-import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
-import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
-import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TickInputContainer;
+import org.apache.commons.lang3.tuple.Triple;
+import org.apache.logging.log4j.Logger;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer;
+import com.minecrafttas.tasmod.mixin.playbackhooks.MixinMinecraft;
+import com.minecrafttas.tasmod.util.Ducks;
+import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.PointerNormalizer;
+import com.minecrafttas.tasmod.virtual.event.VirtualKeyboardEvent;
+import com.minecrafttas.tasmod.virtual.event.VirtualMouseEvent;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.math.MathHelper;
 
 /**
- * One of the core classes of this mod <br>
+ * Main component for redirecting inputs.<br>
  * <br>
- * This mimics peripherals used to control minecraft which are: The keyboard,
- * the mouse and the angle of the player, which is called "Subticks" in this
- * case <i>(this came from a time when the camera angle was actually updated on
- * a subtick level)</i>.<br>
- * <br>
- * For each peripheral there are 2 states. The "current" state <i>(e.g.
- * {@linkplain #currentKeyboard})</i>, which is the state of what the game
- * actually currently recognizes and the "next" state <i>(e.g.
- * {@linkplain #nextKeyboard})</i> which either the buttons pressed on the
- * keyboard, or the buttons pressed in the next playback tick.<br>
- * <br>
- * Outside of this class, there is a third state, which is the Vanilla Minecraft
- * keybindings, which, in the best case, should be a copy of the "current"
- * state. <br>
- * <h2>Events</h2> To update the vanilla keybindings you need something called
- * key events. An event for a keyboard might look like this <br>
- * <br>
- * <b>17,true,'w'</b><br>
- * <br>
- * Something like this is sent by the LWJGL methods to the vanilla methods to
- * update the keybindings. <br>
- * In this case it is the key with the keycode 17 (The 'W' key), in the state
- * true which means it is pressed down. And the 'w' is the character that is
- * associated with that key <br>
- * <br>
- * You can find a complete list of LWJGL keycodes in
- * {@link VirtualKeyboard}.<br>
- * <br>
- * If W is released, the key event for this would look something like this:
- * <b>17, false, NULL</b> <br>
- * From that, the vanilla keybindings know which key is currently pressed down.
- * As a bonus, the character 'w' is used when typing in a textfield.<br>
- * <h2>Emulating events</h2> With the key events from LWJGL, so from the
- * "physical keyboard", we can update the nextKeyboard in the
- * {@link #updateNextKeyboard(int, boolean, char)} method.<br>
- * This method is called every frame and also works in tickrate 0.<br>
- * <br>
- * And on every tick, we call {@link #updateCurrentKeyboard()}, which updates
- * the currentKeyboard with a copy of nextKeyboard. <br>
- * However, we still need to update the Vanilla Minecraft keybinding by using
- * key events.<br>
- * To solve this problem we can use
- * {@link VirtualKeyboard#getDifference(VirtualKeyboard)}, which compares 2
- * keyboards and extracts the key events from that.<br>
- * <br>
- * For instance if we have a keyboard, where nothing is pressed, then a keyboard
- * where only "W" is pressed, we can assume that the key event responsible for
- * that change 17,true,? is. <br>
- * But as indicated by the ? we actually don't know the character that is typed
- * there. And for that we need to store the characters seperately in the
- * keyboard ({@link VirtualKeyboard#getCharList()}).<br>
- * <br>
- * The advantage of this system is:
- * <ul>
- * <li>Better support for savestates</li>
- * <li>Better support for tickrate 0</li>
- * <li>Less cluttering in the resulting files</li>
- * <li>Recording support for the full keyboard/eventual modding support</li>
- * </ul>
- * 
- * @author Scribble
+ * This class mimics the LWJGL classes {@link org.lwjgl.input.Keyboard} and
+ * {@link org.lwjgl.input.Mouse} and redirects the camera angle and player rotation<br>
  *
+ * @author Scribble
  */
-public class VirtualInput implements EventPlayerJoinedClientSide{
-
+public class VirtualInput {
+	private final Logger LOGGER;
 	/**
-	 * The container where all inputs get stored during recording or stored and
-	 * ready to be played back
+	 * Instance of the {@link VirtualKeyboardInput} subclass, intended to improve readability.
 	 */
-	private PlaybackControllerClient container = new PlaybackControllerClient();
-
-	// ===========================Keyboard=================================
-
+	public final VirtualKeyboardInput KEYBOARD;
 	/**
-	 * The state of the keyboard recognized by the game. Updated on a tick basis
-	 * <br>
-	 * See also: {@link VirtualInput}
+	 * Instance of the {@link VirtualMouseInput} subclass, intended to improve readability.
 	 */
-	private VirtualKeyboard currentKeyboard = new VirtualKeyboard();
-
+	public final VirtualMouseInput MOUSE;
 	/**
-	 * The state of the keyboard which will replace
-	 * {@linkplain VirtualInput#currentKeyboard} in the next tick. Updated every
-	 * frame<br>
-	 * See also: {@link VirtualInput}
+	 * Instance of the {@link VirtualCameraAngleInput} subclass, intended to improve readability.
 	 */
-	private VirtualKeyboard nextKeyboard = new VirtualKeyboard();
+	public final VirtualCameraAngleInput CAMERA_ANGLE;
 
-	private List<VirtualKeyboardEvent> currentKeyboardEvents = new ArrayList<VirtualKeyboardEvent>();
-	private Iterator<VirtualKeyboardEvent> currentKeyboardEventIterator = currentKeyboardEvents.iterator();
-
-	private VirtualKeyboardEvent currentKeyboardEvent = null;
-
-	public VirtualKeyboard getCurrentKeyboard() {
-		return currentKeyboard;
-	}
-
-	public VirtualKeyboard getNextKeyboard() {
-		return nextKeyboard;
-	}
-	
 	/**
-	 * Loads the inputs and starts a TAS on initialize
-	 * @param fileToLoad (Nullable) Loads this filename and starts playing back the TAS
+	 * Creates a new virtual input with an empty {@link VirtualKeyboardInput}, {@link VirtualMouseInput} and {@link VirtualCameraAngleInput}
+	 * @param logger The logger instance
 	 */
-	public VirtualInput(String fileToLoad) {
-		if (fileToLoad != null) {
-			try {
-				loadInputs(fileToLoad);
-				container.setStateWhenOpened(TASstate.PLAYBACK);
-			} catch (IOException e) {
-				LOGGER.error("Cannot load inputs from the start of the TAS: {}", e.getMessage());
-			}
-		}
-	}
-
-	public void updateNextKeyboard(int keycode, boolean keystate, char character) {
-
-//		System.out.println(keycode+" "+keystate+" "+character);
-
-		if (keystate) {
-			character = nextKeyboard.encodeUnicode(keycode, character);
-		} else {
-			if (keycode == 15) {
-				character = '\u2907';
-			}
-		}
-		nextKeyboard.addChar(character);
-		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode)) {
-			return;
-		}
-		VirtualKey key = nextKeyboard.get(keycode);
-		
-		key.setPressed(keystate);
-	}
-
-	public List<VirtualKeyboardEvent> getCurrentKeyboardEvents() {
-		return currentKeyboard.getDifference(nextKeyboard);
-	}
-
-	public void updateCurrentKeyboard() {
-		currentKeyboardEvents = getCurrentKeyboardEvents();
-		currentKeyboardEventIterator = currentKeyboardEvents.iterator();
-
-//		currentKeyboardEvents.forEach(action->{
-//			System.out.println(action.toString());
-//		});
-
-		nextKeyboard.clearCharList();
-
-		currentKeyboard = nextKeyboard.clone();
-	}
-
-	public boolean nextKeyboardEvent() {
-		boolean hasnext = currentKeyboardEventIterator.hasNext();
-		if (hasnext) {
-			currentKeyboardEvent = currentKeyboardEventIterator.next();
-		}
-		return hasnext;
-	}
-
-	public int getEventKeyboardKey() {
-		return currentKeyboardEvent.getKeyCode();
-	}
-
-	public boolean getEventKeyboardState() {
-		return currentKeyboardEvent.isState();
-	}
-
-	public char getEventKeyboardCharacter() {
-		return currentKeyboardEvent.getCharacter();
-	}
-
-	public void clearNextKeyboard() {
-		nextKeyboard.clear();
-	}
-
-	public boolean isKeyDown(int keycode) {
-		if (keycode >= 0)
-			return currentKeyboard.get(keycode).isKeyDown();
-		else
-			return currentMouse.get(keycode).isKeyDown();
-	}
-
-	public boolean isKeyDown(String keyname) {
-		if (currentKeyboard.get(keyname).isKeyDown()) {
-			return true;
-		} else if (currentMouse.get(keyname).isKeyDown()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean willKeyBeDown(int keycode) {
-		if (keycode >= 0)
-			return nextKeyboard.get(keycode).isKeyDown();
-		else
-			return nextMouse.get(keycode).isKeyDown();
-	}
-
-	public boolean willKeyBeDown(String keyname) {
-		if (nextKeyboard.get(keyname).isKeyDown()) {
-			return true;
-		} else if (nextMouse.get(keyname).isKeyDown()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public List<String> getCurrentKeyboardPresses() {
-		List<String> out = new ArrayList<String>();
-
-		currentKeyboard.getKeyList().forEach((keycodes, virtualkeys) -> {
-			if (virtualkeys.isKeyDown()) {
-				out.add(virtualkeys.getName());
-			}
-		});
-
-		return out;
-	}
-
-	public List<String> getNextKeyboardPresses() {
-
-		List<String> out = new ArrayList<String>();
-		if (container.isPlayingback() && container.get(container.index()) != null) {
-			container.get(container.index()).getKeyboard().getKeyList().forEach((keycodes, virtualkeys) -> {
-				if (virtualkeys.isKeyDown()) {
-					out.add(virtualkeys.getName());
-				}
-			});
-		} else {
-			nextKeyboard.getKeyList().forEach((keycodes, virtualkeys) -> {
-				if (virtualkeys.isKeyDown()) {
-					out.add(virtualkeys.getName());
-				}
-			});
-		}
-		return out;
-	}
-
-	// =======================================Mouse============================================
-
-	private VirtualMouse currentMouse = new VirtualMouse();
-
-	private VirtualMouse nextMouse = new VirtualMouse();
-
-	private List<VirtualMouseEvent> currentMouseEvents = new ArrayList<VirtualMouseEvent>();
-	private Iterator<VirtualMouseEvent> currentMouseEventIterator = currentMouseEvents.iterator();
-
-	private VirtualMouseEvent currentMouseEvent = null;
-
-	public VirtualMouse getCurrentMouse() {
-		return currentMouse;
-	}
-
-	public VirtualMouse getNextMouse() {
-		return nextMouse;
-	}
-
-	public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY, boolean filter) {
-
-		boolean flag = true;
-		if (filter) {
-			flag = nextMouse.isSomethingDown() || scrollwheel != 0 || keycode != -1;
-		}
-		
-		VirtualKey key = nextMouse.get(keycode - 100);
-
-		if (VirtualKeybindings.isKeyCodeAlwaysBlocked(keycode - 100)) {
-			key.setPressed(false);
-			return;
-		}
-		
-		key.setPressed(keystate);
-
-		nextMouse.setScrollWheel(scrollwheel);
-
-		nextMouse.setCursor(PointerNormalizer.getNormalizedX(cursorX), PointerNormalizer.getNormalizedY(cursorY));
-
-		if (flag == true)
-			nextMouse.addPathNode();
-	}
-
-	public List<VirtualMouseEvent> getCurrentMouseEvents() {
-		return currentMouse.getDifference(nextMouse);
-	}
-
-	public void updateCurrentMouseEvents() {
-		currentMouseEvents = getCurrentMouseEvents();
-		currentMouseEventIterator = currentMouseEvents.iterator();
-
-		// Prints the mouse events given to the keybindings... very useful
-//		currentMouseEvents.forEach(action->{
-//			System.out.println(action.toString());
-//		});
-
-		resetNextMouseLists();
-
-		currentMouse = nextMouse.clone();
-	}
-
-	public void resetNextMouseLists() {
-		nextMouse.resetPath();
-	}
-
-	public boolean nextMouseEvent() {
-		boolean hasnext = currentMouseEventIterator.hasNext();
-		if (hasnext) {
-			currentMouseEvent = currentMouseEventIterator.next();
-		}
-		return hasnext;
-	}
-
-	public int getEventMouseKey() {
-		return currentMouseEvent.getKeyCode();
-	}
-
-	public boolean getEventMouseState() {
-		return currentMouseEvent.isState();
-	}
-
-	public int getEventMouseScrollWheel() {
-		return currentMouseEvent.getScrollwheel();
-	}
-
-	public int getEventCursorX() {
-		return PointerNormalizer.getCoordsX(currentMouseEvent.getMouseX());
-	}
-
-	public int getEventCursorY() {
-		return PointerNormalizer.getCoordsY(currentMouseEvent.getMouseY());
-	}
-
-	public void clearNextMouse() {
-		nextMouse.clear();
-	}
-
-	public List<String> getCurrentMousePresses() {
-		List<String> out = new ArrayList<String>();
-
-		currentMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
-			if (virtualkeys.isKeyDown()) {
-				out.add(virtualkeys.getName());
-			}
-		});
-
-		return out;
-	}
-
-	public List<String> getNextMousePresses() {
-		List<String> out = new ArrayList<String>();
-
-		if (container.isPlayingback() && container.get(container.index()) != null) {
-			container.get(container.index()).getMouse().getKeyList().forEach((keycodes, virtualkeys) -> {
-				if (virtualkeys.isKeyDown()) {
-					out.add(virtualkeys.getName());
-				}
-			});
-		} else {
-			nextMouse.getKeyList().forEach((keycodes, virtualkeys) -> {
-				if (virtualkeys.isKeyDown()) {
-					out.add(virtualkeys.getName());
-				}
-			});
-		}
-
-		return out;
-	}
-
-	public void unpressEverything() {
-		container.unpressContainer();
-		unpressNext();
-	}
-	
-	public void unpressNext() {
-		clearNextKeyboard();
-		clearNextMouse();
-	}
-
-	// ======================================Subticks===========================================
-
-	VirtualSubticks currentSubtick = new VirtualSubticks(0, 0);
-
-	public void updateSubtick(float pitch, float yaw) {
-		currentSubtick = container.addSubticksToContainer(new VirtualSubticks(pitch, yaw));
-	}
-
-	public float getSubtickPitch() {
-		return currentSubtick.getPitch();
-	}
-
-	public float getSubtickYaw() {
-		return currentSubtick.getYaw();
-	}
-
-	// =====================================Container===========================================
-
-	public PlaybackControllerClient getContainer() {
-		return container;
+	public VirtualInput(Logger logger) {
+		this(logger, new VirtualKeyboard(), new VirtualMouse(), new VirtualCameraAngle());
 	}
 
 	/**
-	 * Updates the input container and the {@link #nextKeyboard} as well as
-	 * {@link #nextMouse}<br>
-	 * Gets executed each game tick
-	 */
-	public void updateContainer() {
-		nextKeyboard = container.addKeyboardToContainer(nextKeyboard);
-		nextMouse = container.addMouseToContainer(nextMouse);
-	}
-
-	/**
-	 * Replaces the {@link #container}, used in
+	 * Creates a virtual input with pre-loaded values
 	 * 
-	 * @param container to replace the current one
+	 * @param preloadedKeyboard A keyboard loaded when creating {@link VirtualKeyboardInput}
+	 * @param preloadedMouse A mouse loaded when creating {@link VirtualMouseInput}
+	 * @param preloadedCamera A camera loaded when creating {@link VirtualCameraAngleInput}
 	 */
-	public void setContainer(PlaybackControllerClient container) {
-		this.container = container;
+	public VirtualInput(Logger logger, VirtualKeyboard preloadedKeyboard, VirtualMouse preloadedMouse, VirtualCameraAngle preloadedCamera) {
+		this.LOGGER = logger;
+		KEYBOARD = new VirtualKeyboardInput(preloadedKeyboard);
+		MOUSE = new VirtualMouseInput(preloadedMouse);
+		CAMERA_ANGLE = new VirtualCameraAngleInput(preloadedCamera);
 	}
 
-	// =====================================Savestates===========================================
-
 	/**
-	 * Loads and preloads the inputs from the new InputContainer to
-	 * {@link #container}
+	 * Updates the logic for {@link #KEYBOARD}, {@link #MOUSE} and
+	 * {@link #CAMERA_ANGLE}<br>
+	 * Runs every frame
 	 * 
-	 * Saving a savestate is done via {@linkplain com.minecrafttas.tasmod.playback.PlaybackSerialiser#saveToFileV1(File, PlaybackControllerClient)} in {@linkplain com.minecrafttas.tasmod.savestates.SavestateHandlerClient#savestate(String)}
-	 * 
-	 * @param savestatecontainer The container that should be loaded.
+	 * @see MixinMinecraft#playback_injectRunGameLoop(CallbackInfo)
+	 * @param currentScreen The current screen from Minecraft.class. Used for
+	 *                      checking if the mouse logic should be adapted to
+	 *                      GUIScreens
 	 */
-	public void loadClientSavestate(PlaybackControllerClient savestatecontainer) {
-
-		if (container.isPlayingback()) {
-			preloadInput(container, savestatecontainer.size() - 1); // Preloading from the current container and
-																			// from the second to last index of
-																			// the savestatecontainer. Since this is
-																			// executed during playback,
-																			// we will only load the position of the
-																			// savestate container and not replace the
-																			// container itself. This is due to the fact
-																			// that the playback would immediately end
-																			// when you replace the container.
-			
-			if (container.size() >= savestatecontainer.size()) { // Check if the current container is bigger than the
-																	// savestated one.
-
-				try {
-					container.setIndex(savestatecontainer.size()); // Set the "playback" index of the current
-																	// container to the latest index of the
-																	// savestatecontainer. Meaning this index will
-																	// be played next
-				} catch (IndexOutOfBoundsException e) {
-					e.printStackTrace();
-				}
+	public void update(GuiScreen currentScreen) {
+		while (Keyboard.next()) {
+			KEYBOARD.updateNextKeyboard(Keyboard.getEventKey(), Keyboard.getEventKeyState(), Keyboard.getEventCharacter(), Keyboard.areRepeatEventsEnabled());
+		}
+		while (Mouse.next()) {
+			if (currentScreen == null) {
+				MOUSE.updateNextMouse(Mouse.getEventButton()-100, Mouse.getEventButtonState(), Mouse.getEventDWheel(), 0, 0);
 			} else {
-				String start = savestatecontainer.getStartLocation();
-				savestatecontainer.setStartLocation("");
-
-				try {
-					savestatecontainer.setIndex(savestatecontainer.size() - 1);
-				} catch (IndexOutOfBoundsException e) {
-					e.printStackTrace();
-				}
-				savestatecontainer.setTASStateClient(TASstate.PLAYBACK);
-				savestatecontainer.setStartLocation(start);
-				container = savestatecontainer;
+				Ducks.GuiScreenDuck screen = (Ducks.GuiScreenDuck) currentScreen;
+				int eventX = screen.unscaleX(Mouse.getEventX());
+				int eventY = screen.unscaleY(Mouse.getEventY());
+				eventX = PointerNormalizer.getNormalizedX(eventX);
+				eventY = PointerNormalizer.getNormalizedY(eventY);
+				MOUSE.updateNextMouse(Mouse.getEventButton()-100, Mouse.getEventButtonState(), Mouse.getEventDWheel(), eventX, eventY);
 			}
-
-		} else if (container.isRecording()) {
-			String start = savestatecontainer.getStartLocation();
-			preloadInput(savestatecontainer, savestatecontainer.size() - 1); // Preload the input of the savestate
-
-			nextKeyboard = new VirtualKeyboard(); // Unpress the nextKeyboard and mouse to get rid of the preloaded inputs in the
-													// next keyboard. Note that these inputs are still loaded in the current
-													// keyboard
-			nextMouse = new VirtualMouse();
-
-			try {
-				savestatecontainer.setIndex(savestatecontainer.size());
-			} catch(IndexOutOfBoundsException e) {
-				e.printStackTrace();
-			}
-			
-			savestatecontainer.setTASStateClient(TASstate.RECORDING);
-			savestatecontainer.setStartLocation(start);
-			container = savestatecontainer; // Replace the current container with the savestated container
 		}
 	}
 
 	/**
-	 * Preloads the specified index from, the container to {@link #nextMouse} and
-	 * {@link #nextKeyboard}
+	 * If the keyboard or mouse key is currently down.
+	 * If keycode >= 0 then {@link VirtualKeyboardInput#isKeyDown(int)} will be called,<br>
+	 * otherwise {@link VirtualMouseInput#isKeyDown(int)}
 	 * 
-	 * @param container The container from which the inputs should be pre loaded
-	 * @param index     The index of the container from which the inputs should be
-	 *                  loaded
+	 * @param keycode The keycode in question
+	 * @return If the key is down either on mouse or keyboard
 	 */
-	private void preloadInput(PlaybackControllerClient container, int index) {
-		TickInputContainer tickcontainer = container.get(index);
-
-		if (tickcontainer != null) {
-			tickcontainer = tickcontainer.clone();
-			nextKeyboard = tickcontainer.getKeyboard().clone();
-			nextMouse = tickcontainer.getMouse().clone();
-
-			 Minecraft.getMinecraft().runTickKeyboard(); // Letting mouse and keyboard tick once to load inputs into the
-																						// "currentKeyboard"
-			 Minecraft.getMinecraft().runTickMouse();
+	public boolean isKeyDown(int keycode) {
+		if(keycode >= 0) {
+			return KEYBOARD.isKeyDown(keycode);
 		} else {
-			LOGGER.warn("Can't preload inputs, specified inputs are null!");
+			return MOUSE.isKeyDown(keycode);
 		}
 	}
-	// ================================Load/Save Inputs=====================================
 	
-	public void loadInputs(String filename) throws IOException {
-		setContainer(TASmodClient.serialiser.fromEntireFileV1(new File(TASmodClient.tasdirectory + "/" + filename + ".mctas")));
-		getContainer().fixTicks();
+	/**
+	 * If the keyboard or mouse key is will be down in the next tick.
+	 * If keycode >= 0 then {@link VirtualKeyboardInput#willKeyBeDown(int)} will be called,<br>
+	 * otherwise {@link VirtualMouseInput#willKeyBeDown(int)}
+	 * 
+	 * @param keycode The keycode in question
+	 * @return If the key will be down either on mouse or keyboard
+	 */
+	public boolean willKeyBeDown(int keycode) {
+		if(keycode >= 0) {
+			return KEYBOARD.willKeyBeDown(keycode);
+		} else {
+			return MOUSE.willKeyBeDown(keycode);
+		}
 	}
 	
-	public void saveInputs(String filename) throws IOException {
-		TASmodClient.createTASDir();
-		TASmodClient.serialiser.saveToFileV1(new File(TASmodClient.tasdirectory + "/" + filename + ".mctas"), TASmodClient.virtual.getContainer());
+	/**
+	 * Unpresses all keys in {@link VirtualKeyboardInput#nextKeyboard} and {@link VirtualMouseInput#nextMouse}
+	 */
+	public void clear() {
+		KEYBOARD.nextKeyboard.clear();
+		MOUSE.nextMouse.clear();
+		CAMERA_ANGLE.nextCameraAngle.clear();
 	}
+	
+	/**
+	 * Subclass of {@link VirtualInput} handling keyboard logic.<br>
+	 * <br>
+	 * Vanilla keyboard handling looks something like this:
+	 * 
+	 * <pre>
+	 *	public void runTickKeyboard()  { // Executed every tick in runTick()
+	 *		while({@linkplain Keyboard#next()}){
+	 *			int keycode = {@linkplain Keyboard#getEventKey()};
+	 *			boolean keystate = {@linkplain Keyboard#getEventKey()};
+	 *			char character = {@linkplain Keyboard#getEventCharacter()}
+	 *
+	 *			Keybindings.updateKeybind(keycode, keystate, character)
+	 *		}
+	 *	}
+	 * </pre>
+	 * 
+	 * After redirecting the calls in {@link MixinMinecraft}, the resulting logic
+	 * now looks like this:
+	 * 
+	 * <pre>
+	 *	public void runTickKeyboard()  {
+	 *		{@linkplain #nextKeyboardTick()}
+	 *		while({@linkplain #nextKeyboardSubtick()}){
+	 *			int keycode = {@linkplain #getEventKeyboardKey()}};
+	 *			boolean keystate = {@linkplain #getEventKeyboardState()};
+	 *			char character = {@linkplain #getEventKeyboardCharacter()}
+	 *
+	 *			Keybindings.updateKeybind(keycode, keystate, character)
+	 *		}
+	 *	}
+	 * </pre>
+	 * @see VirtualKeyboard
+	 */
+	public class VirtualKeyboardInput {
+		/**
+		 * The keyboard "state" that is currently recognized by the game,<br>
+		 * meaning it is a direct copy of the vanilla keybindings. Updated every
+		 * <em>tick</em>.<br>
+		 * Updated in {@link #nextKeyboardTick()}
+		 */
+		private final VirtualKeyboard currentKeyboard;
+		/**
+		 * The "state" of the real physical keyboard.<br>
+		 * This is updated every <em>frame</em>.<br>
+		 * Updates {@link #currentKeyboard} in {@link #nextKeyboardTick()}
+		 */
+		private final VirtualKeyboard nextKeyboard = new VirtualKeyboard();
+		/**
+		 * Queue for keyboard events.<br>
+		 * Is filled in {@link #nextKeyboardTick()} and read in
+		 * {@link #nextKeyboardSubtick()}
+		 */
+		private final Queue<VirtualKeyboardEvent> keyboardEventQueue = new ConcurrentLinkedQueue<VirtualKeyboardEvent>();
+		/**
+		 * The current keyboard event where the vanilla keybindings are reading
+		 * from.<br>
+		 * Updated in {@link #nextKeyboardSubtick()} and read out in
+		 * <ul>
+		 * 	<li>{@link #getEventKeyboardKey()}</li>
+		 * 	<li>{@link #getEventKeyboardState()}</li>
+		 * 	<li>{@link #getEventKeyboardCharacter()}</li>
+		 * </ul>
+		 */
+		private VirtualKeyboardEvent currentKeyboardEvent = new VirtualKeyboardEvent();
 
-	// =====================================Debug===========================================
+		/**
+		 * Constructor to preload the {@link #currentKeyboard} with an existing keyboard
+		 * @param preloadedKeyboard The new {@link #currentKeyboard}
+		 */
+		public VirtualKeyboardInput(VirtualKeyboard preloadedKeyboard) {
+			currentKeyboard = preloadedKeyboard;
+		}
 
-	public class InputEvent {
-		public int tick;
-		public List<VirtualKeyboardEvent> keyboardevent;
-		public List<VirtualMouseEvent> mouseEvent;
-		public VirtualSubticks subticks;
+		/**
+		 * Updates the next keyboard
+		 * 
+		 * @see VirtualInput#update(GuiScreen)
+		 * @param keycode   The keycode of this event
+		 * @param keystate  The keystate of this event
+		 * @param character The character of this event
+		 */
+		public void updateNextKeyboard(int keycode, boolean keystate, char character) {
+			updateNextKeyboard(keycode, keystate, character, false);
+		}
+		
+		/**
+		 * Updates the next keyboard
+		 * 
+		 * @see VirtualInput#update(GuiScreen)
+		 * @param keycode   The keycode of this event
+		 * @param keystate  The keystate of this event
+		 * @param character The character of this event
+		 * @param repeatEventsEnabled If repeat events are enabled
+		 */
+		public void updateNextKeyboard(int keycode, boolean keystate, char character, boolean repeatEventsEnabled) {
+			LOGGER.debug(LoggerMarkers.Keyboard, "Update: {}, {}, {}, {}", keycode, keystate, character); 	// Activate with -Dtasmod.marker.keyboard=ACCEPT in VM arguments (and -Dtasmod.log.level=debug)
+			nextKeyboard.update(keycode, keystate, character, repeatEventsEnabled);
+		}
+		
+		/**
+		 * Runs when the next keyboard tick is about to occur.<br>
+		 * Used to load {@link #nextKeyboard} into {@link #currentKeyboard}, creating
+		 * {@link VirtualKeyboardEvent}s in the process.
+		 * 
+		 * @see MixinMinecraft#playback_injectRunTickKeyboard(org.spongepowered.asm.mixin.injection.callback.CallbackInfo)
+		 */
+		public void nextKeyboardTick() {
+			currentKeyboard.getVirtualEvents(nextKeyboard, keyboardEventQueue);
+			currentKeyboard.copyFrom(nextKeyboard);
+		}
 
-		public InputEvent(int tick, List<VirtualKeyboardEvent> keyboardevent, List<VirtualMouseEvent> mouseEvent, VirtualSubticks subticks) {
-			this.tick = tick;
-			this.keyboardevent = keyboardevent;
-			this.mouseEvent = mouseEvent;
-			this.subticks = subticks;
+		/**
+		 * Runs in a while loop. Used for updating {@link #currentKeyboardEvent} and
+		 * ending the while loop.
+		 * 
+		 * @see MixinMinecraft#playback_redirectKeyboardNext()
+		 * @return If a keyboard event is in {@link #keyboardEventQueue}
+		 */
+		public boolean nextKeyboardSubtick() {
+			return (currentKeyboardEvent = keyboardEventQueue.poll()) != null;
+		}
+
+		/**
+		 * @return The keycode of {@link #currentKeyboardEvent}
+		 */
+		public int getEventKeyboardKey() {
+			return currentKeyboardEvent.getKeyCode();
+		}
+
+		/**
+		 * @return The keystate of {@link #currentKeyboardEvent}
+		 */
+		public boolean getEventKeyboardState() {
+			return currentKeyboardEvent.isState();
+		}
+
+		/**
+		 * @return The character(s) of {@link #currentKeyboardEvent}
+		 */
+		public char getEventKeyboardCharacter() {
+			return currentKeyboardEvent.getCharacter();
+		}
+		
+		/**
+		 * If the key is currently down and recognised by Minecraft
+		 * @param keycode The keycode of the key in question
+		 * @return Whether the key of the {@link #currentKeyboard} is down
+		 */
+		public boolean isKeyDown(int keycode) {
+			return currentKeyboard.isKeyDown(keycode);
+		}
+		
+		/**
+		 * If the key will be down and recognised in the next tick by Minecraft.<br>
+		 * This is equal to checking if a key on the physical keyboard is pressed
+		 * @param keycode The keycode of the key in question
+		 * @return Whether the key of the {@link #nextKeyboard} is down
+		 */
+		public boolean willKeyBeDown(int keycode) {
+			return nextKeyboard.isKeyDown(keycode);
 		}
 	}
 
 	/**
-	 * Gets all InputEvents from the current container.<br>
+	 * Subclass of {@link VirtualInput} handling mouse logic.<br>
 	 * <br>
-	 * Container and input events differ in that input events are the events that
-	 * get accepted by Minecraft in the runTickKeyboard.<br>
-	 * The container however stores the current inputs and can calculate the
-	 * corresponding input events from that, but it does it only when you are
-	 * playing back or recording.<br>
-	 * <br>
-	 * This however runs through the {@link VirtualInput#container} and generates
-	 * the input events on for debug purposes.
+	 * Vanilla mouse handling looks something like this:
 	 * 
-	 * @return
+	 * <pre>
+	 *	public void runTickMouse()  { // Executed every tick in runTick()
+	 *		while({@linkplain Mouse#next()}){
+	 *			int keycode = {@linkplain Mouse#getEventButton()};
+	 *			boolean keystate = {@linkplain Mouse#getEventButtonState()};
+	 *			int scrollWheel = {@linkplain Mouse#getEventDWheel()}
+	 *			int cursorX = {@linkplain Mouse#getEventX()} // Important in GUIs
+	 *			int cursorY = {@linkplain Mouse#getEventY()}
+	 *
+	 *			Keybindings.updateKeybind(keycode, keystate, etc...)
+	 *		}
+	 *	}
+	 * </pre>
+	 * 
+	 * After redirecting the calls in {@link MixinMinecraft}, the resulting logic
+	 * now looks like this:
+	 * 
+	 * <pre>
+	 *	public void runTickMouse()  { // Executed every tick in runTick()
+	 *		{@linkplain #nextMouseTick()}
+	 *		while({@linkplain #nextMouseSubtick}){
+	 *			int keycode = {@linkplain #getEventMouseKey};
+	 *			boolean keystate = {@linkplain #getEventMouseState()} ()};
+	 *			int scrollWheel = {@linkplain #getEventMouseScrollWheel()}
+	 *			int cursorX = {@linkplain #getEventCursorX()} // Important in GUIs
+	 *			int cursorY = {@linkplain #getEventCursorY()}
+	 *
+	 *			Keybindings.updateKeybind(keycode, keystate, etc...)
+	 *		}
+	 *	}
+	 * </pre>
+	 * @see VirtualMouse
 	 */
-	public List<InputEvent> getAllInputEvents() {
+	public class VirtualMouseInput {
+		/**
+		 * The mouse "state" that is currently recognized by the game,<br>
+		 * meaning it is a direct copy of the vanilla mouse. Updated every
+		 * <em>tick</em>.<br>
+		 * Updated in {@link #nextMouseTick()}
+		 */
+		private final VirtualMouse currentMouse;
+		/**
+		 * The "state" of the real physical mouse.<br>
+		 * This is updated every <em>frame</em>.<br>
+		 * Updates {@link #currentMouse} in {@link #nextMouseTick()}
+		 */
+		private final VirtualMouse nextMouse = new VirtualMouse();
+		/**
+		 * Queue for keyboard events.<br>
+		 * Is filled in {@link #nextMouseTick()} and read in
+		 * {@link #nextMouseSubtick()}
+		 */
+		private final Queue<VirtualMouseEvent> mouseEventQueue = new ConcurrentLinkedQueue<>();
+		/**
+		 * The current mouse event where the vanilla mouse is reading
+		 * from.<br>
+		 * Updated in {@link #nextMouseSubtick()} and read out in
+		 * <ul>
+		 * 	<li>{@link #getEventMouseKey()}</li>
+		 * 	<li>{@link #getEventMouseState()}</li>
+		 * 	<li>{@link #getEventMouseScrollWheel()}</li>
+		 * 	<li>{@link #getEventCursorX()}</li>
+		 * 	<li>{@link #getEventCursorY()}</li>
+		 * </ul>
+		 */
+		private VirtualMouseEvent currentMouseEvent = new VirtualMouseEvent();
 
-		List<InputEvent> main = new ArrayList<>();
-
-		for (int i = 0; i < container.size(); i++) {
-
-			TickInputContainer tick = container.get(i);
-			TickInputContainer nextTick = container.get(i + 1);
-
-			if (nextTick == null) {
-				nextTick = new TickInputContainer(i + 1); // Fills the last tick in the container with an empty TickInputContainer
-			}
-
-			VirtualKeyboard keyboard = tick.getKeyboard();
-			List<VirtualKeyboardEvent> keyboardEventsList = keyboard.getDifference(nextTick.getKeyboard());
-
-			VirtualMouse mouse = tick.getMouse();
-			List<VirtualMouseEvent> mouseEventsList = mouse.getDifference(nextTick.getMouse());
-
-			main.add(new InputEvent(tick.getTick(), keyboardEventsList, mouseEventsList, tick.getSubticks()));
+		/**
+		 * Constructor to preload the {@link #currentMouse} with an existing mouse
+		 * @param preloadedMouse The new {@link #currentMouse}
+		 */
+		public VirtualMouseInput(VirtualMouse preloadedMouse) {
+			currentMouse = preloadedMouse;
 		}
-		return main;
+
+		/**
+		 * Updates the next keyboard
+		 * 
+		 * @see VirtualInput#update(GuiScreen)
+		 * @param keycode   The keycode of this event
+		 * @param keystate  The keystate of this event
+		 * @param scrollwheel The scrollwheel direction of this event
+		 * @param cursorX The x coordinate of the cursor of this event
+		 * @param cursorY The y coordinate of the cursot of this event
+		 */
+		public void updateNextMouse(int keycode, boolean keystate, int scrollwheel, int cursorX, int cursorY) {
+			LOGGER.debug(LoggerMarkers.Mouse,"Update: {} ({}), {}, {}, {}, {}", keycode, VirtualKey.getName(keycode), keystate, scrollwheel, cursorX, cursorY); 	// Activate with -Dtasmod.marker.mouse=ACCEPT in VM arguments (and -Dtasmod.log.level=debug)
+			nextMouse.update(keycode, keystate, scrollwheel, cursorX, cursorY);
+		}
+
+		/**
+		 * Runs when the next mouse tick is about to occur.<br>
+		 * Used to load {@link #nextMouse} into {@link #currentMouse}, creating
+		 * {@link VirtualMouseEvent}s in the process.
+		 * 
+		 * @see MixinMinecraft#playback_injectRunTickMouse(org.spongepowered.asm.mixin.injection.callback.CallbackInfo)
+		 */
+		public void nextMouseTick() {
+			currentMouse.getVirtualEvents(nextMouse, mouseEventQueue);
+			currentMouse.copyFrom(nextMouse);
+		}
+
+		/**
+		 * Runs in a while loop. Used for updating {@link #currentMouseEvent} and
+		 * ending the while loop.
+		 * 
+		 * @see MixinMinecraft#playback_redirectMouseNext()
+		 * @return If a mouse event is in {@link #mouseEventQueue}
+		 */
+		public boolean nextMouseSubtick() {
+			return (currentMouseEvent = mouseEventQueue.poll()) != null;
+		}
+
+		/**
+		 * @return The keycode of {@link #currentMouseEvent}
+		 */
+		public int getEventMouseKey() {
+			return currentMouseEvent.getKeyCode();
+		}
+
+		/**
+		 * @return The keystate of {@link #currentMouseEvent}
+		 */
+		public boolean getEventMouseState() {
+			return currentMouseEvent.isState();
+		}
+
+		/**
+		 * @return The scroll wheel of {@link #currentMouseEvent}
+		 */
+		public int getEventMouseScrollWheel() {
+			return currentMouseEvent.getScrollwheel();
+		}
+
+		/**
+		 * @return The scaled x coordinate of the cursor of {@link #currentMouseEvent}
+		 */
+		public int getEventCursorX() {
+			return PointerNormalizer.reapplyScalingX(getNormalizedCursorX());
+		}
+
+		/**
+		 * @return The x coordinate of the cursor of {@link #currentMouseEvent}
+		 */
+		public int getNormalizedCursorX() {
+			return currentMouseEvent.getCursorX();
+		}
+		
+		/**
+		 * @return The scaled y coordinate of the cursor of {@link #currentMouseEvent}
+		 */
+		public int getEventCursorY() {
+			return PointerNormalizer.reapplyScalingY(getNormalizedCursorY());
+		}
+		
+		/**
+		 * @return The y coordinate of the cursor of {@link #currentMouseEvent}
+		 */
+		public int getNormalizedCursorY() {
+			return currentMouseEvent.getCursorY();
+		}
+		
+		/**
+		 * If the key is currently down and recognised by Minecraft
+		 * @param keycode The keycode of the key in question
+		 * @return Whether the key of the {@link #currentMouse} is down
+		 */
+		public boolean isKeyDown(int keycode) {
+			return currentMouse.isKeyDown(keycode);
+		}
+		
+		/**
+		 * If the key will be down and recognised in the next tick by Minecraft.<br>
+		 * This is equal to checking if a key on the physical mouse is pressed
+		 * @param keycode The keycode of the key in question
+		 * @return Whether the key of the {@link #nextMouse} is down3
+		 */
+		public boolean willKeyBeDown(int keycode) {
+			return nextMouse.isKeyDown(keycode);
+		}
+		
 	}
 
-	@Override
-	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
-		unpressNext();
+	/**
+	 * Subclass of {@link VirtualInput} handling camera angle logic.<br>
+	 * <br>
+	 * Normally, the camera angle is updated every <em>frame</em>.<br>
+	 * This meant that inputs on mouse and keyboard, updated every <em>tick</em>,<br>
+	 * had to sync with the camera angle, updated every frame, which desynced in some edgecases.<br>
+	 * <br>
+	 * After extensive testing, the decision was made to conform the camera to update every <em>tick</em>,<br>
+	 * instead of every frame. By itself, this meant that moving the camera felt really laggy<br>
+	 * <br>
+	 * Therefore, an interpolation system was created that seperated the camera angle from the player head rotation,<br>
+	 * which are usually the synced.
+	 * <br>
+	 * While the camera is the angle displayed on screen, the player rotation is responsible for the logic,<br>
+	 * e.g. at which block the player is currently aiming.<br>
+	 * This calls for a similar architecture as the {@link VirtualKeyboardInput} and the {@link VirtualMouseInput}.
+	 * <br>
+	 * The {@link VirtualCameraAngleInput#currentCameraAngle} represents the player rotation, updated every tick<br>
+	 * and the {@link VirtualCameraAngleInput#nextCameraAngle} represents the camera angle, updated every frame.
+	 * <br>
+	 * In pseudocode, the tick conformed camera looks like this:
+	 * <pre>
+	 * public void runGameLoop() {// The main update loop, every frame
+	 * 	for(int i;i<timer.toTickCount;i++){ // For loop to enable ticking
+	 * 		entityRenderer.updatePlayerRotation();
+	 * 		runTick()
+	 * 	}
+	 * 
+	 * 	entityRenderer.updateCamera();	// Update the camera
+	 * }
+	 * </pre>
+	 * Note that the camera is updated <em>after</em> the tick function.
+	 * Now in this pseudocode, the following methods from this class are injected like so:
+	 * <pre>
+	 * public void runGameLoop() {// The main update loop, every frame
+	 * 	for(int i;i<timer.toTickCount;i++){ // For loop to enable ticking
+	 * 		{@linkplain VirtualCameraAngleInput#nextCameraTick()};
+	 * 		entityRenderer.updatePlayerRotation({@linkplain VirtualCameraAngleInput#getCurrentPitch()}, {@linkplain VirtualCameraAngleInput#getCurrentYaw()});
+	 * 		runTick()
+	 * 	}
+	 *  {@linkplain VirtualCameraAngleInput#updateNextCameraAngle(float, float)};
+	 * 	entityRenderer.updateCamera();	// Update the camera
+	 * }
+	 * </pre>
+	 * 
+	 * While there is "subtick" behavior in this implementation,<br>
+	 * it is only used for the interpolation of the camera angle and not for the player rotation.<br>
+	 * This way you can customize the interpolated frames during playback.
+	 */
+	public class VirtualCameraAngleInput {
+		/**
+		 * The current camera angle in game.<br>
+		 * <br>
+		 * Updated every tick in {@link #nextCameraTick()}
+		 */
+		private final VirtualCameraAngle currentCameraAngle;
+		/**
+		 * The new camera angle<br>
+		 * <br>
+		 * updated every frame in {@link #updateNextCameraAngle(float, float)}<br>
+		 * and updates {@link #currentCameraAngle} in {@link #nextCameraTick()}
+		 */
+		private final VirtualCameraAngle nextCameraAngle = new VirtualCameraAngle();
+		/**
+		 * States of the {@link #nextCameraAngle} made during the tick.<br>
+		 * Is updated in {@link #nextCameraTick()}
+		 */
+		private final List<VirtualCameraAngle> cameraAngleInterpolationStates = new ArrayList<>();
+
+		/**
+		 * Constructor to preload the {@link #currentCameraAngle} with an existing
+		 * camera angle
+		 * 
+		 * @param preloadedCamera The new {@link #currentCameraAngle}
+		 */
+		public VirtualCameraAngleInput(VirtualCameraAngle preloadedCamera) {
+			currentCameraAngle = preloadedCamera;
+		}
+
+		/**
+		 * Update the camera angle.<br>
+		 * <br>
+		 * Runs every frame
+		 * 
+		 * @see com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer#runUpdate(float);
+		 * @param pitchDelta Relative rotationPitch delta from LWJGLs mouse delta.
+		 * @param yawDelta   Relative rotationYaw delta from LWJGLs mouse delta.
+		 */
+		public void updateNextCameraAngle(float pitchDelta, float yawDelta) {
+//			LOGGER.debug("Pitch: {}, Yaw: {}", pitch, yaw);
+			nextCameraAngle.update(pitchDelta, yawDelta);
+		}
+
+		/**
+		 * Updates the {@link #currentCameraAngle} and {@link #cameraAngleInterpolationStates}.<br>
+		 * Runs every tick.
+		 * 
+		 * @see MixinEntityRenderer#runUpdate(float)
+		 */
+		public void nextCameraTick() {
+			nextCameraAngle.getStates(cameraAngleInterpolationStates);
+			currentCameraAngle.copyFrom(nextCameraAngle);
+		}
+
+		/**
+		 * Sets the camera coordinates directly.<br>
+		 * <br>
+		 * The camera angle is stored in absolute coordinates,<br>
+		 * which should match the vanilla coordinates displayed in F3<br>
+		 * <br>
+		 * This creates a problem when initializing the world, we don't know the camera angle the player has.<br>
+		 * Without this, the player would always start facing the 0;0 coordinate.
+		 * <br>
+		 * To fix this, the camera is initialized with pitch and yaw being null. If that is the case,<br>
+		 * then the current player rotation is set with this method in {@link MixinEntityRenderer#runUpdate(float)}
+		 * @param pitch The absolute player pitch
+		 * @param yaw The absolute player yaw
+		 */
+		public void setCamera(Float pitch, Float yaw) {
+			nextCameraAngle.set(pitch, yaw);
+		}
+
+		/**
+		 * @return The absolute pitch coordinate of the player. May be null when it's initialized
+		 */
+		public Float getCurrentPitch() {
+			return currentCameraAngle.getPitch();
+		}
+		
+		/**
+		 * @return The absolute yaw coordinate of the player. May be null when it's initialized
+		 */
+		public Float getCurrentYaw() {
+			return currentCameraAngle.getYaw();
+		}
+
+		/**
+		 * Gets the absolute coordinates of the camera angle
+		 * 
+		 * @param partialTick The partial ticks of the timer
+		 * @param pitch The original pitch of the camera
+		 * @param yaw The original yaw of the camera
+		 * @param enable Whether the custom interpolation is enabled. Enabled during playback.
+		 * @return A triple of pitch, yaw and roll, as left, middle and right respectively 
+		 */
+		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable) {
+			if (!enable) { // If interpolation is not enabled, return the values of nextCameraAngle
+				return Triple.of(nextCameraAngle.getPitch() == null ? pitch : nextCameraAngle.getPitch(), nextCameraAngle.getYaw() == null ? pitch : nextCameraAngle.getYaw() + 180, 0f);
+			}
+
+			float interpolatedPitch = 0f;
+			float interpolatedYaw = 0f;
+
+			if (cameraAngleInterpolationStates.size() == 1) { // If no interpolation data was specified, interpolate over 2 values
+				interpolatedPitch = (float) MathHelper.clampedLerp(cameraAngleInterpolationStates.get(0).getPitch(), currentCameraAngle.getPitch(), partialTick);
+				interpolatedYaw = (float) MathHelper.clampedLerp(currentCameraAngle.getYaw(), cameraAngleInterpolationStates.get(0).getYaw() + 180, partialTick);
+			} else {
+
+				int index = (int) MathHelper.clampedLerp(0, cameraAngleInterpolationStates.size(), partialTick); // Get interpolate index
+
+				interpolatedPitch = cameraAngleInterpolationStates.get(index).getPitch();
+				interpolatedYaw = cameraAngleInterpolationStates.get(index).getYaw();
+			}
+
+			return Triple.of(interpolatedPitch, interpolatedYaw, 0f);
+		}
 	}
 }

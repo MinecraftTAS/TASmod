@@ -5,37 +5,41 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiWorldSelection;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
 
 /**
- * Adjusts the pointer/cursor of the playback to different gui scalings.
- * 
- * This was the work of many hours of trial and error.
- * 
- * Out of despair I reached out to Darkmoon to help me with this problem...
- * 
- * @author ScribbleLP, Darkmoon
+ * Normalizes the cursor to be independent of gui scalings.<br>
+ * That way, a TAS recorded in e.g. Gui Scale "Large" can also be played back on Gui Scale "Small"
  *
+ * @author Scribble, Darkmoon
  */
 public class PointerNormalizer {
 
+	/**
+	 * Mathematically removes scaling from the x coordinate
+	 * @param pointerX The current pointer coordinate
+	 * @return The normalized x coordinate
+	 */
 	public static int getNormalizedX(int pointerX) {
 		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution scaled = new ScaledResolution(mc);
-		int out = (int) (pointerX - (scaled.getScaledWidth() / 2D));
-		return out;
+		return (int) (pointerX - (scaled.getScaledWidth() / 2D));
 	}
 
+	/**
+	 * Mathematically removes scaling from the y coordinate
+	 * @param pointerY The current pointer coordinate
+	 * @return The normalized y coordinate
+	 */
 	public static int getNormalizedY(int pointerY) {
 		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution scaled = new ScaledResolution(mc);
 
 		int out = pointerY;
 
-		if (mc.currentScreen instanceof GuiContainer || mc.currentScreen instanceof GuiContainerCreative) {
+		if (mc.currentScreen instanceof GuiContainer) {
 			out = (int) (pointerY - (scaled.getScaledHeight() / 2D));
 		} else if (mc.currentScreen instanceof GuiWorldSelection|| mc.currentScreen instanceof GuiMultiplayer) {
-			
+			// TODO Figure out what to do here
 		} else {
 			out = (int) (pointerY - (scaled.getScaledHeight() / 4 + 72 + -16));
 		}
@@ -43,62 +47,62 @@ public class PointerNormalizer {
 		return out;
 	}
 
-	public static int getCoordsX(int normalizedX) {
+	/**
+	 * Reapplies gui scaling to the normalized pointer x coordinate
+	 * @param normalizedX The normalized pointer coordinate
+	 * @return The scaled coordinate
+	 */
+	public static int reapplyScalingX(int normalizedX) {
 		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution scaled = new ScaledResolution(mc);
 		int out = (int) Math.round(normalizedX + (scaled.getScaledWidth() / 2D));
-		return limiterX(out, scaled);
+		return clamp(out, 0, scaled.getScaledWidth());
 	}
 
-	public static int getCoordsY(int normalizedY) {
+	/**
+	 * Reapplies gui scaling to the normalized pointer y coordinate
+	 * @param normalizedY The normalized pointer coordinate
+	 * @return The scaled coordinate
+	 */
+	public static int reapplyScalingY(int normalizedY) {
 		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution scaled = new ScaledResolution(mc);
 
 		int out = normalizedY;
-		if (mc.currentScreen instanceof GuiContainer || mc.currentScreen instanceof GuiContainerCreative) {
+		if (mc.currentScreen instanceof GuiContainer) {
 			out = (int) Math.round(normalizedY + (scaled.getScaledHeight() / 2D));
 		} else if (mc.currentScreen instanceof GuiWorldSelection || mc.currentScreen instanceof GuiMultiplayer) {
-			
+			// TODO Figure out what to do here
 		} else {
 			out = (int) (normalizedY + (scaled.getScaledHeight() / 4 + 72 + -16));
 		}
 
-		return limiterY(out, scaled);
+		return clamp(out, 0, scaled.getScaledHeight());
 	}
 
-	private static int limiterX(int out, ScaledResolution scaled) {
-		int width = scaled.getScaledWidth();
-		if (out > width) {
-			out = width;
-		} else if (out < 0)
-			out = 0;
-		return out;
-	}
-
-	private static int limiterY(int out, ScaledResolution scaled) {
-		int height = scaled.getScaledHeight();
-		if (out > height) {
-			out = height;
-		} else if (out < 0)
-			out = 0;
-		return out;
-	}
-
-	private static int gcd(int a, int b) {
-		return (b == 0) ? a : gcd(b, a % b);
+	private static int clamp(int value, int lower, int upper) {
+		if (value < lower) {
+			return lower;
+		} else {
+			return Math.min(value, upper);
+		}
 	}
 
 	public static void printAspectRatio() {
 		int height = Minecraft.getMinecraft().displayHeight;
 		int width = Minecraft.getMinecraft().displayWidth;
-		int gcd = gcd(width, height);
+		int gcd = greatestCommonDivisor(width, height);
 		if (gcd == 0) {
 			System.out.println(gcd);
 		} else {
 			System.out.println(width / gcd + ":" + height / gcd);
 		}
 	}
-	
+
+	private static int greatestCommonDivisor(int a, int b) {
+		return (b == 0) ? a : greatestCommonDivisor(b, a % b);
+	}
+
 	/*
 	 * Here lies 10 hours of work for something I didn't even use. This code
 	 * normalizes the pointers coordinates and scales it depending on the screen

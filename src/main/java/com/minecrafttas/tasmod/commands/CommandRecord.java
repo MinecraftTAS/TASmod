@@ -38,6 +38,7 @@ public class CommandRecord extends CommandBase {
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		sender.sendMessage(new TextComponentString(TextFormatting.RED + "This feature doesn't work at the moment!"));
 		if (!(sender instanceof EntityPlayer)) {
 			return;
 		}

@@ -2,7 +2,6 @@
     "required": true,
     "minVersion": "0.8.5",
     "package": "com.minecrafttas.tasmod.mixin",
-    "refmap": "tasmod.refmap.json",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
     
@@ -27,8 +26,6 @@
         //General
         "MixinMinecraft",
         "MixinTimer",
-        "MixinEntityRenderer",
-        "MixinGuiScreen",
         "MixinInGameHud",
         
         //Savestates
@@ -40,13 +37,14 @@
 		//Keybinding
 		"MixinTextfield",
 		
-		"fixes.MixinMinecraftFullscreen",
-		
 		//Join and leave game event on the client
 		"events.MixinGuiMainMenu",
 		"events.MixinGuiIngame",
 		
 		//Playbackhooks
+		"playbackhooks.MixinMinecraft",
+        "playbackhooks.MixinEntityRenderer",
+		"playbackhooks.MixinGuiScreen",
 		"playbackhooks.MixinGameSettings",
 		"playbackhooks.MixinGuiChat",
 		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",
@@ -62,6 +60,7 @@
 		"shields.MixinTileEntityItemStackRenderer",
 		
 		//Fixes
+        "fixes.MixinMinecraftFullscreen",
         "fixes.MixinNetworkManager"
 	]
 }

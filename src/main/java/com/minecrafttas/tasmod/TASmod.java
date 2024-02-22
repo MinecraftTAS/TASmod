@@ -121,7 +121,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop{
 		// Save Loadstate Count
 		File savestateDirectory = new File(server.getDataDirectory() + File.separator + "saves" + File.separator + "savestates" + File.separator);
 		try {
-			new SavestateTrackerFile(new File(savestateDirectory, server.getFolderName() + "-info.txt"));
+			new SavestateTrackerFile(new File(savestateDirectory, server.getFolderName() + "-info.txt")); // TODO Ew, remove
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

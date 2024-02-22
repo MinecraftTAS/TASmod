@@ -11,7 +11,6 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import com.minecrafttas.mctcommon.events.EventClient.EventClientTick;
@@ -290,7 +289,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Facing";
-				return String.format("%.2f %.2f", InterpolationHandler.rotationYaw, InterpolationHandler.rotationPitch);
+				return String.format("%.2f %.2f", Minecraft.getMinecraft().player.rotationPitch, Minecraft.getMinecraft().player.rotationYaw);
 			}));
 			
 			title = "cticks";
@@ -324,7 +323,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 				if (Minecraft.getMinecraft().currentScreen == this) {
 					return "State";
 				} else {
-					TASstate state = TASmodClient.virtual.getContainer().getState();
+					TASstate state = TASmodClient.controller.getState();
 					ChatFormatting format = ChatFormatting.WHITE;
 					String out = "";
 					if (state == TASstate.PLAYBACK) {
@@ -343,26 +342,26 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 				}
 			}));
 			
-			title = "cursor";
-			y += 14;
-			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-				if (Minecraft.getMinecraft().currentScreen == this) return "Mouse Position";
-				return String.format("Mouse Cursor: " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorX + " " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorY);
-			}));
+//			title = "cursor";
+//			y += 14;
+//			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+//			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+//				if (Minecraft.getMinecraft().currentScreen == this) return "Mouse Position";
+//				return String.format("Mouse Cursor: " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorX + " " + TASmodClient.virtual.getNextMouse().getPath().get(0).cursorY);
+//			})); TODO Remove?
 			
-			title = "trajectories";
-			y += 14;
-			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
-			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
-				if (Minecraft.getMinecraft().currentScreen == this) return "Trajectories";
-				String message = "Invalid Item";
-				Vec3d vec = TrajectoriesCalculator.calculate();
-				if (vec != null) {
-					message = String.format("%.3f %.3f %.3f", vec.x, vec.y, vec.z);
-				}
-				return String.format("Trajectories: " + message);
-			}));
+//			title = "trajectories";
+//			y += 14;
+//			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
+//			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
+//				if (Minecraft.getMinecraft().currentScreen == this) return "Trajectories";
+//				String message = "Invalid Item";
+//				Vec3d vec = TrajectoriesCalculator.calculate();
+//				if (vec != null) {
+//					message = String.format("%.3f %.3f %.3f", vec.x, vec.y, vec.z);
+//				}
+//				return String.format("Trajectories: " + message);
+//			}));
 			
 			title = "velocity";
 			y += 14;
@@ -377,7 +376,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync";
-				DesyncMonitoring dMonitor=TASmodClient.virtual.getContainer().desyncMonitor;
+				DesyncMonitoring dMonitor=TASmodClient.controller.desyncMonitor;
 				return dMonitor.getStatus(Minecraft.getMinecraft().player);
 			}));
 			
@@ -386,7 +385,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Motion";
-				DesyncMonitoring dMonitor=TASmodClient.virtual.getContainer().desyncMonitor;
+				DesyncMonitoring dMonitor=TASmodClient.controller.desyncMonitor;
 				return dMonitor.getMotion();
 			}));
 			
@@ -395,7 +394,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync Position";
-				DesyncMonitoring dMonitor=TASmodClient.virtual.getContainer().desyncMonitor;
+				DesyncMonitoring dMonitor=TASmodClient.controller.desyncMonitor;
 				return dMonitor.getPos();
 			}));
 			
@@ -404,7 +403,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "Desync KTRNG";
-				DesyncMonitoring dMonitor=TASmodClient.virtual.getContainer().desyncMonitor;
+				DesyncMonitoring dMonitor=TASmodClient.controller.desyncMonitor;
 				return dMonitor.getSeed();
 			}));
 
@@ -414,7 +413,7 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 			if (configuration.getProperty(title + "_x", "err").equals("err")) setDefaults(title, y, true);
 			lists.add(new InfoLabel(title, Integer.parseInt(configuration.getProperty(title + "_x")), Integer.parseInt(configuration.getProperty(title + "_y")), Boolean.parseBoolean(configuration.getProperty(title + "_visible")), Boolean.parseBoolean(configuration.getProperty(title + "_rect")), () -> {
 				if (Minecraft.getMinecraft().currentScreen == this) return "PlaybackIndex";
-				return Integer.toString(TASmodClient.virtual.getContainer().index());
+				return Integer.toString(TASmodClient.controller.index());
 			}));
 			
 			y = height - 14;
@@ -437,10 +436,10 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 	@Override
 	public void onDrawHotbar() {
 		// render custom info box if control byte is set
-		if (!ControlByteHandler.hideInfoBox && TASmodClient.virtual.getContainer().isPlayingback())
+		if (!ControlByteHandler.hideInfoBox && TASmodClient.controller.isPlayingback())
 			drawRectWithText(ControlByteHandler.text, 10, 10, true);
 		// skip rendering of control byte is set
-		if (!ControlByteHandler.shouldRenderHud && TASmodClient.virtual.getContainer().isPlayingback())
+		if (!ControlByteHandler.shouldRenderHud && TASmodClient.controller.isPlayingback())
 			return;
 		int xpos=40;
 		int ypos=190;
@@ -490,26 +489,26 @@ public class InfoHud extends GuiScreen implements EventClientTick, EventDrawHotb
 	}
 	
 	private String keystrokes() {
-		if (Display.isActive()) {
-			String out1 = ""+ChatFormatting.WHITE;
-			for (String mouse : TASmodClient.virtual.getCurrentMousePresses()) {
-				out1 = out1.concat(mouse + " ");
-			}
-			out1=out1.concat(""+ChatFormatting.GREEN);
-			for (String mouse : TASmodClient.virtual.getNextMousePresses()) {
-				out1 = out1.concat(mouse + " ");
-			}
-			
-			String out2 = ""+ChatFormatting.WHITE;
-			for (String key : TASmodClient.virtual.getCurrentKeyboardPresses()) {
-				out2 = out2.concat(key + " ");
-			}
-			out2=out2.concat(""+ChatFormatting.GREEN);
-			for (String key : TASmodClient.virtual.getNextKeyboardPresses()) {
-				out2 = out2.concat(key + " ");
-			}
-			return out1+out2;
-		}
+//		if (Display.isActive()) { //TODO Update
+//			String out1 = ""+ChatFormatting.WHITE;
+//			for (String mouse : TASmodClient.virtual.getCurrentMousePresses()) {
+//				out1 = out1.concat(mouse + " ");
+//			}
+//			out1=out1.concat(""+ChatFormatting.GREEN);
+//			for (String mouse : TASmodClient.virtual.getNextMousePresses()) {
+//				out1 = out1.concat(mouse + " ");
+//			}
+//			
+//			String out2 = ""+ChatFormatting.WHITE;
+//			for (String key : TASmodClient.virtual.getCurrentKeyboardPresses()) {
+//				out2 = out2.concat(key + " ");
+//			}
+//			out2=out2.concat(""+ChatFormatting.GREEN);
+//			for (String key : TASmodClient.virtual.getNextKeyboardPresses()) {
+//				out2 = out2.concat(key + " ");
+//			}
+//			return out1+out2;
+//		}
 		return "";
 	}
 	

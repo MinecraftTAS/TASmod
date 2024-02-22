@@ -1,6 +1,5 @@
 package com.minecrafttas.mctcommon.server.exception;
 
-@SuppressWarnings("serial")
 public class InvalidPacketException extends Exception {
 
 	public InvalidPacketException() {
