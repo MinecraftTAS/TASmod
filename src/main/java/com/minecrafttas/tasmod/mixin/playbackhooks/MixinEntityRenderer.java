@@ -85,7 +85,7 @@ public class MixinEntityRenderer implements SubtickDuck {
 		}
 	}
 
-	@Redirect(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityPlayerSP;turn(FF)V"))
+	@Redirect(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;turn(FF)V"))
 	public void playback_stopVanilla(EntityPlayerSP player, float deltaYaw, float deltaPitch){
 		if(TASmodClient.tickratechanger.ticksPerSecond == 0){
 			player.turn(deltaYaw, deltaPitch);

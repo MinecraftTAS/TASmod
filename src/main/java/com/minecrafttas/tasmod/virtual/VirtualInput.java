@@ -633,7 +633,7 @@ public class VirtualInput {
 		 * @return A triple of pitch, yaw and roll, as left, middle and right respectively 
 		 */
 		public Triple<Float, Float, Float> getInterpolatedState(float partialTick, float pitch, float yaw, boolean enable) {
-			if (!enable) {
+			if (!enable) { // If interpolation is not enabled, return the values of nextCameraAngle
 				return Triple.of(nextCameraAngle.getPitch() == null ? pitch : nextCameraAngle.getPitch(), nextCameraAngle.getYaw() == null ? pitch : nextCameraAngle.getYaw() + 180, 0f);
 			}
 
@@ -641,7 +641,7 @@ public class VirtualInput {
 			float interpolatedYaw = 0f;
 
 			if (cameraAngleInterpolationStates.size() == 1) { // If no interpolation data was specified, interpolate over 2 values
-				interpolatedPitch = (float) MathHelper.clampedLerp(currentCameraAngle.getPitch(), cameraAngleInterpolationStates.get(0).getPitch(), partialTick);
+				interpolatedPitch = (float) MathHelper.clampedLerp(cameraAngleInterpolationStates.get(0).getPitch(), currentCameraAngle.getPitch(), partialTick);
 				interpolatedYaw = (float) MathHelper.clampedLerp(currentCameraAngle.getYaw(), cameraAngleInterpolationStates.get(0).getYaw() + 180, partialTick);
 			} else {
 
