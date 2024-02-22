@@ -291,15 +291,15 @@ class VirtualMouseTest {
     }
     
     /**
-     * Tests 2 updates having the same value. Should return no additional button events
+     * Tests 2 updates having the same value and the scroll wheel is 0. Should return no additional button events
      */
     @Test
     void testSameUpdate() {
     	VirtualMouse unpressed = new VirtualMouse();
     	
     	VirtualMouse pressed = new VirtualMouse();
-    	pressed.update(VirtualKey.LC.getKeycode(), true, 15, 10, 12);
-    	pressed.update(VirtualKey.LC.getKeycode(), true, 15, 10, 12);
+    	pressed.update(VirtualKey.LC.getKeycode(), true, 0, 10, 12);
+    	pressed.update(VirtualKey.LC.getKeycode(), true, 0, 10, 12);
     	
     	// Load actual with the events
     	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
@@ -307,14 +307,15 @@ class VirtualMouseTest {
     	
     	// Load expected
     	List<VirtualMouseEvent> expected = Arrays.asList(
-    			new VirtualMouseEvent(VirtualKey.LC.getKeycode(), true, 15, 10, 12) // Should only have one keyboard event
+    			new VirtualMouseEvent(VirtualKey.LC.getKeycode(), true, 0, 10, 12) // Should only have one keyboard event
     			); 
     	
     	assertIterableEquals(expected, actual);
     }
     
+    
     /**
-     * Tests 2 updates having the same pressed keys, but scrollWheel is different
+     * Tests 2 updates having the same pressed keys, but scrollWheel != 0
      */
     @Test
     void testScrollWheelDifferent() {
@@ -322,7 +323,7 @@ class VirtualMouseTest {
     	
     	VirtualMouse pressed = new VirtualMouse();
     	pressed.update(VirtualKey.LC.getKeycode(), true, 15, 10, 12);
-    	pressed.update(VirtualKey.LC.getKeycode(), true, -30, 10, 12);
+    	pressed.update(VirtualKey.LC.getKeycode(), true, 15, 10, 12);
     	
     	// Load actual with the events
     	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
@@ -331,7 +332,7 @@ class VirtualMouseTest {
     	// Load expected
     	List<VirtualMouseEvent> expected = Arrays.asList(
     			new VirtualMouseEvent(VirtualKey.LC.getKeycode(), true, 15, 10, 12),
-    			new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, -30, 10, 12) // Adds an additional "MOUSEMOVED" event with the scroll wheel
+    			new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, 15, 10, 12) // Adds an additional "MOUSEMOVED" event with the scroll wheel
     			);
     	
     	assertIterableEquals(expected, actual);
@@ -345,8 +346,8 @@ class VirtualMouseTest {
     	VirtualMouse unpressed = new VirtualMouse();
     	
     	VirtualMouse pressed = new VirtualMouse();
-    	pressed.update(VirtualKey.LC.getKeycode(), true, 15, 10, 12);
-    	pressed.update(VirtualKey.LC.getKeycode(), true, 15, 11, 12);
+    	pressed.update(VirtualKey.LC.getKeycode(), true, 0, 10, 12);
+    	pressed.update(VirtualKey.LC.getKeycode(), true, 0, 11, 12);
     	
     	// Load actual with the events
     	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
@@ -354,8 +355,8 @@ class VirtualMouseTest {
     	
     	// Load expected
     	List<VirtualMouseEvent> expected = Arrays.asList(
-    			new VirtualMouseEvent(VirtualKey.LC.getKeycode(), true, 15, 10, 12),
-    			new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, 15, 11, 12) // Adds an additional "MOUSEMOVED" event with the cursorX
+    			new VirtualMouseEvent(VirtualKey.LC.getKeycode(), true, 0, 10, 12),
+    			new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, 0, 11, 12) // Adds an additional "MOUSEMOVED" event with the cursorX
     			);
     	
     	assertIterableEquals(expected, actual);
@@ -369,8 +370,8 @@ class VirtualMouseTest {
     	VirtualMouse unpressed = new VirtualMouse();
     	
     	VirtualMouse pressed = new VirtualMouse();
-    	pressed.update(VirtualKey.LC.getKeycode(), true, 15, 10, 12);
-    	pressed.update(VirtualKey.LC.getKeycode(), true, 15, 10, 120);
+    	pressed.update(VirtualKey.LC.getKeycode(), true, 0, 10, 12);
+    	pressed.update(VirtualKey.LC.getKeycode(), true, 0, 10, 120);
     	
     	// Load actual with the events
     	Queue<VirtualMouseEvent> actual = new ConcurrentLinkedQueue<>();
@@ -378,8 +379,8 @@ class VirtualMouseTest {
     	
     	// Load expected
     	List<VirtualMouseEvent> expected = Arrays.asList(
-    			new VirtualMouseEvent(VirtualKey.LC.getKeycode(), true, 15, 10, 12),
-    			new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, 15, 10, 120) // Adds an additional "MOUSEMOVED" event with the cursorY
+    			new VirtualMouseEvent(VirtualKey.LC.getKeycode(), true, 0, 10, 12),
+    			new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, 0, 10, 120) // Adds an additional "MOUSEMOVED" event with the cursorY
     			);
     	
     	assertIterableEquals(expected, actual);
