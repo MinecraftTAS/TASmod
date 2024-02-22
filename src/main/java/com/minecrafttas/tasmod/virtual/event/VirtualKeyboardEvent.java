@@ -1,8 +1,11 @@
 package com.minecrafttas.tasmod.virtual.event;
 
-import com.minecrafttas.tasmod.virtual.event.VirtualEvent.VirtualButtonEvent;
-
-public class VirtualKeyboardEvent extends VirtualButtonEvent {
+/**
+ * Template for recording {@link org.lwjgl.input.Keyboard#next()} events.
+ *
+ * @author Scribble
+ */
+public class VirtualKeyboardEvent extends VirtualEvent {
     private final char character;
 
     public VirtualKeyboardEvent(){
@@ -11,11 +14,6 @@ public class VirtualKeyboardEvent extends VirtualButtonEvent {
 
     public VirtualKeyboardEvent(int keycode, boolean keystate, char character) {
         super(keycode, keystate);
-        this.character = character;
-    }
-
-    public VirtualKeyboardEvent(VirtualButtonEvent event, char character) {
-        super(event);
         this.character = character;
     }
 

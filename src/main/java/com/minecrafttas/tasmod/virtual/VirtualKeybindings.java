@@ -20,7 +20,7 @@ import net.minecraft.client.settings.KeyBinding;
  * Applies special rules to vanilla keybindings. <br>
  * <br>
  * Using {@link #isKeyDown(KeyBinding)}, the registered keybindings will work
- * inside of gui screens <br>
+ * inside gui screens <br>
  * <br>
  * {@link #isKeyDownExceptTextfield(KeyBinding)} does the same, but excludes
  * textfields, certain guiscreens, and the keybinding options<br>
@@ -32,18 +32,33 @@ import net.minecraft.client.settings.KeyBinding;
  *
  */
 public class VirtualKeybindings {
-	private static Minecraft mc = Minecraft.getMinecraft();
-	private static long cooldown = 50*5;
-	private static HashMap<KeyBinding, Long> cooldownHashMap = Maps.<KeyBinding, Long>newHashMap();
-	private static List<KeyBinding> blockedKeys = new ArrayList<>();
+	/**
+	 * The Minecraft instance
+	 */
+	private static final Minecraft mc = Minecraft.getMinecraft();
+	/**
+	 * The standard cooldown for a keybinding in milliseconds
+	 */
+	private static final long cooldown = 50*5;
+	/**
+	 * Stores the start time of a keybinding, used for cooldown calculation
+	 */
+	private static final HashMap<KeyBinding, Long> cooldownHashMap = new HashMap<>();
+	/**
+	 * A list of keybindings which will not be recorded or pressed during recording or playback.
+	 */
+	private static final List<KeyBinding> blockedKeys = new ArrayList<>();
+	/**
+	 * True when a text field is currently focused in a gui, like the creative search tab
+	 */
 	public static boolean focused = false;
 
 
 	/**
 	 * Checks whether the keycode is pressed, regardless of any gui screens
 	 * 
-	 * @param keybind
-	 * @return
+	 * @param keybind The keybind to check
+	 * @return If the keybind is down
 	 */
 	public static boolean isKeyDown(KeyBinding keybind) {
 
@@ -77,10 +92,12 @@ public class VirtualKeybindings {
 	}
 
 	/**
-	 * Checks whether the key is down, but stops when certain conditions apply
+	 * Checks whether the key is down, but returns false if a text field is focused in a gui.<br>
+	 * <br>
+	 * Always returns false if GuiChat and GuiEditSign is open.
 	 * 
-	 * @param keybind
-	 * @return
+	 * @param keybind The keybinding to check
+	 * @return If a keybind is pressed. Returns false if a text field in a gui is focused
 	 */
 	public static boolean isKeyDownExceptTextfield(KeyBinding keybind) {
 		if (mc.currentScreen instanceof GuiChat || mc.currentScreen instanceof GuiEditSign || (focused && mc.currentScreen != null)) {
@@ -92,7 +109,7 @@ public class VirtualKeybindings {
 	/**
 	 * Registers keybindings that should not be recorded or played back in a TAS
 	 * 
-	 * @param keybind
+	 * @param keybind The keybinding to block
 	 */
 	public static void registerBlockedKeyBinding(KeyBinding keybind) {
 		blockedKeys.add(keybind);
@@ -111,5 +128,4 @@ public class VirtualKeybindings {
 		}
 		return false;
 	}
-
 }

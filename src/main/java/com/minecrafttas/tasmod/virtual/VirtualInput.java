@@ -26,8 +26,9 @@ import net.minecraft.util.math.MathHelper;
  * Main component for redirecting inputs.<br>
  * <br>
  * This class mimics the LWJGL classes {@link org.lwjgl.input.Keyboard} and
- * {@link org.lwjgl.input.Mouse}.<br>
- * <br>
+ * {@link org.lwjgl.input.Mouse} and redirects the camera angle and player rotation<br>
+ *
+ * @author Scribble
  */
 public class VirtualInput {
 	private final Logger LOGGER;
@@ -46,7 +47,7 @@ public class VirtualInput {
 
 	/**
 	 * Creates a new virtual input with an empty {@link VirtualKeyboardInput}, {@link VirtualMouseInput} and {@link VirtualCameraAngleInput}
-	 * @param logger
+	 * @param logger The logger instance
 	 */
 	public VirtualInput(Logger logger) {
 		this(logger, new VirtualKeyboard(), new VirtualMouse(), new VirtualCameraAngle());
@@ -497,7 +498,7 @@ public class VirtualInput {
 	 * After extensive testing, the decision was made to conform the camera to update every <em>tick</em>,<br>
 	 * instead of every frame. By itself, this meant that moving the camera felt really laggy<br>
 	 * <br>
-	 * Therefore an interpolation system was created that seperated the camera angle from the player head rotation,<br>
+	 * Therefore, an interpolation system was created that seperated the camera angle from the player head rotation,<br>
 	 * which are usually the synced.
 	 * <br>
 	 * While the camera is the angle displayed on screen, the player rotation is responsible for the logic,<br>

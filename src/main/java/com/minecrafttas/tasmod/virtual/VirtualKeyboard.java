@@ -52,13 +52,13 @@ import com.google.common.collect.ImmutableList;
  * 	32, true, d 	// D is pressed
  * </pre>
  * <h2>Subticks</h2>
- * Minecraft updates it's keyboard every tick. All the key events that occur inbetween are stored,<br>
+ * Minecraft updates its keyboard every tick. All the key events that occur inbetween are stored,<br>
  * then read out when a new tick has started.<br> We call these "inbetween" ticks <em>subticks</em>.<br>
  * <h3>Parent->Subtick</h3>
  * In a previous version of this keyboard, subticks were bundeled and flattened into one keyboard state.<br>
  * After all, Minecraft updates only occur once every tick, storing subticks seemed unnecessary.<br>
  * <br>
- * However this posed some usability issues when playing in a low game speed via {@link com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient}.<br>
+ * However, this posed some usability issues when playing in a low game speed via {@link com.minecrafttas.tasmod.tickratechanger.TickrateChangerClient}.<br>
  * Now you had to hold the key until the next tick to get it recognised by the game.<br>
  * <br>
  * To fix this, now every subtick is stored as a keyboard state as well.<br>

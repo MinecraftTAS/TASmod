@@ -1,13 +1,11 @@
 package com.minecrafttas.tasmod.virtual.event;
 
-import com.minecrafttas.tasmod.virtual.event.VirtualEvent.VirtualButtonEvent;
-
 /**
- * Template for recording Mouse.next() events.
+ * Template for recording {@link org.lwjgl.input.Mouse#next()} events.
  *
  * @author Scribble
  */
-public class VirtualMouseEvent extends VirtualButtonEvent {
+public class VirtualMouseEvent extends VirtualEvent {
 	private final int scrollwheel;
 	private final int cursorX;
 	private final int cursorY;

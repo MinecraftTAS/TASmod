@@ -1,5 +1,10 @@
 package com.minecrafttas.tasmod.virtual;
 
+/**
+ * List of all names and keycodes from the keyboard and the mouse.
+ *
+ * @author Scribble
+ */
 public enum VirtualKey {
     // Keyboard
     ZERO(0),

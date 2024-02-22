@@ -36,7 +36,7 @@ public class Subtickable<T> {
 
 	/**
 	 * Adds a peripheral to {@link #subtickList}
-	 * 
+	 *
 	 * @param peripheral The peripheral to add
 	 */
 	protected void addSubtick(T peripheral) {
@@ -60,11 +60,11 @@ public class Subtickable<T> {
 	/**
 	 * Gets all peripheral states in an immutable list.<br>
 	 * <br>
-	 * This list is comprised of {@link #subtickList} and the current peripheral
+	 * This list comprises {@link #subtickList} and the current peripheral
 	 * state added after that<br>
 	 * This will result in a list where the first element is the oldest state and
 	 * the last being the current state.
-	 * 
+	 *
 	 * @return An immutable list of keyboard states
 	 */
 	@SuppressWarnings("unchecked")
@@ -78,7 +78,7 @@ public class Subtickable<T> {
 
 	/**
 	 * Retrieves and sets {@link #ignoreFirstUpdate} to false
-	 * 
+	 *
 	 * @return If the first update should be ignored
 	 */
 	protected boolean ignoreFirstUpdate() {
