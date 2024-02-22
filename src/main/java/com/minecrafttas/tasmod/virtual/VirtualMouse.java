@@ -142,8 +142,12 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
 			/*
 			 * ...but scrollWheel, cursorX or cursorY are different.
 			 * Without this, the scrollWheel would only work if a mouse button is pressed at the same time. 
+			 * 
+			 * (#198) Additionally, we also need to check if the scroll wheel is not 0.
+			 * Otherwise, repeated usage of the scrollWheel will result in #equals being true,
+			 * which doesn't trigger the if clause like it should.
 			 */
-			if(!equals(nextMouse)) {
+			if(!equals(nextMouse) || scrollWheel != 0) {
 				reference.add(new VirtualMouseEvent(VirtualKey.MOUSEMOVED.getKeycode(), false, nextMouse.scrollWheel, nextMouse.cursorX, nextMouse.cursorY));
 			}
 			return;
