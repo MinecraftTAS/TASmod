@@ -219,10 +219,9 @@ public class Client {
 	}
 
 	/**
-	 * Write packet to server
+	 * Sends a packet to the server
 	 * 
-	 * @param id  Buffer id
-	 * @param buf Buffer
+	 * @param bufferBuilder The bufferbuilder to use for sending a packet
 	 * @throws Exception Networking exception
 	 */
 	public void send(ByteBufferBuilder bufferBuilder) throws Exception {
@@ -293,7 +292,7 @@ public class Client {
 
 		this.username = ByteBufferBuilder.readString(buf);
 		LOGGER.debug(getLoggerMarker(), "Completing authentication for user {}", username);
-		EventClientCompleteAuthentication.fireClientCompleteAuthentication(username);
+		EventListenerRegistry.fireEvent(EventClientCompleteAuthentication.class, username);
 	}
 
 	private void handle(ByteBuffer buf) {
@@ -327,7 +326,7 @@ public class Client {
 				return packet;
 			}
 		}
-		throw new InvalidPacketException(String.format("Received invalid packet with id {}", id));
+		throw new InvalidPacketException(String.format("Received invalid packet with id %s", id));
 	}
 
 	public boolean isClosed() {

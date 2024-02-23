@@ -1,5 +1,6 @@
 package com.minecrafttas.mctcommon.mixin;
 
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,6 +15,6 @@ import net.minecraft.client.multiplayer.WorldClient;
 public class MixinWorldClient {
 	@Inject(method = "sendQuittingDisconnectingPacket", at = @At(value = "HEAD"))
 	public void clientLeaveServerEvent(CallbackInfo ci) {
-		EventPlayerLeaveClientSide.firePlayerLeaveClientSide(Minecraft.getMinecraft().player);
+		EventListenerRegistry.fireEvent(EventPlayerLeaveClientSide.class, Minecraft.getMinecraft().player);
 	}
 }

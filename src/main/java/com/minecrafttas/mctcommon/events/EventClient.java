@@ -8,6 +8,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 
+/**
+ * Contains all events fired on the client side
+ *
+ * @author Scribble
+ */
 public interface EventClient {
 	
 	/**
@@ -180,7 +185,7 @@ public interface EventClient {
 
 		/**
 		 * Fired when a different player other than yourself joins a server or a world
-		 * @param player The game profile of the player that joins the server or the world
+		 * @param profile The game profile of the player that joins the server or the world
 		 */
 		public void onOtherPlayerJoinedClientSide(GameProfile profile);
 	}
