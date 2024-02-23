@@ -2,6 +2,7 @@ package com.minecrafttas.mctcommon.mixin;
 
 import java.net.ConnectException;
 
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,14 +24,14 @@ public class MixinNetHandlerPlayClient {
 
 	@Inject(method = "handleJoinGame", at = @At(value = "RETURN"))
 	public void clientJoinServerEvent(CallbackInfo ci) throws ConnectException {
-		EventPlayerJoinedClientSide.firePlayerJoinedClientSide(gameController.player);
+		EventListenerRegistry.fireEvent(EventPlayerJoinedClientSide.class, gameController.player);
 	}
 
 	@Inject(method = "handlePlayerListItem", at = @At(value = "HEAD"))
 	public void otherClientJoinServerEvent(SPacketPlayerListItem packet, CallbackInfo ci) {
 		for (int i = 0; i < packet.getEntries().size(); i++) {
 			if (packet.getAction() == Action.ADD_PLAYER) {
-				EventOtherPlayerJoinedClientSide.fireOtherPlayerJoinedClientSide(packet.getEntries().get(i).getProfile());
+				EventListenerRegistry.fireEvent(EventOtherPlayerJoinedClientSide.class, packet.getEntries().get(i).getProfile());
 			}
 		}
 	}

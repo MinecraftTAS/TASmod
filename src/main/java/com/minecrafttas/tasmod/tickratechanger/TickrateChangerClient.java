@@ -4,6 +4,7 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
 
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import com.minecrafttas.mctcommon.server.Client.Side;
 import com.minecrafttas.mctcommon.server.exception.PacketNotImplementedException;
 import com.minecrafttas.mctcommon.server.exception.WrongSideException;
@@ -88,16 +89,16 @@ public class TickrateChangerClient implements ClientPacketHandler {
 			mc.timer.tickLength = Float.MAX_VALUE;
 		}
 		ticksPerSecond = tickrate;
-		EventClientTickrateChange.fireOnClientTickrateChange(tickrate);
+		EventListenerRegistry.fireEvent(EventClientTickrateChange.class, tickrate);
 		if (log)
 			log("Setting the client tickrate to " + ticksPerSecond);
 	}
 
 	/**
 	 * Attempts to change the tickrate on the server. Sends a
-	 * {@link ChangeTickratePacket} to the server
+	 * {@link TASmodPackets#TICKRATE_CHANGE} packet to the server
 	 * 
-	 * @param tickrate
+	 * @param tickrate The new server tickrate
 	 */
 	public void changeServerTickrate(float tickrate) {
 		if (tickrate < 0) {

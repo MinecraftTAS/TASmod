@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
@@ -196,7 +197,7 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(indexToSave);
 		
-		EventSavestate.fireSavestateEvent(indexToSave, targetfolder, currentfolder);
+		EventListenerRegistry.fireEvent(EventSavestate.class, indexToSave, targetfolder, currentfolder);
 
 		if (targetfolder.exists()) {
 			logger.warn(LoggerMarkers.Savestate, "WARNING! Overwriting the savestate with the index {}", indexToSave);
@@ -339,7 +340,7 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 		File currentfolder = new File(savestateDirectory, ".." + File.separator + worldname);
 		File targetfolder = getSavestateFile(indexToLoad);
 
-		EventLoadstate.fireLoadstateEvent(indexToLoad, targetfolder, currentfolder);
+		EventListenerRegistry.fireEvent(EventLoadstate.class, indexToLoad, targetfolder, currentfolder);
 		
 		/*
 		 * Prevents loading an InputSavestate when loading index 0 (Index 0 is the
@@ -418,7 +419,7 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 
 		
 		TASmod.tickSchedulerServer.add(()->{
-			EventCompleteLoadstate.fireLoadstateComplete();
+			EventListenerRegistry.fireEvent(EventCompleteLoadstate.class);
 			onLoadstateComplete();
 			
 			// Unlock savestating
@@ -922,7 +923,7 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 		}
 
 		/**
-		 * Loads all worlds and players from the disk. Also sends the playerdata to the client in {@linkplain SavestatePlayerLoadingPacketHandler}
+		 * Loads all worlds and players from the disk. Also sends the playerdata to the client in {@linkplain SavestateHandlerClient#onClientPacket(PacketID, ByteBuffer, String)}
 		 * 
 		 * Side: Server
 		 */
@@ -1065,7 +1066,7 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 		 * This adds the player to the chunk map so the server knows it can send the information to the client<br>
 		 * <br>
 		 * Side: Server
-		 * @see disconnectPlayersFromChunkMap
+		 * @see #disconnectPlayersFromChunkMap(MinecraftServer)
 		 */
 		public static void addPlayersToChunkMap(MinecraftServer server) {
 			List<EntityPlayerMP> players=server.getPlayerList().getPlayers();
@@ -1094,7 +1095,7 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 		 * Removing the player stops the server from sending chunks to the client.<br>
 		 * <br>
 		 * Side: Server
-		 * @see SavestatesChunkControl#addPlayersToChunkMap()
+		 * @see #addPlayersToChunkMap(MinecraftServer)
 		 */
 		public static void disconnectPlayersFromChunkMap(MinecraftServer server) {
 			List<EntityPlayerMP> players=server.getPlayerList().getPlayers();

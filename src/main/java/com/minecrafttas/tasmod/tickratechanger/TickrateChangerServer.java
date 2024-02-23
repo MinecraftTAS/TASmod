@@ -2,6 +2,7 @@ package com.minecrafttas.tasmod.tickratechanger;
 
 import java.nio.ByteBuffer;
 
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import org.apache.logging.log4j.Logger;
 
 import com.minecrafttas.mctcommon.events.EventServer.EventPlayerJoinedServerSide;
@@ -87,7 +88,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 	}
 
 	/**
-	 * Changes the tickrate of all clients. Sends a {@link ChangeTickratePacket}
+	 * Changes the tickrate of all clients. Sends a {@link TASmodPackets#TICKRATE_CHANGE} packet to all clients
 	 * 
 	 * @param tickrate The new tickrate of the client
 	 * @param log      If a message should logged
@@ -127,7 +128,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 			}
 		}
 		ticksPerSecond = tickrate;
-		EventServerTickrateChange.fireOnServerTickrateChange(tickrate);
+		EventListenerRegistry.fireEvent(EventServerTickrateChange.class, tickrate);
 		if (log) {
 			log("Setting the server tickrate to " + ticksPerSecond);
 		}
@@ -180,7 +181,7 @@ public class TickrateChangerServer implements EventServerStop, EventPlayerJoined
 	}
 
 	/**
-	 * Sends a {@link AdvanceTickratePacket} to all clients
+	 * Sends a {@link TASmodPackets#TICKRATE_ADVANCE} packet to all clients
 	 */
 	private void advanceClientTick() {
 		// Do not check for ticksPerSecond==0 here, because at this point, ticksPerSecond is 20 for one tick!

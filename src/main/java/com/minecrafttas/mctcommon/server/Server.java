@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.minecrafttas.mctcommon.MCTCommon;
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import com.minecrafttas.mctcommon.events.EventServer.EventDisconnectServer;
 import com.minecrafttas.mctcommon.server.Client.ClientCallback;
 import com.minecrafttas.mctcommon.server.interfaces.PacketID;
@@ -49,7 +50,7 @@ public class Server {
 			public void completed(AsynchronousSocketChannel clientSocket, Object attachment) {
 				
 				ClientCallback callback = (client) -> {
-					EventDisconnectServer.fireDisconnectServer(client);
+					EventListenerRegistry.fireEvent(EventDisconnectServer.class, client);
 					clients.remove(client);
 					LOGGER.debug(Server, "Disconnecting player from server");
 				};

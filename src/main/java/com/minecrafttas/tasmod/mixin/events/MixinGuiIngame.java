@@ -1,5 +1,6 @@
 package com.minecrafttas.tasmod.mixin.events;
 
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,6 +15,6 @@ public class MixinGuiIngame {
 	
 	@Inject(method = "renderHotbar", at = @At("HEAD"))
 	public void inject_renderHotbar(CallbackInfo ci) {
-		EventDrawHotbar.fireOnDrawHotbar();
+		EventListenerRegistry.fireEvent(EventDrawHotbar.class);
 	}
 }

@@ -2,6 +2,7 @@ package com.minecrafttas.tasmod.mixin;
 
 import java.io.IOException;
 
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -57,7 +58,7 @@ public abstract class MixinMinecraft {
 			TASmodClient.tickratechanger.advanceTick = false;
 			TASmodClient.tickratechanger.changeClientTickrate(0F);
 		}
-		EventClientTickPost.fireOnClientPostTick((Minecraft)(Object)this);
+		EventListenerRegistry.fireEvent(EventClientTickPost.class, (Minecraft)(Object)this);
 	}
 
 	@Shadow

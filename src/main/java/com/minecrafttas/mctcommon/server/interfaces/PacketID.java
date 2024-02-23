@@ -1,6 +1,6 @@
 package com.minecrafttas.mctcommon.server.interfaces;
 
-import com.minecrafttas.mctcommon.events.CompactPacketHandler;
+import com.minecrafttas.mctcommon.server.CompactPacketHandler;
 import com.minecrafttas.mctcommon.server.Client.Side;
 
 public interface PacketID {

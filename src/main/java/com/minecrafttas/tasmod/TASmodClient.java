@@ -23,7 +23,6 @@ import com.minecrafttas.mctcommon.server.Client;
 import com.minecrafttas.mctcommon.server.PacketHandlerRegistry;
 import com.minecrafttas.mctcommon.server.Server;
 import com.minecrafttas.tasmod.gui.InfoHud;
-import com.minecrafttas.tasmod.handlers.InterpolationHandler;
 import com.minecrafttas.tasmod.handlers.LoadingScreenHandler;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
@@ -82,8 +81,6 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	public static LoadingScreenHandler loadingScreenHandler;
 	
 	public static KeybindManager keybindManager;
-	
-	public static InterpolationHandler interpolation = new InterpolationHandler();
 	
 	public static SavestateHandlerClient savestateHandlerClient = new SavestateHandlerClient();
 	
@@ -150,7 +147,6 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		EventListenerRegistry.register(loadingScreenHandler);
 		EventListenerRegistry.register(ticksyncClient);
 		EventListenerRegistry.register(keybindManager);
-//		EventListenerRegistry.register(interpolation);
 		EventListenerRegistry.register((EventOpenGui)(gui -> {
 			if(gui instanceof GuiMainMenu) {
 				openMainMenuScheduler.runAllTasks();
@@ -312,5 +308,4 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		}
 		return gui;
 	}
-	
 }
