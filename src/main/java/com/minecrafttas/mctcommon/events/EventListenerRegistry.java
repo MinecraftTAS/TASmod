@@ -7,10 +7,64 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Registry for making objects available to listen for events.<br>
+ * <br>
+ * Implement an EventInterface into your class, then implement the function.<br>
+ * <br>
+ * In your initializer method, register the instance of the class with {@link EventListenerRegistry#register(EventBase)}
+ * <br>
+ * Example:
+ * <pre>
+ *     public class ClassWithListener implements EventInit {
+ *
+ *          @ Override
+ *          public void onEventInit() {
+ *              // Implement event specific code
+ *          }
+ *     }
+ * </pre>
+ * <br>
+ * To create and fire your own events, check {@link EventBase}<br>
+ */
 public class EventListenerRegistry {
 
     /**
-     * Eventlistener Registry.<br>
+     * Base interface for events.<br>
+     * <br>
+     * To create a new event, create an interface and extend EventBase.<br>
+     * Only 1 method is accepted in an event, so it's best to add {@link FunctionalInterface} to the interface.<br>
+     * <br>
+     * Example:
+     * <pre>
+     *     @ FunctionalInterface
+     *     public interface EventInit extends EventBase {
+     *         public void onEventInit();
+     *     }
+     *
+     *     @ FunctionalInterface
+     *     public interface EventAdd extends EventBase {
+     *         public int onEventAdd(int a, int b); // Accepts parameters and return types
+     *     }
+     * </pre>
+     *
+     * To fire your event, use {@link EventListenerRegistry#fireEvent(Class)} with the parameter being the event class.<br>
+     *
+     * <pre>
+     *     EventListenerRegistry.fireEvent(EventInit.class);
+     * </pre>
+     *
+     * To fire an event with parameters and return types:
+     * <pre>
+     *     int eventResult = (int) EventListenerRegistry.fireEvent(EventAdd.class, a, b);
+     * </pre>
+     * When using parameters, the type and the amount of parameters has to match!
+     */
+    public interface EventBase {
+    }
+
+    /**
+     * Stores the event listener objects and calls their event methods during {@link EventListenerRegistry#fireEvent(Class, Object...)}<br>
      * <br>
      * Consists of multiple lists seperated by event types.<br>
      * If it were a single ArrayList, firing an event means that you'd have to unnecessarily iterate over the entire list,<br>
@@ -20,7 +74,10 @@ public class EventListenerRegistry {
      */
     private static final HashMap<Class<?>, ArrayList<EventBase>> EVENTLISTENER_REGISTRY = new HashMap<>();
 
-
+    /**
+     * Registers an object to be an event listener. The object must implement an event extending {@link EventBase}
+     * @param eventListener The event listener to register
+     */
     public static void register(EventBase eventListener) {
         if (eventListener == null) {
             throw new NullPointerException("Tried to register a packethandler with value null");
@@ -38,6 +95,10 @@ public class EventListenerRegistry {
         }
     }
 
+    /**
+     * Unregisters an object from being an event listener.
+     * @param eventListener The event listener to unregister
+     */
     public static void unregister(EventBase eventListener) {
         if (eventListener == null) {
             throw new NullPointerException("Tried to unregister a packethandler with value null");
@@ -74,35 +135,45 @@ public class EventListenerRegistry {
      * @return The result of the event, might be null if the event returns nothing
      */
     public static Object fireEvent(Class<? extends EventListenerRegistry.EventBase> eventClass, Object... eventParams) {
-        ArrayList<EventBase> registryList = EVENTLISTENER_REGISTRY.get(eventClass);
-        if (registryList == null) {
+        ArrayList<EventBase> listenerList = EVENTLISTENER_REGISTRY.get(eventClass);
+        if (listenerList == null) {
             throw new EventException("The event has not been registered yet", eventClass);
         }
 
+        // Exception to be thrown at the end of the method. If null then no exception is thrown
         EventException toThrow = null;
 
-        Method methodToCheck = getEventMethod(eventClass);
+        // Get the method from the event that we are looking for in the event listeners
+        Method methodToFind = getEventMethod(eventClass);
 
+        // Variable for the return value. The last registered listener will return its value
         Object returnValue = null;
-        for (EventBase eventListener : registryList) {
+
+        // Iterate through the list of eventListeners
+        for (EventBase eventListener : listenerList) {
+            // Get all methods in this event listener
             Method[] methodsInListener = eventListener.getClass().getDeclaredMethods();
 
+            // Iterate through all methods
             for (Method method : methodsInListener) {
 
-                if (!checkName(method, methodToCheck.getName())) {
+                // Check if the current method has the same name as the method we are looking for
+                if (!checkName(method, methodToFind.getName())) {
                     continue;
                 }
 
+                // Check if the length is the same before we check for types
                 if (!checkLength(method, eventParams)) {
                     toThrow = new EventException(String.format("Event fired with the wrong number of parameters. Expected: %s, Actual: %s", method.getParameterCount(), eventParams.length), eventClass);
                     continue;
                 }
 
+                // Check the types of the method
                 if (checkTypes(method, eventParams)) {
-                    toThrow = null;
+                    toThrow = null;     // Reset toThrow as the correct method was found
                     method.setAccessible(true);
                     try {
-                        returnValue = method.invoke(eventListener, eventParams);
+                        returnValue = method.invoke(eventListener, eventParams); // Call the method
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         throw new EventException(eventClass, e);
                     } catch (IllegalArgumentException e) {
@@ -114,6 +185,7 @@ public class EventListenerRegistry {
             }
         }
 
+        // Throw the exception
         if (toThrow != null) {
             throw toThrow;
         }
@@ -130,14 +202,29 @@ public class EventListenerRegistry {
         return test[0];
     }
 
+    /**
+     * @param method The method to check
+     * @param name The name to check
+     * @return If method.getName equals name
+     */
     private static boolean checkName(Method method, String name) {
         return method.getName().equals(name);
     }
 
+    /**
+     * @param method The method to check
+     * @param parameters The list of parameters
+     * @return True, if length of the method parameters is equal to the length of the object parameters
+     */
     private static boolean checkLength(Method method, Object... parameters) {
         return method.getParameterCount() == parameters.length;
     }
 
+    /**
+     * @param method The method to check
+     * @param parameters The list of parameters
+     * @return True, if the types of the parameters equal the object parameters
+     */
     private static boolean checkTypes(Method method, Object... parameters) {
         Class<?>[] methodParameterTypes = ClassUtils.primitivesToWrappers(method.getParameterTypes());
         Class<?>[] eventParameterTypes = getParameterTypes(parameters);
@@ -165,8 +252,5 @@ public class EventListenerRegistry {
      */
     public static void clear() {
         EVENTLISTENER_REGISTRY.clear();
-    }
-
-    public interface EventBase {
     }
 }

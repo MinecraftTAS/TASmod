@@ -84,11 +84,7 @@ public class Client {
 		this.createHandlers();
 
 		this.callback = (client) -> {
-			try {
-				EventListenerRegistry.fireEvent(EventDisconnectClient.class, client);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			EventListenerRegistry.fireEvent(EventDisconnectClient.class, client);
 		};
 
 		this.local = local;
