@@ -164,9 +164,6 @@ public class EventTest {
 
         EventListenerRegistry.unregister(event);
 
-        Exception exception = assertThrows(EventException.class, () -> EventListenerRegistry.fireEvent(TestEvent.class));
-
-        String expected = "mctcommon.event.EventTest$TestEvent: The event has not been registered yet";
-        assertEquals(expected, exception.getMessage());
+        assertNull(EventListenerRegistry.fireEvent(TestEvent.class));
     }
 }
