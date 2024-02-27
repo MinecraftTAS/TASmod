@@ -290,6 +290,8 @@ public class VirtualKeyboard extends VirtualPeripheral<VirtualKeyboard> implemen
     
     @Override
     public void copyFrom(VirtualKeyboard keyboard) {
+    	if(keyboard == null)
+    		return;
     	super.copyFrom(keyboard);
     	charList.clear();
     	charList.addAll(keyboard.charList);

@@ -11,6 +11,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.events.EventClient.EventVirtualCameraAngleTick;
+import com.minecrafttas.tasmod.events.EventClient.EventVirtualMouseTick;
 import com.minecrafttas.tasmod.mixin.playbackhooks.MixinEntityRenderer;
 import com.minecrafttas.tasmod.mixin.playbackhooks.MixinMinecraft;
 import com.minecrafttas.tasmod.util.Ducks;
@@ -403,6 +406,7 @@ public class VirtualInput {
 		 * @see MixinMinecraft#playback_injectRunTickMouse(org.spongepowered.asm.mixin.injection.callback.CallbackInfo)
 		 */
 		public void nextMouseTick() {
+			nextMouse.copyFrom((VirtualMouse) EventListenerRegistry.fireEvent(EventVirtualMouseTick.class, nextMouse));
 			currentMouse.getVirtualEvents(nextMouse, mouseEventQueue);
 			currentMouse.copyFrom(nextMouse);
 		}
@@ -588,6 +592,7 @@ public class VirtualInput {
 		 * @see MixinEntityRenderer#runUpdate(float)
 		 */
 		public void nextCameraTick() {
+			nextCameraAngle.copyFrom((VirtualCameraAngle) EventListenerRegistry.fireEvent(EventVirtualCameraAngleTick.class, nextCameraAngle));
 			nextCameraAngle.getStates(cameraAngleInterpolationStates);
 			currentCameraAngle.copyFrom(nextCameraAngle);
 		}

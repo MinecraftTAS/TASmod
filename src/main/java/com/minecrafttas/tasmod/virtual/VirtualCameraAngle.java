@@ -117,6 +117,8 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
      * @param camera The camera to move from
      */
 	public void copyFrom(VirtualCameraAngle camera) {
+		if(camera == null)
+			return;
 		this.pitch = camera.pitch;
 		this.yaw = camera.yaw;
 		this.subtickList.clear();

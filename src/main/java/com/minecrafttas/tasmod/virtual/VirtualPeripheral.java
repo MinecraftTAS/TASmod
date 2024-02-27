@@ -140,6 +140,8 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> extends 
 	 * @param peripheral The peripheral to move from
 	 */
 	protected void copyFrom(T peripheral) {
+		if(peripheral == null)
+			return;
 		this.pressedKeys.clear();
 		this.pressedKeys.addAll(peripheral.pressedKeys);
 		peripheral.subtickList.clear();
