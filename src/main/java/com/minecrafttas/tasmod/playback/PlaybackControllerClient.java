@@ -81,6 +81,7 @@ public class PlaybackControllerClient implements ClientPacketHandler, EventVirtu
 	 * The state of the controller when the state is paused
 	 */
 	private TASstate tempPause = TASstate.NONE;
+	
 	/**
 	 * The current index of the inputs
 	 */

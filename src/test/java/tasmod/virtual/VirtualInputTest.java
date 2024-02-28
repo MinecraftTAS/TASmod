@@ -8,9 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.events.EventClient.EventVirtualCameraAngleTick;
+import com.minecrafttas.tasmod.events.EventClient.EventVirtualKeyboardTick;
+import com.minecrafttas.tasmod.events.EventClient.EventVirtualMouseTick;
 import com.minecrafttas.tasmod.virtual.VirtualCameraAngle;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKey;
@@ -20,6 +25,14 @@ import com.minecrafttas.tasmod.virtual.VirtualMouse;
 class VirtualInputTest {
 
 	private final Logger LOGGER = LogManager.getLogger("TASmod");
+	
+	@BeforeAll
+	static void beforeAll() {
+		EventVirtualKeyboardTick kb = (keyboard)->null;
+		EventVirtualMouseTick ms = (mouse)->null;
+		EventVirtualCameraAngleTick cmra = (cameraangle)->null;
+		EventListenerRegistry.register(kb, ms, cmra);
+	}
 	
 	/**
 	 * Test constructor initializing keyboard, mouse and camera_angle

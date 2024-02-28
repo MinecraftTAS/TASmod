@@ -97,15 +97,21 @@ public class EventListenerRegistry {
 		for (Class<?> type : eventListener.getClass().getInterfaces()) {
 			if (EventBase.class.isAssignableFrom(type)) {
 
-				// If a new event type is being registered, add a new arraylist
-				ArrayList<EventBase> registryList = EVENTLISTENER_REGISTRY.putIfAbsent(type, new ArrayList<>());
-				if (registryList == null) {
-					registryList = EVENTLISTENER_REGISTRY.get(type);
-				}
-				registryList.add(eventListener);
-			}
-		}
-	}
+                // If a new event type is being registered, add a new arraylist
+                ArrayList<EventBase> registryList = EVENTLISTENER_REGISTRY.putIfAbsent(type, new ArrayList<>());
+                if (registryList == null) {
+                    registryList = EVENTLISTENER_REGISTRY.get(type);
+                }
+                registryList.add(eventListener);
+            }
+        }
+    }
+    
+    public static void register(EventBase... eventListeners) {
+    	for(EventBase eventListener : eventListeners) {
+    		register(eventListener);
+    	}
+    }
 
 	/**
 	 * Unregisters an object from being an event listener.
