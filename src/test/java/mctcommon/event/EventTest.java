@@ -119,10 +119,6 @@ public class EventTest {
 
         class TestClass implements TestEvent {
 
-            public int onTestEvent(int test) {
-                return test;
-            }
-
             @Override
             public int onTestEvent() {
                 return 1;

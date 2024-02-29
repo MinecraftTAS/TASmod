@@ -248,7 +248,7 @@ public class VirtualInput {
 		 */
 		public void nextKeyboardTick() {
 			currentKeyboard.getVirtualEvents(nextKeyboard, keyboardEventQueue);
-			currentKeyboard.copyFrom(nextKeyboard);
+			currentKeyboard.moveFrom(nextKeyboard);
 		}
 
 		/**
@@ -406,9 +406,9 @@ public class VirtualInput {
 		 * @see MixinMinecraft#playback_injectRunTickMouse(org.spongepowered.asm.mixin.injection.callback.CallbackInfo)
 		 */
 		public void nextMouseTick() {
-			nextMouse.copyFrom((VirtualMouse) EventListenerRegistry.fireEvent(EventVirtualMouseTick.class, nextMouse));
+			nextMouse.moveFrom((VirtualMouse) EventListenerRegistry.fireEvent(EventVirtualMouseTick.class, nextMouse));
 			currentMouse.getVirtualEvents(nextMouse, mouseEventQueue);
-			currentMouse.copyFrom(nextMouse);
+			currentMouse.moveFrom(nextMouse);
 		}
 
 		/**
