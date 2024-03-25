@@ -1,4 +1,4 @@
-package com.minecrafttas.tasmod.playback;
+package com.minecrafttas.tasmod.playback.metadata;
 
 import java.util.LinkedHashMap;
 import java.util.Properties;
@@ -16,5 +16,6 @@ public class PlaybackMetadata {
 		this.metadata = new LinkedHashMap<>();
 	}
 	
-	
+	public void setValue(String category, String key, String value) {
+	}
 }

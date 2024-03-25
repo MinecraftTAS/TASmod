@@ -107,6 +107,10 @@ public class EventListenerRegistry {
         }
     }
     
+    /**
+     * Registers multiple objects to be an event listener. The objects must implement an event extending {@link EventBase}
+     * @param eventListeners The event listeners to register
+     */
     public static void register(EventBase... eventListeners) {
     	for(EventBase eventListener : eventListeners) {
     		register(eventListener);
@@ -128,13 +132,23 @@ public class EventListenerRegistry {
 				if (registryList != null) {
 					registryList.remove(eventListener);
 
-					if (registryList.isEmpty()) {
-						EVENTLISTENER_REGISTRY.remove(type);
-					}
-				}
-			}
-		}
-	}
+                    if (registryList.isEmpty()) {
+                        EVENTLISTENER_REGISTRY.remove(type);
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Unregisters multiple objects from being an event listener.
+     * @param eventListener The event listeners to unregister
+     */
+    public static void unregister(EventBase... eventListeners) {
+    	for(EventBase eventListener : eventListeners) {
+    		unregister(eventListener);
+    	}
+    }
 
 	/**
 	 * Fires an event without parameters
