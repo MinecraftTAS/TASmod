@@ -1,13 +1,26 @@
 package com.minecrafttas.tasmod.playback.metadata;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import com.minecrafttas.mctcommon.MCTCommon;
 
+/**
+ * Registry for registering custom metadata that is stored in the TASFile.<br>
+ * <br>
+ * The default metadata includes general information such as author name, savestate/rerecord count and category.<br>
+ * <br>
+ * Any custom class has to extend PlaybackMetadataExtension
+ * 
+ */
 public class PlaybackMetadataRegistry {
 
 	private static final ArrayList<PlaybackMetadataExtension> METADATA_EXTENSION = new ArrayList<>();
 
+	/**
+	 * Registers a new class as a metadata extension
+	 * @param extension
+	 */
 	public static void register(PlaybackMetadataExtension extension) {
 		if(extension==null) {
 			throw new NullPointerException("Tried to register a playback extension with value null");
@@ -36,12 +49,15 @@ public class PlaybackMetadataRegistry {
 		}
 	}
 	
-	public static PlaybackMetadata handleOnLoad() {
-		return null; //TODO implement
+	public static void handleOnCreate() {
+		
 	}
 	
-	public static void handleOnStore(PlaybackMetadata metadata) {
-		//TODO
+	public static LinkedHashMap<String, PlaybackMetadata> handleOnLoad() {
+		return null;
+	}
+	
+	public static void handleOnStore(LinkedHashMap<String, PlaybackMetadata> metadata) {
 	}
 	
 	private static boolean containsClass(PlaybackMetadataExtension newExtension) {
@@ -54,6 +70,11 @@ public class PlaybackMetadataRegistry {
 	}
 
 	public static interface PlaybackMetadataExtension {
+		
+		public String getExtensionName();
+		
+		public void onCreate();
+		
 		public PlaybackMetadata onStore();
 
 		public void onLoad(PlaybackMetadata metadata);
