@@ -114,9 +114,11 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 	
     /**
      * Copies the data from another camera angle into this camera without creating a new object.
-     * @param camera The camera to move from
+     * @param camera The camera to copy from
      */
 	public void copyFrom(VirtualCameraAngle camera) {
+		if(camera == null)
+			return;
 		this.pitch = camera.pitch;
 		this.yaw = camera.yaw;
 		this.subtickList.clear();

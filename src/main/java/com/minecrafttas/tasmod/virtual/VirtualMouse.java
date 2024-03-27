@@ -226,12 +226,24 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
 	}
 
 	@Override
-	public void copyFrom(VirtualMouse mouse) {
-		super.copyFrom(mouse);
+	public void moveFrom(VirtualMouse mouse) {
+		if(mouse==null)
+			return;
+		super.moveFrom(mouse);
 		this.scrollWheel = mouse.scrollWheel;
 		this.cursorX = mouse.cursorX;
 		this.cursorY = mouse.cursorY;
 		mouse.clearMouseData();
+	}
+	
+	@Override
+	public void copyFrom(VirtualMouse mouse) {
+		if(mouse==null)
+			return;
+		super.copyFrom(mouse);
+		this.scrollWheel = mouse.scrollWheel;
+		this.cursorX = mouse.cursorX;
+		this.cursorY = mouse.cursorY;
 	}
 	
 	@Override

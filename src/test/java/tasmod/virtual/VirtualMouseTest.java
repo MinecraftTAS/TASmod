@@ -192,6 +192,37 @@ class VirtualMouseTest {
 	}
 
 	/**
+	 * Test moveFrom method
+	 */
+	@Test
+	void testMoveFrom() {
+		VirtualMouse moveFrom = new VirtualMouse();
+		VirtualMouse actual = new VirtualMouse();
+
+		moveFrom.update(VirtualKey.LC.getKeycode(), true, 0, 0, 0);
+		moveFrom.update(VirtualKey.MOUSEMOVED.getKeycode(), false, 120, 10, 20);
+
+		VirtualMouse expected = moveFrom.clone();
+
+		actual.update(VirtualKey.MBUTTON12.getKeycode(), true, 0,0,0);
+		actual.update(VirtualKey.MOUSEMOVED.getKeycode(), true, -120, -10, -10);
+
+		actual.moveFrom(null);
+		
+		actual.moveFrom(moveFrom);
+
+		assertIterableEquals(expected.getPressedKeys(), actual.getPressedKeys());
+		assertEquals(expected.getScrollWheel(), actual.getScrollWheel());
+		assertEquals(expected.getCursorX(), actual.getCursorX());
+		assertEquals(expected.getCursorY(), actual.getCursorY());
+
+		assertTrue(moveFrom.getSubticks().isEmpty());
+		assertEquals(0, moveFrom.getScrollWheel());
+		assertEquals(0, moveFrom.getCursorX());
+		assertEquals(0, moveFrom.getCursorY());
+	}
+	
+	/**
 	 * Test copyFrom method
 	 */
 	@Test
@@ -207,6 +238,8 @@ class VirtualMouseTest {
 		actual.update(VirtualKey.MBUTTON12.getKeycode(), true, 0,0,0);
 		actual.update(VirtualKey.MOUSEMOVED.getKeycode(), true, -120, -10, -10);
 
+		actual.copyFrom(null);
+		
 		actual.copyFrom(copyFrom);
 
 		assertIterableEquals(expected.getPressedKeys(), actual.getPressedKeys());
@@ -214,10 +247,10 @@ class VirtualMouseTest {
 		assertEquals(expected.getCursorX(), actual.getCursorX());
 		assertEquals(expected.getCursorY(), actual.getCursorY());
 
-		assertTrue(copyFrom.getSubticks().isEmpty());
-		assertEquals(0, copyFrom.getScrollWheel());
-		assertEquals(0, copyFrom.getCursorX());
-		assertEquals(0, copyFrom.getCursorY());
+		assertFalse(copyFrom.getSubticks().isEmpty());
+		assertEquals(120, copyFrom.getScrollWheel());
+		assertEquals(10, copyFrom.getCursorX());
+		assertEquals(20, copyFrom.getCursorY());
 	}
 
 	/**

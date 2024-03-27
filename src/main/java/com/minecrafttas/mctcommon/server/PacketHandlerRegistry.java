@@ -41,7 +41,7 @@ public class PacketHandlerRegistry {
 		if (REGISTRY.contains(handler)) {
 			REGISTRY.remove(handler);
 		} else {
-			MCTCommon.LOGGER.warn("Trying to unregister packet handler {}, but is was not registered!", handler.getClass().getName());
+			MCTCommon.LOGGER.warn("Trying to unregister packet handler {}, but it was not registered!", handler.getClass().getName());
 		}
 	}
 

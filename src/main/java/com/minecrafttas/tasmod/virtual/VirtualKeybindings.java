@@ -7,7 +7,6 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import com.google.common.collect.Maps;
 import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.Minecraft;

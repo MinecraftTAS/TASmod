@@ -142,10 +142,10 @@ public class VirtualCameraAngleTest {
 	}
 
 	/**
-	 * Test copyfrom method
+	 * Test copyFrom method
 	 */
 	@Test
-	void copyFrom() {
+	void testCopyFrom() {
 		VirtualCameraAngle expected = new VirtualCameraAngle(0f, 0f, true);
 		expected.update(1f, 2f);
 		expected.update(3f, 4f);

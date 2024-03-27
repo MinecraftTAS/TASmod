@@ -12,7 +12,6 @@ import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_STATE;
 import static com.minecrafttas.tasmod.networking.TASmodPackets.PLAYBACK_TELEPORT;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -31,15 +30,18 @@ import com.minecrafttas.mctcommon.server.interfaces.ClientPacketHandler;
 import com.minecrafttas.mctcommon.server.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.events.EventClient.EventVirtualCameraAngleTick;
+import com.minecrafttas.tasmod.events.EventClient.EventVirtualKeyboardTick;
+import com.minecrafttas.tasmod.events.EventClient.EventVirtualMouseTick;
 import com.minecrafttas.tasmod.monitoring.DesyncMonitoring;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.networking.TASmodPackets;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.Scheduler.Task;
+import com.minecrafttas.tasmod.virtual.VirtualCameraAngle;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.VirtualKeyboard;
 import com.minecrafttas.tasmod.virtual.VirtualMouse;
-import com.minecrafttas.tasmod.virtual.VirtualCameraAngle;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.mojang.realmsclient.util.Pair;
 
@@ -68,7 +70,7 @@ import net.minecraft.util.text.TextFormatting;
  * @author Scribble
  *
  */
-public class PlaybackControllerClient implements ClientPacketHandler {
+public class PlaybackControllerClient implements ClientPacketHandler, EventVirtualKeyboardTick, EventVirtualMouseTick, EventVirtualCameraAngleTick{
 
 	/**
 	 * The current state of the controller.
@@ -79,6 +81,7 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 	 * The state of the controller when the state is paused
 	 */
 	private TASstate tempPause = TASstate.NONE;
+	
 	/**
 	 * The current index of the inputs
 	 */
@@ -340,54 +343,21 @@ public class PlaybackControllerClient implements ClientPacketHandler {
 	// These act as an input and output, depending if a recording or a playback is
 	// running
 
-	/**
-	 * Adds or retrives a keyboard to the input container, depends on whether a
-	 * recording or a playback is running
-	 * 
-	 * @param keyboard Keyboard to add
-	 * @return Keyboard to retrieve
-	 */
-	public VirtualKeyboard addKeyboardToContainer(VirtualKeyboard keyboard) {
-		if (state == TASstate.RECORDING) {
-			this.keyboard = keyboard.clone();
-		} else if (state == TASstate.PLAYBACK) {
-			keyboard = this.keyboard.clone();
-		}
-		return keyboard;
+	@Override
+	public VirtualCameraAngle onVirtualCameraTick(VirtualCameraAngle vcamera) {
+		return null;
 	}
 
-	/**
-	 * Adds or retrives a mouse to the input container, depends on whether a
-	 * recording or a playback is running
-	 * 
-	 * @param mouse Mouse to add
-	 * @return Mouse to retrieve
-	 */
-	public VirtualMouse addMouseToContainer(VirtualMouse mouse) {
-		if (state == TASstate.RECORDING) {
-			this.mouse = mouse.clone();
-		} else if (state == TASstate.PLAYBACK) {
-			mouse = this.mouse.clone();
-		}
-		return mouse;
+	@Override
+	public VirtualMouse onVirtualMouseTick(VirtualMouse vmouse) {
+		return null;
 	}
 
-	/**
-	 * Adds or retrives the angle of the camera to the input container, depends on
-	 * whether a recording or a playback is running
-	 * 
-	 * @param subticks Subticks to add
-	 * @return Subticks to retrieve
-	 */
-	public VirtualCameraAngle addSubticksToContainer(VirtualCameraAngle subticks) {
-		if (state == TASstate.RECORDING) {
-			this.subticks = subticks.clone();
-		} else if (state == TASstate.PLAYBACK) {
-			subticks = this.subticks.clone();
-		}
-		return subticks;
+	@Override
+	public VirtualKeyboard onVirtualKeyboardTick(VirtualKeyboard vkeyboard) {
+		return null;
 	}
-
+	
 	/**
 	 * Updates the input container.<br>
 	 * <br>
