@@ -3,7 +3,6 @@ package com.minecrafttas.tasmod.savestates.storage.builtin;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -19,8 +18,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.internal.ConstructorConstructor;
-import com.google.gson.reflect.TypeToken;
 import com.minecrafttas.tasmod.savestates.exceptions.SavestateException;
 import com.minecrafttas.tasmod.savestates.storage.SavestateStorageExtensionBase;
 import com.minecrafttas.tasmod.savestates.typeadapters.BlockPosTypeAdapterFactory;
@@ -28,6 +25,7 @@ import com.minecrafttas.tasmod.savestates.typeadapters.EntityClassTypeAdapterFac
 import com.minecrafttas.tasmod.savestates.typeadapters.EntityLivingTypeAdapter;
 import com.minecrafttas.tasmod.savestates.typeadapters.EntityTypeAdapterFactory;
 import com.minecrafttas.tasmod.savestates.typeadapters.ItemTypeAdapter;
+import com.minecrafttas.tasmod.savestates.typeadapters.PathNavigateTypeAdapterFactory;
 import com.minecrafttas.tasmod.savestates.typeadapters.WorldTypeAdapterFactory;
 import com.minecrafttas.tasmod.savestates.typeadapters.util.ClassExclusionStrategy;
 import com.minecrafttas.tasmod.util.JsonUtils;
@@ -40,6 +38,10 @@ import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.item.Item;
 import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigateClimber;
+import net.minecraft.pathfinding.PathNavigateFlying;
+import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.pathfinding.PathNavigateSwimmer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
 
@@ -65,6 +67,10 @@ public class EntityAiTaskStorage extends SavestateStorageExtensionBase {
 						)
 				.registerTypeAdapter(Item.class, new ItemTypeAdapter())
 				.registerTypeAdapter(EntityLivingTypeAdapter.class, new EntityLivingTypeAdapter())
+				.registerTypeAdapter(PathNavigateGround.class, new PathNavigateTypeAdapterFactory())
+				.registerTypeAdapter(PathNavigateClimber.class, new PathNavigateTypeAdapterFactory())
+				.registerTypeAdapter(PathNavigateFlying.class, new PathNavigateTypeAdapterFactory())
+				.registerTypeAdapter(PathNavigateSwimmer.class, new PathNavigateTypeAdapterFactory())
 				.setExclusionStrategies(new ExclusionStrategy() {
 					
 					@Override
@@ -222,9 +228,8 @@ public class EntityAiTaskStorage extends SavestateStorageExtensionBase {
 				continue;
 			}
 			int priority = jsonEntry.get("priority").getAsInt();
-			ConstructorConstructor constructor = new ConstructorConstructor(Collections.emptyMap(), true, Collections.emptyList());
-			TypeToken<? extends EntityAIBase> token = TypeToken.get(clazz);
-			EntityAIBase action = constructor.get(token, true).construct();
+
+			EntityAIBase action = JsonUtils.constructNew(clazz);
 			try {
 				action = deserialiseAction(action, jsonEntry.get("action"));
 			} catch (Exception e) {

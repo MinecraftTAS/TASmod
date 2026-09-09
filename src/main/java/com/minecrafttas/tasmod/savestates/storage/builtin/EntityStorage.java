@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.savestates.storage.SavestateStorageExtensionBase;
+import com.minecrafttas.tasmod.savestates.typeadapters.PathNavigateTypeAdapterFactory;
 import com.minecrafttas.tasmod.savestates.typeadapters.util.ClassExclusionStrategy;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
@@ -37,7 +38,9 @@ public class EntityStorage extends SavestateStorageExtensionBase {
 				new ClassExclusionStrategy(IAttributeInstance.class),
 				new ClassExclusionStrategy(NodeProcessor.class),
 				new ClassExclusionStrategy(PathFinder.class)
-				).create());
+				)
+				.registerTypeAdapterFactory(new PathNavigateTypeAdapterFactory())
+				.create());
 		//@formatter:on
 		this.subStorages = entitySubStorages;
 	}
