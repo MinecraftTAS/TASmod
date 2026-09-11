@@ -43,7 +43,7 @@ public class SavestateStorageExtensionRegistry extends AbstractRegistry<Savestat
 			JsonObject dataToSave = storage.onSavestate(server, new JsonObject());
 
 			try {
-				JsonUtils.saveJson(dataPath, dataToSave);
+				JsonUtils.saveJson(dataPath, dataToSave, storage.gsonInstance);
 			} catch (IOException e) {
 				throw new SavestateException(e, "Can't save %s from %s extension", storage.fileName, storage.getExtensionName());
 			}
@@ -71,7 +71,7 @@ public class SavestateStorageExtensionRegistry extends AbstractRegistry<Savestat
 
 			JsonObject loadedData;
 			try {
-				loadedData = JsonUtils.loadJson(dataPath);
+				loadedData = JsonUtils.loadJson(dataPath, storage.gsonInstance);
 			} catch (IOException e) {
 				throw new LoadstateException(e, "Can't load %s in %s extension", storage.fileName, storage.getExtensionName());
 			}

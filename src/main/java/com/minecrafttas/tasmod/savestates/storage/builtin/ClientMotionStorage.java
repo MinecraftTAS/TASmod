@@ -74,7 +74,7 @@ public class ClientMotionStorage extends SavestateStorageExtensionBase implement
 				if (player.getName().equals(server.getServerOwner())) {
 					uuid = "singleplayer";
 				}
-				dataToSave.add(uuid, json.toJsonTree(data));
+				dataToSave.add(uuid, gsonInstance.toJsonTree(data));
 
 			} catch (TimeoutException e) {
 				throw new SavestateException(e, "Writing client motion for %s timed out!", player.getName());
@@ -92,7 +92,7 @@ public class ClientMotionStorage extends SavestateStorageExtensionBase implement
 
 		for (Entry<String, JsonElement> motionDataJsonElement : loadedData.entrySet()) {
 			String playerUUID = motionDataJsonElement.getKey();
-			MotionData motionData = json.fromJson(motionDataJsonElement.getValue(), MotionData.class);
+			MotionData motionData = gsonInstance.fromJson(motionDataJsonElement.getValue(), MotionData.class);
 
 			EntityPlayerMP player;
 			if (playerUUID.equals("singleplayer")) {

@@ -28,10 +28,40 @@ accessible field net/minecraft/client/settings/KeyBinding CATEGORY_ORDER Ljava/u
 accessible field net/minecraft/entity/Entity rand Ljava/util/Random;
 accessible field net/minecraft/world/World updateLCG I
 mutable field net/minecraft/world/World rand Ljava/util/Random;
-accessible field net/minecraft/entity/EntityLiving tasks Lnet/minecraft/entity/ai/EntityAITasks;
-accessible field net/minecraft/entity/EntityLiving targetTasks Lnet/minecraft/entity/ai/EntityAITasks;
+
+# EntityRNG
 accessible field net/minecraft/entity/ai/EntityAITasks tickCount I
 accessible field net/minecraft/entity/passive/EntityBat spawnPosition Lnet/minecraft/util/math/BlockPos;
 accessible field net/minecraft/entity/Entity nextEntityID I
+accessible field net/minecraft/entity/EntityLivingBase revengeTarget Lnet/minecraft/entity/EntityLivingBase;
+accessible field net/minecraft/entity/EntityLivingBase revengeTimer I
+accessible field net/minecraft/entity/EntityLivingBase lastAttackedEntity Lnet/minecraft/entity/EntityLivingBase;
 accessible field net/minecraft/entity/EntityLivingBase idleTime I
+accessible field net/minecraft/entity/EntityLiving attackTarget Lnet/minecraft/entity/EntityLivingBase;
+accessible field net/minecraft/entity/monster/EntityCreeper timeSinceIgnited I
+accessible field net/minecraft/entity/monster/EntityCreeper droppedSkulls I
 
+# EntityPathFinding
+accessible method net/minecraft/entity/EntityLiving createNavigator (Lnet/minecraft/world/World;)Lnet/minecraft/pathfinding/PathNavigate;
+accessible field net/minecraft/entity/EntityLiving navigator Lnet/minecraft/pathfinding/PathNavigate;
+accessible field net/minecraft/pathfinding/PathNavigate entity Lnet/minecraft/entity/EntityLiving;
+accessible field net/minecraft/pathfinding/PathNavigate world Lnet/minecraft/world/World;
+accessible field net/minecraft/pathfinding/PathNavigate pathSearchRange Lnet/minecraft/entity/ai/attributes/IAttributeInstance;
+mutable field net/minecraft/pathfinding/PathNavigate pathSearchRange Lnet/minecraft/entity/ai/attributes/IAttributeInstance;
+accessible field net/minecraft/pathfinding/PathNavigate nodeProcessor Lnet/minecraft/pathfinding/NodeProcessor;
+accessible field net/minecraft/pathfinding/PathNavigate pathFinder Lnet/minecraft/pathfinding/PathFinder;
+mutable field net/minecraft/pathfinding/PathNavigate pathFinder Lnet/minecraft/pathfinding/PathFinder;
+
+# EntityAI
+accessible field net/minecraft/entity/EntityLiving tasks Lnet/minecraft/entity/ai/EntityAITasks;
+accessible field net/minecraft/entity/EntityLiving targetTasks Lnet/minecraft/entity/ai/EntityAITasks;
+
+accessible class net/minecraft/entity/ai/EntityAITasks$EntityAITaskEntry
+
+accessible field net/minecraft/entity/ai/EntityAITasks taskEntries Ljava/util/Set;
+mutable field net/minecraft/entity/ai/EntityAITasks taskEntries Ljava/util/Set;
+
+mutable field net/minecraft/entity/ai/EntityAITasks$EntityAITaskEntry action Lnet/minecraft/entity/ai/EntityAIBase;
+
+accessible field net/minecraft/entity/ai/EntityAITasks executingTaskEntries Ljava/util/Set;
+mutable field net/minecraft/entity/ai/EntityAITasks executingTaskEntries Ljava/util/Set;

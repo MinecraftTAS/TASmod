@@ -53,7 +53,8 @@ dependencies {
 	// tasmod dependencies
 	embed "com.dselent:bigarraylist:1.6"
 	embed "com.github.KaptainWutax:SeedUtils:b6a383113c"
-
+	implementation "com.google.code.gson:gson:2.14.0"
+	
 	// loom dependencies
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings ploceus.mcpMappings(project.mcp_channel, project.mcp_mcversion, project.mcp_build)

@@ -366,7 +366,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 				LOGGER.catching(e);
 			}
 		}
-		config = new Configuration("TASmod configuration", configDir.resolve("tasmod.cfg"), CLIENT_CONFIG_REGISTRY);
+		config = new Configuration("TASmod configuration", configDir.resolve("tasmod_client.cfg"), CLIENT_CONFIG_REGISTRY);
 
 		config.load();
 		config.save();

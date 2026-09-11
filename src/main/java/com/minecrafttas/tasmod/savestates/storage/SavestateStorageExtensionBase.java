@@ -15,12 +15,17 @@ import net.minecraft.server.MinecraftServer;
 
 public abstract class SavestateStorageExtensionBase implements Registerable {
 	protected final Logger logger = TASmod.LOGGER;
-	protected final Gson json = JsonUtils.getJsonInstance();
+	protected final Gson gsonInstance;
 
 	public final Path fileName;
 
-	public SavestateStorageExtensionBase(String fileName) {
+	public SavestateStorageExtensionBase(String filename) {
+		this(filename, JsonUtils.getGsonInstance());
+	}
+
+	public SavestateStorageExtensionBase(String fileName, Gson gson) {
 		this.fileName = Paths.get(fileName);
+		this.gsonInstance = gson;
 	}
 
 	public abstract JsonObject onSavestate(MinecraftServer server, JsonObject dataToSave);

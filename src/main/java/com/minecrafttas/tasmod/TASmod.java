@@ -1,6 +1,7 @@
 package com.minecrafttas.tasmod;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,6 +32,7 @@ import com.minecrafttas.tasmod.config.TASmodServerConfig;
 import com.minecrafttas.tasmod.handlers.PlayUntilHandler;
 import com.minecrafttas.tasmod.ktrng.GlobalRNG;
 import com.minecrafttas.tasmod.ktrng.builtin.MathRNG;
+import com.minecrafttas.tasmod.ktrng.builtin.SquidRNG;
 import com.minecrafttas.tasmod.ktrng.builtin.WorldSeedRNG;
 import com.minecrafttas.tasmod.ktrng.events.KillTheRNGMonitor;
 import com.minecrafttas.tasmod.ktrng.handlers.UUIDHandler;
@@ -42,10 +44,13 @@ import com.minecrafttas.tasmod.savestates.SavestateHandlerServer;
 import com.minecrafttas.tasmod.savestates.handlers.SavestateGuiHandlerServer;
 import com.minecrafttas.tasmod.savestates.handlers.SavestateResourcePackHandler;
 import com.minecrafttas.tasmod.savestates.storage.builtin.ClientMotionStorage;
-import com.minecrafttas.tasmod.savestates.storage.builtin.EntityBatSpawnPositionStorage;
-import com.minecrafttas.tasmod.savestates.storage.builtin.EntitySquidRotationStorage;
-import com.minecrafttas.tasmod.savestates.storage.builtin.EntityTickTimersStorage;
+import com.minecrafttas.tasmod.savestates.storage.builtin.EntityAiTaskStorage;
+import com.minecrafttas.tasmod.savestates.storage.builtin.EntityStorage;
 import com.minecrafttas.tasmod.savestates.storage.builtin.KTRNGSeedStorage;
+import com.minecrafttas.tasmod.savestates.storage.builtin.entity.BatSpawnPositionSubStorage;
+import com.minecrafttas.tasmod.savestates.storage.builtin.entity.CreeperDetonateSubStorage;
+import com.minecrafttas.tasmod.savestates.storage.builtin.entity.LivingTickTimersSubStorage;
+import com.minecrafttas.tasmod.savestates.storage.builtin.entity.SquidRotationSubStorage;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
@@ -102,13 +107,13 @@ public class TASmod implements ModInitializer, EventServerStart, EventServerInit
 	public static GlobalRNG globalRandomness;
 
 	public static KTRNGSeedStorage seedStorage = new KTRNGSeedStorage();
-	public static EntityTickTimersStorage entityTickTimers = new EntityTickTimersStorage();
-	public static EntityBatSpawnPositionStorage entityBatSpawnPositionStorage = new EntityBatSpawnPositionStorage();
-	public static EntitySquidRotationStorage entitySquidRotationStorage = new EntitySquidRotationStorage();
+	public static EntityAiTaskStorage entityAiTaskStorage = new EntityAiTaskStorage();
 
 	public static MathRNG mathRandomness = new MathRNG(0);
 
 	public static WorldSeedRNG worldSeedRandomness = new WorldSeedRNG(0);
+
+	public static SquidRNG squidRNG = new SquidRNG(0L);
 
 	public static KillTheRNGMonitor debugRand = new KillTheRNGMonitor();
 
@@ -173,6 +178,7 @@ public class TASmod implements ModInitializer, EventServerStart, EventServerInit
 			EventListenerRegistry.register(globalRandomness);
 		}
 		mathRandomness = new MathRNG(0);
+		squidRNG.setSeed(globalRandomness.getCurrentSeed() + 1000L);
 	}
 
 	@Override
@@ -239,9 +245,17 @@ public class TASmod implements ModInitializer, EventServerStart, EventServerInit
 	private void registerSavestateStorage() {
 		TASmodAPIRegistry.SAVESTATE_STORAGE.register(motionStorage);
 		TASmodAPIRegistry.SAVESTATE_STORAGE.register(seedStorage);
-		TASmodAPIRegistry.SAVESTATE_STORAGE.register(entityTickTimers);
-		TASmodAPIRegistry.SAVESTATE_STORAGE.register(entityBatSpawnPositionStorage);
-		TASmodAPIRegistry.SAVESTATE_STORAGE.register(entitySquidRotationStorage);
+		//@formatter:off
+		TASmodAPIRegistry.SAVESTATE_STORAGE.register(
+				new EntityStorage(
+							new BatSpawnPositionSubStorage(),
+							new CreeperDetonateSubStorage(),
+							new SquidRotationSubStorage(),
+							new LivingTickTimersSubStorage()
+						)
+				);
+		//@formatter:on
+		TASmodAPIRegistry.SAVESTATE_STORAGE.register(entityAiTaskStorage);
 	}
 
 	public static MinecraftServer getServerInstance() {
@@ -249,11 +263,19 @@ public class TASmod implements ModInitializer, EventServerStart, EventServerInit
 	}
 
 	private void loadConfig(MinecraftServer server) {
-		Path configDir = server.getDataDirectory().toPath();
+		Path configDir = server.getDataDirectory().toPath().resolve("config");
+
+		if (!Files.exists(configDir)) {
+			try {
+				Files.createDirectory(configDir);
+			} catch (IOException e) {
+				LOGGER.catching(e);
+			}
+		}
 
 		ConfigurationRegistry SERVER_CONFIG_REGISTRY = new ConfigurationRegistry();
 		SERVER_CONFIG_REGISTRY.register(TASmodServerConfig.values());
-		config = new Configuration("TASmod Server Configuration", configDir.resolve("tasmod.cfg"), SERVER_CONFIG_REGISTRY);
+		config = new Configuration("TASmod Server Configuration", configDir.resolve("tasmod_server.cfg"), SERVER_CONFIG_REGISTRY);
 
 		config.load();
 		config.save();
