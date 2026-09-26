@@ -113,6 +113,10 @@ public class VirtualInput {
         this.useVanillaIsKeyDown = isVanilla;
     }
 
+    public boolean isUseVanillaIsKeyDown() {
+        return useVanillaIsKeyDown;
+    }
+
     /**
      * If the keyboard or mouse key is currently down.
      * If keycode >= 0 then {@link VirtualKeyboardInput#isKeyDown(int)} will be called,<br>
