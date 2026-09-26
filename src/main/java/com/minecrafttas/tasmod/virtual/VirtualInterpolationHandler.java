@@ -10,6 +10,7 @@ import com.minecrafttas.tasmod.util.Ducks.ScreenDuck;
 import com.minecrafttas.tasmod.util.PointerNormalizer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
 
 public class VirtualInterpolationHandler implements EventVirtualInput.EventVirtualMouseTick, EventVirtualInput.EventVirtualCameraAngleTick {
@@ -71,16 +72,27 @@ public class VirtualInterpolationHandler implements EventVirtualInput.EventVirtu
 			interpolatedPointerY = interpolatedCamera.getCursorY();
 
 		}
-		// Screen scaling API changed in 26.3 - skip for now
-		// Minecraft mc = Minecraft.getInstance();
-		// ScreenDuck gui = (ScreenDuck) mc.screen;
-		// 
-		// if (gui != null && !(mc.screen instanceof SubtickGuiScreen)) {
-		// 	interpolatedPointerX = gui.rescaleX(PointerNormalizer.reapplyScalingX(interpolatedPointerX));
-		// 	interpolatedPointerY = gui.rescaleY(PointerNormalizer.reapplyScalingY(interpolatedPointerY));
-		// }
+		// Apply screen scaling for modern API (1.22+)
+		Minecraft mc = Minecraft.getInstance();
+		Screen currentScreen = getScreen(mc);
+
+		if (currentScreen != null && !(currentScreen instanceof SubtickGuiScreen)) {
+			// Apply GUI scaling
+			interpolatedPointerX = (int) (interpolatedPointerX * mc.getWindow().getGuiScale());
+			interpolatedPointerY = (int) (interpolatedPointerY * mc.getWindow().getGuiScale());
+		}
 
 		return new MouseInterpolation(interpolatedPointerX, interpolatedPointerY);
+	}
+
+	private static Screen getScreen(Minecraft mc) {
+		try {
+			java.lang.reflect.Field field = Minecraft.class.getDeclaredField("screen");
+			field.setAccessible(true);
+			return (Screen) field.get(mc);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/**

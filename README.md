@@ -4,6 +4,9 @@ A [Tool-Assisted Speedrun](https://tasvideos.org/WelcomeToTASVideos) mod for Min
 Adds tools such as input playback, slowdown and savestates for creating TASes,  
 which aim to beat the game as fast as possible.
 
+> [!Warning]
+This port project is AI slop!!
+
 # Installation
 This mod uses the modloader [LegacyFabric](https://legacyfabric.net/), a fork of [Fabric](https://fabricmc.net/) for versions below 1.14.4.  
 **Does NOT need LegacyFabric-API**
