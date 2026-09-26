@@ -2,7 +2,7 @@ package com.minecrafttas.tasmod.savestates.files;
 
 import java.nio.file.Path;
 
-import com.minecrafttas.mctcommon.file.AbstractDataFile;
+import com.minecrafttas.tasmod.mctcommon.file.AbstractDataFile;
 
 @Deprecated
 public class SavestateDataFile extends AbstractDataFile {
@@ -35,3 +35,4 @@ public class SavestateDataFile extends AbstractDataFile {
 		return properties.getProperty(key.getConfigName());
 	}
 }
+

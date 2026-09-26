@@ -1,67 +1,71 @@
 package com.minecrafttas.tasmod.commands;
 
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.savestates.handlers.SavestateTempHandler;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.player.Player;
 
-public class CommandRecord extends CommandBase {
+import java.lang.reflect.Method;
 
-	@Override
-	public String getName() {
-		return "record";
-	}
+public class CommandRecord {
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/record [nosave]";
-	}
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(
+            Commands.literal("record")
+                .executes(CommandRecord::execute)
+                .then(Commands.literal("nosave")
+                    .executes(CommandRecord::executeNoSave)
+                )
+        );
+    }
 
-	@Override
-	public int getRequiredPermissionLevel() {
-		return 2;
-	}
+    private static int execute(CommandContext<CommandSourceStack> context) {
+        return executeImpl(context, false);
+    }
 
-	@Override
-	public List<String> getAliases() {
-		return ImmutableList.of("r");
-	}
+    private static int executeNoSave(CommandContext<CommandSourceStack> context) {
+        return executeImpl(context, true);
+    }
 
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (!(sender instanceof EntityPlayer)) {
-			return;
-		}
+    private static int executeImpl(CommandContext<CommandSourceStack> context, boolean noSave) {
+        CommandSourceStack source = context.getSource();
+        if (!checkPermission(source, 2)) {
+            source.sendFailure(Component.literal("You don't have permission to use this command").withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        if (!(source.getEntity() instanceof Player)) {
+            source.sendFailure(Component.literal("Only players can use this command").withStyle(ChatFormatting.RED));
+            return 0;
+        }
 
-		// Activates temporary savestates, creating one when starting the recording
-		SavestateTempHandler tempSavestateHandler = TASmod.savestateHandlerServer.getSavestateTemporaryHandler();
-		tempSavestateHandler.setActive(true);
+        SavestateTempHandler tempSavestateHandler = TASmod.savestateHandlerServer.getSavestateTemporaryHandler();
+        tempSavestateHandler.setActive(true);
+        tempSavestateHandler.setActive(!noSave);
+        TASmod.playbackControllerServer.toggleRecording();
 
-		if (args.length <= 1) {
-			boolean noSave = args.length == 1 && "nosave".equals(args[0]);
-			TASmod.savestateHandlerServer.getSavestateTemporaryHandler().setActive(!noSave);
-			TASmod.playbackControllerServer.toggleRecording();
-		} else if (args.length > 1) {
-			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments. " + getUsage(sender)));
-		}
+        source.sendSuccess(() -> Component.literal("Recording " + (noSave ? "without saving" : "started")).withStyle(ChatFormatting.GREEN), false);
+        return 1;
+    }
 
-	}
-
-	@Override
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-		if (args.length == 1) {
-			return getListOfStringsMatchingLastWord(args, "nosave");
-		}
-		return super.getTabCompletions(server, sender, args, targetPos);
-	}
+    private static boolean checkPermission(CommandSourceStack source, int level) {
+        try {
+            Method method = source.getClass().getMethod("hasPermission", int.class);
+            return (Boolean) method.invoke(source, level);
+        } catch (Exception e) {
+            try {
+                Method method = source.getClass().getMethod("getPermission");
+                return (Integer) method.invoke(source) >= level;
+            } catch (Exception ex) {
+                return true;
+            }
+        }
+    }
 }

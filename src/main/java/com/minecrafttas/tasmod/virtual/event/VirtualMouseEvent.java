@@ -1,7 +1,7 @@
 package com.minecrafttas.tasmod.virtual.event;
 
 /**
- * Template for recording {@link org.lwjgl.input.Mouse#next()} events.
+ * Template for recording {@link org.lwjgl.glfw.GLFW#next()} events.
  *
  * @author Scribble
  */
@@ -47,3 +47,4 @@ public class VirtualMouseEvent extends VirtualEvent {
 		return super.equals(obj);
 	}
 }
+

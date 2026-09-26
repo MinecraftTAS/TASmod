@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.minecrafttas.mctcommon.Configuration;
-import com.minecrafttas.mctcommon.registry.AbstractRegistry;
+import com.minecrafttas.tasmod.mctcommon.Configuration;
+import com.minecrafttas.tasmod.mctcommon.registry.AbstractRegistry;
 import com.minecrafttas.tasmod.events.EventPlaybackClient;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.InputContainer;
 import com.minecrafttas.tasmod.playback.filecommands.PlaybackFileCommand.PlaybackFileCommandExtension;
@@ -186,3 +186,4 @@ public class PlaybackFileCommandsRegistry extends AbstractRegistry<PlaybackFileC
 		config.save();
 	}
 }
+

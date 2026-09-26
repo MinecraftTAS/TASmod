@@ -17,12 +17,12 @@ import java.util.concurrent.TimeoutException;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.minecrafttas.mctcommon.networking.Client.Side;
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.ClientPacketHandler;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
-import com.minecrafttas.mctcommon.networking.interfaces.ServerPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.Client.Side;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ClientPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
@@ -34,14 +34,14 @@ import com.minecrafttas.tasmod.util.LoggerMarkers;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.PlayerList;
+import net.minecraft.server.players.PlayerList;
 
 public class ClientMotionStorage extends SavestateStorageExtensionBase implements ClientPacketHandler, ServerPacketHandler {
 
-	private final Map<EntityPlayerMP, CompletableFuture<MotionData>> futures;
+	private final Map<ServerPlayer, CompletableFuture<MotionData>> futures;
 
 	public ClientMotionStorage() {
 		super("clientMotion.json");
@@ -54,7 +54,7 @@ public class ClientMotionStorage extends SavestateStorageExtensionBase implement
 
 		this.futures.clear();
 
-		List<EntityPlayerMP> playerList = server.getPlayerList().getPlayers();
+		List<ServerPlayer> playerList = server.getPlayerList().getPlayers();
 		playerList.forEach(player -> {
 			futures.put(player, new CompletableFuture<>());
 		});
@@ -66,27 +66,27 @@ public class ClientMotionStorage extends SavestateStorageExtensionBase implement
 			e.printStackTrace();
 		}
 
-		futures.forEach((player, future) -> {
+futures.forEach((player, future) -> {
 			try {
 				MotionData data = future.get(5L, TimeUnit.SECONDS);
 
-				String uuid = player.getUniqueID().toString();
-				if (player.getName().equals(server.getServerOwner())) {
+				String uuid = player.getUUID().toString();
+				if (!server.isDedicatedServer() && player.getName().getString().equals(server.getWorldData().getLevelName())) {
 					uuid = "singleplayer";
 				}
 				dataToSave.add(uuid, json.toJsonTree(data));
 
 			} catch (TimeoutException e) {
-				throw new SavestateException(e, "Writing client motion for %s timed out!", player.getName());
+				throw new SavestateException(e, "Writing client motion for %s timed out!", player.getName().getString());
 			} catch (ExecutionException | InterruptedException e) {
-				throw new SavestateException(e, "Writing client motion for %s", player.getName());
+				throw new SavestateException(e, "Writing client motion for %s", player.getName().getString());
 			}
 		});
 
 		return dataToSave;
 	}
 
-	@Override
+@Override
 	public void onLoadstate(MinecraftServer server, JsonObject loadedData) {
 		PlayerList list = server.getPlayerList();
 
@@ -94,15 +94,18 @@ public class ClientMotionStorage extends SavestateStorageExtensionBase implement
 			String playerUUID = motionDataJsonElement.getKey();
 			MotionData motionData = json.fromJson(motionDataJsonElement.getValue(), MotionData.class);
 
-			EntityPlayerMP player;
+			ServerPlayer player;
 			if (playerUUID.equals("singleplayer")) {
-				String ownerName = server.getServerOwner();
+				if (server.isDedicatedServer()) {
+					continue;
+				}
+				String ownerName = server.getWorldData().getLevelName();
 				if (ownerName == null) {
 					continue;
 				}
-				player = list.getPlayerByUsername(ownerName);
+				player = list.getPlayerByName(ownerName);
 			} else {
-				player = list.getPlayerByUUID(UUID.fromString(playerUUID));
+				player = list.getPlayer(UUID.fromString(playerUUID));
 			}
 
 			if (player == null) {
@@ -122,12 +125,12 @@ public class ClientMotionStorage extends SavestateStorageExtensionBase implement
 		return new PacketID[] { SAVESTATE_REQUEST_MOTION, SAVESTATE_SET_MOTION };
 	}
 
-	@Environment(EnvType.CLIENT)
+@Environment(EnvType.CLIENT)
 	@Override
 	public void onClientPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
-		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayerSP player = mc.player;
+		Minecraft mc = Minecraft.getInstance();
+		LocalPlayer player = mc.player;
 
 		switch (packet) {
 			case SAVESTATE_REQUEST_MOTION:
@@ -135,14 +138,14 @@ public class ClientMotionStorage extends SavestateStorageExtensionBase implement
 				if (player != null) {
 				//@formatter:off
 				MotionData motionData = new MotionData(
-						player.motionX,
-						player.motionY,
-						player.motionZ,
-						player.moveForward,
-						player.moveVertical,
-						player.moveStrafing,
+						player.getDeltaMovement().x,
+						player.getDeltaMovement().y,
+						player.getDeltaMovement().z,
+						player.zza,
+						0, // moveVertical not available
+						player.xxa,
 						player.isSprinting(), 
-						player.jumpMovementFactor
+						0.02f // jumpMovementFactor not available in newer mappings
 						);
 				//@formatter:on
 					TASmodClient.client.send(new TASmodBufferBuilder(TASmodPackets.SAVESTATE_REQUEST_MOTION).writeMotionData(motionData));
@@ -152,26 +155,24 @@ public class ClientMotionStorage extends SavestateStorageExtensionBase implement
 				LOGGER.trace(LoggerMarkers.Savestate, "Loading client motion");
 
 				MotionData data = TASmodBufferBuilder.readMotionData(buf);
-				player.motionX = data.motionX;
-				player.motionY = data.motionY;
-				player.motionZ = data.motionZ;
+				player.setDeltaMovement(data.motionX, data.motionY, data.motionZ);
 
-				player.moveForward = data.deltaX;
-				player.moveVertical = data.deltaY;
-				player.moveStrafing = data.deltaZ;
+				player.zza = data.deltaX;
+				// player.moveVertical = data.deltaY; // Not available
+				player.xxa = data.deltaZ;
 
 				player.setSprinting(data.sprinting);
-				player.jumpMovementFactor = data.jumpMovementFactor;
+				// player.jumpMovementFactor = data.jumpMovementFactor; // Not available in newer mappings
 				break;
 			default:
 				break;
 		}
 	}
 
-	@Override
+@Override
 	public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
-		EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUsername(username);
+		ServerPlayer player = TASmod.getServerInstance().getPlayerList().getPlayerByName(username);
 
 		switch (packet) {
 			case SAVESTATE_REQUEST_MOTION:
@@ -250,3 +251,4 @@ public class ClientMotionStorage extends SavestateStorageExtensionBase implement
 		return "ClientMotionStorage";
 	}
 }
+

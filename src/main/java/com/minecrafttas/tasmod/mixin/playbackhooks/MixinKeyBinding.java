@@ -6,12 +6,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.TASmodClient;
 
-import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.KeyMapping;
 
-@Mixin(KeyBinding.class)
+@Mixin(KeyMapping.class)
 public class MixinKeyBinding {
 	@Redirect(method = "updateKeyBindState", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
 	private static boolean redirectIsKeyDown(int i) {
 		return TASmodClient.virtual.isKeyDown(i);
 	}
 }
+

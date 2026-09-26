@@ -5,12 +5,11 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.minecrafttas.mctcommon.CommandRegistry;
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
-import com.minecrafttas.mctcommon.events.EventServer.EventServerInit;
-import com.minecrafttas.mctcommon.events.EventServer.EventServerStop;
-import com.minecrafttas.mctcommon.networking.PacketHandlerRegistry;
-import com.minecrafttas.mctcommon.networking.Server;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.events.EventServer.EventServerInit;
+import com.minecrafttas.tasmod.mctcommon.events.EventServer.EventServerStop;
+import com.minecrafttas.tasmod.mctcommon.networking.PacketHandlerRegistry;
+import com.minecrafttas.tasmod.mctcommon.networking.Server;
 import com.minecrafttas.tasmod.commands.CommandClearInputs;
 import com.minecrafttas.tasmod.commands.CommandFileCommand;
 import com.minecrafttas.tasmod.commands.CommandFullPlay;
@@ -39,8 +38,10 @@ import com.minecrafttas.tasmod.util.Scheduler;
 import com.minecrafttas.tasmod.util.TabCompletionUtils;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.impl.FabricLoaderImpl;
+import com.mojang.brigadier.CommandDispatcher;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 
 /**
@@ -73,7 +74,7 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop 
 
 	public static final int networkingport = 8999;
 
-	public static final boolean isDevEnvironment = FabricLoaderImpl.INSTANCE.isDevelopmentEnvironment();
+	public static final boolean isDevEnvironment = FabricLoader.getInstance().isDevelopmentEnvironment();
 
 	public static final StartpositionMetadataExtension startPositionMetadataExtension = new StartpositionMetadataExtension();
 
@@ -96,12 +97,28 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop 
 			version = modVersion;
 		}
 
+		// Register commands
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			CommandTickrate.register(dispatcher);
+			CommandRecord.register(dispatcher);
+			CommandPlay.register(dispatcher);
+			CommandSaveTAS.register(dispatcher);
+			CommandLoadTAS.register(dispatcher);
+			CommandClearInputs.register(dispatcher);
+			CommandSavestate.register(dispatcher);
+			CommandFullRecord.register(dispatcher);
+			CommandFullPlay.register(dispatcher);
+			CommandRestartAndPlay.register(dispatcher);
+			CommandPlayUntil.register(dispatcher);
+			CommandFileCommand.register(dispatcher);
+		});
+
 		// Start ticksync
 		ticksyncServer = new TickSyncServer();
 
 		// Initilize KillTheRNG
 		LOGGER.info("Testing connection with KillTheRNG");
-		//		ktrngHandler = new KillTheRNGHandler(FabricLoaderImpl.INSTANCE.isModLoaded("killtherng"));
+		//		ktrngHandler = new KillTheRNGHandler(FabricLoader.getInstance().isModLoaded("killtherng"));
 
 		// Initialize TickrateChanger
 		tickratechanger = new TickrateChangerServer(LOGGER);
@@ -138,21 +155,6 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop 
 	public void onServerInit(MinecraftServer server) {
 		LOGGER.info("Initializing server");
 		serverInstance = server;
-
-		// Command handling
-
-		CommandRegistry.registerServerCommand(new CommandTickrate(), server);
-		CommandRegistry.registerServerCommand(new CommandRecord(), server);
-		CommandRegistry.registerServerCommand(new CommandPlay(), server);
-		CommandRegistry.registerServerCommand(new CommandSaveTAS(), server);
-		CommandRegistry.registerServerCommand(new CommandLoadTAS(), server);
-		CommandRegistry.registerServerCommand(new CommandClearInputs(), server);
-		CommandRegistry.registerServerCommand(new CommandSavestate(), server);
-		CommandRegistry.registerServerCommand(new CommandFullRecord(), server);
-		CommandRegistry.registerServerCommand(new CommandFullPlay(), server);
-		CommandRegistry.registerServerCommand(new CommandRestartAndPlay(), server);
-		CommandRegistry.registerServerCommand(new CommandPlayUntil(), server);
-		CommandRegistry.registerServerCommand(commandFileCommand, server);
 
 		savestateHandlerServer = new SavestateHandlerServer(server, LOGGER);
 		PacketHandlerRegistry.register(savestateHandlerServer);
@@ -202,3 +204,4 @@ public class TASmod implements ModInitializer, EventServerInit, EventServerStop 
 		return serverInstance;
 	}
 }
+

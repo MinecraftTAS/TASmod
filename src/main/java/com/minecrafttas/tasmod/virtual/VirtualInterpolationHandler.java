@@ -6,11 +6,11 @@ import java.util.List;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventVirtualInput;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
-import com.minecrafttas.tasmod.util.Ducks.GuiScreenDuck;
+import com.minecrafttas.tasmod.util.Ducks.ScreenDuck;
 import com.minecrafttas.tasmod.util.PointerNormalizer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public class VirtualInterpolationHandler implements EventVirtualInput.EventVirtualMouseTick, EventVirtualInput.EventVirtualCameraAngleTick {
 
@@ -64,20 +64,21 @@ public class VirtualInterpolationHandler implements EventVirtualInput.EventVirtu
 
 		if (enable && !mousePointerStates.isEmpty()) {
 			partialTick = dynamicallyRound(partialTick, TASmodClient.tickratechanger.ticksPerSecond);
-			int index = (int) MathHelper.clampedLerp(0, mousePointerStates.size() - 1, partialTick); // Get interpolate index
+			int index = (int) Mth.clampedLerp(0, mousePointerStates.size() - 1, partialTick); // Get interpolate index
 			VirtualMouse interpolatedCamera = mousePointerStates.get(index);
 
 			interpolatedPointerX = interpolatedCamera.getCursorX();
 			interpolatedPointerY = interpolatedCamera.getCursorY();
 
 		}
-		Minecraft mc = Minecraft.getMinecraft();
-		GuiScreenDuck gui = (GuiScreenDuck) mc.currentScreen;
-
-		if (gui != null && !(mc.currentScreen instanceof SubtickGuiScreen)) {
-			interpolatedPointerX = gui.rescaleX(PointerNormalizer.reapplyScalingX(interpolatedPointerX));
-			interpolatedPointerY = gui.rescaleY(PointerNormalizer.reapplyScalingY(interpolatedPointerY));
-		}
+		// Screen scaling API changed in 26.3 - skip for now
+		// Minecraft mc = Minecraft.getInstance();
+		// ScreenDuck gui = (ScreenDuck) mc.screen;
+		// 
+		// if (gui != null && !(mc.screen instanceof SubtickGuiScreen)) {
+		// 	interpolatedPointerX = gui.rescaleX(PointerNormalizer.reapplyScalingX(interpolatedPointerX));
+		// 	interpolatedPointerY = gui.rescaleY(PointerNormalizer.reapplyScalingY(interpolatedPointerY));
+		// }
 
 		return new MouseInterpolation(interpolatedPointerX, interpolatedPointerY);
 	}
@@ -117,7 +118,7 @@ public class VirtualInterpolationHandler implements EventVirtualInput.EventVirtu
 		float interpolatedYaw = nextCameraAngle.getYaw() == null ? yaw : nextCameraAngle.getYaw() + 180;
 
 		if (enable && !cameraAngleStates.isEmpty()) {
-			int index = (int) MathHelper.clampedLerp(0, cameraAngleStates.size() - 1, partialTick); // Get interpolate index
+			int index = (int) Mth.clampedLerp(0, cameraAngleStates.size() - 1, partialTick); // Get interpolate index
 
 			VirtualCameraAngle interpolatedCamera = cameraAngleStates.get(index);
 
@@ -182,3 +183,4 @@ public class VirtualInterpolationHandler implements EventVirtualInput.EventVirtu
 		}
 	}
 }
+

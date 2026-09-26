@@ -22,3 +22,8 @@ eclipse
 run/
 logs/
 /.apt_generated_tests/
+.kilo
+fix_*.ps1
+error*.txt
+PScommand.txt
+PROGRESS.md

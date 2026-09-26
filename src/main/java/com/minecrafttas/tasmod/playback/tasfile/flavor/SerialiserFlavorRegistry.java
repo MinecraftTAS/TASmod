@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import com.minecrafttas.mctcommon.registry.AbstractRegistry;
+import com.minecrafttas.tasmod.mctcommon.registry.AbstractRegistry;
 
 /**
  * Registry for registering custom PlaybackSerialisers.<br>
@@ -32,3 +32,4 @@ public class SerialiserFlavorRegistry extends AbstractRegistry<SerialiserFlavorB
 		return new ArrayList<>(REGISTRY.values());
 	}
 }
+

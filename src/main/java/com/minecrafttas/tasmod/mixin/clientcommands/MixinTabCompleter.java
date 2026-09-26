@@ -10,15 +10,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.registries.TASmodAPIRegistry;
 
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.util.TabCompleter;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.CommandSuggestions;
 
-@Mixin(TabCompleter.class)
+@Mixin(CommandSuggestions.class)
 public abstract class MixinTabCompleter {
 
 	@Shadow
 	@Final
-	private GuiTextField textField;
+	private EditBox textField;
 	@Shadow
 	private boolean requestedCompletions;
 
@@ -49,3 +49,4 @@ public abstract class MixinTabCompleter {
 	@Shadow
 	protected abstract void setCompletions(String... strings);
 }
+

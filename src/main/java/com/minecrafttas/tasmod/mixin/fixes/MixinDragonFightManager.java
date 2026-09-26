@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.world.end.DragonFightManager;
+import net.minecraft.world.level.dimension.end.EnderDragonFight;
 
-@Mixin(DragonFightManager.class)
+@Mixin(EnderDragonFight.class)
 public abstract class MixinDragonFightManager {
 
 	@Shadow
@@ -31,3 +31,4 @@ public abstract class MixinDragonFightManager {
 	}
 
 }
+

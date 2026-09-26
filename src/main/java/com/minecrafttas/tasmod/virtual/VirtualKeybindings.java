@@ -4,85 +4,76 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-
 import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.virtual.event.VirtualKeyboardEvent;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiControls;
-import net.minecraft.client.gui.inventory.GuiEditSign;
-import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.util.Util;
 
 /**
- * Applies special rules to vanilla keybindings. <br>
- * <br>
- * Using {@link #isKeyDown(KeyBinding)}, the registered keybindings will work
- * inside gui screens <br>
- * <br>
- * {@link #isKeyDownExceptTextfield(KeyBinding)} does the same, but excludes
- * textfields, certain guiscreens, and the keybinding options<br>
- * <br>
- * Keybindings registered with {@link #registerBlockedKeyBinding(KeyBinding)}
- * will not be recorded during a recording or pressed in a playback
- * 
- * @author Scribble
- *
+ * VirtualKeybindings - Handles key state checking for TAS playback
+ * Uses modern GLFW input system (1.22+)
  */
 public class VirtualKeybindings {
-	/**
-	 * The Minecraft instance
-	 */
-	private static final Minecraft mc = Minecraft.getMinecraft();
-	/**
-	 * The standard cooldown for a keybinding in milliseconds
-	 */
-	private static final long cooldown = 50 * 5;
-	/**
-	 * Stores the start time of a keybinding, used for cooldown calculation
-	 */
-	private static final HashMap<KeyBinding, Long> cooldownHashMap = new HashMap<>();
-	/**
-	 * A list of keybindings which will not be recorded or pressed during recording or playback.
-	 */
-	private static final List<KeyBinding> blockedKeys = new ArrayList<>();
-	/**
-	 * True when a text field is currently focused in a gui, like the creative search tab
-	 */
+
 	public static boolean focused = false;
 
+	private static List<KeyMapping> blockedKeys = new ArrayList<>();
+
+	private static HashMap<KeyMapping, Long> cooldownHashMap = new HashMap<>();
+
+	private static long cooldown = 50;
+
 	/**
-	 * Checks whether the keycode is pressed, regardless of any gui screens
-	 * 
-	 * @param keybind The keybind to check
-	 * @return If the keybind is down
+	 * Checks if a key is currently down
+	 * Uses Minecraft's key handler which processes GLFW events
 	 */
-	public static boolean isKeyDown(KeyBinding keybind) {
+	public static boolean isKeyDown(KeyMapping keybind) {
+		if (keybind == null) return false;
+		
+		// Check if we're using virtual input (TAS playback)
+		if (!TASmodClient.virtual.useVanillaIsKeyDown) {
+			// Use virtual keyboard state
+			return TASmodClient.virtual.KEYBOARD.willKeyBeDown(keybind.getKey().getValue());
+		}
+		
+		// Use vanilla key handler
+		return keybind.isDown();
+	}
 
-		int keycode = keybind.getKeyCode();
-
-		boolean down = false;
-
-		if (mc.currentScreen instanceof GuiControls) {
+	/**
+	 * Checks if a key is down, but returns false if a text field is focused
+	 * Used for keybinds that shouldn't trigger while typing
+	 */
+	public static boolean isKeyDownExceptTextfield(KeyMapping keybind) {
+		Minecraft mc = Minecraft.getInstance();
+		Screen currentScreen = mc.screen;
+		
+		// Check if a text field is focused
+		if (currentScreen != null && currentScreen.getFocused() != null) {
 			return false;
 		}
+		
+		return isKeyDown(keybind);
+	}
 
-		if (isKeyCodeAlwaysBlocked(keycode)) {
-			down = keycode >= 0 ? Keyboard.isKeyDown(keycode) : Mouse.isButtonDown(keycode + 100);
-		} else {
-			down = TASmodClient.virtual.willKeyBeDown(keycode);
+	/**
+	 * Registers a key mapping as blocked (won't trigger vanilla actions during playback)
+	 */
+	public static void registerBlockedKeyMapping(KeyMapping keybind) {
+		if (!blockedKeys.contains(keybind)) {
+			blockedKeys.add(keybind);
 		}
+	}
 
-		if (down) {
-			if (cooldownHashMap.containsKey(keybind)) {
-				if (cooldown <= Minecraft.getSystemTime() - (long) cooldownHashMap.get(keybind)) {
-					cooldownHashMap.put(keybind, Minecraft.getSystemTime());
-					return true;
-				}
-				return false;
-			} else {
-				cooldownHashMap.put(keybind, Minecraft.getSystemTime());
+	/**
+	 * Checks if a keycode is always blocked (used during TAS playback)
+	 */
+	public static boolean isKeyCodeAlwaysBlocked(int keycode) {
+		for (KeyMapping keybind : blockedKeys) {
+			if (keybind.getKey().getValue() == keycode) {
 				return true;
 			}
 		}
@@ -90,40 +81,35 @@ public class VirtualKeybindings {
 	}
 
 	/**
-	 * Checks whether the key is down, but returns false if a text field is focused in a gui.<br>
-	 * <br>
-	 * Always returns false if GuiChat and GuiEditSign is open.
-	 * 
-	 * @param keybind The keybinding to check
-	 * @return If a keybind is pressed. Returns false if a text field in a gui is focused
+	 * Checks if a key was just pressed (not held)
+	 * Uses cooldown to prevent rapid repeats
 	 */
-	public static boolean isKeyDownExceptTextfield(KeyBinding keybind) {
-		if (mc.currentScreen instanceof GuiChat || mc.currentScreen instanceof GuiEditSign || (focused && mc.currentScreen != null)) {
-			return false;
-		}
-		return isKeyDown(keybind);
-	}
-
-	/**
-	 * Registers keybindings that should not be recorded or played back in a TAS
-	 * 
-	 * @param keybind The keybinding to block
-	 */
-	public static void registerBlockedKeyBinding(KeyBinding keybind) {
-		blockedKeys.add(keybind);
-	}
-
-	/**
-	 * Checks whether the keycode should not be recorded or played back in a TAS
-	 * 
-	 * @param keycode to block
-	 * @return Whether it should be blocked
-	 */
-	public static boolean isKeyCodeAlwaysBlocked(int keycode) {
-		for (KeyBinding keybind : blockedKeys) {
-			if (keycode == keybind.getKeyCode())
+	public static boolean wasKeyPressed(KeyMapping keybind) {
+		if (keybind == null) return false;
+		
+		long now = Util.getMillis();
+		Long lastPress = cooldownHashMap.get(keybind);
+		
+		if (isKeyDown(keybind)) {
+			if (lastPress == null || now - lastPress >= cooldown) {
+				cooldownHashMap.put(keybind, now);
 				return true;
+			}
 		}
 		return false;
+	}
+
+	/**
+	 * Clears all blocked keys
+	 */
+	public static void clearBlockedKeys() {
+		blockedKeys.clear();
+	}
+
+	/**
+	 * Clears cooldown map
+	 */
+	public static void clearCooldowns() {
+		cooldownHashMap.clear();
 	}
 }

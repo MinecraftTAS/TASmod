@@ -2,16 +2,14 @@ package com.minecrafttas.tasmod.util;
 
 import java.util.List;
 
-import com.minecrafttas.tasmod.mixin.savestates.MixinPlayerChunkMap;
-
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Oh boy, ducks! I can't help but quack up when they waddle their way into the code. :duck:
  * But let me tell you a little secret: I have a love-hate relationship with ducks. Not the adorable feathered creatures, mind you, but those sneaky little programming devils that swim in the deep waters of out-of-scope variables.
  * They say, "If it looks like a duck and quacks like a duck, it must be a duck." Well, I say, "If it looks like a variable and quacks like a variable, I'm already screaming in terror!"
  * 
- * Ducks and I are like oil and water, or more like C# and JavaScript – incompatible from the very beginning. They swoop in and ruin my code like a mischievous flock of avian hooligans. They make me feel like I'm swimming upstream in an endless river of chaos.
+ * Ducks and I are like oil and water, or more like C# and JavaScript  Eincompatible from the very beginning. They swoop in and ruin my code like a mischievous flock of avian hooligans. They make me feel like I'm swimming upstream in an endless river of chaos.
  * 
  * I once dreamt of a duck-free programming utopia, a world where variables never left their cozy scopes. But alas, that dream quickly turned into a feathered nightmare! Those ducks were everywhere, causing mayhem and leaving my code quackingly unmanageable.
  * 
@@ -32,8 +30,6 @@ public class Ducks {
 	public static interface ChunkProviderDuck {
 		/**
 		 * Unloads chunks in the chunk providers
-		 * @see com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderServer#unloadAllChunks() MixinChunkProviderServer#unloadAllChunks()
-		 * @see com.minecrafttas.tasmod.mixin.savestates.MixinChunkProviderClient#unloadAllChunks() MixinChunkProviderClient#unloadAllChunks()
 		 */
 		public void unloadAllChunks();
 	}
@@ -41,7 +37,7 @@ public class Ducks {
 	/**
 	 * Quacks the gui screen to spit out mouse positions independent of the display size
 	 */
-	public static interface GuiScreenDuck {
+	public static interface ScreenDuck {
 
 		/**
 		 * Calculates the true value of the pointer coordinate, by removing the scaling for custom screen sizes applied to it:
@@ -114,7 +110,7 @@ public class Ducks {
 	/**
 	 * Quacks the world client
 	 */
-	public static interface WorldClientDuck {
+	public static interface ClientLevelDuck {
 
 		/**
 		 * Clear entitylist on the client
@@ -123,22 +119,21 @@ public class Ducks {
 	}
 
 	/**
-	 * Quacks the {@link MixinPlayerChunkMap}
+	 * Quacks the PlayerChunkMap
 	 */
 	public static interface PlayerChunkMapDuck {
 		/**
 		 * @return The list of players of this chunk map
 		 */
-		public List<EntityPlayerMP> getPlayers();
+		public List<ServerPlayer> getPlayers();
 
 		/**
 		 * <p>Forces a tick in the chunk map without being dependent on the world time.
 		 * <p>The chunk map is responsible for sending the necessary chunks to the client.<br>
 		 * However, to properly do that, the chunks have to be sorted first, which happens every few world ticks.
-		 * <p>Under normal circumstances, WorldServer#tick() would update the world time to make this happen,
+		 * <p>Under normal circumstances, ServerLevel#tick() would update the world time to make this happen,
 		 * but our goal with savestates is to load the chunks without advancing the world time.
 		 * Hence why this method sorts and ticks the chunk map, without waiting for the world time
-		 * @see MixinPlayerChunkMap#forceTick()
 		 */
 		public void forceTick();
 	}

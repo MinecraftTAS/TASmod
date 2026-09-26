@@ -1,38 +1,21 @@
 package com.minecrafttas.tasmod.savestates.gui;
 
-import com.minecrafttas.tasmod.util.MessageUtils;
+import com.minecrafttas.tasmod.TASmodClient;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 /**
- * Screen for warning the player that a "reources.zip" is present in the world folder,<br>
- * which significantly slows down savestates
+ * Stub GuiResourcepackWarn - GUI system needs complete rewrite for modern GuiGraphics API
  */
-public class GuiResourcepackWarn extends GuiScreen {
+public class GuiResourcepackWarn extends Screen {
 
-	/**
-	 * Screen for warning the player that a "reources.zip" is present in the world folder,<br>
-	 * which significantly slows down savestates
-	 */
 	public GuiResourcepackWarn() {
-		this.mc = Minecraft.getMinecraft();
+		super(Component.literal("GuiResourcepackWarn"));
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		this.drawDefaultBackground();
-
-		ScaledResolution scaled = new ScaledResolution(Minecraft.getMinecraft());
-		int width = scaled.getScaledWidth();
-		int height = scaled.getScaledHeight();
-
-		MessageUtils.splitNewline(I18n.format("gui.tasmod.savestate.resourcepack"), 15, (line, y) -> {
-			drawCenteredString(fontRenderer, line, width / 2, height / 4 + 40 + y, 0xFF5555);
-		});
-
-		super.drawScreen(mouseX, mouseY, partialTicks);
+	public boolean isPauseScreen() {
+		return false;
 	}
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.minecrafttas.mctcommon.registry.Registerable;
+import com.minecrafttas.tasmod.mctcommon.registry.Registerable;
 
 /**
  * Stores a section of<br>
@@ -138,3 +138,4 @@ public class PlaybackMetadata {
 		public abstract void onClear();
 	}
 }
+

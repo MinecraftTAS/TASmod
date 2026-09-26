@@ -2,17 +2,7 @@
     "required": true,
     "minVersion": "0.8.5",
     "package": "com.minecrafttas.mctcommon.mixin",
-    "compatibilityLevel": "JAVA_8",
-    "mixins": [
-        "MixinMinecraftServer",
-        "MixinPlayerList"
-    ],
-    "client": [
-    	"AccessorKeyBinding",
-    	"MixinMinecraft",
-    	"MixinNetHandlerPlayClient",
-    	"MixinWorldClient",
-        "MixinLocale",
-		"MixinGameSettings"
-	]
+    "compatibilityLevel": "JAVA_25",
+    "mixins": [],
+    "client": []
 }

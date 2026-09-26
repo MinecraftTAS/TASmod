@@ -9,17 +9,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.Options;
 
 @Mixin(Minecraft.class)
 public class MixinMinecraftFullscreen {
 
 	@Shadow
-	private GameSettings gameSettings;
+	private Options gameSettings;
 
 	@Inject(method = "toggleFullscreen", at = @At("RETURN"))
 	public void fixes_toggleFullscreen(CallbackInfo ci) {
-		int keyF11 = this.gameSettings.keyBindFullscreen.getKeyCode();
+		int keyF11 = this.gameSettings.keyFullscreen.getDefaultKey().getValue();
 		TASmodClient.virtual.KEYBOARD.updateNextKeyboard(keyF11, false, Character.MIN_VALUE);
 	}
 }
+

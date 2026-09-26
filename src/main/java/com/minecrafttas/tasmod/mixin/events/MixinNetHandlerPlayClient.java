@@ -5,12 +5,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.mctcommon.events.EventClient.EventSetCameraAngle;
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventSetCameraAngle;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
 
-import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 
-@Mixin(NetHandlerPlayClient.class)
+@Mixin(ClientPacketListener.class)
 public class MixinNetHandlerPlayClient {
 
 	@Inject(method = "handlePlayerPosLook", at = @At(value = "RETURN"))
@@ -18,3 +18,4 @@ public class MixinNetHandlerPlayClient {
 		EventListenerRegistry.fireEvent(EventSetCameraAngle.class);
 	}
 }
+

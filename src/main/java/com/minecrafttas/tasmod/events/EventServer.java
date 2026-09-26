@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry.EventBase;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry.EventBase;
 
 import net.minecraft.server.MinecraftServer;
 
@@ -23,3 +23,4 @@ public interface EventServer {
 		public void onServerTickPost(MinecraftServer minecraftServer);
 	}
 }
+

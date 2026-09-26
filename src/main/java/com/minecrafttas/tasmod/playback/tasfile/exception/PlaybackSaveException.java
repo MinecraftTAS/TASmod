@@ -18,3 +18,4 @@ public class PlaybackSaveException extends PlaybackLoadException {
 		super(cause, String.format(msg, args));
 	}
 }
+

@@ -1,11 +1,15 @@
-// configure plugin management
 pluginManagement {
-    // add repositories for plugins
     repositories {
-		maven { url = "https://maven.minecrafttas.com/main" }
-        maven { url = "https://maven.fabricmc.net/" }
-        maven { url = "https://maven.ornithemc.net/releases" }
-        maven { url = "https://maven.ornithemc.net/snapshots" }
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        maven {
+            url = 'https://maven.minecrafttas.com/main'
+        }
+        maven { url = 'https://maven.legacyfabric.net/' }
+        maven { url = 'https://jitpack.io' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
         mavenCentral()
         gradlePluginPortal()
     }

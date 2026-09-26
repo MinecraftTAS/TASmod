@@ -1,13 +1,21 @@
 package com.minecrafttas.tasmod.commands.client;
 
-import com.minecrafttas.mctcommon.registry.Registerable;
+import com.minecrafttas.tasmod.mctcommon.registry.Registerable;
 
-import net.minecraft.command.CommandBase;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 
-public abstract class ClientCommandBase extends CommandBase implements Registerable {
+import java.util.List;
 
-	@Override
-	public String getExtensionName() {
-		return this.getName();
-	}
+public abstract class ClientCommandBase implements Registerable {
+
+	public abstract String getName();
+
+	public abstract String getUsage();
+
+	public abstract int getRequiredPermissionLevel();
+
+	public abstract void execute(LocalPlayer player, String[] args);
+
+	public abstract List<String> getTabCompletions(LocalPlayer player, String[] args);
 }

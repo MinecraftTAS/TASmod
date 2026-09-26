@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.minecrafttas.mctcommon.registry.Registerable;
+import com.minecrafttas.tasmod.mctcommon.registry.Registerable;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.util.JsonUtils;
 
@@ -27,3 +27,4 @@ public abstract class SavestateStorageExtensionBase implements Registerable {
 
 	public abstract void onLoadstate(MinecraftServer server, JsonObject loadedData);
 }
+

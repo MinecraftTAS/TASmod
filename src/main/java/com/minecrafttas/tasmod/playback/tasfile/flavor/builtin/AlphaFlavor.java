@@ -536,3 +536,4 @@ public class AlphaFlavor extends SerialiserFlavorBase {
 		TASmodAPIRegistry.PLAYBACK_FILE_COMMAND.setEnabled("tasmod_label@v1", "tasmod_desyncMonitor@v1", "tasmod_options@v1");
 	}
 }
+

@@ -92,3 +92,4 @@ public class OptionsFileCommandExtension extends PlaybackFileCommandExtension {
 		return shouldRenderHud;
 	}
 }
+

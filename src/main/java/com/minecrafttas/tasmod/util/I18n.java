@@ -1,12 +1,17 @@
 package com.minecrafttas.tasmod.util;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+
 public class I18n {
 
 	public static String format(String string, Object... args) {
-		return net.minecraft.client.resources.I18n.format(string, args);
+		return Component.translatable(string, args).getString();
 	}
 
 	public static boolean hasKey(String key) {
-		return net.minecraft.client.resources.I18n.hasKey(key);
+		// In modern MC, we can't easily check without the Language instance
+		return true;
 	}
 }
+

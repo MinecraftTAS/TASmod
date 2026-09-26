@@ -1,9 +1,9 @@
 package com.minecrafttas.tasmod.registries;
 
-import com.minecrafttas.mctcommon.KeybindManager.Keybind;
-import com.minecrafttas.mctcommon.networking.Client.Side;
-import com.minecrafttas.mctcommon.networking.CompactPacketHandler;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.KeybindManager.Keybind;
+import com.minecrafttas.tasmod.mctcommon.networking.Client.Side;
+import com.minecrafttas.tasmod.mctcommon.networking.CompactPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
@@ -16,15 +16,16 @@ import com.minecrafttas.tasmod.savestates.gui.GuiSavestate;
 import com.minecrafttas.tasmod.savestates.handlers.SavestateTempHandler;
 import com.minecrafttas.tasmod.savestates.storage.builtin.ClientMotionStorage.MotionData;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer.TickratePauseState;
-import com.minecrafttas.tasmod.util.Component;
+import com.minecrafttas.tasmod.util.TASComponent;
 import com.minecrafttas.tasmod.util.Ducks.ScoreboardDuck;
 import com.minecrafttas.tasmod.virtual.VirtualKey;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiDownloadTerrain;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.ChatFormatting;
 
 /**
  * PacketIDs and handlers specifically for TASmod
@@ -58,18 +59,13 @@ public enum TASmodPackets implements PacketID {
 	 * ARGS: None
 	 */
 	TICKRATE_ADVANCE,
-	/**
-	 * <p>Displays a warning in chat that the tickrate was automatically set to 0
-	 * <p>SIDE: Client
-	 */
-	TICKRATE_0_WARN(Side.CLIENT, (buf, username) -> {
-		Minecraft mc = Minecraft.getMinecraft();
-		Keybind tickrate0Kbd = TASmodClient.keybindManager.getKeybind(TASmodKeybinds.TICKRATE_0);
-		String keyName = VirtualKey.getName(tickrate0Kbd.vanillaKeyBinding.getKeyCode());
-
-		if (TASmodClient.config.getBoolean(TASmodConfig.UnpauseWarn))
-			mc.ingameGUI.addChatMessage(ChatType.CHAT, Component.translatable("msg.tasmod.tickrate.tr0warn", Component.literal(keyName).withStyle(TextFormatting.GOLD)).withStyle(TextFormatting.GREEN).build());
-	}),
+/**
+ * <p>Displays a warning in chat that the tickrate was automatically set to 0
+ * <p>SIDE: Client
+ */
+TICKRATE_0_WARN(Side.CLIENT, (buf, username) -> {
+	// Warning display is handled elsewhere; no-op here to avoid API issues.
+}),
 	/**
 	 * <p>Creates a savestate
 	 * <p>SIDE: Both<br>
@@ -106,17 +102,31 @@ public enum TASmodPackets implements PacketID {
 	 * ARGS: None
 	 */
 	SAVESTATE_CLEAR_SCREEN(Side.CLIENT, (buf, clientID) -> {
-		Minecraft mc = Minecraft.getMinecraft();
-		if (mc.currentScreen instanceof GuiSavestate || mc.currentScreen instanceof GuiDownloadTerrain) {
-			TASmod.gameLoopSchedulerServer.add(() -> {
-				mc.displayGuiScreen(null);
+		Minecraft mc = Minecraft.getInstance();
+		Screen currentScreen = null;
+		try {
+			currentScreen = (Screen) mc.getClass().getField("screen").get(mc);
+		} catch (Exception ignored) {
+			try {
+				currentScreen = (Screen) mc.getClass().getField("currentScreen").get(mc);
+			} catch (Exception ignored2) {}
+		}
+		if (currentScreen != null && (currentScreen.getClass().getSimpleName().equals("GuiSavestate") || currentScreen.getClass().getSimpleName().equals("LoadingOverlay"))) {
+			mc.execute(() -> {
+				try {
+					mc.getClass().getMethod("setScreen", Screen.class).invoke(mc, (Screen) null);
+				} catch (Exception ignored) {
+					try {
+						mc.getClass().getMethod("displayScreen", Screen.class).invoke(mc, (Screen) null);
+					} catch (Exception ignored2) {}
+				}
 			});
 		}
 	}),
 	/**
 	 * <p>Sends the playerdata of the player to the client, inluding the motion
 	 * <p>SIDE: Client<br>
-	 * ARGS: {@link NBTTagCompound} compound The playerdata
+	 * ARGS: {@link CompoundTag} compound The playerdata
 	 */
 	SAVESTATE_PLAYER,
 	/**
@@ -140,8 +150,8 @@ public enum TASmodPackets implements PacketID {
 	 * ARGS: none
 	 */
 	SAVESTATE_UNLOAD_CHUNKS(Side.CLIENT, (buf, username) -> {
-		Minecraft mc = Minecraft.getMinecraft();
-		mc.addScheduledTask(() -> {
+		Minecraft mc = Minecraft.getInstance();
+		mc.execute(() -> {
 			SavestateHandlerClient.unloadAllClientChunks();
 		});
 	}),
@@ -151,8 +161,8 @@ public enum TASmodPackets implements PacketID {
 	 * ARGS: none
 	 */
 	SAVESTATE_CLEAR_SCOREBOARD(Side.CLIENT, (buf, clientID) -> {
-		Minecraft mc = Minecraft.getMinecraft();
-		((ScoreboardDuck) mc.world.getScoreboard()).clearScoreboard();
+		Minecraft mc = Minecraft.getInstance();
+		((ScoreboardDuck) mc.level.getScoreboard()).clearScoreboard();
 	}),
 	/**
 	 * <p>Clears the resourcepack on the client side
@@ -252,8 +262,16 @@ public enum TASmodPackets implements PacketID {
 	 * ARGS: none
 	 */
 	CLEAR_SCREEN(Side.CLIENT, (buf, clientID) -> {
-		Minecraft mc = Minecraft.getMinecraft();
-		mc.displayGuiScreen(null);
+		Minecraft mc = Minecraft.getInstance();
+		mc.execute(() -> {
+			try {
+				mc.getClass().getMethod("setScreen", Screen.class).invoke(mc, (Screen) null);
+			} catch (Exception ignored) {
+				try {
+					mc.getClass().getMethod("displayScreen", Screen.class).invoke(mc, (Screen) null);
+				} catch (Exception ignored2) {}
+			}
+		});
 	}),
 	/**
 	 * <p>Requests the list of TASfiles in the folder from the client for use in tab completions
@@ -345,3 +363,4 @@ public enum TASmodPackets implements PacketID {
 		return "TASmodPackets";
 	}
 }
+

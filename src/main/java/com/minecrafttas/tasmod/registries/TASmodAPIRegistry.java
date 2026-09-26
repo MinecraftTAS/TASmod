@@ -9,8 +9,9 @@ import com.minecrafttas.tasmod.playback.tasfile.flavor.SerialiserFlavorRegistry;
 import com.minecrafttas.tasmod.playback.tasfile.flavor.builtin.Beta1Flavor;
 import com.minecrafttas.tasmod.savestates.storage.SavestateStorageExtensionBase;
 import com.minecrafttas.tasmod.savestates.storage.SavestateStorageExtensionRegistry;
+import net.minecraft.commands.CommandSourceStack;
 
-import net.minecraft.command.CommandBase;
+
 
 public class TASmodAPIRegistry {
 	/**
@@ -46,7 +47,7 @@ public class TASmodAPIRegistry {
 	 * <p>Registry for registering commands that are only executed on the client
 	 * 
 	 * <p>Create a new ClientCommand by extending {@link ClientCommandBase},<br>
-	 * then create a command like normal, as it extends from the vanilla {@link CommandBase}
+	 * then create a command like normal, as it extends from the vanilla {@link CommandSourceStack}
 	 */
 	public static final ClientCommandRegistry CLIENT_COMMANDS = new ClientCommandRegistry();
 
@@ -57,3 +58,4 @@ public class TASmodAPIRegistry {
 	 */
 	public static final SavestateStorageExtensionRegistry SAVESTATE_STORAGE = new SavestateStorageExtensionRegistry();
 }
+

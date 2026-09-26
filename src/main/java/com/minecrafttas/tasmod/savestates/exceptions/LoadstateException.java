@@ -18,3 +18,4 @@ public class LoadstateException extends RuntimeException {
 		super(String.format(msg, args), t);
 	}
 }
+

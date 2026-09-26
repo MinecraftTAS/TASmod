@@ -1,68 +1,70 @@
 package com.minecrafttas.tasmod.commands;
 
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.savestates.handlers.SavestateTempHandler;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.player.Player;
 
-public class CommandPlay extends CommandBase {
+import java.lang.reflect.Method;
 
-	@Override
-	public String getName() {
-		return "play";
-	}
+public class CommandPlay {
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/play [nosave]";
-	}
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(
+            Commands.literal("play")
+                .executes(CommandPlay::execute)
+                .then(Commands.literal("nosave")
+                    .executes(CommandPlay::executeNoSave)
+                )
+        );
+    }
 
-	@Override
-	public int getRequiredPermissionLevel() {
-		return 2;
-	}
+    private static int execute(CommandContext<CommandSourceStack> context) {
+        return executeImpl(context, false);
+    }
 
-	@Override
-	public List<String> getAliases() {
-		return ImmutableList.of("p");
-	}
+    private static int executeNoSave(CommandContext<CommandSourceStack> context) {
+        return executeImpl(context, true);
+    }
 
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (!(sender instanceof EntityPlayer)) {
-			return;
-		}
+    private static int executeImpl(CommandContext<CommandSourceStack> context, boolean noSave) {
+        CommandSourceStack source = context.getSource();
+        if (!checkPermission(source, 2)) {
+            source.sendFailure(Component.literal("You don't have permission to use this command").withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        if (!(source.getEntity() instanceof Player)) {
+            source.sendFailure(Component.literal("Only players can use this command").withStyle(ChatFormatting.RED));
+            return 0;
+        }
 
-		// Activates temporary savestates, loading one when starting the playback
-		SavestateTempHandler tempSavestateHandler = TASmod.savestateHandlerServer.getSavestateTemporaryHandler();
-		tempSavestateHandler.setActive(true);
+        SavestateTempHandler tempSavestateHandler = TASmod.savestateHandlerServer.getSavestateTemporaryHandler();
+        tempSavestateHandler.setActive(true);
+        tempSavestateHandler.setActive(!noSave);
+        TASmod.playbackControllerServer.togglePlayback();
 
-		if (args.length <= 1) {
-			boolean noSave = args.length == 1 && "nosave".equals(args[0]);
-			tempSavestateHandler.setActive(!noSave);
+        source.sendSuccess(() -> Component.literal("Playback " + (noSave ? "without saving" : "started")).withStyle(ChatFormatting.GREEN), false);
+        return 1;
+    }
 
-			TASmod.playbackControllerServer.togglePlayback();
-		} else if (args.length > 2) {
-			sender.sendMessage(new TextComponentString(TextFormatting.RED + "Too many arguments. " + getUsage(sender)));
-		}
-
-	}
-
-	@Override
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-		if (args.length == 1) {
-			return getListOfStringsMatchingLastWord(args, "nosave");
-		}
-		return super.getTabCompletions(server, sender, args, targetPos);
-	}
+    private static boolean checkPermission(CommandSourceStack source, int level) {
+        try {
+            Method method = source.getClass().getMethod("hasPermission", int.class);
+            return (Boolean) method.invoke(source, level);
+        } catch (Exception e) {
+            try {
+                Method method = source.getClass().getMethod("getPermission");
+                return (Integer) method.invoke(source) >= level;
+            } catch (Exception ex) {
+                return true;
+            }
+        }
+    }
 }

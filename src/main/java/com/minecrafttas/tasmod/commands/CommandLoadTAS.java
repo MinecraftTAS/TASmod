@@ -1,104 +1,110 @@
 package com.minecrafttas.tasmod.commands;
 
-import java.util.List;
-import java.util.concurrent.TimeoutException;
-
-import com.google.common.collect.ImmutableList;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.registries.TASmodPackets;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.player.Player;
 
-public class CommandLoadTAS extends CommandBase {
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
 
-	@Override
-	public String getName() {
-		return "load";
-	}
+public class CommandLoadTAS {
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "/load <filename> [flavor]";
-	}
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(
+            Commands.literal("load")
+                .then(Commands.argument("filename", StringArgumentType.string())
+                    .suggests((context, builder) -> {
+                        CommandSourceStack source = context.getSource();
+                        if (source.getEntity() instanceof Player player) {
+                            try {
+                                List<String> files = TASmod.tabCompletionUtils.getTASfileList(player.getName().getString());
+                                for (String file : files) {
+                                    builder.suggest(file);
+                                }
+                            } catch (TimeoutException e) {
+                                TASmod.LOGGER.catching(e);
+                            } catch (Exception e) {
+                                TASmod.LOGGER.catching(e);
+                            }
+                        }
+                        return builder.buildFuture();
+                    })
+                    .executes(CommandLoadTAS::execute)
+                    .then(Commands.argument("flavor", StringArgumentType.string())
+                        .suggests((context, builder) -> {
+                            CommandSourceStack source = context.getSource();
+                            if (source.getEntity() instanceof Player player) {
+                                try {
+                                    List<String> flavors = TASmod.tabCompletionUtils.getFlavorList(player.getName().getString());
+                                    for (String flavor : flavors) {
+                                        builder.suggest(flavor);
+                                    }
+                                } catch (TimeoutException e) {
+                                    TASmod.LOGGER.catching(e);
+                                } catch (Exception e) {
+                                    TASmod.LOGGER.catching(e);
+                                }
+                            }
+                            return builder.buildFuture();
+                        })
+                        .executes(CommandLoadTAS::executeWithFlavor)
+                    )
+                )
+        );
+    }
 
-	@Override
-	public List<String> getAliases() {
-		return ImmutableList.of("loadTAS");
-	}
+    private static int execute(CommandContext<CommandSourceStack> context) {
+        return executeImpl(context, "");
+    }
 
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (sender instanceof EntityPlayer) {
-			if (sender.canUseCommand(2, "load")) {
-				if (args.length < 1) {
-					sender.sendMessage(new TextComponentString(TextFormatting.RED + "Please add a filename, " + getUsage(sender)));
-				} else if (args.length == 1) {
-					String filename = args[0];
-					try {
-						TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_LOAD).writeString(filename).writeString(""));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				} else if (args.length == 2) {
-					String filename = args[0];
-					String flavorname = args[1];
-					try {
-						TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_LOAD).writeString(filename).writeString(flavorname));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			} else {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));
-			}
-		}
-	}
+    private static int executeWithFlavor(CommandContext<CommandSourceStack> context) {
+        String flavor = StringArgumentType.getString(context, "flavor");
+        return executeImpl(context, flavor);
+    }
 
-	@Override
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-		List<String> tab;
-		if (args.length == 1) {
-			try {
-				tab = TASmod.tabCompletionUtils.getTASfileList(getCommandSenderAsPlayer(sender).getName());
-			} catch (TimeoutException e) {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to fetch the file list after 2 seconds, something went wrong"));
-				TASmod.LOGGER.catching(e);
-				return super.getTabCompletions(server, sender, args, targetPos);
-			} catch (Exception e) {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Something went wrong with Tab Completions"));
-				TASmod.LOGGER.catching(e);
-				return super.getTabCompletions(server, sender, args, targetPos);
-			}
+    private static int executeImpl(CommandContext<CommandSourceStack> context, String flavor) {
+        CommandSourceStack source = context.getSource();
+        if (!checkPermission(source, 2)) {
+            source.sendFailure(Component.literal("You don't have permission to use this command").withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        if (!(source.getEntity() instanceof Player)) {
+            source.sendFailure(Component.literal("Only players can use this command").withStyle(ChatFormatting.RED));
+            return 0;
+        }
 
-			if (tab.isEmpty()) {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "No files in directory"));
-				return super.getTabCompletions(server, sender, args, targetPos);
-			}
-			return getListOfStringsMatchingLastWord(args, tab);
+        String filename = StringArgumentType.getString(context, "filename");
+        try {
+            TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.PLAYBACK_LOAD).writeString(filename).writeString(flavor));
+            source.sendSuccess(() -> Component.literal("Loaded TAS: " + filename).withStyle(ChatFormatting.GREEN), false);
+        } catch (Exception e) {
+            TASmod.LOGGER.error("Failed to load TAS", e);
+            source.sendFailure(Component.literal("Failed to load TAS: " + e.getMessage()).withStyle(ChatFormatting.RED));
+        }
+        return 1;
+    }
 
-		} else if (args.length == 2) {
-			try {
-				tab = TASmod.tabCompletionUtils.getFlavorList(getCommandSenderAsPlayer(sender).getName());
-			} catch (TimeoutException e) {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Failed to fetch the flavor list after 2 seconds, something went wrong"));
-				TASmod.LOGGER.catching(e);
-				return super.getTabCompletions(server, sender, args, targetPos);
-			} catch (Exception e) {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "Something went wrong with Tab Completions"));
-				TASmod.LOGGER.catching(e);
-				return super.getTabCompletions(server, sender, args, targetPos);
-			}
-			return getListOfStringsMatchingLastWord(args, tab);
-
-		} else
-			return super.getTabCompletions(server, sender, args, targetPos);
-	}
+    private static boolean checkPermission(CommandSourceStack source, int level) {
+        try {
+            Method method = source.getClass().getMethod("hasPermission", int.class);
+            return (Boolean) method.invoke(source, level);
+        } catch (Exception e) {
+            try {
+                Method method = source.getClass().getMethod("getPermission");
+                return (Integer) method.invoke(source) >= level;
+            } catch (Exception ex) {
+                return true;
+            }
+        }
+    }
 }

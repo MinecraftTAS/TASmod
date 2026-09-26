@@ -5,8 +5,8 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.minecrafttas.mctcommon.networking.interfaces.ClientPacketHandler;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ClientPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventClient.EventClientTickPost;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
@@ -60,3 +60,4 @@ public class TickSyncClient implements ClientPacketHandler, EventClientTickPost 
 		}
 	}
 }
+

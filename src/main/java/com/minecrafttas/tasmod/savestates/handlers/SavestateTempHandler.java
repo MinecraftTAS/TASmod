@@ -18,10 +18,11 @@ import com.minecrafttas.tasmod.registries.TASmodPackets;
 import com.minecrafttas.tasmod.savestates.SavestateHandlerServer;
 import com.minecrafttas.tasmod.savestates.SavestateIndexer.SavestatePaths;
 import com.minecrafttas.tasmod.savestates.exceptions.SavestateException;
-import com.minecrafttas.tasmod.util.Component;
+import com.minecrafttas.tasmod.util.TASComponent;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 
 /**
  * <p>Handles the creation of temporary savestates when recording/playing back a TAS
@@ -66,7 +67,7 @@ public class SavestateTempHandler implements EventControllerStateChange, EventRe
 					}
 				});
 			} catch (SavestateException e) {
-				TASmod.getServerInstance().getServer().getPlayerList().sendMessage(Component.translatable(e.getMessage()).withStyle(TextFormatting.RED).build());
+				TASmod.getServerInstance().getPlayerList().broadcastSystemMessage(Component.translatable(e.getMessage()).withStyle(ChatFormatting.RED), false);
 
 				try {
 					TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_0_WARN));
@@ -82,7 +83,7 @@ public class SavestateTempHandler implements EventControllerStateChange, EventRe
 				if (cause == null) {
 					cause = e;
 				}
-				TASmod.getServerInstance().getPlayerList().sendMessage(Component.translatable("msg.tasmod.savestate.failure", e.getMessage()).withStyle(TextFormatting.RED).build());
+				TASmod.getServerInstance().getPlayerList().broadcastSystemMessage(Component.translatable("msg.tasmod.savestate.failure", e.getMessage()).withStyle(ChatFormatting.RED), false);
 
 				try {
 					TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_0_WARN));
@@ -108,7 +109,7 @@ public class SavestateTempHandler implements EventControllerStateChange, EventRe
 					}
 				});
 			} catch (SavestateException e) {
-				TASmod.getServerInstance().getServer().getPlayerList().sendMessage(Component.translatable(e.getMessage()).withStyle(TextFormatting.RED).build());
+				TASmod.getServerInstance().getPlayerList().broadcastSystemMessage(Component.translatable(e.getMessage()).withStyle(ChatFormatting.RED), false);
 
 				try {
 					TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.CLEAR_SCREEN));
@@ -123,7 +124,7 @@ public class SavestateTempHandler implements EventControllerStateChange, EventRe
 				if (cause == null) {
 					cause = e;
 				}
-				TASmod.getServerInstance().getPlayerList().sendMessage(Component.translatable("msg.tasmod.savestate.failure", e.getMessage()).withStyle(TextFormatting.RED).build());
+				TASmod.getServerInstance().getPlayerList().broadcastSystemMessage(Component.translatable("msg.tasmod.savestate.failure", e.getMessage()).withStyle(ChatFormatting.RED), false);
 
 				try {
 					TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.CLEAR_SCREEN));
@@ -153,3 +154,4 @@ public class SavestateTempHandler implements EventControllerStateChange, EventRe
 		createState = false;
 	}
 }
+

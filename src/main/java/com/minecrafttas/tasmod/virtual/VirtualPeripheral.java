@@ -190,3 +190,4 @@ public abstract class VirtualPeripheral<T extends VirtualPeripheral<T>> extends 
 		return super.isEmpty() && flag;
 	}
 }
+

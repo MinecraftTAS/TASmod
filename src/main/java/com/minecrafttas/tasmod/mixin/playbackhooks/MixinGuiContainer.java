@@ -8,10 +8,11 @@ import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.virtual.VirtualKey;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.Screen;
 
-@Mixin(GuiContainer.class)
+@Mixin(AbstractContainerScreen.class)
 public class MixinGuiContainer {
 
 	/**
@@ -38,12 +39,13 @@ public class MixinGuiContainer {
 	 * Fixes <a href="https://github.com/MinecraftTAS/TASmod/issues/67">#67</a>
 	 * @param player The current player
 	 */
-	@Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V"))
-	public void redirectCloseScreen(EntityPlayerSP player) {
-		Minecraft mc = Minecraft.getMinecraft();
-		if (TASmodClient.virtual.isKeyDown(mc.gameSettings.keyBindInventory.getKeyCode()) && ((GuiContainer) (Object) this).isFocused()) {
+	@Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet.minecraft.client.player.LocalPlayer;closeScreen()V"))
+	public void redirectCloseScreen(LocalPlayer player) {
+		Minecraft mc = Minecraft.getInstance();
+		if (TASmodClient.virtual.isKeyDown(mc.options.keyInventory.getDefaultKey().getValue()) && ((AbstractContainerScreen) (Object) this).isFocused()) {
 			return;
 		}
-		player.closeScreen();
+		// mc.setScreen(null); // API changed in 26.3
 	}
 }
+

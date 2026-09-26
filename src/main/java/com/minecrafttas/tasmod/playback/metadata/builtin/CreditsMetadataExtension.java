@@ -11,8 +11,8 @@ import com.minecrafttas.tasmod.playback.tasfile.exception.PlaybackLoadException;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 /**
  * Adds credits to the playback metadata<br>
@@ -113,9 +113,9 @@ public class CreditsMetadataExtension extends PlaybackMetadataExtension implemen
 		LOGGER.trace(LoggerMarkers.Playback, "Printing credits");
 		if (state == TASstate.PLAYBACK && !creditsPrinted) {
 			creditsPrinted = true;
-			printMessage(title, TextFormatting.GOLD);
+			printMessage(title, ChatFormatting.GOLD);
 			printMessage("", null);
-			printMessage("by " + authors, TextFormatting.AQUA);
+			printMessage("by " + authors, ChatFormatting.AQUA);
 			printMessage("", null);
 			printMessage("in " + playtime, null);
 			printMessage("", null);
@@ -123,12 +123,13 @@ public class CreditsMetadataExtension extends PlaybackMetadataExtension implemen
 		}
 	}
 
-	protected void printMessage(String msg, TextFormatting format) {
+	protected void printMessage(String msg, ChatFormatting format) {
 		String formatString = "";
 		if (format != null)
 			formatString = format.toString();
 
-		Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(formatString + msg));
+		// Chat API changed in 26.3
+		// Minecraft.getInstance().gui.getChat().addMessage(Component.literal(formatString + msg));
 	}
 
 	@Override
@@ -138,3 +139,4 @@ public class CreditsMetadataExtension extends PlaybackMetadataExtension implemen
 		}
 	}
 }
+

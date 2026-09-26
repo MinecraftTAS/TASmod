@@ -2,12 +2,12 @@ package com.minecrafttas.tasmod.handlers;
 
 import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
-import com.minecrafttas.mctcommon.events.EventClient.EventClientGameLoop;
-import com.minecrafttas.mctcommon.events.EventClient.EventDoneLoadingWorld;
-import com.minecrafttas.mctcommon.events.EventClient.EventLaunchIntegratedServer;
-import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
-import com.minecrafttas.mctcommon.events.EventClient.EventPlayerLeaveClientSide;
-import com.minecrafttas.mctcommon.events.EventClient.EventSetCameraAngle;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventClientGameLoop;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventDoneLoadingWorld;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventLaunchIntegratedServer;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventPlayerLeaveClientSide;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventSetCameraAngle;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
@@ -15,7 +15,7 @@ import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.virtual.VirtualInput.VirtualCameraAngleInput;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.player.LocalPlayer;
 
 /**
  * Handles logic during a loading screen to transition between states.
@@ -83,9 +83,9 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 	public void onSetCameraAngle() {
 		LOGGER.debug(LoggerMarkers.Event, "Setting the camera angle");
 		VirtualCameraAngleInput cameraAngle = TASmodClient.virtual.CAMERA_ANGLE;
-		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayerSP player = mc.player;
-		cameraAngle.setCamera(player.rotationPitch, player.rotationYaw);
+		Minecraft mc = Minecraft.getInstance();
+		LocalPlayer player = mc.player;
+		cameraAngle.setCamera(player.getXRot(), player.getYRot());
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 	 * <p>Fixes stuck keys when loading the world  
 	 */
 	@Override
-	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
+	public void onPlayerJoinedClientSide(LocalPlayer player) {
 		TASmodClient.virtual.clearNext();
 	}
 
@@ -105,9 +105,10 @@ public class LoadingScreenHandler implements EventLaunchIntegratedServer, EventC
 	 * <p>If you later rejoin the world {@link #onSetCameraAngle()} will re-initialise the camera angle
 	 */
 	@Override
-	public void onPlayerLeaveClientSide(EntityPlayerSP player) {
+	public void onPlayerLeaveClientSide(LocalPlayer player) {
 		LOGGER.debug(LoggerMarkers.Event, "Finished leaving on the on the client side");
 		LOGGER.debug("Resetting the camera angle on leaving the world");
 		TASmodClient.virtual.CAMERA_ANGLE.clearNext();
 	}
 }
+

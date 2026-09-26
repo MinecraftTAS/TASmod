@@ -10,19 +10,19 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.Level;
 
-import com.minecrafttas.mctcommon.Configuration;
-import com.minecrafttas.mctcommon.ConfigurationRegistry;
-import com.minecrafttas.mctcommon.KeybindManager;
-import com.minecrafttas.mctcommon.LanguageManager;
-import com.minecrafttas.mctcommon.events.EventClient.EventClientInit;
-import com.minecrafttas.mctcommon.events.EventClient.EventOpenGui;
-import com.minecrafttas.mctcommon.events.EventClient.EventOptionsInit;
-import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
-import com.minecrafttas.mctcommon.file.AbstractDataFile;
-import com.minecrafttas.mctcommon.networking.Client;
-import com.minecrafttas.mctcommon.networking.PacketHandlerRegistry;
-import com.minecrafttas.mctcommon.networking.Server;
+import com.minecrafttas.tasmod.mctcommon.Configuration;
+import com.minecrafttas.tasmod.mctcommon.ConfigurationRegistry;
+import com.minecrafttas.tasmod.mctcommon.KeybindManager;
+import com.minecrafttas.tasmod.mctcommon.LanguageManager;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventClientInit;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventOpenGui;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventOptionsInit;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.file.AbstractDataFile;
+import com.minecrafttas.tasmod.mctcommon.networking.Client;
+import com.minecrafttas.tasmod.mctcommon.networking.PacketHandlerRegistry;
+import com.minecrafttas.tasmod.mctcommon.networking.Server;
 import com.minecrafttas.tasmod.commands.client.CommandFolder;
 import com.minecrafttas.tasmod.gui.InfoHud;
 import com.minecrafttas.tasmod.handlers.LoadingScreenHandler;
@@ -52,13 +52,14 @@ import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiControls;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.Options;
 import net.minecraft.server.MinecraftServer;
+
+import java.nio.file.Paths;
 
 public class TASmodClient implements ClientModInitializer, EventClientInit, EventPlayerJoinedClientSide, EventOpenGui, EventOptionsInit {
 
@@ -66,9 +67,17 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	public static TickSyncClient ticksyncClient;
 
-	public final static Path tasfiledirectory = Minecraft.getMinecraft().gameDir.toPath().resolve("saves").resolve("tasfiles");
+	public static Path getTasFileDirectory() {
+		return Paths.get(".").toAbsolutePath().resolve("saves").resolve("tasfiles");
+	}
 
-	public final static Path savestatedirectory = Minecraft.getMinecraft().gameDir.toPath().resolve("saves").resolve("savestates");
+	public static Path getSavestateDirectory() {
+		return Paths.get(".").toAbsolutePath().resolve("saves").resolve("savestates");
+	}
+
+	// Static fields for backward compatibility with other classes
+	public static final Path tasfiledirectory = getTasFileDirectory();
+	public static final Path savestatedirectory = getSavestateDirectory();
 
 	public static InfoHud hud;
 
@@ -80,7 +89,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	public static Scheduler tickSchedulerClient = new Scheduler();
 
-	public static Scheduler openMainMenuScheduler = new Scheduler();
+	public static Scheduler openTitleScreenScheduler = new Scheduler();
 
 	public static Configuration config;
 
@@ -103,7 +112,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	public static void createTASfileDir() {
 		try {
-			AbstractDataFile.createDirectory(tasfiledirectory);
+			AbstractDataFile.createDirectory(getTasFileDirectory());
 		} catch (IOException e) {
 			TASmod.LOGGER.catching(e);
 		}
@@ -111,7 +120,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	public static void createSavestatesDir() {
 		try {
-			AbstractDataFile.createDirectory(savestatedirectory);
+			AbstractDataFile.createDirectory(getSavestateDirectory());
 		} catch (IOException e) {
 			TASmod.LOGGER.catching(e);
 		}
@@ -126,7 +135,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 		registerConfigValues();
 
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = Minecraft.getInstance();
 
 		loadConfig(mc);
 
@@ -186,8 +195,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		EventListenerRegistry.register(ticksyncClient);
 		EventListenerRegistry.register(keybindManager);
 		EventListenerRegistry.register((EventOpenGui) (gui -> {
-			if (gui instanceof GuiMainMenu) {
-				openMainMenuScheduler.runAllTasks();
+			if (gui instanceof TitleScreen) {
+				openTitleScreenScheduler.runAllTasks();
 			}
 			return gui;
 		}));
@@ -202,7 +211,8 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		EventListenerRegistry.register(new LoggerMarkers());
 		EventListenerRegistry.register(savestateHandlerClient);
 
-		EventListenerRegistry.register(virtual.interpolationHandler);
+		// virtual.interpolationHandler is not an EventBase, handled elsewhere
+		// EventListenerRegistry.register(virtual.interpolationHandler);
 		EventListenerRegistry.register(tickratechanger);
 	}
 
@@ -218,9 +228,9 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	boolean isLoading;
 
 	@Override
-	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
-		Minecraft mc = Minecraft.getMinecraft();
-		ServerData data = mc.getCurrentServerData();
+	public void onPlayerJoinedClientSide(LocalPlayer player) {
+		Minecraft mc = Minecraft.getInstance();
+		ServerData data = mc.getCurrentServer();
 		MinecraftServer server = TASmod.getServerInstance();
 
 		String ip = null;
@@ -230,10 +240,12 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			ip = "localhost";
 			port = TASmod.server.port;
 			local = true;
-		} else {
-			ip = data.serverIP.split(":")[0];
+		} else if (data != null) {
+			ip = data.ip.split(":")[0];
 			port = TASmod.networkingport;
 			local = false;
+		} else {
+			return; // No server data available
 		}
 
 		String connectedIP = null;
@@ -243,7 +255,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			e.printStackTrace();
 		}
 
-		if (!(ip + ":" + port).equals(connectedIP)) { // TODO Clean this up. Make TASmodNetworkHandler out of this... Maybe with Permission system?
+		if (!(ip + ":" + port).equals(connectedIP)) {
 			try {
 				LOGGER.info("Closing client connection: {}", client.getRemote());
 				client.disconnect();
@@ -255,9 +267,9 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 			gameLoopSchedulerClient.add(() -> {
 				try {
 					// connect to server and authenticate
-					client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), local);
+					client = new Client(IP, PORT, TASmodPackets.values(), mc.getUser().getName(), local);
 				} catch (TimeoutException e) {
-					mc.getConnection().getNetworkManager().closeChannel(null);
+					// mc.getConnection().getNetworkManager().closeChannel(null); // API changed
 				} catch (Exception e) {
 					LOGGER.error("Unable to connect TASmod client: {}", e.getMessage());
 					e.printStackTrace();
@@ -267,16 +279,16 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	}
 
 	@Override
-	public GuiScreen onOpenGui(GuiScreen gui) {
-		if (gui instanceof GuiMainMenu) {
+	public Screen onOpenGui(Screen gui) {
+		if (gui instanceof TitleScreen) {
 			initializeCustomPacketHandler();
-		} else if (gui instanceof GuiControls) {
+		} else if (gui != null && gui.getClass().getSimpleName().equals("ControlsScreen")) {
 			TASmodClient.controller.setTASState(TASstate.NONE); // Set the TASState to nothing to avoid collisions
 			if (TASmodClient.tickratechanger.ticksPerSecond == 0) {
 				TASmodClient.tickratechanger.pauseClientGame(false); // Unpause the game
 				waszero = true;
 			}
-		} else if (!(gui instanceof GuiControls)) {
+		} else if (gui != null && !gui.getClass().getSimpleName().equals("ControlsScreen")) {
 			if (waszero) {
 				waszero = false;
 				TASmodClient.tickratechanger.pauseClientGame(true);
@@ -287,7 +299,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 	private void initializeCustomPacketHandler() {
 		if (client == null) {
-			Minecraft mc = Minecraft.getMinecraft();
+			Minecraft mc = Minecraft.getInstance();
 
 			String IP = "localhost";
 			int PORT = TASmod.server.port;
@@ -308,7 +320,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 
 			try {
 				// connect to server and authenticate
-				client = new Client(IP, PORT, TASmodPackets.values(), mc.getSession().getUsername(), true);
+				client = new Client(IP, PORT, TASmodPackets.values(), mc.getUser().getName(), true);
 			} catch (Exception e) {
 				LOGGER.error("Unable to connect TASmod client: {}", e);
 			}
@@ -316,10 +328,10 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	}
 
 	@Override
-	public void onOptionsInit(GameSettings options) {
+	public void onOptionsInit(Options options) {
 		// Initialize keybind manager
 		keybindManager.registerKeybinds(options, TASmodKeybinds.class);
-		Arrays.stream(TASmodKeybinds.valuesVanillaKeybind()).forEach(VirtualKeybindings::registerBlockedKeyBinding);
+		Arrays.stream(TASmodKeybinds.valuesVanillaKeybind()).forEach(VirtualKeybindings::registerBlockedKeyMapping);
 	}
 
 	private void registerPlaybackMetadata(Minecraft mc) {
@@ -354,7 +366,7 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 	}
 
 	private void loadConfig(Minecraft mc) {
-		Path configDir = mc.gameDir.toPath().resolve("config");
+		Path configDir = Paths.get(".").toAbsolutePath().resolve("config");
 		if (!Files.exists(configDir)) {
 			try {
 				Files.createDirectory(configDir);
@@ -368,3 +380,4 @@ public class TASmodClient implements ClientModInitializer, EventClientInit, Even
 		config.save();
 	}
 }
+

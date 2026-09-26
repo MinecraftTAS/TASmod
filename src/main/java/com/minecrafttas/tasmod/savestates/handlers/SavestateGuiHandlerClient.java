@@ -5,21 +5,22 @@ import static com.minecrafttas.tasmod.registries.TASmodPackets.SAVESTATE_RENAME_
 
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.mctcommon.networking.Client.Side;
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.ClientPacketHandler;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.Client.Side;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ClientPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.registries.TASmodPackets;
 import com.minecrafttas.tasmod.savestates.SavestateHandlerServer.SavestateState;
 import com.minecrafttas.tasmod.savestates.gui.GuiSavestate;
 import com.minecrafttas.tasmod.savestates.gui.GuiSavestateRename;
-import com.minecrafttas.tasmod.util.Component;
+import com.minecrafttas.tasmod.util.TASComponent;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 /**
  * Handles displaying Gui screens for savestating on the client
@@ -41,7 +42,7 @@ public class SavestateGuiHandlerClient implements ClientPacketHandler {
 	@Override
 	public void onClientPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
 		TASmodPackets packet = (TASmodPackets) id;
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = Minecraft.getInstance();
 
 		switch (packet) {
 			case SAVESTATE_LOADING_SCREEN:
@@ -54,7 +55,7 @@ public class SavestateGuiHandlerClient implements ClientPacketHandler {
 						msg = "gui.tasmod.savestate.save.start";
 					else if (state == SavestateState.LOADING)
 						msg = "gui.tasmod.savestate.load.start";
-					mc.displayGuiScreen(new GuiSavestate(Component.translatable(msg).withStyle(TextFormatting.YELLOW).build()));
+					// mc.setScreen(new GuiSavestate(Component.translatable(msg).withStyle(ChatFormatting.YELLOW))); // Stubbed
 				});
 				break;
 			case SAVESTATE_RENAME_SCREEN:
@@ -71,7 +72,7 @@ public class SavestateGuiHandlerClient implements ClientPacketHandler {
 				 * 
 				 * Apparently showing a screen has a tiny influence on the motion of the client...
 				 */
-				mc.displayGuiScreen(null);
+				// mc.setScreen(null); // Stubbed
 				TASmodClient.tickSchedulerClient.add(() -> {
 					displayGuiRename(index);
 				});
@@ -82,16 +83,17 @@ public class SavestateGuiHandlerClient implements ClientPacketHandler {
 	}
 
 	private void displayGuiRename(int index) {
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = Minecraft.getInstance();
 		//@formatter:off
-		mc.displayGuiScreen(
-				new GuiSavestateRename(
-						Component.translatable("gui.tasmod.savestate.save.rename", 
-								Component.literal(Integer.toString(index)).withStyle(t->t.setColor(TextFormatting.AQUA))
-						).withStyle(t->t.setColor(TextFormatting.GREEN)).build(),
-						index
-				)
-		);
+		// mc.setScreen(
+		// 		new GuiSavestateRename(
+		// 				Component.translatable("gui.tasmod.savestate.save.rename", 
+		// 						Component.literal(Integer.toString(index)).withStyle(t->t.withColor(ChatFormatting.AQUA))
+		// 				).withStyle(t->t.withColor(ChatFormatting.GREEN)),
+		// 				index
+		// 		)
+		// );
 		//@formatter:on
 	}
 }
+

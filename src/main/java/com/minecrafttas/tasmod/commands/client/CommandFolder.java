@@ -13,14 +13,11 @@ import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.gui.Gui;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 public class CommandFolder extends ClientCommandBase {
 
@@ -30,7 +27,12 @@ public class CommandFolder extends ClientCommandBase {
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender) {
+	public String getExtensionName() {
+		return "folder";
+	}
+
+	@Override
+	public String getUsage() {
 		return "/folder <type>";
 	}
 
@@ -40,7 +42,7 @@ public class CommandFolder extends ClientCommandBase {
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void execute(LocalPlayer player, String[] args) {
 		if (args.length == 1) {
 			if (args[0].equalsIgnoreCase("savestates")) {
 				openSavestates();
@@ -51,12 +53,15 @@ public class CommandFolder extends ClientCommandBase {
 	}
 
 	@Override
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-		List<String> tab = new ArrayList<String>();
+	public List<String> getTabCompletions(LocalPlayer player, String[] args) {
+		List<String> tab = new ArrayList<>();
 		if (args.length == 1) {
-			tab.addAll(getListOfStringsMatchingLastWord(args, new String[] { "savestates", "tasfiles" }));
-		} else {
-			tab.clear();
+			String lastWord = args[args.length - 1];
+			for (String option : new String[] { "savestates", "tasfiles" }) {
+				if (option.startsWith(lastWord)) {
+					tab.add(option);
+				}
+			}
 		}
 		return tab;
 	}
@@ -67,26 +72,29 @@ public class CommandFolder extends ClientCommandBase {
 			TASmodClient.createTASfileDir();
 			Desktop.getDesktop().open(file.toFile());
 		} catch (IOException e) {
-			LOGGER.error("Something went wrong while opening ", file);
+			LOGGER.error("Something went wrong while opening {}", file);
 			LOGGER.catching(e);
 		}
 	}
 
 	private void openSavestates() {
-		Path file = TASmodClient.savestatedirectory;
+		Path file = TASmodClient.getSavestateDirectory();
 		if (TASmod.getServerInstance() != null) {
 			file = TASmod.savestateHandlerServer.getCurrentSavestateDir();
 		}
 
 		if (!Files.exists(file)) {
-			Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.CHAT, new TextComponentString("Can't open savestates, as the directory doesn't exist").setStyle(new Style().setColor(TextFormatting.RED)));
+			Minecraft mc = Minecraft.getInstance();
+			if (mc.player != null) {
+				mc.player.sendSystemMessage(Component.literal("Can't open savestates, as the directory doesn't exist").withStyle(ChatFormatting.RED));
+			}
 			return;
 		}
 
 		try {
 			Desktop.getDesktop().open(file.toFile());
 		} catch (IOException e) {
-			LOGGER.error("Something went wrong while opening ", file);
+			LOGGER.error("Something went wrong while opening {}", file);
 			LOGGER.catching(e);
 		}
 	}

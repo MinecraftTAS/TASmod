@@ -14,3 +14,4 @@ public class Beta1Flavor extends SerialiserFlavorBase {
 		return new Beta1Flavor();
 	}
 }
+

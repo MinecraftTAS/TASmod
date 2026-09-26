@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.dselent.bigarraylist.BigArrayList;
-import com.minecrafttas.mctcommon.registry.Registerable;
+import com.minecrafttas.tasmod.mctcommon.registry.Registerable;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.CommentContainer;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.InputContainer;
 import com.minecrafttas.tasmod.playback.filecommands.PlaybackFileCommand;
@@ -156,16 +156,16 @@ public abstract class SerialiserFlavorBase implements Registerable {
 	/**
 	 * <p>Serialises the flavor of this file, the enabled file commands and other metadata
 	 * <h5>Tree</h5>
-	 * <pre>
-	 * serialiseHeader
-	 *	├── {@link #headerStart()}
-	 *	├── {@link #serialiseFlavorName(List)}
-	 *	├── {@link #serialiseEnabledFileCommandNames(List)}
-	 *	├── {@link #serialiseMetadata(List)}
-	 *	│   ├── {@link #serialiseMetadataName(List, String)}
-	 *	│   └── {@link #serialiseMetadataValues(List, LinkedHashMap)}
-	 *	└── {@link #headerEnd()}
-	 * </pre>
+* <pre>
+* serialiseHeader
+*	-> {@link #headerStart()}
+*	-> {@link #serialiseFlavorName(List)}
+*	-> {@link #serialiseEnabledFileCommandNames(List)}
+*	-> {@link #serialiseMetadata(List)}
+*		-> {@link #serialiseMetadataName(List, String)}
+*		-> {@link #serialiseMetadataValues(List, LinkedHashMap)}
+*	-> {@link #headerEnd()}
+* </pre>
 	 * <h5>Example</h5>
 	 * <pre>
 	 * ##################### TASfile ####################					// {@link #headerStart()}
@@ -309,28 +309,28 @@ public abstract class SerialiserFlavorBase implements Registerable {
 
 	/**
 	 * <p>Serialises a list of inputs into a list of strings
-	 * <h5>Tree</h5>
-	 * <pre>
-	 * serialise
-	 * └── {@link #serialiseContainer(BigArrayList, InputContainer)}
-	 *     ├── {@link #serialiseKeyboard(VirtualKeyboard)}
-	 *     │   └── {@link #serialiseKeyboardSubtick(VirtualKeyboard)}
-	 *     ├── {@link #serialiseMouse(VirtualMouse)}
-	 *     │   └── {@link #serialiseMouseSubtick(VirtualMouse)}
-	 *     ├── {@link #serialiseCameraAngle(VirtualCameraAngle)}
-	 *     │   └── {@link #serialiseCameraAngleSubtick(VirtualCameraAngle)}
-	 *     ├── {@link #serialiseInlineComments(List, UnsortedFileCommandContainer)}
-	 *     │   ├── {@link #serialiseInlineComment(String)}
-	 *     │   └── {@link #serialiseFileCommandsInline(List)}
-	 *     │       └── {@link #serialiseFileCommand(PlaybackFileCommand)}
-	 *     ├── {@link #serialiseEndlineComments(List, UnsortedFileCommandContainer)}	// Same as serialiseInlineComments
-	 *     │   ├── {@link #serialiseEndlineComment(String)}
-	 *     │   └── {@link #serialiseFileCommandsEndline(FileCommandsInCommentList)}	// Unused
-	 *     │       └── {@link #serialiseFileCommand(PlaybackFileCommand)}
-	 *     └── {@link #mergeInputs(BigArrayList, List, List, List, List)}
-	 *         ├── {@link #mergeInput(long, String, String, String, String)}
-	 *         └── {@link #mergeSubtickInput(long, String, String, String, String)}
-	 * </pre>
+* <h5>Tree</h5>
+* <pre>
+* serialise
+* -> {@link #serialiseContainer(BigArrayList, InputContainer)}
+*     -> {@link #serialiseKeyboard(VirtualKeyboard)}
+*     -> {@link #serialiseKeyboardSubtick(VirtualKeyboard)}
+*     -> {@link #serialiseMouse(VirtualMouse)}
+*     -> {@link #serialiseMouseSubtick(VirtualMouse)}
+*     -> {@link #serialiseCameraAngle(VirtualCameraAngle)}
+*     -> {@link #serialiseCameraAngleSubtick(VirtualCameraAngle)}
+*     -> {@link #serialiseInlineComments(List, UnsortedFileCommandContainer)}
+*     -> {@link #serialiseInlineComment(String)}
+*     -> {@link #serialiseFileCommandsInline(List)}
+*         -> {@link #serialiseFileCommand(PlaybackFileCommand)}
+*     -> {@link #serialiseEndlineComments(List, UnsortedFileCommandContainer)}	// Same as serialiseInlineComments
+*     -> {@link #serialiseEndlineComment(String)}
+*     -> {@link #serialiseFileCommandsEndline(FileCommandsInCommentList)}	// Unused
+*         -> {@link #serialiseFileCommand(PlaybackFileCommand)}
+*     -> {@link #mergeInputs(BigArrayList, List, List, List, List)}
+*         -> {@link #mergeInput(long, String, String, String, String)}
+*         -> {@link #mergeSubtickInput(long, String, String, String, String)}
+* </pre>
 	 * 
 	 * @param inputs The inputs to serialise
 	 * @param toTick The tick where to stop, used for partial serialisation by savestates. -1 to serialise all
@@ -964,8 +964,8 @@ public abstract class SerialiserFlavorBase implements Registerable {
 	 * <p>Deserialise header lines
 	 * <pre>
 	 *  deserialiseHeader
-	 *  ├── {@link #deserialiseMetadata(List)}
-	 *  └── {@link #deserialiseEnabledFileCommandNames(List)}
+	 *  笝懌楳笝 {@link #deserialiseMetadata(List)}
+	 *  笝披楳笝 {@link #deserialiseEnabledFileCommandNames(List)}
 	 * </pre>
 	 * 
 	 * @param headerLines The header lines to deserialise
@@ -1058,20 +1058,20 @@ public abstract class SerialiserFlavorBase implements Registerable {
 	/**
 	 * <p>Deserialises the input part of the TASfile
 	 * 
-	 * <pre>
-	 * deserialise
-	 * ├── {@link #extractContainer(List, BigArrayList, long)}
-	 * └── {@link #deserialiseContainer(BigArrayList, List)}
-	 *     ├── {@link #deserialiseMultipleInlineComments(List, UnsortedFileCommandContainer)}
-	 *     │   └── {@link #deserialiseInlineComment(String, FileCommandsInCommentList)}
-	 *     │       └── {@link #deserialiseFileCommandsInline(String, FileCommandsInCommentList)}
-	 *     ├── {@link #splitTickLines(List, List, List, List, List, List)}
-	 *     │   └── {@link #deserialiseEndlineComment(String, FileCommandsInCommentList)}
-	 *     │       └── {@link #deserialiseFileCommandsEndline(String, FileCommandsInCommentList)}
-	 *     ├── {@link #deserialiseKeyboard(List)}
-	 *     ├── {@link #deserialiseMouse(List)}
-	 *     └── {@link #deserialiseCameraAngle(List)}
-	 * </pre>
+* <pre>
+* deserialise
+* -> {@link #extractContainer(List, BigArrayList, long)}
+* -> {@link #deserialiseContainer(BigArrayList, List)}
+*     -> {@link #deserialiseMultipleInlineComments(List, UnsortedFileCommandContainer)}
+*     -> {@link #deserialiseInlineComment(String, FileCommandsInCommentList)}
+*         -> {@link #deserialiseFileCommandsInline(String, FileCommandsInCommentList)}
+*     -> {@link #splitTickLines(List, List, List, List, List, List)}
+*     -> {@link #deserialiseEndlineComment(String, FileCommandsInCommentList)}
+*         -> {@link #deserialiseFileCommandsEndline(String, FileCommandsInCommentList)}
+*     -> {@link #deserialiseKeyboard(List)}
+*     -> {@link #deserialiseMouse(List)}
+*     -> {@link #deserialiseCameraAngle(List)}
+* </pre>
 	 * 
 	 * @param lines The serialised lines of the TASfile
 	 * @param startPos The position when the header ends and the inputs start
@@ -2084,3 +2084,4 @@ public abstract class SerialiserFlavorBase implements Registerable {
 		return super.equals(obj);
 	}
 }
+

@@ -3,7 +3,7 @@ package com.minecrafttas.tasmod.savestates.files;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.minecrafttas.mctcommon.file.AbstractDataFile;
+import com.minecrafttas.tasmod.mctcommon.file.AbstractDataFile;
 import com.minecrafttas.tasmod.TASmod;
 
 /**
@@ -68,3 +68,4 @@ public class SavestateTrackerFile extends AbstractDataFile {
 		properties.setProperty(key, Integer.toString(count));
 	}
 }
+

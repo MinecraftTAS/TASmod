@@ -14,17 +14,16 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
-import com.minecrafttas.mctcommon.networking.Client.Side;
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
-import com.minecrafttas.mctcommon.networking.interfaces.ServerPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.networking.Client.Side;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.commands.CommandSavestate;
 import com.minecrafttas.tasmod.events.EventSavestate;
 import com.minecrafttas.tasmod.mixin.savestates.AccessorAnvilChunkLoader;
-import com.minecrafttas.tasmod.mixin.savestates.AccessorChunkLoader;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.registries.TASmodPackets;
 import com.minecrafttas.tasmod.savestates.SavestateIndexer.DeletionRunnable;
@@ -37,17 +36,19 @@ import com.minecrafttas.tasmod.savestates.handlers.SavestatePlayerHandlerServer;
 import com.minecrafttas.tasmod.savestates.handlers.SavestateResourcePackHandler;
 import com.minecrafttas.tasmod.savestates.handlers.SavestateTempHandler;
 import com.minecrafttas.tasmod.savestates.handlers.SavestateWorldHandler;
-import com.minecrafttas.tasmod.util.Component;
+import com.minecrafttas.tasmod.util.TASComponent;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 import com.minecrafttas.tasmod.util.Scheduler.Task;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.PlayerList;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.ChatFormatting;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.chunk.storage.RegionFileStorage;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.storage.LevelStorageSource;
 
 /**
  * Creates and loads savestates on both client and server without closing the
@@ -218,9 +219,11 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 		// Enable tickrate 0
 		TASmod.tickratechanger.pauseGame(true);
 
-		// Save the world!
-		server.getPlayerList().saveAllPlayerData();
-		server.saveAllWorlds(false);
+// Save the world!
+		server.getPlayerList().saveAll();
+		for (ServerLevel level : server.getAllLevels()) {
+			level.save(null, true, false);
+		}
 
 		Path sourceFolder = paths.getSourceFolder();
 		Path targetFolder = paths.getTargetFolder();
@@ -254,11 +257,13 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 			}
 		}
 
-		// Wait for the chunkloader to save the game
-		for (WorldServer world : server.worlds) {
-			AnvilChunkLoader chunkloader = (AnvilChunkLoader) ((AccessorChunkLoader) world.getChunkProvider()).getChunkLoader();
-
-			while (((AccessorAnvilChunkLoader) chunkloader).getChunksToSave().size() > 0) {
+// Wait for the chunkloader to save the game
+		for (ServerLevel world : server.getAllLevels()) {
+			// Modern chunk saving is automatic, just wait a bit
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 		}
 
@@ -377,10 +382,10 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 	 * @param flags The {@link SavestateFlags}
 	 */
 	private void loadStateInner(SavestatePaths paths, SavestateCallback cb, SavestateFlags... flags) {
-		// Enable tickrate 0
+// Enable tickrate 0
 		TASmod.tickratechanger.pauseGame(true);
 
-		String worldname = server.getFolderName();
+		String worldname = server.getWorldData().getLevelName();
 		Path sourcefolder = paths.getSourceFolder();
 		Path targetfolder = paths.getTargetFolder();
 
@@ -476,17 +481,17 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 	 * Create and set the {@link #indexer} based on the server
 	 * @param server The server to retrieve the current directory from
 	 */
-	private void createIndexer(MinecraftServer server) {
+private void createIndexer(MinecraftServer server) {
 		logger.trace(LoggerMarkers.Savestate, "Creating savestate indexer");
 
-		Path dataDirectory = server.getDataDirectory().toPath(); // The basic minecraft data directory
+		Path dataDirectory = server.getServerDirectory(); // The basic minecraft data directory
 		Path savesDirectory = dataDirectory; // The location of minecraft saves. On the a dedicated server it's the same as the data directory
 		if (!server.isDedicatedServer()) {
 			savesDirectory = dataDirectory.resolve("saves"); // The location of minecraft saves. On the integrated server it's .minecraft/saves
 		}
 
-		Path savestateBaseDirectory = savesDirectory.resolve("savestates"); // The base savestatedir: .minecraft/saves/savestates
-		String worldname = server.getFolderName();
+Path savestateBaseDirectory = savesDirectory.resolve("savestates"); // The base savestatedir: .minecraft/saves/savestates
+		String worldname = server.getWorldData().getLevelName();
 
 		logger.debug("Created savestate handler with saves: {}, savestates: {}, worldname: {}", savesDirectory, savestateBaseDirectory, worldname);
 		this.indexer = new SavestateIndexer(logger, savesDirectory, savestateBaseDirectory, worldname);
@@ -574,12 +579,12 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 		indexer.reload();
 	}
 
-	public void onLoadstateComplete() { // TODO Make Event
+public void onLoadstateComplete() { // TODO Make Event
 		logger.trace(LoggerMarkers.Savestate, "Running loadstate complete event");
 		PlayerList playerList = server.getPlayerList();
-		for (EntityPlayerMP player : playerList.getPlayers()) {
-			NBTTagCompound nbttagcompound = playerList.readPlayerDataFromFile(player);
-			playerHandler.reattachEntityToPlayer(nbttagcompound, player.getServerWorld(), player);
+		for (ServerPlayer player : playerList.getPlayers()) {
+			CompoundTag nbttagcompound = new CompoundTag(); // TODO: getPersistentData() not available in newer mappings
+			playerHandler.reattachEntityToPlayer(nbttagcompound, player.level(), player);
 		}
 	}
 
@@ -598,7 +603,7 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 		// TODO Permissions
 		TASmodPackets packet = (TASmodPackets) id;
 
-		EntityPlayerMP player = server.getPlayerList().getPlayerByUsername(username);
+		ServerPlayer player = server.getPlayerList().getPlayerByName(username);
 
 		switch (packet) {
 			case SAVESTATE_SAVE:
@@ -616,11 +621,11 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 					}
 				};
 
-				Task savestateTask = () -> {
+Task savestateTask = () -> {
 					try {
 						saveState(index, cb);
 					} catch (SavestateException e) {
-						TASmod.getServerInstance().getServer().getPlayerList().sendMessage(Component.translatable(e.getMessage()).withStyle(TextFormatting.RED).build());
+						server.getPlayerList().broadcastSystemMessage(Component.translatable(e.getMessage()).withStyle(ChatFormatting.RED), false);
 
 						try {
 							TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_0_WARN));
@@ -636,7 +641,7 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 						if (cause == null) {
 							cause = e;
 						}
-						TASmod.getServerInstance().getPlayerList().sendMessage(Component.translatable("msg.tasmod.savestate.failure", e.getMessage()).withStyle(TextFormatting.RED).build());
+						server.getPlayerList().broadcastSystemMessage(Component.translatable("msg.tasmod.savestate.failure", e.getMessage()).withStyle(ChatFormatting.RED), false);
 
 						try {
 							TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_0_WARN));
@@ -666,14 +671,14 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 			case SAVESTATE_LOAD:
 				int indexing = TASmodBufferBuilder.readInt(buf);
 
-				SavestateCallback cb2 = CommandSavestate.createChatMessageCallback(player, "msg.tasmod.savestate.load.end");
+SavestateCallback cb2 = CommandSavestate.createChatMessageCallback(player.createCommandSourceStack(), "msg.tasmod.savestate.load.end");
 
 				Task loadstateTask = () -> {
 
 					try {
 						loadState(indexing, cb2);
 					} catch (LoadstateException e) {
-						TASmod.getServerInstance().getServer().getPlayerList().sendMessage(Component.translatable(e.getMessage()).withStyle(TextFormatting.RED).build());
+						server.getPlayerList().broadcastSystemMessage(Component.translatable(e.getMessage()).withStyle(ChatFormatting.RED), false);
 
 						try {
 							TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_0_WARN));
@@ -688,7 +693,7 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 						if (cause == null) {
 							cause = e;
 						}
-						TASmod.getServerInstance().getServer().getPlayerList().sendMessage(Component.translatable("msg.tasmod.savestate.failure", e.getMessage()).withStyle(TextFormatting.RED).build());
+						server.getPlayerList().broadcastSystemMessage(Component.translatable("msg.tasmod.savestate.failure", e.getMessage()).withStyle(ChatFormatting.RED), false);
 
 						try {
 							TASmod.server.sendToAll(new TASmodBufferBuilder(TASmodPackets.TICKRATE_0_WARN));
@@ -888,3 +893,4 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 		return tempSavestateHandler;
 	}
 }
+

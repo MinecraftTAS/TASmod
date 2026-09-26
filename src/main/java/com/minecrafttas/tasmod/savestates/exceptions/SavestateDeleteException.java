@@ -21,3 +21,4 @@ public class SavestateDeleteException extends RuntimeException {
 		super(String.format(msg, args), t);
 	}
 }
+

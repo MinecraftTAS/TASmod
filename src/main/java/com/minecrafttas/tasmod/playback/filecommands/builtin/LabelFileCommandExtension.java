@@ -68,3 +68,4 @@ public class LabelFileCommandExtension extends PlaybackFileCommandExtension {
 		return labelText;
 	}
 }
+

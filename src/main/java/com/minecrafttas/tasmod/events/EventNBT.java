@@ -1,30 +1,31 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry.EventBase;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry.EventBase;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.storage.WorldInfo;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.LevelData;
 
 public interface EventNBT {
 
 	@FunctionalInterface
 	public interface EventPlayerRead extends EventBase {
-		public void onPlayerReadNBT(NBTTagCompound compound, EntityPlayerMP player);
+		public void onPlayerReadNBT(CompoundTag compound, ServerPlayer player);
 	}
 
 	@FunctionalInterface
 	public interface EventPlayerWrite extends EventBase {
-		public void onPlayerWriteNBT(NBTTagCompound compound, EntityPlayerMP player);
+		public void onPlayerWriteNBT(CompoundTag compound, ServerPlayer player);
 	}
 
 	@FunctionalInterface
 	public interface EventWorldRead extends EventBase {
-		public void onWorldReadNBT(NBTTagCompound worldCompound);
+		public void onWorldReadNBT(CompoundTag worldCompound);
 	}
 
 	@FunctionalInterface
 	public interface EventWorldWrite extends EventBase {
-		public NBTTagCompound onWorldWriteNBT(NBTTagCompound compound, WorldInfo worldInfo);
+		public CompoundTag onWorldWriteNBT(CompoundTag compound, LevelData worldInfo);
 	}
 }
+

@@ -4,13 +4,13 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.mctcommon.events.EventClient.EventClientGameLoop;
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
-import com.minecrafttas.mctcommon.networking.Client.Side;
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.ClientPacketHandler;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventClientGameLoop;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.networking.Client.Side;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ClientPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventClient.EventClientTickPost;
 import com.minecrafttas.tasmod.events.EventTickratechanger;
@@ -128,22 +128,27 @@ public class TickrateChangerClient implements ClientPacketHandler, EventClientGa
 		if (tickrate < 0) {
 			return;
 		}
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = Minecraft.getInstance();
 		if (tickrate > 0) {
 			millisecondsPerTick = (long) (1000F / tickrate);
-			mc.timer.tickLength = millisecondsPerTick;
+			// deltaTracker.tickLength is private in 1.22+, stub for now
+			// setDeltaTrackerTickLength(mc, millisecondsPerTick);
 
 		} else if (tickrate == 0F) {
 			if (ticksPerSecond != 0) {
 				tickrateSaved = ticksPerSecond;
 			}
-			mc.timer.tickLength = Float.MAX_VALUE;
+			// setDeltaTrackerTickLength(mc, Float.MAX_VALUE);
 		}
 		ticksPerSecond = tickrate;
 		EventListenerRegistry.fireEvent(EventTickratechanger.EventClientTickrateChange.class, tickrate);
 		if (log)
 			log("Setting the client tickrate to " + ticksPerSecond);
 	}
+
+	// Stubbed - reflection on private deltaTracker fields is unreliable in 1.22+
+	// private void setDeltaTrackerTickLength(Minecraft mc, float tickLength) {
+	// }
 
 	/**
 	 * <p>Attempts to change the tickrate on the server.
@@ -230,7 +235,7 @@ public class TickrateChangerClient implements ClientPacketHandler, EventClientGa
 	 * or calls {@link #advanceClientTick()} if the world is null.
 	 */
 	public void advanceTick() {
-		if (Minecraft.getMinecraft().world != null) {
+		if (Minecraft.getInstance().level != null) {
 			advanceServerTick();
 		} else {
 			advanceClientTick();
@@ -382,3 +387,4 @@ public class TickrateChangerClient implements ClientPacketHandler, EventClientGa
 		}
 	}
 }
+

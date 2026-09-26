@@ -1,7 +1,7 @@
 package com.minecrafttas.tasmod.virtual.event;
 
 /**
- * Template for recording {@link org.lwjgl.input.Keyboard#next()} events.
+ * Template for recording {@link org.lwjgl.glfw.GLFW#next()} events.
  *
  * @author Scribble
  */
@@ -35,3 +35,4 @@ public class VirtualKeyboardEvent extends VirtualEvent {
 		return super.equals(obj);
 	}
 }
+

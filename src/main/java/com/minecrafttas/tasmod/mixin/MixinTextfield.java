@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.virtual.VirtualKeybindings;
 
-import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.components.EditBox;
 
-@Mixin(GuiTextField.class)
+@Mixin(EditBox.class)
 public class MixinTextfield {
 
 	@Inject(at = @At("HEAD"), method = "setFocused", cancellable = true)
@@ -18,3 +18,4 @@ public class MixinTextfield {
 	}
 
 }
+

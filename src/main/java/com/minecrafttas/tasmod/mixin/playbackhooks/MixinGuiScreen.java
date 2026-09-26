@@ -7,21 +7,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventClient.EventDrawScreen;
-import com.minecrafttas.tasmod.util.Ducks.GuiScreenDuck;
+import com.minecrafttas.tasmod.util.Ducks.ScreenDuck;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 import com.minecrafttas.tasmod.virtual.event.VirtualKeyboardEvent;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screens.Screen;
 
-@Mixin(GuiScreen.class)
-public class MixinGuiScreen implements GuiScreenDuck {
+@Mixin(Screen.class)
+public class MixinGuiScreen implements ScreenDuck {
 
 	/**
-	 * Redirects a {@link org.lwjgl.input.Keyboard#next()}. Starts running every tick and continues as long as there are {@link VirtualKeyboardEvent}s in {@link VirtualInput}
+	 * Redirects a {@link org.lwjgl.glfw.GLFW#next()}. Starts running every tick and continues as long as there are {@link VirtualKeyboardEvent}s in {@link VirtualInput}
 	 * @see VirtualInput.VirtualKeyboardInput#nextKeyboardSubtick()
 	 * @return If {@link VirtualKeyboardEvent}s are present in {@link VirtualInput}
 	 */
@@ -109,7 +109,7 @@ public class MixinGuiScreen implements GuiScreenDuck {
 
 	@Inject(method = "drawScreen", at = @At("HEAD"))
 	private void injectDrawScreen(int i, int j, float f, CallbackInfo ci) {
-		EventListenerRegistry.fireEvent(EventDrawScreen.class, (GuiScreen) (Object) this, i, j);
+		EventListenerRegistry.fireEvent(EventDrawScreen.class, (Screen) (Object) this, i, j);
 	}
 
 	@Shadow
@@ -123,22 +123,23 @@ public class MixinGuiScreen implements GuiScreenDuck {
 
 	@Override
 	public int unscaleX(int X) {
-		return X * this.width / this.mc.displayWidth;
+		return X * this.width / this.mc.getWindow().getWidth();
 	}
 
 	@Override
 	public int unscaleY(int Y) {
-		return this.height - Y * this.height / this.mc.displayHeight - 1;
+		return this.height - Y * this.height / this.mc.getWindow().getHeight() - 1;
 	}
 
 	@Override
 	public int rescaleX(int X) {
-		return X * this.mc.displayWidth / this.width;
+		return X * this.mc.getWindow().getWidth() / this.width;
 	}
 
 	@Override
 	public int rescaleY(int Y) {
-		return (this.mc.displayHeight * (this.height - Y - 1) / this.height);
+		return (this.mc.getWindow().getHeight() * (this.height - Y - 1) / this.height);
 	}
 
 }
+

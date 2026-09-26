@@ -3,28 +3,28 @@ package com.minecrafttas.tasmod.savestates.gui;
 import com.minecrafttas.tasmod.virtual.SubtickGuiScreen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
+/**
+ * Savestate GUI screen
+ */
 public class GuiSavestate extends SubtickGuiScreen {
 
-	private final ITextComponent msg;
+	private final Component msg;
 
-	public GuiSavestate(ITextComponent msg) {
-		this.mc = Minecraft.getMinecraft();
+	public GuiSavestate(Component msg) {
+		super();
 		this.msg = msg;
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		this.drawDefaultBackground();
-
-		drawCenteredString(fontRenderer, msg.getFormattedText(), width / 2, 90, 0xFFFFFF);
-
-		super.drawScreen(mouseX, mouseY, partialTicks);
+	public boolean shouldCloseOnEsc() {
+		return true;
 	}
 
 	@Override
-	public boolean doesGuiPauseGame() {
+	public boolean isPauseScreen() {
 		return true;
 	}
 }
+

@@ -19,9 +19,9 @@ import com.minecrafttas.tasmod.virtual.event.VirtualKeyboardEvent;
 /**
  * Stores keyboard specific values in a given timeframe.<br>
  * <br>
- * This keyboard mimics the {@link org.lwjgl.input.Keyboard} Minecraft is using.
+ * This keyboard mimics the {@link org.lwjgl.glfw.GLFW} Minecraft is using.
  * <h2>KeyboardEvent</h2>
- * {@link org.lwjgl.input.Keyboard} has the following outputs, when a key is pressed or unpressed on the <em>physical</em> keyboard:
+ * {@link org.lwjgl.glfw.GLFW} has the following outputs, when a key is pressed or unpressed on the <em>physical</em> keyboard:
  * <ul>
  *     <li>int <strong>KeyCode</strong>: The unique keycode of the key</li>
  *     <li>boolean <strong>KeyState</strong>: The new state of the key. True for pressed, false for unpressed</li>
@@ -392,3 +392,4 @@ public class VirtualKeyboard extends VirtualPeripheral<VirtualKeyboard> implemen
 		return super.isEmpty() && charList.isEmpty();
 	}
 }
+

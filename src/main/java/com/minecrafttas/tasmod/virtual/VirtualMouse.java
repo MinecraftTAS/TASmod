@@ -366,3 +366,4 @@ public class VirtualMouse extends VirtualPeripheral<VirtualMouse> implements Ser
 		}
 	}
 }
+

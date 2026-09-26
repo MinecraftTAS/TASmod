@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry.EventBase;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry.EventBase;
 
 public interface EventTickratechanger {
 
@@ -29,3 +29,4 @@ public interface EventTickratechanger {
 	}
 
 }
+

@@ -13,9 +13,10 @@ import com.minecrafttas.tasmod.playback.tasfile.PlaybackSerialiser;
  */
 public class DebugWriter {
 
-	private static Path debugTASFile = TASmodClient.tasfiledirectory.resolve("debug.mctas");
+	private static Path debugTASFile = TASmodClient.getTasFileDirectory().resolve("debug.mctas");
 
 	public static void writeDebugFile(PlaybackControllerClient controller) {
 		PlaybackSerialiser.saveToFile(debugTASFile, controller, null);
 	}
 }
+

@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.virtual.VirtualInput;
 
-import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.screens.ChatScreen;
 
-@Mixin(GuiChat.class)
+@Mixin(ChatScreen.class)
 public class MixinGuiChat {
 	/**
 	 * @return {@link VirtualInput.VirtualMouseInput#getEventMouseScrollWheel()}
@@ -19,3 +19,4 @@ public class MixinGuiChat {
 		return TASmodClient.virtual.MOUSE.getEventMouseScrollWheel();
 	}
 }
+

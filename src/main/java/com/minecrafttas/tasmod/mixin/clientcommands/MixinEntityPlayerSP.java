@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.minecrafttas.tasmod.registries.TASmodAPIRegistry;
 
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.player.LocalPlayer;
 
-@Mixin(EntityPlayerSP.class)
+@Mixin(LocalPlayer.class)
 public class MixinEntityPlayerSP {
 
 	@Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
@@ -19,3 +19,4 @@ public class MixinEntityPlayerSP {
 		}
 	}
 }
+

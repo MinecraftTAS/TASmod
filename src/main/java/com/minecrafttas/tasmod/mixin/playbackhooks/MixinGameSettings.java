@@ -6,10 +6,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.TASmodClient;
 
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.Options;
+import net.minecraft.client.KeyMapping;
 
-@Mixin(GameSettings.class)
+@Mixin(Options.class)
 public class MixinGameSettings {
 
 	/**
@@ -19,7 +19,7 @@ public class MixinGameSettings {
 	 * @return Whether the key is down
 	 */
 	@Redirect(method = "isKeyDown", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;isButtonDown(I)Z", remap = false))
-	private static boolean redirectIsKeyDown1(int i, KeyBinding key) {
+	private static boolean redirectIsKeyDown1(int i, KeyMapping key) {
 		return TASmodClient.virtual.isKeyDown(i + 100);
 	}
 
@@ -30,7 +30,8 @@ public class MixinGameSettings {
 	 * @return Whether the key is down
 	 */
 	@Redirect(method = "isKeyDown", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;isKeyDown(I)Z", remap = false))
-	private static boolean redirectIsKeyDown2(int i, KeyBinding key) {
+	private static boolean redirectIsKeyDown2(int i, KeyMapping key) {
 		return TASmodClient.virtual.isKeyDown(i);
 	}
 }
+

@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.registries;
 
-import com.minecrafttas.mctcommon.ConfigurationRegistry.ConfigOptions;
+import com.minecrafttas.tasmod.mctcommon.ConfigurationRegistry.ConfigOptions;
 
 /**
  * The config options that will be stored in .minecraft/config/tasmod.cfg
@@ -36,3 +36,4 @@ public enum TASmodConfig implements ConfigOptions {
 		return "TASmodConfig";
 	}
 }
+

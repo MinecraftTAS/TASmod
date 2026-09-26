@@ -9,15 +9,15 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventClient.EventClientTickPost;
 import com.minecrafttas.tasmod.util.Ducks.SubtickDuck;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.util.Timer;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.DeltaTracker;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -25,7 +25,7 @@ public abstract class MixinMinecraft {
 	// =====================================================================================================================================
 
 	@Shadow
-	private GuiScreen currentScreen;
+	private Screen screen;
 
 	@Inject(method = "runGameLoop", at = @At(value = "HEAD"))
 	public void injectRunGameLoop(CallbackInfo ci) {
@@ -35,18 +35,18 @@ public abstract class MixinMinecraft {
 	// =====================================================================================================================================
 
 	@Shadow
-	private EntityRenderer entityRenderer;
+	private GameRenderer entityRenderer;
 	@Shadow
 	private boolean isGamePaused;
 	@Shadow
 	private float renderPartialTicksPaused;
 	@Shadow
-	private Timer timer;
+	private DeltaTracker timer;
 
 	@Redirect(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;runTick()V"))
 	public void redirectRunTick(Minecraft mc) {
 		if (TASmodClient.tickratechanger.ticksPerSecond != 0) {
-			((SubtickDuck) this.entityRenderer).runUpdate(this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks);
+			((SubtickDuck) this.entityRenderer).runUpdate(this.isGamePaused ? this.renderPartialTicksPaused : 0.0f);
 		}
 		this.runTick();
 		TASmodClient.tickSchedulerClient.runAllTasks();

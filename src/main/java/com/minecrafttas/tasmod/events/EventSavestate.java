@@ -1,9 +1,9 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry.EventBase;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry.EventBase;
 import com.minecrafttas.tasmod.savestates.SavestateIndexer.SavestatePaths;
 
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.MinecraftServer;
 
 public interface EventSavestate {
@@ -89,6 +89,7 @@ public interface EventSavestate {
 		/**
 		 * Fired during loadstating, after the player is loaded on the client
 		 */
-		public void onClientLoadPlayer(EntityPlayerSP player);
+		public void onClientLoadPlayer(LocalPlayer player);
 	}
 }
+

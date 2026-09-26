@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.minecrafttas.mctcommon.events.EventServer.EventClientCompleteAuthentication;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
-import com.minecrafttas.mctcommon.networking.interfaces.ServerPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.events.EventServer.EventClientCompleteAuthentication;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
@@ -98,3 +98,4 @@ public class TickSyncServer implements ServerPacketHandler, EventServerTickPost,
 		this.enabled = enabled;
 	}
 }
+

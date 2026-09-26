@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import com.minecrafttas.tasmod.TASmodClient;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Util;
 
 /**
  * This mixin tries to make the animation of the advancement toasts dependent on the tickrate while keeping the code as vanilla as possible<br>
@@ -18,7 +19,7 @@ import net.minecraft.client.Minecraft;
  * And if it's set to SHOW the fly in animation and sound will play, the same goes with HIDE where it flies out after a certain amount of time<br>
  * After a lot of trial and error I found out that animationTimer, which was originally "i", is the way to go...<br>
  * <br>
- * So just as RenderItem and GuiSubtitleOverlay, things are done with an offset for tickrate 0 and simple multiplication<br>
+ * So just as ItemRenderer and SubtitleOverlay, things are done with an offset for tickrate 0 and simple multiplication<br>
  * Also I used a copy of the vanilla ToastInstance-class to make it work for every subtitle on screen... If you seek to make it work for only 1, at the end is a commented code that shows you how to use @ModyfyVarable<br>
  * <br>
  * There is one compromise I had to make... When you change the tickrate while a toast is showing, it will stay at the old tickrate until it's done...<br>
@@ -79,10 +80,10 @@ public abstract class MixinGuiToast {
 		if (TASmodClient.tickratechanger.ticksPerSecond != 0) {
 			if (once) {
 				once = false;
-				offset = Minecraft.getSystemTime() - store;
+				offset = Util.getMillis() - store;
 			}
 
-			animationTimer = (long) ((Minecraft.getSystemTime() - offset) * (TASmodClient.tickratechanger.ticksPerSecond / 20));
+			animationTimer = (long) ((Util.getMillis() - offset) * (TASmodClient.tickratechanger.ticksPerSecond / 20));
 
 			if (ticksave != TASmodClient.tickratechanger.ticksPerSecond) {
 				ticksave = TASmodClient.tickratechanger.ticksPerSecond;
@@ -95,10 +96,11 @@ public abstract class MixinGuiToast {
 		} else {
 			if (!once) {
 				once = true;
-				store = (long) ((Minecraft.getSystemTime() - offset));
+				store = (long) ((Util.getMillis() - offset));
 			}
 			animationTimer = (long) (store * (TASmodClient.tickratechanger.tickrateSaved / 20));
 		}
 		return animationTimer;
 	}
 }
+

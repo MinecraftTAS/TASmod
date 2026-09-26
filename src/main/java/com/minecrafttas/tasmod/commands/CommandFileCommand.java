@@ -3,6 +3,33 @@ package com.minecrafttas.tasmod.commands;
 import static com.minecrafttas.tasmod.registries.TASmodPackets.COMMAND_FILECOMMANDLIST;
 import static com.minecrafttas.tasmod.registries.TASmodPackets.PLAYBACK_FILECOMMAND_ENABLE;
 
+import com.minecrafttas.tasmod.mctcommon.networking.Client.Side;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ClientPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ServerPacketHandler;
+import com.minecrafttas.tasmod.TASmod;
+import com.minecrafttas.tasmod.TASmodClient;
+import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
+import com.minecrafttas.tasmod.playback.filecommands.PlaybackFileCommand.PlaybackFileCommandExtension;
+import com.minecrafttas.tasmod.registries.TASmodAPIRegistry;
+import com.minecrafttas.tasmod.registries.TASmodPackets;
+
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,189 +43,182 @@ import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.minecrafttas.mctcommon.networking.Client.Side;
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.ClientPacketHandler;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
-import com.minecrafttas.mctcommon.networking.interfaces.ServerPacketHandler;
-import com.minecrafttas.tasmod.TASmod;
-import com.minecrafttas.tasmod.TASmodClient;
-import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
-import com.minecrafttas.tasmod.playback.filecommands.PlaybackFileCommand.PlaybackFileCommandExtension;
-import com.minecrafttas.tasmod.registries.TASmodAPIRegistry;
-import com.minecrafttas.tasmod.registries.TASmodPackets;
+import java.lang.reflect.Method;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerNotFoundException;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+public class CommandFileCommand implements ClientPacketHandler, ServerPacketHandler {
 
-public class CommandFileCommand extends CommandBase implements ClientPacketHandler, ServerPacketHandler {
+    private static final SimpleCommandExceptionType USAGE_EXCEPTION = new SimpleCommandExceptionType(Component.literal("/filecommand <filecommandname>"));
 
-	CompletableFuture<List<String>> fileCommandList = null;
+    static CompletableFuture<List<String>> fileCommandList = null;
 
-	@Override
-	public String getName() {
-		return "filecommand";
-	}
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(
+            Commands.literal("filecommand")
+                .executes(CommandFileCommand::showList)
+                .then(Commands.argument("name", StringArgumentType.string())
+                    .suggests(CommandFileCommand::suggestFileCommands)
+                    .executes(CommandFileCommand::toggleFileCommand)
+                )
+        );
+    }
 
-	@Override
-	public String getUsage(ICommandSender iCommandSender) {
-		return "/filecommand <filecommandname>";
-	}
+    private static int showList(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack sender = context.getSource();
+        if (!checkPermission(sender, 2)) {
+            sender.sendFailure(Component.literal("You don't have permission to use this command").withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        try {
+            Map<String, Boolean> fileCommandNames = getExtensions(sender);
+            sender.sendSuccess(() -> Component.literal(String.join(" ", getColoredNames(fileCommandNames))), false);
+        } catch (Exception e) {
+            sender.sendFailure(Component.literal(e.getMessage()).withStyle(ChatFormatting.RED));
+        }
+        return 1;
+    }
 
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (sender instanceof EntityPlayer) {
-			if (sender.canUseCommand(2, "fileCommand")) {
+    private static int toggleFileCommand(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack sender = context.getSource();
+        if (!checkPermission(sender, 2)) {
+            sender.sendFailure(Component.literal("You don't have permission to use this command").withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        String name = StringArgumentType.getString(context, "name");
 
-				String senderName = null;
+        try {
+            Map<String, Boolean> fileCommandNames = getExtensions(sender);
+            Boolean enable = fileCommandNames.get(name);
 
-				// Get the list of file commands from the server
-				Map<String, Boolean> fileCommandNames;
-				try {
-					senderName = getCommandSenderAsPlayer(sender).getName();
-					fileCommandNames = getExtensions(senderName);
-				} catch (PlayerNotFoundException | InterruptedException | ExecutionException | TimeoutException e) {
-					sender.sendMessage(new TextComponentString(e.getMessage()));
-					return;
-				}
+            if (enable == null) {
+                sender.sendFailure(Component.literal("The file command was not found: " + name).withStyle(ChatFormatting.RED));
+                return 0;
+            }
 
-				if (args.length == 0) { // Displays all enabled and disabled filecommands
-					sender.sendMessage(new TextComponentString(String.join(" ", getColoredNames(fileCommandNames))));
-				} else if (args.length == 1) { // Toggles the filecommand
+            TASmod.server.sendTo(sender.getPlayer().getName().getString(), new TASmodBufferBuilder(PLAYBACK_FILECOMMAND_ENABLE).writeString(name).writeBoolean(!enable));
+            sender.sendSuccess(() -> Component.literal("Toggled file command: " + name).withStyle(ChatFormatting.GREEN), false);
+        } catch (Exception e) {
+            TASmod.LOGGER.error("Failed to toggle file command", e);
+            sender.sendFailure(Component.literal("Failed to toggle file command: " + e.getMessage()).withStyle(ChatFormatting.RED));
+        }
+        return 1;
+    }
 
-					String name = args[0];
-					Boolean enable = fileCommandNames.get(name);
+    private static CompletableFuture<Suggestions> suggestFileCommands(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        CommandSourceStack sender = context.getSource();
+        try {
+            Map<String, Boolean> fileCommandNames = getExtensions(sender);
+            for (String name : fileCommandNames.keySet()) {
+                builder.suggest(name);
+            }
+        } catch (Exception e) {
+            TASmod.LOGGER.error("Failed to get file command list", e);
+        }
+        return builder.buildFuture();
+    }
 
-					if (enable == null) {
-						throw new CommandException("The file command was not found: %s", name);
-					}
+    private static Map<String, Boolean> getExtensions(CommandSourceStack sender) throws InterruptedException, ExecutionException, TimeoutException {
+        Map<String, Boolean> out = new LinkedHashMap<>();
+        CompletableFuture<List<String>> future = new CompletableFuture<>();
+        fileCommandList = future;
 
-					try {
-						TASmod.server.sendTo(senderName, new TASmodBufferBuilder(PLAYBACK_FILECOMMAND_ENABLE).writeString(name).writeBoolean(!enable));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			} else {
-				sender.sendMessage(new TextComponentString(TextFormatting.RED + "You have no permission to use this command"));
-			}
-		}
-	}
+        try {
+            String senderName = sender.getPlayer().getName().getString();
+            TASmod.server.sendTo(senderName, new TASmodBufferBuilder(COMMAND_FILECOMMANDLIST));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	@Override
-	public List<String> getTabCompletions(MinecraftServer minecraftServer, ICommandSender iCommandSender, String[] args, BlockPos blockPos) {
-		if (args.length == 1) {
-			List<String> names = null;
-			try {
-				names = new ArrayList<>(getExtensions(getCommandSenderAsPlayer(iCommandSender).getName()).keySet());
-			} catch (PlayerNotFoundException | InterruptedException | ExecutionException | TimeoutException e) {
-				e.printStackTrace();
-				return super.getTabCompletions(minecraftServer, iCommandSender, args, blockPos);
-			}
-			return getListOfStringsMatchingLastWord(args, names);
-		}
-		return super.getTabCompletions(minecraftServer, iCommandSender, args, blockPos);
-	}
+        List<String> commands = future.get(2, TimeUnit.SECONDS);
 
-	private Map<String, Boolean> getExtensions(String playername) throws InterruptedException, ExecutionException, TimeoutException {
-		Map<String, Boolean> out = new LinkedHashMap<>();
-		fileCommandList = new CompletableFuture<>();
+        commands.forEach(element -> {
+            Pattern pattern = Pattern.compile("^E_");
+            Matcher matcher = pattern.matcher(element);
+            if (matcher.find()) {
+                element = matcher.replaceFirst("");
+                out.put(element, true);
+                return;
+            }
 
-		try {
-			TASmod.server.sendTo(playername, new TASmodBufferBuilder(COMMAND_FILECOMMANDLIST));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            pattern = Pattern.compile("^D_");
+            matcher = pattern.matcher(element);
+            if (matcher.find()) {
+                element = matcher.replaceFirst("");
+                out.put(element, false);
+                return;
+            }
+        });
 
-		List<String> commands = fileCommandList.get(2, TimeUnit.SECONDS);
+        return out;
+    }
 
-		commands.forEach(element -> {
+    private static List<String> getColoredNames(Map<String, Boolean> list) {
+        List<String> out = new ArrayList<>();
+        list.forEach((name, enabled) -> {
+            out.add(String.format("%s%s%s", enabled ? ChatFormatting.GREEN : ChatFormatting.RED, name, ChatFormatting.RESET));
+        });
+        return out;
+    }
 
-			Pattern pattern = Pattern.compile("^E_");
-			Matcher matcher = pattern.matcher(element);
-			if (matcher.find()) {
-				element = matcher.replaceFirst("");
-				out.put(element, true);
-				return;
-			}
+    @Override
+    public PacketID[] getAcceptedPacketIDs() {
+        return new PacketID[] { COMMAND_FILECOMMANDLIST, PLAYBACK_FILECOMMAND_ENABLE };
+    }
 
-			pattern = Pattern.compile("^D_");
-			matcher = pattern.matcher(element);
-			if (matcher.find()) {
-				element = matcher.replaceFirst("");
-				out.put(element, false);
-				return;
-			}
-		});
+    @Override
+    public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
+        TASmodPackets packet = (TASmodPackets) id;
+        switch (packet) {
+            case COMMAND_FILECOMMANDLIST:
+                String filecommandnames = TASmodBufferBuilder.readString(buf);
+                fileCommandList.complete(Arrays.asList(filecommandnames.split("\\|")));
+                break;
+            default:
+                throw new WrongSideException(packet, Side.SERVER);
+        }
+    }
 
-		return out;
-	}
+    // ========== Client
 
-	private List<String> getColoredNames(Map<String, Boolean> list) {
-		List<String> out = new ArrayList<>();
-		list.forEach((name, enabled) -> {
-			out.add(String.format("%s%s%s", enabled ? TextFormatting.GREEN : TextFormatting.RED, name, TextFormatting.RESET));
-		});
-		return out;
-	}
+    @Override
+    public void onClientPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
+        TASmodPackets packet = (TASmodPackets) id;
+        switch (packet) {
+            case COMMAND_FILECOMMANDLIST:
+                String filecommandnames = String.join("|", getFileCommandNames(TASmodAPIRegistry.PLAYBACK_FILE_COMMAND.getAll()));
+                TASmodClient.client.send(new TASmodBufferBuilder(COMMAND_FILECOMMANDLIST).writeString(filecommandnames));
+                break;
+            case PLAYBACK_FILECOMMAND_ENABLE:
+                String filecommand = TASmodBufferBuilder.readString(buf);
+                boolean enable = TASmodBufferBuilder.readBoolean(buf);
+                boolean success = TASmodAPIRegistry.PLAYBACK_FILE_COMMAND.setEnabled(filecommand, enable);
 
-	@Override
-	public PacketID[] getAcceptedPacketIDs() {
-		return new PacketID[] { COMMAND_FILECOMMANDLIST, PLAYBACK_FILECOMMAND_ENABLE };
-	}
+                String msg = success ? String.format("%s%s file command: %s", ChatFormatting.GREEN, enable ? "Enabled" : "Disabled", filecommand) : String.format("%sFailed to %s file command: %s", ChatFormatting.RED, enable ? "enable" : "disable", filecommand);
+                // Minecraft.getInstance().gui.getChat().addMessage(Component.literal(msg));
+                break;
+            default:
+                break;
+        }
+    }
 
-	@Override
-	public void onServerPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
-		TASmodPackets packet = (TASmodPackets) id;
-		switch (packet) {
-			case COMMAND_FILECOMMANDLIST:
-				String filecommandnames = TASmodBufferBuilder.readString(buf);
-				fileCommandList.complete(Arrays.asList(filecommandnames.split("\\|")));
-				break;
-			default:
-				throw new WrongSideException(packet, Side.SERVER);
-		}
-	}
+    private List<String> getFileCommandNames(List<PlaybackFileCommandExtension> fileCommands) {
+        List<String> out = new ArrayList<>();
+        fileCommands.forEach(element -> {
+            out.add(String.format("%s_%s", element.isEnabled() ? "E" : "D", element.toString()));
+        });
+        return out;
+    }
 
-	// ========== Client
-
-	@Override
-	public void onClientPacket(PacketID id, ByteBuffer buf, String username) throws PacketNotImplementedException, WrongSideException, Exception {
-		TASmodPackets packet = (TASmodPackets) id;
-		switch (packet) {
-			case COMMAND_FILECOMMANDLIST:
-				String filecommandnames = String.join("|", getFileCommandNames(TASmodAPIRegistry.PLAYBACK_FILE_COMMAND.getAll()));
-				TASmodClient.client.send(new TASmodBufferBuilder(COMMAND_FILECOMMANDLIST).writeString(filecommandnames));
-				break;
-			case PLAYBACK_FILECOMMAND_ENABLE:
-				String filecommand = TASmodBufferBuilder.readString(buf);
-				boolean enable = TASmodBufferBuilder.readBoolean(buf);
-				boolean success = TASmodAPIRegistry.PLAYBACK_FILE_COMMAND.setEnabled(filecommand, enable);
-
-				String msg = success ? String.format("%s%s file command: %s", TextFormatting.GREEN, enable ? "Enabled" : "Disabled", filecommand) : String.format("%sFailed to %s file command: %s", TextFormatting.RED, enable ? "enable" : "disable", filecommand);
-				Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.CHAT, new TextComponentString(msg));
-				break;
-			default:
-				break;
-		}
-	}
-
-	private List<String> getFileCommandNames(List<PlaybackFileCommandExtension> fileCommands) {
-		List<String> out = new ArrayList<>();
-		fileCommands.forEach(element -> {
-			out.add(String.format("%s_%s", element.isEnabled() ? "E" : "D", element.toString()));
-		});
-		return out;
-	}
-
+    private static boolean checkPermission(CommandSourceStack source, int level) {
+        try {
+            Method method = source.getClass().getMethod("hasPermission", int.class);
+            return (Boolean) method.invoke(source, level);
+        } catch (Exception e) {
+            try {
+                Method method = source.getClass().getMethod("getPermission");
+                return (Integer) method.invoke(source) >= level;
+            } catch (Exception ex) {
+                return true;
+            }
+        }
+    }
 }

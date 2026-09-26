@@ -31,3 +31,4 @@ public class JsonUtils {
 		return jsonInstance.fromJson(new String(Files.readAllBytes(loadPath)), JsonObject.class);
 	}
 }
+

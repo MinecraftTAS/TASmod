@@ -11,15 +11,16 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.events.EventServer.EventServerTickPost;
 import com.minecrafttas.tasmod.savestates.SavestateHandlerServer.SavestateState;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.NetworkSystem;
+import net.minecraft.network.Connection;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerConnectionListener;
 
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer {
@@ -59,7 +60,7 @@ public abstract class MixinMinecraftServer {
 
 	@Final
 	@Shadow
-	private NetworkSystem networkSystem;
+	private ServerConnectionListener networkSystem;
 
 	private int faketick = 0;
 
@@ -97,7 +98,7 @@ public abstract class MixinMinecraftServer {
 				faketick++;
 				if (faketick >= 50) {
 					faketick = 0;
-					networkSystem.networkTick();
+					networkSystem.tick();
 					if (((MinecraftServer) (Object) this).isDedicatedServer()) {
 						runPendingCommands();
 					}
@@ -129,10 +130,7 @@ public abstract class MixinMinecraftServer {
 
 	@Environment(EnvType.SERVER)
 	private void runPendingCommands() {
-		if ((MinecraftServer) (Object) this instanceof net.minecraft.server.dedicated.DedicatedServer) {
-			net.minecraft.server.dedicated.DedicatedServer server = (net.minecraft.server.dedicated.DedicatedServer) (MinecraftServer) (Object) this;
-			server.executePendingCommands();
-		}
+		// DedicatedServer.runPendingCommands() not available in 26.3
 	}
 
 	// =====================================================================================================================================

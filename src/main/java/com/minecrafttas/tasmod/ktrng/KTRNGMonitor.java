@@ -8,3 +8,4 @@ public class KTRNGMonitor {
 //		System.out.println(String.format("Seed: %s, Value: %s", seed, value));
 	}
 }
+

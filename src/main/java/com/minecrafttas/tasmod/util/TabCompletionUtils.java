@@ -14,11 +14,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.ClientPacketHandler;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
-import com.minecrafttas.mctcommon.networking.interfaces.ServerPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ClientPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
@@ -99,7 +99,7 @@ public class TabCompletionUtils implements ServerPacketHandler, ClientPacketHand
 
 	private List<String> getFilenames() {
 		List<String> tab = new ArrayList<String>();
-		File folder = new File(Minecraft.getMinecraft().gameDir, "saves" + File.separator + "tasfiles");
+		File folder = new File(Minecraft.getInstance().gameDirectory, "saves" + File.separator + "tasfiles");
 
 		File[] listOfFiles = folder.listFiles(new FileFilter() {
 			@Override
@@ -113,3 +113,4 @@ public class TabCompletionUtils implements ServerPacketHandler, ClientPacketHand
 		return tab;
 	}
 }
+

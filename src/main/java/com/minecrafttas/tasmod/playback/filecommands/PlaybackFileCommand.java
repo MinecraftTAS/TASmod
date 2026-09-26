@@ -8,8 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.dselent.bigarraylist.BigArrayList;
-import com.minecrafttas.mctcommon.file.AbstractDataFile;
-import com.minecrafttas.mctcommon.registry.Registerable;
+import com.minecrafttas.tasmod.mctcommon.file.AbstractDataFile;
+import com.minecrafttas.tasmod.mctcommon.registry.Registerable;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.commands.CommandFileCommand;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient;
@@ -115,7 +115,7 @@ public class PlaybackFileCommand {
 		 * @param tempFolderName The name of the temp folder
 		 */
 		public PlaybackFileCommandExtension(String tempFolderName) {
-			this(TASmodClient.tasfiledirectory.resolve("temp").resolve(tempFolderName));
+			this(TASmodClient.getTasFileDirectory().resolve("temp").resolve(tempFolderName));
 		}
 
 		/**
@@ -590,3 +590,4 @@ public class PlaybackFileCommand {
 		}
 	}
 }
+

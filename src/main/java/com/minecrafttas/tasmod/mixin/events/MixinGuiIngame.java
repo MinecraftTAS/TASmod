@@ -5,12 +5,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
 import com.minecrafttas.tasmod.events.EventClient.EventDrawHotbar;
 
-import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.gui.Gui;
 
-@Mixin(GuiIngame.class)
+@Mixin(Gui.class)
 public class MixinGuiIngame {
 
 	@Inject(method = "renderHotbar", at = @At("HEAD"))
@@ -18,3 +18,4 @@ public class MixinGuiIngame {
 		EventListenerRegistry.fireEvent(EventDrawHotbar.class);
 	}
 }
+

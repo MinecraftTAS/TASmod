@@ -1,7 +1,5 @@
 plugins {
-	// loom plugin
-	id "fabric-loom" version "${loom_version}"
-	id "ploceus" version "${loom_version}"
+	id "net.fabricmc.fabric-loom" version "${loom_version}"
 	id "com.palantir.git-version" version "4.2.0"
 	id "com.diffplug.spotless" version "8.1.0"
 }
@@ -19,8 +17,7 @@ base {
 }
 
 java {
-	// compile for java 8
-	sourceCompatibility = targetCompatibility = 8
+	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
 }
 
 loom {
@@ -35,31 +32,23 @@ repositories {
 	mavenCentral()
 	maven { url = "https://maven.minecrafttas.com/main" }
 	maven { url = "https://maven.legacyfabric.net/" }
-	//maven { url = "https://maven.minecrafttas.com/snapshots" }
 	maven { url = "https://jitpack.io" }
 	maven { url = "https://repo.spongepowered.org/maven" }
-}
-
-// dependency configurations
-configurations {
-	// embed dependency included in build
-	implementation.extendsFrom(embed)
-}
-
-ploceus {
-	setIntermediaryGeneration(2)
 }
 
 // dependencies
 dependencies {
 	// tasmod dependencies
-	embed "com.dselent:bigarraylist:1.6"
-	embed "com.github.KaptainWutax:SeedUtils:b6a383113c"
+	implementation "com.dselent:bigarraylist:1.6"
+	include "com.dselent:bigarraylist:1.6"
+	implementation "com.github.KaptainWutax:SeedUtils:b6a383113c"
+	include "com.github.KaptainWutax:SeedUtils:b6a383113c"
 
 	// loom dependencies
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings ploceus.mcpMappings(project.mcp_channel, project.mcp_mcversion, project.mcp_build)
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	implementation "org.lwjgl:lwjgl-glfw:3.4.3"
 
 	// testing dependencies
 	testImplementation "org.junit.jupiter:junit-jupiter:5.14.1"
@@ -68,7 +57,7 @@ dependencies {
 
 
 compileJava {
-	options.release = 8
+	options.release = 25
 }
 
 // process fabric mod json
@@ -83,13 +72,11 @@ processResources {
 
 // configure jar file
 jar {
-
-	// pack embedded stuff
 	from {
-		configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
+		configurations.include.collect { it.isDirectory() ? it : zipTree(it) }
 	} {
-		exclude "LICENSE.txt", "META-INF/MANIFSET.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
-    }
+		exclude "LICENSE.txt", "META-INF/MANIFEST.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
+	}
 }
 
 // configure testing

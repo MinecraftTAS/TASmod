@@ -4,14 +4,14 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
-import com.minecrafttas.mctcommon.events.EventServer.EventServerTick;
-import com.minecrafttas.mctcommon.networking.Client.Side;
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.ClientPacketHandler;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
-import com.minecrafttas.mctcommon.networking.interfaces.ServerPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.events.EventClient.EventPlayerJoinedClientSide;
+import com.minecrafttas.tasmod.mctcommon.events.EventServer.EventServerTick;
+import com.minecrafttas.tasmod.mctcommon.networking.Client.Side;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ClientPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
@@ -20,7 +20,7 @@ import com.minecrafttas.tasmod.registries.TASmodPackets;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.MinecraftServer;
 
 /**
@@ -169,7 +169,7 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void onPlayerJoinedClientSide(EntityPlayerSP player) {
+	public void onPlayerJoinedClientSide(LocalPlayer player) {
 		setInitialSeed(getGlobalSeedClient());
 	}
 
@@ -219,3 +219,4 @@ public class KillTheRNGHandler implements EventServerTick, EventPlayerJoinedClie
 	}
 
 }
+

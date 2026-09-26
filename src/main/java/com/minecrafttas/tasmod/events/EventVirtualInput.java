@@ -1,6 +1,6 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry.EventBase;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry.EventBase;
 import com.minecrafttas.tasmod.virtual.VirtualCameraAngle;
 import com.minecrafttas.tasmod.virtual.VirtualInput.VirtualCameraAngleInput;
 import com.minecrafttas.tasmod.virtual.VirtualInput.VirtualKeyboardInput;
@@ -107,3 +107,4 @@ public interface EventVirtualInput {
 //		public void onVirtualCameraSubtick(boolean isPolled);
 //	}
 }
+

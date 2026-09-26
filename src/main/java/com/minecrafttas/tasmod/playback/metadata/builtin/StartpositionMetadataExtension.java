@@ -4,10 +4,10 @@ import static com.minecrafttas.tasmod.TASmod.LOGGER;
 
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
-import com.minecrafttas.mctcommon.networking.interfaces.ServerPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventPlaybackClient.EventControllerStateChange;
@@ -20,8 +20,8 @@ import com.minecrafttas.tasmod.registries.TASmodPackets;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Adds a "start position" entry in the playback metadata.<br>
@@ -157,7 +157,7 @@ public class StartpositionMetadataExtension extends PlaybackMetadataExtension im
 
 	@Override
 	public void onControllerStateChange(TASstate newstate, TASstate oldstate) {
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = Minecraft.getInstance();
 
 		if (mc.player != null) {
 			if (oldstate == TASstate.NONE && newstate == TASstate.RECORDING && startPosition == null) { // If a recording is started, the player is in a world and startposition is uninitialized
@@ -180,10 +180,10 @@ public class StartpositionMetadataExtension extends PlaybackMetadataExtension im
 
 	public void updateStartPosition() {
 		LOGGER.debug(LoggerMarkers.Playback, "Setting start location");
-		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayerSP player = mc.player;
+		Minecraft mc = Minecraft.getInstance();
+		LocalPlayer player = mc.player;
 		if (player != null)
-			startPosition = new StartPosition(player.posX, player.posY, player.posZ, player.rotationPitch, player.rotationYaw);
+			startPosition = new StartPosition(player.getX(), player.getY(), player.getZ(), player.getXRot(), player.getYRot());
 		else
 			LOGGER.warn("Start position not set, the player was null! This will create problems when storing inputs!");
 
@@ -205,13 +205,13 @@ public class StartpositionMetadataExtension extends PlaybackMetadataExtension im
 			float angleYaw = TASmodBufferBuilder.readFloat(buf);
 			float anglePitch = TASmodBufferBuilder.readFloat(buf);
 
-			EntityPlayerMP player = TASmod.getServerInstance().getPlayerList().getPlayerByUsername(username);
-			player.getServerWorld().addScheduledTask(() -> {
-				player.rotationPitch = anglePitch;
-				player.rotationYaw = angleYaw;
-
-				player.setPositionAndUpdate(x, y, z);
+			ServerPlayer player = TASmod.getServerInstance().getPlayerList().getPlayerByName(username);
+			player.level().getServer().execute(() -> {
+				player.setXRot(anglePitch);
+				player.setYRot(angleYaw);
+				player.teleportTo(x, y, z);
 			});
 		}
 	}
 }
+

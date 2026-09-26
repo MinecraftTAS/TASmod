@@ -11,9 +11,10 @@ import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.ticksync.TickSyncClient;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Timer;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.util.Util;
 
-@Mixin(Timer.class)
+@Mixin(DeltaTracker.class)
 /**
  * <p>Rewrites updateTimer, to add a tickratechanger and apply ticksync.
  * <p>Dynamically speeds up or slows down the tickrate depending on the time between {@link TickSyncClient TickSync} packages.
@@ -23,13 +24,13 @@ import net.minecraft.util.Timer;
 public class MixinTimer {
 
 	/**
-	 * <p>How many ticks elapsed since the {@link Timer#updateTimer()} method was called.
+	 * <p>How many ticks elapsed since the {@link DeltaTracker#updateTimer()} method was called.
 	 * <p>Used in Minecraft#runGameLoop to call {@link Minecraft#runTick()} in the for loop
 	 */
 	@Shadow
 	private int elapsedTicks;
 	/**
-	 * How many "frames" elapsed since the {@link Timer#updateTimer()} method was called
+	 * How many "frames" elapsed since the {@link DeltaTracker#updateTimer()} method was called
 	 */
 	@Shadow
 	private float elapsedPartialTicks;
@@ -39,7 +40,7 @@ public class MixinTimer {
 	@Shadow
 	private float renderPartialTicks;
 	/**
-	 * The last time the {@link Timer#updateTimer()} method was called
+	 * The last time the {@link DeltaTracker#updateTimer()} method was called
 	 */
 	@Shadow
 	private long lastSyncSysClock;
@@ -58,10 +59,10 @@ public class MixinTimer {
 	private float lastTickLength;
 
 	/**
-	 * <p>Overwrites {@link Timer#updateTimer()} in a way,<br>
+	 * <p>Overwrites {@link DeltaTracker#updateTimer()} in a way,<br>
 	 * so that the tickrate matches the tickrate of the server.
 	 * 
-	 * <p>It does this by removing {@link Timer#tickLength} from the equasion.<br>
+	 * <p>It does this by removing {@link DeltaTracker#tickLength} from the equasion.<br>
 	 * Takes the time between incoming packets from {@link TickSyncClient#onClientPacket(com.minecrafttas.mctcommon.networking.interfaces.PacketID, java.nio.ByteBuffer, String) TickSyncClient.onClientPacket()}
 	 * and calculates the tickrate dynamically.
 	 * 
@@ -83,9 +84,9 @@ public class MixinTimer {
 		 * 
 		 * Only runs when there is a connection to the custom networking server and the player is in a world
 		 */
-		if (TASmodClient.client != null && !TASmodClient.client.isClosed() && Minecraft.getMinecraft().world != null) {
+		if (TASmodClient.client != null && !TASmodClient.client.isClosed() && Minecraft.getInstance().level != null) {
 
-			long currentTime = Minecraft.getSystemTime();	// The current system time as of calling this method
+			long currentTime = Util.getMillis();	// The current system time as of calling this method
 			/*
 			 * The length of the tick in milliseconds.
 			 * Set to 50 in vanilla, but in this instance,
@@ -129,8 +130,9 @@ public class MixinTimer {
 		}
 		// Run vanilla updateTimer
 		else {
-			this.timeSinceLastTick = Minecraft.getSystemTime();
+			this.timeSinceLastTick = Util.getMillis();
 			TickSyncClient.shouldTick.set(true);	// Client should always tick, when in the main menu
 		}
 	}
 }
+

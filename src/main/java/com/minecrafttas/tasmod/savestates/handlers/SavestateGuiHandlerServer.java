@@ -5,17 +5,18 @@ import static com.minecrafttas.tasmod.registries.TASmodPackets.SAVESTATE_RENAME_
 
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.mctcommon.networking.Client.Side;
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
-import com.minecrafttas.mctcommon.networking.interfaces.ServerPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.Client.Side;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ServerPacketHandler;
 import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.registries.TASmodPackets;
-import com.minecrafttas.tasmod.util.Component;
+import com.minecrafttas.tasmod.util.TASComponent;
 
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 /**
  * Handles the server side effects of the GUIs that are displayed in {@link SavestateGuiHandlerClient}
@@ -44,15 +45,14 @@ public class SavestateGuiHandlerServer implements ServerPacketHandler {
 				TASmod.server.sendToAll(new TASmodBufferBuilder(SAVESTATE_CLEAR_SCREEN));
 
 				//@formatter:off
-				TASmod.getServerInstance().getPlayerList().sendMessage(
+				TASmod.getServerInstance().getPlayerList().broadcastSystemMessage(
 						Component.translatable("msg.tasmod.savestate.save.end", 
 								Component.literal(name)
-									.withStyle(TextFormatting.YELLOW),
+									.withStyle(ChatFormatting.YELLOW),
 								Component.literal(Integer.toString(index))
-									.withStyle(TextFormatting.AQUA)
+									.withStyle(ChatFormatting.AQUA)
 						)
-						.withStyle(TextFormatting.GREEN).build()
-				);
+						.withStyle(ChatFormatting.GREEN), false);
 				//@formatter:on
 
 				break;
@@ -64,3 +64,4 @@ public class SavestateGuiHandlerServer implements ServerPacketHandler {
 		}
 	}
 }
+

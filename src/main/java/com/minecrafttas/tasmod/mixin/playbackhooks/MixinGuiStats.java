@@ -13,3 +13,4 @@ public class MixinGuiStats {
 		return !TASmodClient.virtual.isKeyDown(-100);
 	}
 }
+

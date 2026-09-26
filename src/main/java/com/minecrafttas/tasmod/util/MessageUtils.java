@@ -21,3 +21,4 @@ public class MessageUtils {
 		public void draw(String line, int y);
 	}
 }
+

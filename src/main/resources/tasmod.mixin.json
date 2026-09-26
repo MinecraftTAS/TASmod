@@ -2,81 +2,40 @@
 	"required": true,
 	"minVersion": "0.8.5",
 	"package": "com.minecrafttas.tasmod.mixin",
-	"compatibilityLevel": "JAVA_8",
+	"compatibilityLevel": "JAVA_25",
 	"mixins": [
-		// General
-		"MixinMinecraftServer",
-		"MixinEntityPlayer",
-
 		// Savestates
-		"savestates.AccessorAnvilChunkLoader",
-		"savestates.AccessorChunkLoader",
-		"savestates.AccessorEntityLivingBase",
-		"savestates.MixinPlayerChunkMap",
-		"savestates.MixinChunkProviderServer",
 		"savestates.MixinNetHandlerPlayServer",
-		"savestates.MixinScoreboard",
-		
-		// Events
-		"events.MixinEntityPlayerMP",
 
-		// Fixing forge and vanilla stuff
-		"fixes.MixinDragonFightManager"
-		
+		// Events
+		"events.MixinEntityPlayerMP"
+
 	],
 	"client": [
 		// General
-		"MixinMinecraft",
-		"MixinTimer",
-		
-		// Savestates
-		"savestates.MixinChunkProviderClient",
-		"savestates.MixinWorldClient",
-		"savestates.MixinMinecraft",
-		
-		// Interpolation
 		"MixinFrustum",
-		
-		// Keybinding
 		"MixinTextfield",
-		
+
 		// Events
 		"events.MixinGuiIngame",
 		"events.MixinNetHandlerPlayClient",
-		
+		"events.MixinSaveFormatOld",
+		"events.MixinSaveHandler",
+
+		// Client commands
 		"clientcommands.MixinEntityPlayerSP",
-		"clientcommands.MixinTabCompleter",
-		
+
 		// Playbackhooks
-		"playbackhooks.MixinMinecraft",
-		"playbackhooks.MixinEntityRenderer",
-		"playbackhooks.MixinGuiScreen",
 		"playbackhooks.MixinGameSettings",
 		"playbackhooks.MixinGuiChat",
-		"playbackhooks.MixinGuiClickableScrolledSelectionListProxy",
-		"playbackhooks.MixinGuiContainer",
-		"playbackhooks.MixinGuiContainerCreative",
 		"playbackhooks.MixinGuiScreenAdvancements",
 		"playbackhooks.MixinGuiSlot",
-		"playbackhooks.MixinGuiStats",
 		"playbackhooks.MixinKeyBinding",
-		
-		// Shields
-		"shields.MixinRenderItem",
-		"shields.MixinTileEntityItemStackRenderer",
-		
+
 		// Fixes
-		"fixes.MixinMinecraftFullscreen",
-		"fixes.MixinNetworkManager",
 		"fixes.MixinMouseHelper",
-		
+
 		// Tickrate Rendering
-		"tickrate.MixinAudioPitch",
-		"tickrate.MixinEnchantmentGlimm",
-		"tickrate.MixinGuiToast",
-		"tickrate.MixinSoundManager",
-		"tickrate.MixinSubtitle",
-		"tickrate.MixinSubtitleOverlay",
 		"tickrate.MixinWorldborder"
 	]
 }

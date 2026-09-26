@@ -18,8 +18,8 @@ import com.minecrafttas.tasmod.playback.filecommands.PlaybackFileCommand.SortedF
 import com.minecrafttas.tasmod.playback.tasfile.exception.PlaybackLoadException;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.ChatFormatting;
 
 /**
  * Stores the players position during recording and compares it with the
@@ -76,10 +76,10 @@ public class DesyncMonitorFileCommandExtension extends PlaybackFileCommandExtens
 
 	@Override
 	public void onRecord(long tick, InputContainer inputContainer) {
-		EntityPlayerSP player = Minecraft.getMinecraft().player;
+		LocalPlayer player = Minecraft.getInstance().player;
 		MonitorContainer values = null;
 		if (player != null) {
-			values = new MonitorContainer(tick, player.posX, player.posY, player.posZ, player.motionX, player.motionY, player.motionZ);
+			values = new MonitorContainer(tick, player.getX(), player.getY(), player.getZ(), player.getDeltaMovement().x, player.getDeltaMovement().y, player.getDeltaMovement().z);
 		} else {
 			values = new MonitorContainer(tick);
 		}
@@ -165,22 +165,22 @@ public class DesyncMonitorFileCommandExtension extends PlaybackFileCommandExtens
 		}
 	}
 
-	private String lastStatus = TextFormatting.GRAY + "Empty";
+	private String lastStatus = ChatFormatting.GRAY + "Empty";
 
-	public String getStatus(EntityPlayerSP player) {
+	public String getStatus(LocalPlayer player) {
 		if (!TASmodClient.controller.isNothingPlaying()) {
 			if (currentValues != null) {
-				double[] playervalues = new double[6];
-				playervalues[0] = player.posX;
-				playervalues[1] = player.posY;
-				playervalues[2] = player.posZ;
-				playervalues[3] = player.motionX;
-				playervalues[4] = player.motionY;
-				playervalues[5] = player.motionZ;
+double[] playervalues = new double[6];
+			playervalues[0] = player.getX();
+			playervalues[1] = player.getY();
+			playervalues[2] = player.getZ();
+			playervalues[3] = player.getDeltaMovement().x;
+			playervalues[4] = player.getDeltaMovement().y;
+			playervalues[5] = player.getDeltaMovement().z;
 				DesyncStatus status = currentValues.getSeverity(playervalues);
 				lastStatus = status.getFormat() + status.getText();
 			} else {
-				lastStatus = TextFormatting.GRAY + "Empty";
+				lastStatus = ChatFormatting.GRAY + "Empty";
 			}
 		}
 		return lastStatus;
@@ -190,11 +190,11 @@ public class DesyncMonitorFileCommandExtension extends PlaybackFileCommandExtens
 
 	public String getPos() {
 		if (currentValues != null && TASmodClient.controller.isPlayingback()) {
-			EntityPlayerSP player = Minecraft.getMinecraft().player;
+			LocalPlayer player = Minecraft.getInstance().player;
 			String[] values = new String[3];
-			values[0] = getFormattedString(player.posX - currentValues.values[0]);
-			values[1] = getFormattedString(player.posY - currentValues.values[1]);
-			values[2] = getFormattedString(player.posZ - currentValues.values[2]);
+			values[0] = getFormattedString(player.getX() - currentValues.values[0]);
+			values[1] = getFormattedString(player.getY() - currentValues.values[1]);
+			values[2] = getFormattedString(player.getZ() - currentValues.values[2]);
 
 			lastPos = String.join(" ", values);
 		}
@@ -205,11 +205,11 @@ public class DesyncMonitorFileCommandExtension extends PlaybackFileCommandExtens
 
 	public String getMotion() {
 		if (currentValues != null && TASmodClient.controller.isPlayingback()) {
-			EntityPlayerSP player = Minecraft.getMinecraft().player;
+			LocalPlayer player = Minecraft.getInstance().player;
 			String[] values = new String[3];
-			values[0] = getFormattedString(player.motionX - currentValues.values[3]);
-			values[1] = getFormattedString(player.motionY - currentValues.values[4]);
-			values[2] = getFormattedString(player.motionZ - currentValues.values[5]);
+			values[0] = getFormattedString(player.getDeltaMovement().x - currentValues.values[3]);
+			values[1] = getFormattedString(player.getDeltaMovement().y - currentValues.values[4]);
+			values[2] = getFormattedString(player.getDeltaMovement().z - currentValues.values[5]);
 
 			lastMotion = String.join(" ", values);
 		}
@@ -294,25 +294,25 @@ public class DesyncMonitorFileCommandExtension extends PlaybackFileCommandExtens
 	}
 
 	public enum DesyncStatus {
-		EQUAL(0, TextFormatting.GREEN, "In sync", 0D),
-		WARNING(1, TextFormatting.YELLOW, "Slight desync", 0.00001D),
-		MODERATE(2, TextFormatting.RED, "Moderate desync", 0.01D),
-		TOTAL(3, TextFormatting.DARK_RED, "Total desync"),
-		ERROR(3, TextFormatting.DARK_PURPLE, "ERROR");
+		EQUAL(0, ChatFormatting.GREEN, "In sync", 0D),
+		WARNING(1, ChatFormatting.YELLOW, "Slight desync", 0.00001D),
+		MODERATE(2, ChatFormatting.RED, "Moderate desync", 0.01D),
+		TOTAL(3, ChatFormatting.DARK_RED, "Total desync"),
+		ERROR(3, ChatFormatting.DARK_PURPLE, "ERROR");
 
 		private Double tolerance;
 		private int severity;
 		private String text;
-		private TextFormatting format;
+		private ChatFormatting format;
 
-		private DesyncStatus(int severity, TextFormatting color, String text) {
+		private DesyncStatus(int severity, ChatFormatting color, String text) {
 			this.severity = severity;
 			this.format = color;
 			this.text = text;
 			tolerance = null;
 		}
 
-		private DesyncStatus(int severity, TextFormatting color, String text, double tolerance) {
+		private DesyncStatus(int severity, ChatFormatting color, String text, double tolerance) {
 			this(severity, color, text);
 			this.tolerance = tolerance;
 		}
@@ -333,7 +333,7 @@ public class DesyncMonitorFileCommandExtension extends PlaybackFileCommandExtens
 			return out;
 		}
 
-		public TextFormatting getFormat() {
+		public ChatFormatting getFormat() {
 			return format;
 		}
 
@@ -356,7 +356,7 @@ public class DesyncMonitorFileCommandExtension extends PlaybackFileCommandExtens
 	public void onClear() {
 		currentValues = null;
 		monitorContainer.clear();
-		lastStatus = TextFormatting.GRAY + "Empty";
+		lastStatus = ChatFormatting.GRAY + "Empty";
 		lastPos = "";
 		lastMotion = "";
 	}
@@ -366,3 +366,4 @@ public class DesyncMonitorFileCommandExtension extends PlaybackFileCommandExtens
 		monitorContainer.remove(index);
 	}
 }
+

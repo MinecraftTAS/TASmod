@@ -7,24 +7,25 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
 import com.minecrafttas.tasmod.events.EventNBT;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.storage.SaveHandler;
-import net.minecraft.world.storage.WorldInfo;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.LevelData;
 
-@Mixin(SaveHandler.class)
+@Mixin(LevelStorageSource.class)
 public class MixinSaveHandler {
 
 	@Inject(method = "saveWorldInfoWithPlayer", at = @At(value = "HEAD"))
-	public void inject_onSaveWorldInfo(WorldInfo worldInfo, NBTTagCompound singlePlayerData, @Share(value = "worldInfo") LocalRef<WorldInfo> sharedWorldInfo) {
+	public void inject_onSaveWorldInfo(LevelData worldInfo, CompoundTag singlePlayerData, @Share(value = "worldInfo") LocalRef<LevelData> sharedWorldInfo) {
 		sharedWorldInfo.set(worldInfo);
 	}
 
-	@ModifyArg(method = "saveWorldInfoWithPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/NBTTagCompound;setTag(Ljava/lang/String;Lnet/minecraft/nbt/NBTTagCompound;)V"), index = 1)
-	public NBTTagCompound modifyarg_onSaveWorldInfo(NBTTagCompound singlePlayerCompound, @Share("worldInfo") LocalRef<WorldInfo> sharedWorldInfo) {
-		WorldInfo worldInfo = sharedWorldInfo.get();
-		return (NBTTagCompound) EventListenerRegistry.fireEvent(EventNBT.EventWorldWrite.class, singlePlayerCompound, worldInfo);
+	@ModifyArg(method = "saveWorldInfoWithPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;setTag(Ljava/lang/String;Lnet/minecraft/nbt/CompoundTag;)V"), index = 1)
+	public CompoundTag modifyarg_onSaveWorldInfo(CompoundTag singlePlayerCompound, @Share("worldInfo") LocalRef<LevelData> sharedWorldInfo) {
+		LevelData worldInfo = sharedWorldInfo.get();
+		return (CompoundTag) EventListenerRegistry.fireEvent(EventNBT.EventWorldWrite.class, singlePlayerCompound, worldInfo);
 	}
 }
+

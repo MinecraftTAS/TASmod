@@ -1,9 +1,9 @@
 package com.minecrafttas.tasmod.events;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry.EventBase;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry.EventBase;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screens.Screen;
 
 /**
  * TASmod specific events fired on the client side
@@ -31,7 +31,7 @@ public interface EventClient {
 		/**
 		 * Fired when a screen in a gui is drawn
 		 */
-		public void onDrawScreen(GuiScreen screen, int xCoordinate, int yCoordinate);
+		public void onDrawScreen(Screen screen, int xCoordinate, int yCoordinate);
 	}
 
 	/**
@@ -57,3 +57,4 @@ public interface EventClient {
 		public void onClientTickPost(Minecraft mc);
 	}
 }
+

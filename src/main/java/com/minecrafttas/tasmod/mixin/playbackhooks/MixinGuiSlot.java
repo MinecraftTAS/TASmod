@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.minecrafttas.tasmod.TASmodClient;
 
-import net.minecraft.client.gui.GuiSlot;
+import net.minecraft.client.gui.components.ObjectSelectionList;
 
-@Mixin(GuiSlot.class)
+@Mixin(ObjectSelectionList.class)
 public class MixinGuiSlot {
 	@Redirect(method = "handleMouseInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButtonState()Z", ordinal = 0, remap = false))
 	public boolean redirectHandleMouseInput() {
@@ -30,3 +30,4 @@ public class MixinGuiSlot {
 		return TASmodClient.virtual.MOUSE.getEventMouseScrollWheel();
 	}
 }
+

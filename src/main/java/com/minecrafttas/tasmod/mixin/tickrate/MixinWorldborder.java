@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import com.minecrafttas.tasmod.TASmodClient;
 
-import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.LevelRenderer;
 
-@Mixin(RenderGlobal.class)
+@Mixin(LevelRenderer.class)
 public class MixinWorldborder {
 
 	@ModifyVariable(method = "renderWorldBorder", at = @At(value = "STORE"), index = 20, ordinal = 4)
@@ -17,3 +17,4 @@ public class MixinWorldborder {
 	}
 
 }
+

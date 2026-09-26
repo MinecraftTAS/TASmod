@@ -27,3 +27,4 @@ public class VirtualEvent {
 		return String.format("%s, %s", keycode, keystate);
 	}
 }
+

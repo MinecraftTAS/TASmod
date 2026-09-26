@@ -7,12 +7,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.mctcommon.networking.ByteBufferBuilder;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.networking.ByteBufferBuilder;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
 import com.minecrafttas.tasmod.savestates.storage.builtin.ClientMotionStorage.MotionData;
 
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 
 public class TASmodBufferBuilder extends ByteBufferBuilder {
 
@@ -28,14 +29,14 @@ public class TASmodBufferBuilder extends ByteBufferBuilder {
 		super(buf);
 	}
 
-	public TASmodBufferBuilder writeNBTTagCompound(NBTTagCompound compound) {
+	public TASmodBufferBuilder writeNBTTagCompound(CompoundTag compound) {
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 		DataOutputStream dataout = new DataOutputStream(out);
 
 		try {
-			CompressedStreamTools.writeCompressed(compound, dataout);
+			NbtIo.writeCompressed(compound, dataout);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -64,12 +65,12 @@ public class TASmodBufferBuilder extends ByteBufferBuilder {
 		return this;
 	}
 
-	public static NBTTagCompound readNBTTagCompound(ByteBuffer buf) throws IOException {
+	public static CompoundTag readNBTTagCompound(ByteBuffer buf) throws IOException {
 		ByteArrayInputStream input = new ByteArrayInputStream(readByteArray(buf));
 
 		DataInputStream datain = new DataInputStream(input);
 
-		NBTTagCompound compound = CompressedStreamTools.readCompressed(datain);
+		CompoundTag compound = NbtIo.readCompressed(datain, new NbtAccounter(1024L * 1024 * 1024, 0));
 
 		input.close();
 		datain.close();
@@ -91,3 +92,4 @@ public class TASmodBufferBuilder extends ByteBufferBuilder {
 	}
 
 }
+

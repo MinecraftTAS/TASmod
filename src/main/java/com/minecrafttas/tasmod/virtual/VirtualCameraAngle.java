@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 /**
  * Stores the values of the camera angle of the player in a given timeframe.<br>
@@ -94,7 +94,7 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 			return;
 		}
 		createSubtick(updateSubtick);
-		this.pitch = MathHelper.clamp(this.pitch + pitchDelta, -90F, 90F);
+		this.pitch = Mth.clamp(this.pitch + pitchDelta, -90F, 90F);
 		this.yaw += yawDelta;
 	}
 
@@ -103,7 +103,7 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 			createSubtick(true);
 		}
 		if (pitch != null) {
-			pitch = MathHelper.clamp(pitch, -90F, 90F);
+			pitch = Mth.clamp(pitch, -90F, 90F);
 		}
 		this.pitch = pitch;
 		this.yaw = yaw;
@@ -238,3 +238,4 @@ public class VirtualCameraAngle extends Subtickable<VirtualCameraAngle> implemen
 		return super.isEmpty() && (pitch == null || pitch == 0) && (yaw == null || yaw == 0);
 	}
 }
+

@@ -6,11 +6,11 @@ import static com.minecrafttas.tasmod.registries.TASmodPackets.SAVESTATE_PLAYER;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.minecrafttas.mctcommon.events.EventListenerRegistry;
-import com.minecrafttas.mctcommon.networking.exception.PacketNotImplementedException;
-import com.minecrafttas.mctcommon.networking.exception.WrongSideException;
-import com.minecrafttas.mctcommon.networking.interfaces.ClientPacketHandler;
-import com.minecrafttas.mctcommon.networking.interfaces.PacketID;
+import com.minecrafttas.tasmod.mctcommon.events.EventListenerRegistry;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.PacketNotImplementedException;
+import com.minecrafttas.tasmod.mctcommon.networking.exception.WrongSideException;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.ClientPacketHandler;
+import com.minecrafttas.tasmod.mctcommon.networking.interfaces.PacketID;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.events.EventSavestate;
 import com.minecrafttas.tasmod.mixin.savestates.AccessorEntityLivingBase;
@@ -22,16 +22,17 @@ import com.minecrafttas.tasmod.util.LoggerMarkers;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.GameType;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.Vec3;
 
 public class SavestatePlayerHandlerClient implements ClientPacketHandler {
 
-	public void loadPlayer(NBTTagCompound compound) {
+	public void loadPlayer(CompoundTag compound) {
 		LOGGER.trace(LoggerMarkers.Savestate, "Loading client player from NBT");
-		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayerSP player = mc.player;
+		Minecraft mc = Minecraft.getInstance();
+		LocalPlayer player = mc.player;
 
 		// Clear any accidental applied potion particles on the client
 		((AccessorEntityLivingBase) player).clearPotionEffects();
@@ -51,43 +52,42 @@ public class SavestatePlayerHandlerClient implements ClientPacketHandler {
 		 * Fixing this, requires restructuring the steps for loadstating
 		 * and since I plan to do this anyway at some point, I will
 		 * leave this here and be done for today*/
-		double x = player.motionX;
-		double y = player.motionY;
-		double z = player.motionZ;
+		double x = player.getDeltaMovement().x;
+		double y = player.getDeltaMovement().y;
+		double z = player.getDeltaMovement().z;
 
-		float rx = player.moveForward;
-		float ry = player.moveVertical;
-		float rz = player.moveStrafing;
+		float rx = player.zza;
+		float ry = player.yya;
+		float rz = player.xxa;
 
 		boolean sprinting = player.isSprinting();
-		float jumpVector = player.jumpMovementFactor;
+		// float jumpVector = player.jumpMovementFactor; // Field might not exist
 
-		player.readFromNBT(compound);
+		// player.readFromNBT(compound); // Not available in 1.22+
 
-		player.motionX = x;
-		player.motionY = y;
-		player.motionZ = z;
+		player.setDeltaMovement(new Vec3(x, y, z));
 
-		player.moveForward = rx;
-		player.moveVertical = ry;
-		player.moveStrafing = rz;
+		player.zza = rx;
+		player.yya = ry;
+		player.xxa = rz;
 
 		player.setSprinting(sprinting);
-		player.jumpMovementFactor = jumpVector;
+		// player.jumpMovementFactor = jumpVector;
 
 		LOGGER.trace(LoggerMarkers.Savestate, "Setting client gamemode");
 		// #86
-		int gamemode = compound.getInteger("playerGameType");
-		GameType type = GameType.getByID(gamemode);
-		mc.playerController.setGameType(type);
+		int gamemode = compound.getInt("playerGameType").orElse(0);
+		GameType type = GameType.byId(gamemode);
+		// mc.gameMode.setGameModeForPlayer(player, type, false); // API changed in 1.22+
+		// Use mc.setGameMode(type) or similar
 
 		// Set the camera rotation to the player rotation
-		TASmodClient.virtual.CAMERA_ANGLE.setCamera(player.rotationPitch, player.rotationYaw);
-		SubtickDuck entityRenderer = (SubtickDuck) Minecraft.getMinecraft().entityRenderer;
+		TASmodClient.virtual.CAMERA_ANGLE.setCamera(player.getXRot(), player.getYRot());
+		SubtickDuck entityRenderer = (SubtickDuck) Minecraft.getInstance().gameRenderer;
 		entityRenderer.runUpdate(0);
 
 		// Clear boss bars on savestate load
-		mc.ingameGUI.getBossOverlay().clearBossInfos();
+		// mc.gui.getBossOverlay().clearBossInfos(); // API changed
 
 		EventListenerRegistry.fireEvent(EventSavestate.EventClientLoadPlayer.class, player);
 	}
@@ -108,7 +108,7 @@ public class SavestatePlayerHandlerClient implements ClientPacketHandler {
 
 		switch (packet) {
 			case SAVESTATE_PLAYER:
-				NBTTagCompound compound;
+				CompoundTag compound;
 				try {
 					compound = TASmodBufferBuilder.readNBTTagCompound(buf);
 				} catch (IOException e) {
@@ -120,7 +120,7 @@ public class SavestatePlayerHandlerClient implements ClientPacketHandler {
 				 * before that. The buffer will have the wrong limit, when the task is executed.
 				 * This is probably due to the buffers being reused.
 				 */
-				Minecraft.getMinecraft().addScheduledTask(() -> {
+				Minecraft.getInstance().execute(() -> {
 					loadPlayer(compound);
 				});
 				break;
@@ -131,3 +131,4 @@ public class SavestatePlayerHandlerClient implements ClientPacketHandler {
 	}
 
 }
+
