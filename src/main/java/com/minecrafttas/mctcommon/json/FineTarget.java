@@ -9,5 +9,9 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FineTarget {
-	Class<?> value();
+	Class<?> value() default Object.class;
+
+	Class<?> superclazz() default Object.class;
+
+	Class<?> enclosingclazz() default Object.class;
 }

@@ -6,10 +6,13 @@ import java.util.Set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.minecrafttas.mctcommon.json.FineField.FineMode;
+import com.minecrafttas.mctcommon.json.FineGson;
 import com.minecrafttas.mctcommon.json.FineMultiTarget;
 import com.minecrafttas.mctcommon.json.FineTarget;
 import com.minecrafttas.mctcommon.json.FineTypeAdapter;
 
+import net.minecraft.entity.ai.EntityAIAttackMelee;
+import net.minecraft.entity.monster.AbstractSkeleton;
 import net.minecraft.item.Item;
 
 @FineMultiTarget
@@ -78,6 +81,29 @@ public class EntityAITypeAdapters {
 			register("lookX", FineMode.FINE);
 			register("lookZ", FineMode.FINE);
 			register("idleTime", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(enclosingclazz = AbstractSkeleton.class, superclazz = EntityAIAttackMelee.class)
+	public static class AbstractSkeletonAITypeAdapter extends FineTypeAdapter {
+
+		public AbstractSkeletonAITypeAdapter() {
+			register("world", FineMode.FINE);
+			register("attacker", FineMode.FINE);
+			register("attackTick", FineMode.FINE);
+			register("speedTowardsTarget", FineMode.FINE);
+			register("longMemory", FineMode.FINE);
+			register("path", FineMode.FINE);
+			register("delayCounter", FineMode.FINE);
+			register("targetX", FineMode.FINE);
+			register("targetY", FineMode.FINE);
+			register("targetZ", FineMode.FINE);
+			register("attackInterval", FineMode.FINE);
+		}
+
+		@Override
+		public JsonElement serialize(Object obj, FineGson fineJson, Class<?> clazz) throws RuntimeException {
+			return super.serialize(obj, fineJson, EntityAIAttackMelee.class);
 		}
 	}
 

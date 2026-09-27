@@ -86,8 +86,8 @@ public abstract class FineTypeAdapter {
 	}
 
 	public Object deserialize(JsonElement element, Class<?> clazz, FineGson fineJson) {
-		Object obj = constructNew(clazz);
-		return deserialize(element, clazz, fineJson, obj);
+		Object existing = FineGson.constructNew(clazz);
+		return deserialize(element, clazz, fineJson, existing);
 	}
 
 	public Object deserialize(JsonElement element, Class<?> clazz, FineGson fineJson, Object obj) {

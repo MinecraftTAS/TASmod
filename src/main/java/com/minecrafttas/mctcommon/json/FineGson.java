@@ -1,6 +1,7 @@
 package com.minecrafttas.mctcommon.json;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.internal.ConstructorConstructor;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * A fine grained gson replacement
@@ -18,7 +21,7 @@ import com.google.gson.JsonObject;
  */
 public class FineGson {
 
-	private Map<Class<?>, FineTypeAdapter> typeAdapters = new HashMap<>();
+	private TypeAdapterMap typeAdapters = new TypeAdapterMap();
 
 	private final Gson gsonInstance;
 
@@ -37,8 +40,10 @@ public class FineGson {
 			if (!FineTypeAdapter.class.isAssignableFrom(type)) {
 				throw new RuntimeException(String.format("Trying to register type adapter %s, but it doesn't extend FineTypeAdapter", type.getName()));
 			}
-			Class<?> targetType = type.getAnnotation(FineTarget.class).value();
+			FineTarget fineTargetAnnotation = type.getAnnotation(FineTarget.class);
+			Class<?> targetType = fineTargetAnnotation.value();
 			FineTypeAdapter adapter;
+
 			try {
 				adapter = (FineTypeAdapter) type.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
@@ -82,9 +87,16 @@ public class FineGson {
 	public Object deserialize(JsonElement element, Class<?> type) {
 		if (!typeAdapters.containsKey(type))
 			return gsonInstance.fromJson(element, type);
+		Object obj = constructNew(type);
+		return deserialize(element, type, obj);
+	}
+
+	public Object deserialize(JsonElement element, Class<?> type, Object existing) {
+		if (!typeAdapters.containsKey(type))
+			return gsonInstance.fromJson(element, type);
 
 		FineTypeAdapter adapter = typeAdapters.get(type);
-		Object out = adapter.deserialize(element, type, this);
+		Object out = adapter.deserialize(element, type, this, existing);
 
 		Class<?> superclass = type.getSuperclass();
 		if (superclass != Object.class) {
@@ -100,5 +112,37 @@ public class FineGson {
 
 	public Map<Class<?>, FineTypeAdapter> getTypeAdapters() {
 		return typeAdapters;
+	}
+
+	private class TypeAdapterMap extends HashMap<Class<?>, FineTypeAdapter> {
+
+		@Override
+		public boolean containsKey(Object key) {
+			return get(key) != null;
+		}
+
+		@Override
+		public FineTypeAdapter get(Object key) {
+			Class<?> classKey = (Class<?>) key;
+			if (classKey.isAnonymousClass()) {
+				for (FineTypeAdapter adapter : values()) {
+					FineTarget fineTargetAnnotation = adapter.getClass().getAnnotation(FineTarget.class);
+					if (fineTargetAnnotation == null)
+						continue;
+					Class<?> enclosingType = fineTargetAnnotation.enclosingclazz();
+					Class<?> superType = fineTargetAnnotation.superclazz();
+					if (classKey.getEnclosingClass() == enclosingType && classKey.getSuperclass() == superType)
+						return adapter;
+				}
+				return null;
+			}
+			return super.get(key);
+		}
+	}
+
+	public static <T> T constructNew(Class<T> clazz) {
+		ConstructorConstructor constructor = new ConstructorConstructor(Collections.emptyMap(), true, Collections.emptyList());
+		TypeToken<T> token = TypeToken.get(clazz);
+		return constructor.get(token, true).construct();
 	}
 }
