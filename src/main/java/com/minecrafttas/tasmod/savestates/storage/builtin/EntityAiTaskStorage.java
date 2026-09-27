@@ -1,10 +1,7 @@
 package com.minecrafttas.tasmod.savestates.storage.builtin;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Modifier;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
@@ -131,18 +128,21 @@ public class EntityAiTaskStorage extends SavestateStorageExtensionBase {
 		return out;
 	}
 
+	@SuppressWarnings("unchecked")
 	private JsonArray serialiseAIEntries(Set<EntityAITaskEntry> taskEntries) {
 		JsonArray serialisedEntries = new JsonArray();
 		for (EntityAITasks.EntityAITaskEntry entry : taskEntries) {
 			JsonObject jsonAiTaskEntry = new JsonObject();
 			Class<? extends EntityAIBase> clazz = entry.action.getClass();
+			if (clazz.isAnonymousClass())
+				clazz = (Class<? extends EntityAIBase>) clazz.getSuperclass();
 			jsonAiTaskEntry.addProperty("priority", entry.priority);
 			jsonAiTaskEntry.addProperty("using", entry.using);
 			jsonAiTaskEntry.addProperty("class", clazz.getName());
 
 			try {
 				System.out.println(clazz.getName());
-				jsonAiTaskEntry.add("action", serializeAction(entry.action, clazz));
+				jsonAiTaskEntry.add("action", fgson.serialize(entry.action));
 			} catch (Exception e) {
 				throw new SavestateException(e, "Could not serialise AI Task %s", entry.action.getClass().getName());
 			}
@@ -150,19 +150,6 @@ public class EntityAiTaskStorage extends SavestateStorageExtensionBase {
 			serialisedEntries.add(jsonAiTaskEntry);
 		}
 		return serialisedEntries;
-	}
-
-	private JsonElement serializeAction(EntityAIBase action, Class<? extends EntityAIBase> clazz) {
-//		@SuppressWarnings("unchecked")
-//		Class<? extends EntityAIBase> superclazz = (Class<? extends EntityAIBase>) clazz.getSuperclass();
-//
-//		JsonObject out = new JsonObject();
-//
-//		if (superclazz != EntityAIBase.class)
-//			out = serializeAction(action, superclazz);
-//
-//		return JsonUtils.mergeJsonObjects(out, gsonInstance.toJsonTree(action, clazz).getAsJsonObject());
-		return fgson.serialize(action);
 	}
 
 	@Override
@@ -199,7 +186,7 @@ public class EntityAiTaskStorage extends SavestateStorageExtensionBase {
 			JsonObject jsonEntry = jsonEntryElement.getAsJsonObject();
 
 			// Deserialise the type of the AI action
-			System.out.println(jsonEntry.get("class").getAsString());
+//			System.out.println(jsonEntry.get("class").getAsString());
 			Class<? extends EntityAIBase> clazz;
 			try {
 				clazz = Class.forName(jsonEntry.get("class").getAsString(), false, getClass().getClassLoader()).asSubclass(EntityAIBase.class);
@@ -217,7 +204,7 @@ public class EntityAiTaskStorage extends SavestateStorageExtensionBase {
 				}
 
 				createNew = false;
-				vanillaEntry.action = deserialiseAction(vanillaAction, jsonEntry.get("action"));
+				vanillaEntry.action = (EntityAIBase) fgson.deserialize(jsonEntry.get("action"), vanillaAction.getClass(), vanillaAction);
 				vanillaEntry.using = using;
 				out.add(vanillaEntry);
 				break;
@@ -228,9 +215,11 @@ public class EntityAiTaskStorage extends SavestateStorageExtensionBase {
 			}
 			int priority = jsonEntry.get("priority").getAsInt();
 
+			if (Modifier.isAbstract(clazz.getModifiers()))
+				continue;
 			EntityAIBase action = JsonUtils.constructNew(clazz);
 			try {
-				action = deserialiseAction(action, jsonEntry.get("action"));
+				action = (EntityAIBase) fgson.deserialize(jsonEntry.get("action"), action.getClass(), action);
 			} catch (Exception e) {
 				e.printStackTrace();
 				continue;
@@ -239,45 +228,6 @@ public class EntityAiTaskStorage extends SavestateStorageExtensionBase {
 			entry.using = using;
 			out.add(entry);
 		}
-		return out;
-	}
-
-	private EntityAIBase deserialiseAction(EntityAIBase action, JsonElement json) {
-		JsonObject jsonObject = json.getAsJsonObject();
-		List<Field> fields = getFieldList(action.getClass());
-
-		for (Field field : fields) {
-			field.setAccessible(true);
-			String fieldname = field.getName();
-			Class<?> fieldClass = field.getType();
-
-			JsonElement value = jsonObject.get(fieldname);
-
-			if (value == null)
-				continue;
-
-			Object deserialised = gsonInstance.fromJson(value, fieldClass);
-			try {
-				field.set(action, deserialised);
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return action;
-	}
-
-	private List<Field> getFieldList(Class<? extends EntityAIBase> clazz) {
-		@SuppressWarnings("unchecked")
-		Class<? extends EntityAIBase> superclazz = (Class<? extends EntityAIBase>) clazz.getSuperclass();
-		List<Field> out = new ArrayList<>();
-
-		if (superclazz != EntityAIBase.class) {
-			out.addAll(getFieldList(superclazz));
-		}
-
-		out.addAll(Arrays.asList(clazz.getDeclaredFields()));
-
 		return out;
 	}
 }

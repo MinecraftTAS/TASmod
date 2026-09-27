@@ -16,10 +16,9 @@ public class ItemTypeAdapter extends FineTypeAdapter {
 	}
 
 	@Override
-	public Object deserialize(JsonElement element, Class<?> clazz, FineGson fineJson) {
+	public Object deserialize(JsonElement element, Class<?> clazz, FineGson fineJson, Object existing) {
 		JsonPrimitive value = element.getAsJsonPrimitive();
-		Item.getItemById(value.getAsInt());
-		return super.deserialize(element, clazz, fineJson);
+		return Item.getItemById(value.getAsInt());
 	}
 
 }

@@ -1,8 +1,6 @@
 package com.minecrafttas.tasmod.savestates.typeadapters;
 
-import com.google.gson.JsonElement;
 import com.minecrafttas.mctcommon.json.FineField.FineMode;
-import com.minecrafttas.mctcommon.json.FineGson;
 import com.minecrafttas.mctcommon.json.FineMultiTarget;
 import com.minecrafttas.mctcommon.json.FineTarget;
 import com.minecrafttas.mctcommon.json.FineTypeAdapter;
@@ -18,7 +16,7 @@ public class PathNavigateTypeAdapters {
 			register("world", FineMode.FINE);
 			register("currentPath", FineMode.FINE);
 			register("speed", FineMode.FINE);
-			register("pathSearchRange", FineMode.EXCLUDED);
+			register("pathSearchRange", FineMode.FINE);
 			register("totalTicks", FineMode.FINE);
 			register("ticksAtLastPos", FineMode.FINE);
 			register("lastPosCheck", FineMode.FINE);
@@ -29,9 +27,9 @@ public class PathNavigateTypeAdapters {
 			register("maxDistanceToWaypoint", FineMode.FINE);
 			register("tryUpdatePath", FineMode.FINE);
 			register("lastTimeUpdated", FineMode.FINE);
-			register("nodeProcessor", FineMode.EXCLUDED);
+			register("nodeProcessor", FineMode.FINE);
 			register("targetPos", FineMode.FINE);
-			register("pathFinder", FineMode.EXCLUDED);
+			register("pathFinder", FineMode.FINE);
 		}
 	}
 
@@ -40,12 +38,6 @@ public class PathNavigateTypeAdapters {
 
 		public PathNavigateGroundTypeAdapter() {
 			register("shouldAvoidSun", FineMode.FINE);
-		}
-
-		@Override
-		public Object deserialize(JsonElement element, Class<?> clazz, FineGson fineJson) {
-			Object obj = constructNew(clazz);
-			return deserialize(element, clazz, fineJson, obj);
 		}
 	}
 

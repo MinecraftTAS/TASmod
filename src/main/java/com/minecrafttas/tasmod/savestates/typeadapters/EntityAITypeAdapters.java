@@ -433,7 +433,7 @@ public class EntityAITypeAdapters {
 
 		public EntityAIAttackRangedTypeAdapter() {
 			register("entityHost", FineMode.FINE);
-			register("rangedAttackEntityHost", FineMode.FINE);
+			register("rangedAttackEntityHost", FineMode.EXCLUDED);
 			register("attackTarget", FineMode.FINE);
 			register("rangedAttackTime", FineMode.FINE);
 			register("entityMoveSpeed", FineMode.FINE);
