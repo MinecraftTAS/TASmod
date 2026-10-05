@@ -61,7 +61,7 @@ public abstract class FineTypeAdapter {
 			}
 
 			String fieldName = fineField.getName();
-			System.out.println(String.format("[%s|%s] Serializing field %s (%s)", obj.getClass().getSimpleName(), clazz.getSimpleName(), field.getName(), fieldName));
+//			System.out.println(String.format("[%s|%s] Serializing field %s (%s)", obj.getClass().getSimpleName(), clazz.getSimpleName(), field.getName(), fieldName));
 			switch (fineField.getMode()) {
 				case CUSTOM:
 					out.add(fieldName, fineField.serialize(fieldValue, fineJson));
@@ -106,7 +106,7 @@ public abstract class FineTypeAdapter {
 			String fieldName = fineField.getName();
 			JsonElement fieldElement = elementObj.get(fieldName);
 
-			System.out.println(String.format("[%s|%s] Deserializing field %s (%s)", obj.getClass().getSimpleName(), clazz.getSimpleName(), field.getName(), fieldName));
+//			System.out.println(String.format("[%s|%s] Deserializing field %s (%s)", obj.getClass().getSimpleName(), clazz.getSimpleName(), field.getName(), fieldName));
 			Object fieldValue = null;
 			switch (fineField.getMode()) {
 				case CUSTOM:

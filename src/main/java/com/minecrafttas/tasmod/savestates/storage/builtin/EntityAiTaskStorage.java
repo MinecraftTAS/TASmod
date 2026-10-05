@@ -141,7 +141,7 @@ public class EntityAiTaskStorage extends SavestateStorageExtensionBase {
 			jsonAiTaskEntry.addProperty("class", clazz.getName());
 
 			try {
-				System.out.println(clazz.getName());
+//				System.out.println(clazz.getName());
 				jsonAiTaskEntry.add("action", fgson.serialize(entry.action));
 			} catch (Exception e) {
 				throw new SavestateException(e, "Could not serialise AI Task %s", entry.action.getClass().getName());

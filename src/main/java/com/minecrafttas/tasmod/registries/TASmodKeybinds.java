@@ -1,16 +1,10 @@
 package com.minecrafttas.tasmod.registries;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-
 import org.lwjgl.input.Keyboard;
 
 import com.minecrafttas.mctcommon.KeybindManager.IsKeyDownFunc;
 import com.minecrafttas.mctcommon.KeybindManager.Keybind;
 import com.minecrafttas.mctcommon.KeybindManager.KeybindID;
-import com.minecrafttas.tasmod.TASmod;
 import com.minecrafttas.tasmod.TASmodClient;
 import com.minecrafttas.tasmod.networking.TASmodBufferBuilder;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
@@ -57,11 +51,11 @@ public enum TASmodKeybinds implements KeybindID {
 		 * This is how we did it before AI kids.
 		 */
 
-		try {
-			Files.write(Paths.get("../src/main/java/com/minecrafttas/tasmod/savestates/typeadapters/EntityAITypeAdapters2.java"), TASmod.generator.generateMulti(), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	//		try {
+		//			Files.write(Paths.get("../src/main/java/com/minecrafttas/tasmod/savestates/typeadapters/EntityAITypeAdapters2.java"), TASmod.generator.generateMulti(), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		//		} catch (IOException e) {
+		//			e.printStackTrace();
+		//		}
 	}, VirtualKeybindings::isKeyDown),
 	TEST2("Various Testing2", "TASmod", Keyboard.KEY_F7, () -> {
 	}, VirtualKeybindings::isKeyDown);
