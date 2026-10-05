@@ -26,6 +26,16 @@ public class EntityAITypeAdapters {
 		}
 	}
 
+	@FineTarget(net.minecraft.entity.monster.EntityBlaze.AIFireballAttack.class)
+	public static class AIFireballAttackTypeAdapter extends FineTypeAdapter {
+
+		public AIFireballAttackTypeAdapter() {
+			register("blaze", FineMode.FINE);
+			register("attackStep", FineMode.FINE);
+			register("attackTime", FineMode.FINE);
+		}
+	}
+
 	@FineTarget(net.minecraft.entity.ai.EntityAIMoveTowardsRestriction.class)
 	public static class EntityAIMoveTowardsRestrictionTypeAdapter extends FineTypeAdapter {
 
@@ -293,15 +303,6 @@ public class EntityAITypeAdapters {
 		}
 	}
 
-	@FineTarget(net.minecraft.entity.ai.EntityAICreeperSwell.class)
-	public static class EntityAICreeperSwellTypeAdapter extends FineTypeAdapter {
-
-		public EntityAICreeperSwellTypeAdapter() {
-			register("swellingCreeper", FineMode.FINE);
-			register("creeperAttackTarget", FineMode.FINE);
-		}
-	}
-
 	@FineTarget(net.minecraft.entity.ai.EntityAIAttackMelee.class)
 	public static class EntityAIAttackMeleeTypeAdapter extends FineTypeAdapter {
 
@@ -317,6 +318,29 @@ public class EntityAITypeAdapters {
 			register("targetY", FineMode.FINE);
 			register("targetZ", FineMode.FINE);
 			register("attackInterval", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySpider.AISpiderAttack.class)
+	public static class AISpiderAttackTypeAdapter extends FineTypeAdapter {
+
+		public AISpiderAttackTypeAdapter() {
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySpider.AISpiderTarget.class)
+	public static class AISpiderTargetTypeAdapter extends FineTypeAdapter {
+
+		public AISpiderTargetTypeAdapter() {
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.ai.EntityAICreeperSwell.class)
+	public static class EntityAICreeperSwellTypeAdapter extends FineTypeAdapter {
+
+		public EntityAICreeperSwellTypeAdapter() {
+			register("swellingCreeper", FineMode.FINE);
+			register("creeperAttackTarget", FineMode.FINE);
 		}
 	}
 
@@ -352,6 +376,68 @@ public class EntityAITypeAdapters {
 			register("targetX", FineMode.FINE);
 			register("targetY", FineMode.FINE);
 			register("targetZ", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityGuardian.AIGuardianAttack.class)
+	public static class AIGuardianAttackTypeAdapter extends FineTypeAdapter {
+
+		public AIGuardianAttackTypeAdapter() {
+			register("guardian", FineMode.FINE);
+			register("tickCounter", FineMode.FINE);
+			register("isElder", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityEnderman.AIPlaceBlock.class)
+	public static class AIPlaceBlockTypeAdapter extends FineTypeAdapter {
+
+		public AIPlaceBlockTypeAdapter() {
+			register("enderman", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityEnderman.AITakeBlock.class)
+	public static class AITakeBlockTypeAdapter extends FineTypeAdapter {
+
+		public AITakeBlockTypeAdapter() {
+			register("enderman", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityEnderman.AIFindPlayer.class)
+	public static class AIFindPlayerTypeAdapter extends FineTypeAdapter {
+
+		public AIFindPlayerTypeAdapter() {
+			register("enderman", FineMode.FINE);
+			register("player", FineMode.FINE);
+			register("aggroTime", FineMode.FINE);
+			register("teleportTime", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityGhast.AIRandomFly.class)
+	public static class AIRandomFlyTypeAdapter extends FineTypeAdapter {
+
+		public AIRandomFlyTypeAdapter() {
+			register("parentEntity", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityGhast.AILookAround.class)
+	public static class AILookAroundTypeAdapter extends FineTypeAdapter {
+
+		public AILookAroundTypeAdapter() {
+			register("parentEntity", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityGhast.AIFireballAttack.class)
+	public static class AIFireballAttack2TypeAdapter extends FineTypeAdapter {
+
+		public AIFireballAttack2TypeAdapter() {
+			register("parentEntity", FineMode.FINE);
+			register("attackTimer", FineMode.FINE);
 		}
 	}
 
@@ -471,6 +557,55 @@ public class EntityAITypeAdapters {
 		}
 	}
 
+	@FineTarget(net.minecraft.entity.passive.EntityLlama.AIHurtByTarget.class)
+	public static class AIHurtByTargetTypeAdapter extends FineTypeAdapter {
+
+		public AIHurtByTargetTypeAdapter() {
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.passive.EntityLlama.AIDefendTarget.class)
+	public static class AIDefendTargetTypeAdapter extends FineTypeAdapter {
+
+		public AIDefendTargetTypeAdapter() {
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySlime.AISlimeFloat.class)
+	public static class AISlimeFloatTypeAdapter extends FineTypeAdapter {
+
+		public AISlimeFloatTypeAdapter() {
+			register("slime", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySlime.AISlimeAttack.class)
+	public static class AISlimeAttackTypeAdapter extends FineTypeAdapter {
+
+		public AISlimeAttackTypeAdapter() {
+			register("slime", FineMode.FINE);
+			register("growTieredTimer", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySlime.AISlimeFaceRandom.class)
+	public static class AISlimeFaceRandomTypeAdapter extends FineTypeAdapter {
+
+		public AISlimeFaceRandomTypeAdapter() {
+			register("slime", FineMode.FINE);
+			register("chosenDegrees", FineMode.FINE);
+			register("nextRandomizeTime", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySlime.AISlimeHop.class)
+	public static class AISlimeHopTypeAdapter extends FineTypeAdapter {
+
+		public AISlimeHopTypeAdapter() {
+			register("slime", FineMode.FINE);
+		}
+	}
+
 	@FineTarget(net.minecraft.entity.ai.EntityAIFindEntityNearest.class)
 	public static class EntityAIFindEntityNearestTypeAdapter extends FineTypeAdapter {
 
@@ -524,6 +659,64 @@ public class EntityAITypeAdapters {
 		}
 	}
 
+	@FineTarget(net.minecraft.entity.monster.EntityPolarBear.AIMeleeAttack.class)
+	public static class AIMeleeAttackTypeAdapter extends FineTypeAdapter {
+
+		public AIMeleeAttackTypeAdapter() {
+			register("f_1682088", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityPolarBear.AIPanic.class)
+	public static class AIPanicTypeAdapter extends FineTypeAdapter {
+
+		public AIPanicTypeAdapter() {
+			register("f_1588945", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityPolarBear.AIHurtByTarget.class)
+	public static class AIHurtByTarget2TypeAdapter extends FineTypeAdapter {
+
+		public AIHurtByTarget2TypeAdapter() {
+			register("f_4352699", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityPolarBear.AIAttackPlayer.class)
+	public static class AIAttackPlayerTypeAdapter extends FineTypeAdapter {
+
+		public AIAttackPlayerTypeAdapter() {
+			register("f_4967813", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.passive.EntityRabbit.AIPanic.class)
+	public static class AIPanic2TypeAdapter extends FineTypeAdapter {
+
+		public AIPanic2TypeAdapter() {
+			register("rabbit", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.passive.EntityRabbit.AIAvoidEntity.class)
+	public static class AIAvoidEntityTypeAdapter extends FineTypeAdapter {
+
+		public AIAvoidEntityTypeAdapter() {
+			register("rabbit", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.passive.EntityRabbit.AIRaidFarm.class)
+	public static class AIRaidFarmTypeAdapter extends FineTypeAdapter {
+
+		public AIRaidFarmTypeAdapter() {
+			register("rabbit", FineMode.FINE);
+			register("wantsToRaid", FineMode.FINE);
+			register("canRaid", FineMode.FINE);
+		}
+	}
+
 	@FineTarget(net.minecraft.entity.ai.EntityAIEatGrass.class)
 	public static class EntityAIEatGrassTypeAdapter extends FineTypeAdapter {
 
@@ -532,6 +725,57 @@ public class EntityAITypeAdapters {
 			register("grassEaterEntity", FineMode.FINE);
 			register("entityWorld", FineMode.FINE);
 			register("eatingGrassTimer", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityShulker.AIAttack.class)
+	public static class AIAttackTypeAdapter extends FineTypeAdapter {
+
+		public AIAttackTypeAdapter() {
+			register("attackTime", FineMode.FINE);
+			register("f_0549306", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityShulker.AIPeek.class)
+	public static class AIPeekTypeAdapter extends FineTypeAdapter {
+
+		public AIPeekTypeAdapter() {
+			register("peekTime", FineMode.FINE);
+			register("f_7126754", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityShulker.AIAttackNearest.class)
+	public static class AIAttackNearestTypeAdapter extends FineTypeAdapter {
+
+		public AIAttackNearestTypeAdapter() {
+			register("f_8711122", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityShulker.AIDefenseAttack.class)
+	public static class AIDefenseAttackTypeAdapter extends FineTypeAdapter {
+
+		public AIDefenseAttackTypeAdapter() {
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySilverfish.AISummonSilverfish.class)
+	public static class AISummonSilverfishTypeAdapter extends FineTypeAdapter {
+
+		public AISummonSilverfishTypeAdapter() {
+			register("silverfish", FineMode.FINE);
+			register("lookForFriends", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySilverfish.AIHideInStone.class)
+	public static class AIHideInStoneTypeAdapter extends FineTypeAdapter {
+
+		public AIHideInStoneTypeAdapter() {
+			register("facing", FineMode.FINE);
+			register("doMerge", FineMode.FINE);
 		}
 	}
 
@@ -577,6 +821,38 @@ public class EntityAITypeAdapters {
 
 		public EntityAISkeletonRidersTypeAdapter() {
 			register("horse", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.passive.EntitySquid.AIMoveRandom.class)
+	public static class AIMoveRandomTypeAdapter extends FineTypeAdapter {
+
+		public AIMoveRandomTypeAdapter() {
+			register("squid", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityVex.AIChargeAttack.class)
+	public static class AIChargeAttackTypeAdapter extends FineTypeAdapter {
+
+		public AIChargeAttackTypeAdapter() {
+			register("f_5200292", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityVex.AIMoveRandom.class)
+	public static class AIMoveRandom2TypeAdapter extends FineTypeAdapter {
+
+		public AIMoveRandom2TypeAdapter() {
+			register("f_3949223", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityVex.AICopyOwnerTarget.class)
+	public static class AICopyOwnerTargetTypeAdapter extends FineTypeAdapter {
+
+		public AICopyOwnerTargetTypeAdapter() {
+			register("f_7758303", FineMode.FINE);
 		}
 	}
 
@@ -675,6 +951,57 @@ public class EntityAITypeAdapters {
 		}
 	}
 
+	@FineTarget(net.minecraft.entity.monster.EntityVindicator.AIJohnnyAttack.class)
+	public static class AIJohnnyAttackTypeAdapter extends FineTypeAdapter {
+
+		public AIJohnnyAttackTypeAdapter() {
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySpellcasterIllager.AICastingApell.class)
+	public static class AICastingApellTypeAdapter extends FineTypeAdapter {
+
+		public AICastingApellTypeAdapter() {
+			register("f_1024672", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntitySpellcasterIllager.AIUseSpell.class)
+	public static class AIUseSpellTypeAdapter extends FineTypeAdapter {
+
+		public AIUseSpellTypeAdapter() {
+			register("spellWarmup", FineMode.FINE);
+			register("spellCooldown", FineMode.FINE);
+			register("f_4432138", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityIllusionIllager.AIMirriorSpell.class)
+	public static class AIMirriorSpellTypeAdapter extends FineTypeAdapter {
+
+		public AIMirriorSpellTypeAdapter() {
+			register("f_4096963", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityIllusionIllager.AIBlindnessSpell.class)
+	public static class AIBlindnessSpellTypeAdapter extends FineTypeAdapter {
+
+		public AIBlindnessSpellTypeAdapter() {
+			register("lastTargetId", FineMode.FINE);
+			register("f_2457942", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.passive.EntityWolf.AIAvoidEntity.class)
+	public static class AIAvoidEntity2TypeAdapter extends FineTypeAdapter {
+
+		public AIAvoidEntity2TypeAdapter() {
+			register("wolf", FineMode.FINE);
+			register("f_5613973", FineMode.FINE);
+		}
+	}
+
 	@FineTarget(net.minecraft.entity.ai.EntityAIBeg.class)
 	public static class EntityAIBegTypeAdapter extends FineTypeAdapter {
 
@@ -704,6 +1031,28 @@ public class EntityAITypeAdapters {
 			register("tameable", FineMode.FINE);
 			register("attacker", FineMode.FINE);
 			register("timestamp", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.boss.EntityWither.AIDoNothing.class)
+	public static class AIDoNothingTypeAdapter extends FineTypeAdapter {
+
+		public AIDoNothingTypeAdapter() {
+			register("f_4462935", FineMode.FINE);
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityPigZombie.AIHurtByAggressor.class)
+	public static class AIHurtByAggressorTypeAdapter extends FineTypeAdapter {
+
+		public AIHurtByAggressorTypeAdapter() {
+		}
+	}
+
+	@FineTarget(net.minecraft.entity.monster.EntityPigZombie.AITargetAggressor.class)
+	public static class AITargetAggressorTypeAdapter extends FineTypeAdapter {
+
+		public AITargetAggressorTypeAdapter() {
 		}
 	}
 

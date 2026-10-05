@@ -58,7 +58,7 @@ public enum TASmodKeybinds implements KeybindID {
 		 */
 
 		try {
-			Files.write(Paths.get("../src/main/java/com/minecrafttas/tasmod/savestates/typeadapters/EntityAITypeAdapters.java"), TASmod.generator.generateMulti(), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+			Files.write(Paths.get("../src/main/java/com/minecrafttas/tasmod/savestates/typeadapters/EntityAITypeAdapters2.java"), TASmod.generator.generateMulti(), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -3,8 +3,10 @@ package com.minecrafttas.mctcommon.json;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class FineTypeAdapterGenerator {
@@ -15,6 +17,7 @@ public class FineTypeAdapterGenerator {
 
 	protected final List<String> importLines = new ArrayList<>();
 	protected final Set<Class<?>> classList = new LinkedHashSet<>();
+	protected final Map<String, Integer> duplicateClassNameList = new HashMap<>();
 
 	public FineTypeAdapterGenerator(String className, String packagge) {
 		this.className = className;
@@ -72,9 +75,9 @@ public class FineTypeAdapterGenerator {
 		if (classList.contains(clazz))
 			return;
 
-//		if (clazz.getName().contains("$")) {
-//			return;
-//		}
+		if (clazz.isAnonymousClass()) {
+			return;
+		}
 
 		Class<?> superclazz = clazz.getSuperclass();
 		if (superclazz != Object.class)
@@ -89,11 +92,17 @@ public class FineTypeAdapterGenerator {
 		String clazzName = clazz.getSimpleName();
 		List<Field> fields = FineTypeAdapter.getFieldList(clazz);
 
+		Integer duplicateCount = duplicateClassNameList.getOrDefault(clazzName, 0);
+		duplicateCount++;
+		duplicateClassNameList.put(clazzName, duplicateCount);
+
+		String typeAdapterName = duplicateCount == 1 ? clazzName : clazzName + duplicateCount;
+
 		out.addAll(splitNewLine(String.format(""
 				+ "@FineTarget(%s.class)\n"
 				+ "public %sclass %sTypeAdapter extends FineTypeAdapter {\n"
 				+ "\n"
-				+ "\tpublic %sTypeAdapter() {", clazz.getName().replace("$", "."), isStatic ? "static " : "", clazzName, clazzName)));
+				+ "\tpublic %sTypeAdapter() {", clazz.getName().replace("$", "."), isStatic ? "static " : "", typeAdapterName, typeAdapterName)));
 
 		for (Field field : fields) {
 			out.add(String.format("\t\tregister(\"%s\", FineMode.FINE);", field.getName()));

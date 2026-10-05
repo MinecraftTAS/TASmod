@@ -122,7 +122,7 @@ public class TASmod implements ModInitializer, EventServerStart, EventServerInit
 
 	public static Configuration config;
 
-	public static FineTypeAdapterGenerator generator = new FineTypeAdapterGenerator("EntityAITypeAdapters", "com.minecrafttas.tasmod.savestates.typeadapters");
+	public static FineTypeAdapterGenerator generator = new FineTypeAdapterGenerator("EntityAITypeAdapters2", "com.minecrafttas.tasmod.savestates.typeadapters");
 
 	@Override
 	public void onInitialize() {
