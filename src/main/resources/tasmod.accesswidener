@@ -28,10 +28,82 @@ accessible field net/minecraft/client/settings/KeyBinding CATEGORY_ORDER Ljava/u
 accessible field net/minecraft/entity/Entity rand Ljava/util/Random;
 accessible field net/minecraft/world/World updateLCG I
 mutable field net/minecraft/world/World rand Ljava/util/Random;
-accessible field net/minecraft/entity/EntityLiving tasks Lnet/minecraft/entity/ai/EntityAITasks;
-accessible field net/minecraft/entity/EntityLiving targetTasks Lnet/minecraft/entity/ai/EntityAITasks;
+
+# EntityRNG
 accessible field net/minecraft/entity/ai/EntityAITasks tickCount I
 accessible field net/minecraft/entity/passive/EntityBat spawnPosition Lnet/minecraft/util/math/BlockPos;
 accessible field net/minecraft/entity/Entity nextEntityID I
+accessible field net/minecraft/entity/EntityLivingBase revengeTarget Lnet/minecraft/entity/EntityLivingBase;
+accessible field net/minecraft/entity/EntityLivingBase revengeTimer I
+accessible field net/minecraft/entity/EntityLivingBase lastAttackedEntity Lnet/minecraft/entity/EntityLivingBase;
 accessible field net/minecraft/entity/EntityLivingBase idleTime I
+accessible field net/minecraft/entity/EntityLiving attackTarget Lnet/minecraft/entity/EntityLivingBase;
+accessible field net/minecraft/entity/monster/EntityCreeper timeSinceIgnited I
+accessible field net/minecraft/entity/monster/EntityCreeper droppedSkulls I
 
+# EntityPathFinding
+accessible method net/minecraft/entity/EntityLiving createNavigator (Lnet/minecraft/world/World;)Lnet/minecraft/pathfinding/PathNavigate;
+accessible field net/minecraft/entity/EntityLiving navigator Lnet/minecraft/pathfinding/PathNavigate;
+accessible field net/minecraft/pathfinding/PathNavigate entity Lnet/minecraft/entity/EntityLiving;
+accessible field net/minecraft/pathfinding/PathNavigate world Lnet/minecraft/world/World;
+accessible field net/minecraft/pathfinding/PathNavigate pathSearchRange Lnet/minecraft/entity/ai/attributes/IAttributeInstance;
+mutable field net/minecraft/pathfinding/PathNavigate pathSearchRange Lnet/minecraft/entity/ai/attributes/IAttributeInstance;
+accessible field net/minecraft/pathfinding/PathNavigate nodeProcessor Lnet/minecraft/pathfinding/NodeProcessor;
+accessible field net/minecraft/pathfinding/PathNavigate pathFinder Lnet/minecraft/pathfinding/PathFinder;
+mutable field net/minecraft/pathfinding/PathNavigate pathFinder Lnet/minecraft/pathfinding/PathFinder;
+
+# EntityAI
+accessible field net/minecraft/entity/EntityLiving tasks Lnet/minecraft/entity/ai/EntityAITasks;
+accessible field net/minecraft/entity/EntityLiving targetTasks Lnet/minecraft/entity/ai/EntityAITasks;
+
+accessible class net/minecraft/entity/ai/EntityAITasks$EntityAITaskEntry
+
+accessible field net/minecraft/entity/ai/EntityAITasks taskEntries Ljava/util/Set;
+mutable field net/minecraft/entity/ai/EntityAITasks taskEntries Ljava/util/Set;
+
+mutable field net/minecraft/entity/ai/EntityAITasks$EntityAITaskEntry action Lnet/minecraft/entity/ai/EntityAIBase;
+
+accessible field net/minecraft/entity/ai/EntityAITasks executingTaskEntries Ljava/util/Set;
+mutable field net/minecraft/entity/ai/EntityAITasks executingTaskEntries Ljava/util/Set;
+
+# Private Inner Classes .-.
+accessible class net/minecraft/entity/boss/EntityWither$AIDoNothing
+accessible class net/minecraft/entity/monster/EntityBlaze$AIFireballAttack
+accessible class net/minecraft/entity/monster/EntityEnderman$AIFindPlayer
+accessible class net/minecraft/entity/monster/EntityEnderman$AIPlaceBlock
+accessible class net/minecraft/entity/monster/EntityEnderman$AITakeBlock
+accessible class net/minecraft/entity/monster/EntityGhast$AIFireballAttack
+accessible class net/minecraft/entity/monster/EntityGhast$AILookAround
+accessible class net/minecraft/entity/monster/EntityGhast$AIRandomFly
+accessible class net/minecraft/entity/monster/EntityGuardian$AIGuardianAttack
+accessible class net/minecraft/entity/monster/EntityIllusionIllager$AIBlindnessSpell
+accessible class net/minecraft/entity/monster/EntityIllusionIllager$AIMirriorSpell
+accessible class net/minecraft/entity/monster/EntityPigZombie$AIHurtByAggressor
+accessible class net/minecraft/entity/monster/EntityPigZombie$AITargetAggressor
+accessible class net/minecraft/entity/monster/EntityPolarBear$AIAttackPlayer
+accessible class net/minecraft/entity/monster/EntityPolarBear$AIHurtByTarget
+accessible class net/minecraft/entity/monster/EntityPolarBear$AIMeleeAttack
+accessible class net/minecraft/entity/monster/EntityPolarBear$AIPanic
+accessible class net/minecraft/entity/monster/EntityShulker$AIAttack
+accessible class net/minecraft/entity/monster/EntityShulker$AIAttackNearest
+accessible class net/minecraft/entity/monster/EntityShulker$AIDefenseAttack
+accessible class net/minecraft/entity/monster/EntityShulker$AIPeek
+accessible class net/minecraft/entity/monster/EntitySilverfish$AIHideInStone
+accessible class net/minecraft/entity/monster/EntitySilverfish$AISummonSilverfish
+accessible class net/minecraft/entity/monster/EntitySlime$AISlimeAttack
+accessible class net/minecraft/entity/monster/EntitySlime$AISlimeFaceRandom
+accessible class net/minecraft/entity/monster/EntitySlime$AISlimeFloat
+accessible class net/minecraft/entity/monster/EntitySlime$AISlimeHop
+accessible class net/minecraft/entity/monster/EntitySpider$AISpiderAttack
+accessible class net/minecraft/entity/monster/EntitySpider$AISpiderTarget
+accessible class net/minecraft/entity/monster/EntityVex$AIChargeAttack
+accessible class net/minecraft/entity/monster/EntityVex$AICopyOwnerTarget
+accessible class net/minecraft/entity/monster/EntityVex$AIMoveRandom
+accessible class net/minecraft/entity/monster/EntityVindicator$AIJohnnyAttack
+accessible class net/minecraft/entity/passive/EntityLlama$AIDefendTarget
+accessible class net/minecraft/entity/passive/EntityLlama$AIHurtByTarget
+accessible class net/minecraft/entity/passive/EntityRabbit$AIAvoidEntity
+accessible class net/minecraft/entity/passive/EntityRabbit$AIPanic
+accessible class net/minecraft/entity/passive/EntityRabbit$AIRaidFarm
+accessible class net/minecraft/entity/passive/EntitySquid$AIMoveRandom
+accessible class net/minecraft/entity/passive/EntityWolf$AIAvoidEntity
