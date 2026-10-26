@@ -12,6 +12,7 @@ import com.minecrafttas.tasmod.events.EventKillTheRNGServer;
 import com.minecrafttas.tasmod.events.EventPlaybackServer;
 import com.minecrafttas.tasmod.ktrng.RandomBase.RNGSide;
 import com.minecrafttas.tasmod.playback.PlaybackControllerClient.TASstate;
+import com.minecrafttas.tasmod.savestates.SavestateIndexer;
 import com.minecrafttas.tasmod.util.FileThread;
 
 import net.minecraft.server.MinecraftServer;
@@ -34,7 +35,16 @@ public class KillTheRNGMonitor implements EventPlaybackServer.EventControllerSta
 		if (TASmod.getServerInstance() == null)
 			return;
 
-		Path serverDir = TASmod.getServerInstance().getDataDirectory().toPath();
+		Path serverDirs = TASmod.getServerInstance().getDataDirectory().toPath();
+		Path monitorDir = serverDirs.resolve("ktrngMonitor");
+
+		if (!Files.exists(monitorDir)) {
+			try {
+				Files.createDirectory(monitorDir);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 		if (isActive()) {
 			thread.close();
@@ -42,21 +52,29 @@ public class KillTheRNGMonitor implements EventPlaybackServer.EventControllerSta
 		}
 
 		if (newstate == TASstate.RECORDING) {
+			onRecordingClear();
+			if (!Files.exists(monitorDir)) {
+				try {
+					Files.createDirectory(monitorDir);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 			try {
-				thread = new FileThread(serverDir.resolve("ktrng_recording.txt"), false);
+				thread = new FileThread(monitorDir.resolve("ktrng_recording.txt"), false);
 				thread.start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else if (newstate == TASstate.PLAYBACK) {
 
-			Path playbackFile = serverDir.resolve("ktrng_playback.txt");
+			Path playbackFile = monitorDir.resolve("ktrng_playback.txt");
 
 			if (Files.exists(playbackFile)) {
 				int i = 0;
 				do {
 					i++;
-					playbackFile = serverDir.resolve(String.format("ktrng_playback%s.txt", i));
+					playbackFile = monitorDir.resolve(String.format("ktrng_playback%s.txt", i));
 				} while (Files.exists(playbackFile));
 			}
 
@@ -74,18 +92,9 @@ public class KillTheRNGMonitor implements EventPlaybackServer.EventControllerSta
 		if (!isEnabled()) {
 			return;
 		}
-		Path serverDir = TASmod.getServerInstance().getDataDirectory().toPath();
-		try {
-			Files.delete(serverDir.resolve("ktrng_recording.txt"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			Files.delete(serverDir.resolve("ktrng_playback.txt"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Path serverDirs = TASmod.getServerInstance().getDataDirectory().toPath();
+		Path monitorDir = serverDirs.resolve("ktrngMonitor");
+		SavestateIndexer.deleteFolder(monitorDir);
 	}
 
 	@Override
