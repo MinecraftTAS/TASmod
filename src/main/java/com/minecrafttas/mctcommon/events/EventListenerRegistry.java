@@ -229,8 +229,8 @@ public class EventListenerRegistry {
 
 		// Iterate through the list of eventListeners
 		for (EventBase eventListener : listenerList) {
-			// Get all methods in this event listener
-			Method[] methodsInListener = eventListener.getClass().getDeclaredMethods();
+			// Get all methods in this event listener and their superclass
+			List<Method> methodsInListener = getMethodListWithSuperclass(eventListener.getClass());
 
 			// Iterate through all methods
 			for (Method method : methodsInListener) {
@@ -330,6 +330,23 @@ public class EventListenerRegistry {
 			out[i] = parameters[i].getClass();
 		}
 		return out;
+	}
+
+	public static List<Method> getMethodList(Class<?> clazz) {
+		List<Method> methods = new ArrayList<>();
+		for (Method method : clazz.getDeclaredMethods()) {
+			methods.add(method);
+		}
+		return methods;
+	}
+
+	public static List<Method> getMethodListWithSuperclass(Class<?> clazz) {
+		List<Method> fields = getMethodList(clazz);
+		Class<?> superclazz = clazz.getSuperclass();
+		if (superclazz != Object.class)
+			fields.addAll(getMethodListWithSuperclass(superclazz));
+
+		return fields;
 	}
 
 	/**
