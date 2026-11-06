@@ -17,6 +17,7 @@ import com.minecrafttas.mctcommon.events.EventServer.EventServerStop;
 import com.minecrafttas.mctcommon.json.FineTypeAdapterGenerator;
 import com.minecrafttas.mctcommon.networking.PacketHandlerRegistry;
 import com.minecrafttas.mctcommon.networking.Server;
+import com.minecrafttas.mctcommon.test.TestRunner;
 import com.minecrafttas.tasmod.commands.CommandClearInputs;
 import com.minecrafttas.tasmod.commands.CommandFileCommand;
 import com.minecrafttas.tasmod.commands.CommandFullPlay;
@@ -52,6 +53,7 @@ import com.minecrafttas.tasmod.savestates.storage.builtin.entity.BatSpawnPositio
 import com.minecrafttas.tasmod.savestates.storage.builtin.entity.CreeperDetonateSubStorage;
 import com.minecrafttas.tasmod.savestates.storage.builtin.entity.LivingTickTimersSubStorage;
 import com.minecrafttas.tasmod.savestates.storage.builtin.entity.SquidRotationSubStorage;
+import com.minecrafttas.tasmod.test.TestMotion;
 import com.minecrafttas.tasmod.tickratechanger.TickrateChangerServer;
 import com.minecrafttas.tasmod.ticksync.TickSyncServer;
 import com.minecrafttas.tasmod.util.LoggerMarkers;
@@ -124,6 +126,8 @@ public class TASmod implements ModInitializer, EventServerStart, EventServerInit
 
 	public static FineTypeAdapterGenerator generator = new FineTypeAdapterGenerator("EntityAITypeAdapters2", "com.minecrafttas.tasmod.savestates.typeadapters");
 
+	public static TestRunner testRegistry = new TestRunner();
+
 	@Override
 	public void onInitialize() {
 
@@ -172,6 +176,15 @@ public class TASmod implements ModInitializer, EventServerStart, EventServerInit
 		EventListenerRegistry.register(TASmodAPIRegistry.SAVESTATE_STORAGE);
 
 		registerSavestateStorage();
+
+		registerTests();
+	}
+
+	private void registerTests() {
+		EventListenerRegistry.register(testRegistry);
+		if (isDevEnvironment) {
+			testRegistry.register(new TestMotion());
+		}
 	}
 
 	@Override

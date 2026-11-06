@@ -28,7 +28,7 @@ public interface EventClient {
 		/**
 		 * Fired when a gui is opened (Minecraft#displayGuiScreen)
 		 * @param gui The gui that is opened
-		 * @return
+		 * @return The gui screen that should be used instead
 		 */
 		public GuiScreen onOpenGui(GuiScreen gui);
 	}

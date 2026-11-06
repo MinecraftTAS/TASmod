@@ -53,6 +53,7 @@ dependencies {
 	// tasmod dependencies
 	embed "com.dselent:bigarraylist:1.6"
 	embed "com.github.KaptainWutax:SeedUtils:b6a383113c"
+	embed "net.lingala.zip4j:zip4j:2.11.6"
 	implementation "com.google.code.gson:gson:2.14.0"
 	
 	// loom dependencies

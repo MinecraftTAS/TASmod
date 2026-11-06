@@ -20,5 +20,6 @@ build
 # other
 eclipse
 run/
+testrunner/
 logs/
 /.apt_generated_tests/

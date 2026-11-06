@@ -16,4 +16,5 @@ public class MCTCommon {
 
 	public static final Marker Timeout = MarkerManager.getMarker("Timeout");
 
+	public static final Marker Test = MarkerManager.getMarker("Test");
 }

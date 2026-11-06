@@ -113,6 +113,25 @@ public class SavestateHandlerServer implements ServerPacketHandler {
 	}
 
 	/**
+	 * Creates a savestate handler in a custom loacation usually for testing purposes
+	 * @param server The server that should store the savestates
+	 * @param logger The logger instance
+	 * @param savesDirectory The saves directory to use
+	 * @param savestateBaseDirectory The savestate directory to use
+	 * @param worldname The worldname of the world that is used for the savestates
+	 */
+	public SavestateHandlerServer(MinecraftServer server, Logger logger, Path savesDirectory, Path savestateBaseDirectory, String worldname) {
+		this.server = server;
+		this.logger = logger;
+
+		this.playerHandler = new SavestatePlayerHandlerServer(server);
+		this.worldHandler = new SavestateWorldHandler(server);
+		this.tempSavestateHandler = new SavestateTempHandler(this, logger);
+
+		this.indexer = new SavestateIndexer(logger, savesDirectory, savestateBaseDirectory, worldname);
+	}
+
+	/**
 	 * Creates a new savestate at index {@link SavestateIndexer#getCurrentIndex()} + 1 with a default name
 	 * @param cb The {@link SavestateCallback}
 	 * @param flags The {@link SavestateFlags}
