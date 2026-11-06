@@ -30,6 +30,10 @@ public class KillTheRNGMonitor implements EventPlaybackServer.EventControllerSta
 		if (!isEnabled()) {
 			return;
 		}
+
+		if (TASmod.getServerInstance() == null)
+			return;
+
 		Path serverDir = TASmod.getServerInstance().getDataDirectory().toPath();
 
 		if (isActive()) {

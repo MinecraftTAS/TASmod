@@ -914,7 +914,7 @@ public class PlaybackControllerClient implements
 //				long seed = TASmod.ktrngHandler.getGlobalSeedClient();
 //				container.setStartSeed(seed);
 //			}
-			setTASState(state);
+			setTASStateClient(state);
 		});
 	}
 

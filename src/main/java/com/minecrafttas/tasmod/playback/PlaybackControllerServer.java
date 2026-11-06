@@ -75,31 +75,21 @@ public class PlaybackControllerServer implements ServerPacketHandler {
 				TASstate networkState = TASmodBufferBuilder.readEnum(TASstate.class, buf);
 
 				/* TODO Permissions */
-				TASmod.gameLoopSchedulerServer.add(() -> {
-					setTASState(networkState);
-				});
+				setTASState(networkState);
 				break;
 
 			case PLAYBACK_CLEAR_INPUTS:
-				TASmod.gameLoopSchedulerServer.add(() -> {
-					clearInputs();
-				});
+				clearInputs();
 				break;
 			case PLAYBACK_FULLRECORD:
-				TASmod.gameLoopSchedulerServer.add(() -> {
-					fullRecord();
-				});
+				fullRecord();
 				break;
 			case PLAYBACK_FULLPLAY:
-				TASmod.gameLoopSchedulerServer.add(() -> {
-					fullPlay();
-				});
+				fullPlay();
 				break;
 			case PLAYBACK_RESTARTANDPLAY:
 				String tasFileName = TASmodBufferBuilder.readString(buf);
-				TASmod.gameLoopSchedulerServer.add(() -> {
-					restartAndPlay(tasFileName);
-				});
+				restartAndPlay(tasFileName);
 				break;
 			case PLAYBACK_SAVE:
 			case PLAYBACK_LOAD:
