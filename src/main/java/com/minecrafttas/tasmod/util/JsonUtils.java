@@ -47,6 +47,6 @@ public class JsonUtils {
 	public static <T> T constructNew(Class<T> clazz) {
 		ConstructorConstructor constructor = new ConstructorConstructor(Collections.emptyMap(), true, Collections.emptyList());
 		TypeToken<T> token = TypeToken.get(clazz);
-		return constructor.get(token, true).construct();
+		return constructor.get(token).construct();
 	}
 }
